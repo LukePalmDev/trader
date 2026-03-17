@@ -1,0 +1,94 @@
+# Xbox Price Tracker — configurazione multi-fonte
+
+# ------------------------------------------------------------------ #
+# Parametri comuni a tutti gli scraper                                #
+# ------------------------------------------------------------------ #
+[common]
+user_agent      = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+viewport_width  = 1280
+viewport_height = 900
+locale          = "it-IT"
+nav_timeout_ms  = 60000
+# Delay in secondi tra richieste HTTP (scraper requests-based)
+request_delay   = 1.5
+
+# ------------------------------------------------------------------ #
+# Gestione dati                                                        #
+# ------------------------------------------------------------------ #
+[data]
+output_dir     = "data"
+# Quanti snapshot tenere per ogni sorgente (0 = nessun limite)
+retention_keep = 30
+
+# ------------------------------------------------------------------ #
+# Viewer web                                                           #
+# ------------------------------------------------------------------ #
+[viewer]
+port = 8080
+
+# ------------------------------------------------------------------ #
+# Sorgenti — una sezione per ogni scraper                              #
+# ------------------------------------------------------------------ #
+
+[sources.gamelife]
+enabled    = true
+label      = "Gamelife"
+method     = "playwright"
+color      = "#e84444"   # colore badge nel viewer
+# Categorie da scrapare — label usata solo per il log
+cat_labels = ["Xbox Series", "Xbox One", "Xbox 360"]
+cat_urls   = [
+    "https://www.gamelife.it/shop/category/8-xbox-series",
+    "https://www.gamelife.it/22-xbox-one",
+    "https://www.gamelife.it/shop/category/21-xbox-360",
+]
+# URL prodotti da ignorare (slug o URL completo, case-insensitive)
+url_blacklist = [
+    "https://www.gamelife.it/hwxx0008-xbox-series-x",
+    "https://www.gamelife.it/hwxx0017-xbox-series-x-digital-edition-robot-white",
+    "https://www.gamelife.it/hwxx0018-xbox-series-s",
+    "https://www.gamelife.it/hwx10047-xbox-one-s-1tb",
+    "https://www.gamelife.it/hwx30062-xbox-360-500gb",
+]
+
+[sources.gamepeople]
+enabled    = true
+label      = "GamePeople"
+method     = "playwright"
+color      = "#4488ff"
+cat_labels = ["Xbox Series S/X — Console", "Xbox One — Console"]
+cat_urls   = [
+    "https://www.gamepeople.it/index.php?id=prodotti&mf=VG&page=sfm&code=XBX&cat=GAAA&items=50",
+    "https://www.gamepeople.it/index.php?id=prodotti&mf=VG&page=sfm&code=XBO&cat=GAAA&items=50",
+]
+
+[sources.jollyrogerbay]
+# DISABILITATO: JollyRogerBay vende solo giochi Xbox, non hardware console.
+# Le categorie /shop/54-xbox-360, /shop/14-xbox-one, /shop/183-xbox-series-x
+# contengono esclusivamente titoli videoludici, non console hardware.
+enabled   = false
+label     = "JollyRogerBay"
+method    = "requests"
+start_url = "https://www.jollyrogerbay.it/shop/ricerca?s=xbox&post_type=product"
+color     = "#ff8c42"
+
+[sources.gameshock]
+enabled   = true
+label     = "Gameshock"
+method    = "requests"
+start_url = "https://www.gameshock.it"
+color     = "#9b59b6"
+
+[sources.rebuy]
+enabled   = true
+label     = "rebuy.it"
+method    = "requests"
+start_url = "https://www.rebuy.it"
+color     = "#2ecc71"
+
+[sources.cex]
+enabled   = true
+label     = "CEX"
+method    = "algolia"
+start_url = "https://it.webuy.com"
+color     = "#e6b800"

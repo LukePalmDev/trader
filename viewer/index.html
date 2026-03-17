@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xbox Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">🎮 Xbox Tracker</div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="home">Home</button>
+    <button class="tab" data-tab="shop">Tutto</button>
+    <button class="tab" data-tab="catalogo">Catalogo</button>
+  </nav>
+  <div class="header-right">
+    <span id="last-update">—</span>
+    <button id="btn-refresh" title="Aggiorna dati">↻</button>
+  </div>
+</header>
+
+<!-- ======== HOME VIEW ======== -->
+<div id="view-home" class="view active">
+  <div class="home-inner">
+
+    <div class="home-header">
+      <h1 class="home-title">Dashboard Prezzi</h1>
+      <p class="home-sub">Modelli base selezionati — confronto prezzi tra store</p>
+    </div>
+
+    <!-- Mostrato quando non ci sono modelli base -->
+    <div id="home-empty" style="display:none;">
+      <div class="home-empty-card">
+        <div class="home-empty-icon">☆</div>
+        <h2>Nessun modello base configurato</h2>
+        <p>
+          Vai al <strong>Catalogo</strong>, identifica gli ID dei modelli che vuoi monitorare
+          e usa la stella (☆) per marcarli come base.
+        </p>
+        <p class="home-empty-hint">
+          Le console appariranno qui con un confronto prezzi tra tutti gli store.
+        </p>
+      </div>
+    </div>
+
+    <!-- Griglia modelli base per famiglia -->
+    <div id="home-grid"></div>
+
+  </div>
+</div>
+
+<!-- ======== SHOP VIEW (Tutto) ======== -->
+<div id="view-shop" class="view">
+
+  <!-- Barra statistiche generali -->
+  <div id="global-stats">
+    <div class="gstat"><span id="gs-total">—</span><label>Prodotti totali</label></div>
+    <div class="gstat gstat-accent"><span id="gs-avail">—</span><label>Disponibili</label></div>
+    <div class="gstat"><span id="gs-stores">—</span><label>Store attivi</label></div>
+    <div class="gstat"><span id="gs-avg-u">—</span><label>Media usato</label></div>
+    <div class="gstat"><span id="gs-avg-n">—</span><label>Media nuovo</label></div>
+    <div class="gstat"><span id="gs-min">—</span><label>Minimo disponibile</label></div>
+  </div>
+
+  <div class="shop-inner">
+
+    <!-- Griglia store cards -->
+    <div id="shop-grid"></div>
+
+    <!-- Riepilogo cross-store per tipo console -->
+    <div id="summary-section">
+      <h2 class="section-title">Riepilogo per tipo di console</h2>
+      <p class="section-sub">
+        Disponibilità e prezzi minimi per ogni store ·
+        Prezzi di riferimento calcolati sulla media dei pezzi disponibili
+      </p>
+      <div class="table-scroll">
+        <table id="summary-table">
+          <thead id="summary-thead"></thead>
+          <tbody id="summary-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======== CATALOGO VIEW ======== -->
+<div id="view-catalogo" class="view">
+
+  <div id="controls">
+    <input type="text" id="search" placeholder="🔍  Cerca prodotto…" oninput="applyFilters()" />
+    <select id="filter-source" onchange="applyFilters()">
+      <option value="">Tutte le fonti</option>
+    </select>
+    <select id="filter-condition" onchange="applyFilters()">
+      <option value="">Tutte le condizioni</option>
+      <option value="Usato">Usato</option>
+      <option value="Nuovo">Nuovo</option>
+    </select>
+    <select id="filter-family" onchange="applyFilters()">
+      <option value="">Tutte le famiglie</option>
+      <option value="series-x">Series X</option>
+      <option value="series-s">Series S</option>
+      <option value="one-x">One X</option>
+      <option value="one-s">One S</option>
+      <option value="one">One</option>
+      <option value="360">360</option>
+      <option value="original">Original</option>
+    </select>
+    <select id="filter-storage" onchange="applyFilters()">
+      <option value="">Tutti gli storage</option>
+    </select>
+    <label class="filter-avail-label">
+      <input type="checkbox" id="filter-available" onchange="applyFilters()" />
+      Solo disponibili
+    </label>
+    <label class="filter-avail-label">
+      <input type="checkbox" id="filter-base" onchange="applyFilters()" />
+      Solo base
+    </label>
+    <span id="count-label"></span>
+  </div>
+
+  <table id="products-table" style="display:none;">
+    <thead>
+      <tr>
+        <th style="width:60px; text-align:center;" onclick="toggleSort('id')">ID</th>
+        <th onclick="toggleSort('name')">Prodotto</th>
+        <th onclick="toggleSort('storage_label')">Storage</th>
+        <th onclick="toggleSort('condition')">Cond.</th>
+        <th onclick="toggleSort('source')">Fonte</th>
+        <th onclick="toggleSort('last_price')" style="text-align:right;">Prezzo</th>
+        <th>Disponibilità</th>
+      </tr>
+    </thead>
+    <tbody id="table-body"></tbody>
+  </table>
+
+  <div id="empty-msg">
+    Nessun dato disponibile.<br />
+    <code>python3 run.py --all</code>
+  </div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
