@@ -16,27 +16,20 @@ Condizione: rilevata dall'URL del prodotto (contiene "usato" o "#/XX-condizioni-
 from __future__ import annotations
 
 import logging
-import re
-import sys
 import time
 from pathlib import Path
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 import requests
 from bs4 import BeautifulSoup
 
 from scrapers.base import clean_price, retry_sync, save_snapshot, deduplicate
+from settings import load_config
 
 log = logging.getLogger("jollyrogerbay")
 
 # --- Config ---
 _CONFIG_PATH = Path(__file__).parent.parent / "config.toml"
-with open(_CONFIG_PATH, "rb") as _f:
-    _CFG = tomllib.load(_f)
+_CFG = load_config(_CONFIG_PATH)
 
 _COMMON = _CFG["common"]
 _SRC    = _CFG["sources"]["jollyrogerbay"]

@@ -9,30 +9,18 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
-import sys
 from pathlib import Path
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
-
-# Prodotti NON Xbox da escludere (es. ASUS ROG Ally, Steam Deck, ecc.)
-_NON_XBOX_RE = re.compile(
-    r"\bROG\s+Ally\b|\bSteam\s+Deck\b|\bPlayStation\b|\bPS[345]\b|\bNintendo\b",
-    re.IGNORECASE,
-)
 
 from playwright.async_api import async_playwright
 
-from scrapers.base import clean_price, retry, save_snapshot, deduplicate
+from scrapers.base import clean_price, deduplicate, launch_chromium, retry, save_snapshot
+from settings import load_config
 
 log = logging.getLogger("gamelife")
 
 # --- Carica configurazione ---
 _CONFIG_PATH = Path(__file__).parent.parent / "config.toml"
-with open(_CONFIG_PATH, "rb") as _f:
-    _CFG = tomllib.load(_f)
+_CFG = load_config(_CONFIG_PATH)
 
 _COMMON  = _CFG["common"]
 _SRC     = _CFG["sources"]["gamelife"]
@@ -44,6 +32,12 @@ DATA_DIR      = Path(__file__).parent.parent / _DATA["output_dir"]
 SOURCE        = "gamelife"
 # URL da ignorare (normalizzati lowercase, senza slash finale)
 _URL_BLACKLIST = {u.lower().rstrip("/") for u in _SRC.get("url_blacklist", [])}
+
+# Prodotti NON Xbox da escludere (es. ASUS ROG Ally, Steam Deck, ecc.)
+_NON_XBOX_RE = re.compile(
+    r"\bROG\s+Ally\b|\bSteam\s+Deck\b|\bPlayStation\b|\bPS[345]\b|\bNintendo\b",
+    re.IGNORECASE,
+)
 
 # Selettore container prodotti — atteso dopo ogni navigazione
 _PRODUCTS_SELECTOR = "#products_grid .o_wsale_product_grid_wrapper"
@@ -286,7 +280,11 @@ async def run_scraper() -> list[dict]:
     all_products: list[dict] = []
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await launch_chromium(
+            p,
+            headless=True,
+            preferred_channel=_COMMON.get("playwright_channel", "chrome"),
+        )
 
         for cat_label, cat_url in CATEGORIES:
             prods = await _scrape_category(browser, cat_label, cat_url)

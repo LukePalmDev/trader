@@ -9,6 +9,8 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+.pytest_cache/
+.ruff_cache/
 *.egg-info/
 dist/
 build/
@@ -18,6 +20,11 @@ env/
 
 # Dati scraper (snapshot JSON — non committare, il DB tiene lo storico)
 data/*.json
+data/archive/*.json.gz
+
+# Report runtime
+logs/run_report_*.json
+!logs/run_report_latest.json
 
 # Il DB SQLite viene committato (storico prezzi su GitHub)
 # trader.db  ← NON ignorare questo file

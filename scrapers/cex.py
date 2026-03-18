@@ -17,25 +17,19 @@ from __future__ import annotations
 
 import logging
 import re
-import sys
 import time
 from pathlib import Path
 
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
-
 import requests
 
-from scrapers.base import clean_price, retry_sync, save_snapshot, deduplicate
+from scrapers.base import deduplicate, retry_sync, save_snapshot
+from settings import load_config
 
 log = logging.getLogger("cex")
 
 # --- Config ---
 _CONFIG_PATH = Path(__file__).parent.parent / "config.toml"
-with open(_CONFIG_PATH, "rb") as _f:
-    _CFG = tomllib.load(_f)
+_CFG = load_config(_CONFIG_PATH)
 
 _COMMON = _CFG["common"]
 _DATA   = _CFG["data"]

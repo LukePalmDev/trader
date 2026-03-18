@@ -15,6 +15,8 @@
     <button class="tab active" data-tab="home">Home</button>
     <button class="tab" data-tab="shop">Tutto</button>
     <button class="tab" data-tab="catalogo">Catalogo</button>
+    <button class="tab" data-tab="subito">Subito.it</button>
+    <button class="tab" data-tab="ebay">eBay</button>
   </nav>
   <div class="header-right">
     <span id="last-update">—</span>
@@ -147,6 +149,88 @@
 
 </div>
 
+<!-- ======== SUBITO VIEW ======== -->
+<div id="view-subito" class="view">
+
+  <div id="subito-stats">
+    <div class="gstat"><span id="ss-total">—</span><label>Annunci totali</label></div>
+    <div class="gstat gstat-accent"><span id="ss-avail">—</span><label>Disponibili</label></div>
+    <div class="gstat"><span id="ss-min">—</span><label>Prezzo minimo</label></div>
+    <div class="gstat"><span id="ss-avg">—</span><label>Prezzo medio</label></div>
+  </div>
+
+  <div class="subito-inner">
+
+    <div id="subito-filters">
+      <input type="text"  id="subito-search"    placeholder="🔍  Cerca annuncio…" oninput="renderSubito()" />
+      <select id="subito-filter-family"   onchange="renderSubito()">
+        <option value="">Tutte le console</option>
+        <option value="series-x">Series X</option>
+        <option value="series-s">Series S</option>
+        <option value="one-x">One X</option>
+        <option value="one-s">One S</option>
+        <option value="one">One</option>
+        <option value="360">360</option>
+      </select>
+      <select id="subito-filter-seller" onchange="renderSubito()">
+        <option value="">Tutti i venditori</option>
+        <option value="privato">Privato</option>
+        <option value="professionale">Professionale</option>
+      </select>
+      <select id="subito-filter-region" onchange="renderSubito()">
+        <option value="">Tutte le regioni</option>
+      </select>
+      <label class="filter-avail-label">
+        <input type="checkbox" id="subito-filter-avail" onchange="renderSubito()" />
+        Solo disponibili
+      </label>
+      <span id="subito-count"></span>
+    </div>
+
+    <div id="subito-grid"></div>
+
+  </div>
+</div>
+
+<!-- ======== EBAY VIEW ======== -->
+<div id="view-ebay" class="view">
+
+  <div id="ebay-stats">
+    <div class="gstat"><span id="es-total">—</span><label>Lotti venduti</label></div>
+    <div class="gstat gstat-ebay"><span id="es-avg">—</span><label>Prezzo medio</label></div>
+    <div class="gstat"><span id="es-min">—</span><label>Prezzo minimo</label></div>
+    <div class="gstat"><span id="es-max">—</span><label>Prezzo massimo</label></div>
+  </div>
+
+  <div class="ebay-inner">
+
+    <div id="ebay-filters">
+      <input type="text" id="ebay-search" placeholder="🔍  Cerca lotto…" oninput="renderEbay()" />
+      <select id="ebay-filter-family" onchange="renderEbay()">
+        <option value="">Tutte le console</option>
+        <option value="series-x">Series X</option>
+        <option value="series-s">Series S</option>
+        <option value="one-x">One X</option>
+        <option value="one-s">One S</option>
+        <option value="one">One</option>
+        <option value="360">360</option>
+        <option value="original">Original</option>
+      </select>
+      <span id="ebay-count"></span>
+    </div>
+
+    <!-- Riepilogo prezzi per famiglia -->
+    <div id="ebay-summary"></div>
+
+    <!-- Lista lotti venduti -->
+    <div id="ebay-grid"></div>
+
+  </div>
+</div>
+
+<script src="modules/state.js"></script>
+<script src="modules/sanitize.js"></script>
+<script src="modules/api.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

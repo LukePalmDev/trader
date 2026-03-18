@@ -30,6 +30,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import re
 from datetime import datetime
 from pathlib import Path
@@ -179,4 +180,35 @@ def deduplicate(products: list[dict]) -> list[dict]:
             unique.append(p)
     return unique
 
+
+# --------------------------------------------------------------------------- #
+# Playwright browser launch con fallback
+# --------------------------------------------------------------------------- #
+
+async def launch_chromium(playwright, headless: bool = True, preferred_channel: str = "chrome"):
+    """Avvia Chromium con fallback robusto tra channel e bundled binary.
+
+    Ordine tentativi:
+      1) channel da env/config (es. \"chrome\")
+      2) chromium bundled Playwright (nessun channel)
+    """
+    requested = (os.environ.get("TRADER_PLAYWRIGHT_CHANNEL") or preferred_channel or "").strip().lower()
+
+    attempts: list[dict] = []
+    if requested and requested != "chromium":
+        attempts.append({"channel": requested})
+    attempts.append({})
+
+    last_exc = None
+    for opts in attempts:
+        label = opts.get("channel", "bundled-chromium")
+        try:
+            browser = await playwright.chromium.launch(headless=headless, **opts)
+            log.info("Playwright browser avviato: %s", label)
+            return browser
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            log.warning("Playwright launch fallito (%s): %s", label, exc)
+
+    raise RuntimeError("Impossibile avviare Playwright Chromium con fallback") from last_exc
 

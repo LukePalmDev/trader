@@ -11,6 +11,8 @@ locale          = "it-IT"
 nav_timeout_ms  = 60000
 # Delay in secondi tra richieste HTTP (scraper requests-based)
 request_delay   = 1.5
+# Browser Playwright preferito: "chrome" (sistema) o "chromium" (bundled)
+playwright_channel = "chrome"
 
 # ------------------------------------------------------------------ #
 # Gestione dati                                                        #
@@ -19,12 +21,20 @@ request_delay   = 1.5
 output_dir     = "data"
 # Quanti snapshot tenere per ogni sorgente (0 = nessun limite)
 retention_keep = 30
+# Archiviazione automatica snapshot più vecchi di N giorni in data/archive/*.json.gz
+archive_after_days = 45
 
 # ------------------------------------------------------------------ #
 # Viewer web                                                           #
 # ------------------------------------------------------------------ #
 [viewer]
 port = 8080
+# Sicurezza: default solo localhost
+host = "127.0.0.1"
+# Apri browser automaticamente quando parte il viewer
+open_browser = true
+# Token bearer opzionale per endpoint POST (vuoto = disabilitato)
+api_token = ""
 
 # ------------------------------------------------------------------ #
 # Sorgenti — una sezione per ogni scraper                              #
@@ -92,3 +102,13 @@ label     = "CEX"
 method    = "algolia"
 start_url = "https://it.webuy.com"
 color     = "#e6b800"
+
+[sources.subito]
+enabled   = true
+label     = "Subito.it"
+method    = "playwright"
+start_url = "https://www.subito.it"
+color     = "#ff6600"
+# Query di ricerca usate dallo scraper (solo documentazione, non lette dal codice)
+# q: "xbox series x console", "xbox series s console", "xbox one console", "xbox 360 console"
+# cat: /annunci-italia/vendita/console/

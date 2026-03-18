@@ -16,6 +16,8 @@ import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
+from migrations import Migration, run_migrations
+
 log = logging.getLogger(__name__)
 
 DB_PATH = Path(__file__).parent / "trader.db"
@@ -43,6 +45,26 @@ _FAMILY_TO_CATEGORY = {
     '360':      'Xbox 360',
     'original': 'Xbox Original',
 }
+
+_MIGRATIONS = (
+    Migration(
+        1,
+        "baseline-indexes",
+        (
+            "CREATE INDEX IF NOT EXISTS idx_products_sku ON products(sku)",
+            "CREATE INDEX IF NOT EXISTS idx_products_last_seen ON products(last_seen)",
+            "CREATE INDEX IF NOT EXISTS idx_products_price ON products(last_price)",
+        ),
+    ),
+    Migration(
+        2,
+        "fill-missing-family",
+        (
+            "UPDATE products SET console_family = 'other' "
+            "WHERE console_family IS NULL OR TRIM(console_family) = ''",
+        ),
+    ),
+)
 
 
 # ---------------------------------------------------------------------------
@@ -154,6 +176,9 @@ def init_db(db_path: Path = DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_products_source ON products(source);
         CREATE INDEX IF NOT EXISTS idx_products_family ON products(console_family);
         """)
+    applied = run_migrations(db_path, _MIGRATIONS)
+    if applied:
+        log.info("Migrazioni trader.db applicate: %s", applied)
     log.info("DB pronto: %s", db_path)
 
 
