@@ -13,26 +13,71 @@ Tabelle:
 from __future__ import annotations
 
 import logging
-import re
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
 from migrations import Migration, run_migrations
+from model_rules import classify_title, detect_family
 
 log = logging.getLogger(__name__)
 
 DB_PATH = Path(__file__).parent / "ebay.db"
 
-_FAMILY_PATTERNS: list[tuple[str, re.Pattern]] = [
-    ('series-x', re.compile(r'series\s*x', re.I)),
-    ('series-s', re.compile(r'series\s*s', re.I)),
-    ('one-x',    re.compile(r'one\s*x',    re.I)),
-    ('one-s',    re.compile(r'one\s*s',    re.I)),
-    ('one',      re.compile(r'\bone\b',    re.I)),
-    ('360',      re.compile(r'\b360\b')),
-    ('original', re.compile(r'\boriginal\b', re.I)),
-]
+def _table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
+    rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
+    return {str(row[1]) for row in rows}
+
+
+def _add_column_if_missing(conn: sqlite3.Connection, table_name: str, definition: str) -> None:
+    column_name = definition.split()[0]
+    if column_name not in _table_columns(conn, table_name):
+        conn.execute(f"ALTER TABLE {table_name} ADD COLUMN {definition}")
+
+
+def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
+    _add_column_if_missing(conn, "sold_items", "model_segment TEXT NOT NULL DEFAULT 'unknown'")
+    _add_column_if_missing(conn, "sold_items", "edition_class TEXT NOT NULL DEFAULT 'standard'")
+    _add_column_if_missing(conn, "sold_items", "canonical_model TEXT")
+    _add_column_if_missing(conn, "sold_items", "classify_confidence REAL")
+    _add_column_if_missing(conn, "sold_items", "classify_method TEXT")
+
+    rows = conn.execute("SELECT id, name, console_family FROM sold_items").fetchall()
+    payload = []
+    for row in rows:
+        row_id = int(row[0])
+        name = str(row[1] or "")
+        family_hint = row[2]
+        classified = classify_title(name, family_hint=family_hint)
+        payload.append(
+            (
+                classified.console_family,
+                classified.model_segment,
+                classified.edition_class,
+                classified.canonical_model,
+                classified.classify_confidence,
+                classified.classify_method,
+                row_id,
+            )
+        )
+
+    if payload:
+        conn.executemany(
+            """
+            UPDATE sold_items
+            SET console_family = ?,
+                model_segment = ?,
+                edition_class = ?,
+                canonical_model = ?,
+                classify_confidence = ?,
+                classify_method = ?
+            WHERE id = ?
+            """,
+            payload,
+        )
+
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_sold_segment ON sold_items(model_segment)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_sold_canonical ON sold_items(canonical_model)")
 
 _MIGRATIONS = (
     Migration(
@@ -53,14 +98,16 @@ _MIGRATIONS = (
             "WHERE console_family IS NULL OR TRIM(console_family) = ''",
         ),
     ),
+    Migration(
+        3,
+        "ebay-segment-models",
+        callback=_migration_v3_segment_models,
+    ),
 )
 
 
 def _detect_family(name: str) -> str:
-    for key, pattern in _FAMILY_PATTERNS:
-        if pattern.search(name):
-            return key
-    return 'other'
+    return detect_family(name)
 
 
 def _connect(db_path: Path = DB_PATH) -> sqlite3.Connection:
@@ -84,6 +131,11 @@ def init_db(db_path: Path = DB_PATH) -> None:
             item_id        TEXT    NOT NULL UNIQUE,   -- es. "EBAY-123456789"
             name           TEXT    NOT NULL,
             console_family TEXT,
+            model_segment  TEXT    NOT NULL DEFAULT 'unknown',
+            edition_class  TEXT    NOT NULL DEFAULT 'standard',
+            canonical_model TEXT,
+            classify_confidence REAL,
+            classify_method TEXT,
             sold_price     REAL,
             sold_date      TEXT,                       -- data vendita (stringa dal sito)
             url            TEXT,
@@ -139,7 +191,14 @@ def process_sold_items(
             sold_date   = p.get("sold_date") or ""
             url         = p.get("url") or ""
             query_label = p.get("query_label") or ""
-            family      = _detect_family(name)
+            initial_family = _detect_family(name)
+            classified = classify_title(name, family_hint=initial_family)
+            family = classified.console_family
+            model_segment = classified.model_segment
+            edition_class = classified.edition_class
+            canonical_model = classified.canonical_model
+            classify_confidence = classified.classify_confidence
+            classify_method = classified.classify_method
 
             existing = conn.execute(
                 "SELECT * FROM sold_items WHERE item_id = ?", (item_id,)
@@ -163,10 +222,16 @@ def process_sold_items(
             if existing is None:
                 conn.execute("""
                     INSERT INTO sold_items
-                        (item_id, name, console_family, sold_price, sold_date,
+                        (item_id, name, console_family,
+                         model_segment, edition_class, canonical_model,
+                         classify_confidence, classify_method,
+                         sold_price, sold_date,
                          url, query_label, first_seen, last_seen)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (item_id, name, family, price, sold_date,
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (item_id, name, family,
+                      model_segment, edition_class, canonical_model,
+                      classify_confidence, classify_method,
+                      price, sold_date,
                       url, query_label, now, now))
                 stats["new"] += 1
 
@@ -179,10 +244,18 @@ def process_sold_items(
                     SET last_seen      = ?,
                         url            = COALESCE(NULLIF(?, ''), url),
                         console_family = ?,
+                        model_segment  = ?,
+                        edition_class  = ?,
+                        canonical_model = ?,
+                        classify_confidence = ?,
+                        classify_method = ?,
                         sold_price     = ?,
                         sold_date      = COALESCE(NULLIF(?, ''), sold_date)
                     WHERE id = ?
-                """, (now, url, family, price, sold_date, row_id))
+                """, (now, url, family,
+                      model_segment, edition_class, canonical_model,
+                      classify_confidence, classify_method,
+                      price, sold_date, row_id))
 
                 if old_price != price:
                     conn.execute("""
@@ -205,6 +278,8 @@ def get_all_sold(db_path: Path = DB_PATH) -> list[dict]:
     with _connect(db_path) as conn:
         rows = conn.execute("""
             SELECT id, item_id, name, console_family,
+                   model_segment, edition_class, canonical_model,
+                   classify_confidence, classify_method,
                    sold_price, sold_date, url, query_label,
                    first_seen, last_seen
             FROM sold_items

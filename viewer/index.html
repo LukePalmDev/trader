@@ -17,6 +17,7 @@
     <button class="tab" data-tab="catalogo">Catalogo</button>
     <button class="tab" data-tab="subito">Subito.it</button>
     <button class="tab" data-tab="ebay">eBay</button>
+    <button class="tab" data-tab="ricerca">🔍 Ricerca</button>
   </nav>
   <div class="header-right">
     <span id="last-update">—</span>
@@ -105,16 +106,29 @@
     </select>
     <select id="filter-family" onchange="applyFilters()">
       <option value="">Tutte le famiglie</option>
-      <option value="series-x">Series X</option>
-      <option value="series-s">Series S</option>
-      <option value="one-x">One X</option>
-      <option value="one-s">One S</option>
-      <option value="one">One</option>
+      <option value="Serie">Serie</option>
+      <option value="One">One</option>
       <option value="360">360</option>
-      <option value="original">Original</option>
+      <option value="Original">Original</option>
     </select>
     <select id="filter-storage" onchange="applyFilters()">
       <option value="">Tutti gli storage</option>
+    </select>
+    <select id="filter-segment" onchange="applyFilters()">
+      <option value="">Tutti i segmenti</option>
+      <option value="Base">Base</option>
+      <option value="S">S</option>
+      <option value="X">X</option>
+      <option value="Slim">Slim</option>
+      <option value="Elite">Elite</option>
+      <option value="E">E</option>
+    </select>
+    <select id="filter-edition" onchange="applyFilters()">
+      <option value="">Tutte le edizioni</option>
+      <option value="standard">Standard</option>
+      <option value="limited">Limited</option>
+      <option value="special">Special</option>
+      <option value="bundle">Bundle</option>
     </select>
     <label class="filter-avail-label">
       <input type="checkbox" id="filter-available" onchange="applyFilters()" />
@@ -130,10 +144,15 @@
   <table id="products-table" style="display:none;">
     <thead>
       <tr>
-        <th style="width:60px; text-align:center;" onclick="toggleSort('id')">ID</th>
+        <th style="width:60px; text-align:center;" onclick="toggleSort('display_id')">ID</th>
         <th onclick="toggleSort('name')">Prodotto</th>
+        <th onclick="toggleSort('parsed_family')">Famiglia</th>
+        <th onclick="toggleSort('parsed_segment')">Segmento</th>
+        <th onclick="toggleSort('parsed_edition')">Edizione</th>
+        <th onclick="toggleSort('parsed_kinect')">Kinect</th>
         <th onclick="toggleSort('storage_label')">Storage</th>
         <th onclick="toggleSort('condition')">Cond.</th>
+        <th onclick="toggleSort('packaging_state')">Imballo</th>
         <th onclick="toggleSort('source')">Fonte</th>
         <th onclick="toggleSort('last_price')" style="text-align:right;">Prezzo</th>
         <th>Disponibilità</th>
@@ -148,6 +167,7 @@
   </div>
 
 </div>
+
 
 <!-- ======== SUBITO VIEW ======== -->
 <div id="view-subito" class="view">
@@ -176,6 +196,18 @@
         <option value="">Tutti i venditori</option>
         <option value="privato">Privato</option>
         <option value="professionale">Professionale</option>
+      </select>
+      <select id="subito-filter-segment" onchange="renderSubito()">
+        <option value="">Tutti i segmenti</option>
+        <option value="base">Base</option>
+        <option value="premium">Premium</option>
+      </select>
+      <select id="subito-filter-edition" onchange="renderSubito()">
+        <option value="">Tutte le edizioni</option>
+        <option value="standard">Standard</option>
+        <option value="limited">Limited</option>
+        <option value="special">Special</option>
+        <option value="bundle">Bundle</option>
       </select>
       <select id="subito-filter-region" onchange="renderSubito()">
         <option value="">Tutte le regioni</option>
@@ -224,6 +256,102 @@
 
     <!-- Lista lotti venduti -->
     <div id="ebay-grid"></div>
+
+  </div>
+</div>
+
+<!-- ======== RICERCA VIEW ======== -->
+<div id="view-ricerca" class="view">
+  <div class="ricerca-inner">
+    <h2 class="ricerca-title">Ricerca console</h2>
+    <p class="ricerca-sub">Filtra per caratteristiche e confronta i prezzi tra store</p>
+
+    <div class="ricerca-form">
+
+      <div class="rfield">
+        <label>Modello</label>
+        <div class="rbtn-group" id="rf-family">
+          <button class="rbtn active" data-val="">Tutti</button>
+          <button class="rbtn" data-val="Original">Original</button>
+          <button class="rbtn" data-val="360">360</button>
+          <button class="rbtn" data-val="One">One</button>
+          <button class="rbtn" data-val="Series">Series</button>
+        </div>
+      </div>
+
+      <div class="rfield" id="rfield-submodel">
+        <label>Sotto-Modello</label>
+        <div class="rbtn-group" id="rf-submodel">
+          <button class="rbtn active" data-val="">Tutti</button>
+        </div>
+      </div>
+
+      <div class="rfield">
+        <label>Edizione</label>
+        <select id="rf-edition">
+          <option value="">Tutte</option>
+          <option>Standard</option>
+          <option>Halo</option>
+          <option>Forza</option>
+          <option>Gears</option>
+          <option>Minecraft</option>
+          <option>Call Of Duty</option>
+          <option>Battlefield</option>
+          <option>Cyberpunk 2077</option>
+          <option>Fortnite</option>
+          <option>Sunset Overdrive</option>
+          <option>Project Scorpio</option>
+          <option>Starfield</option>
+        </select>
+      </div>
+
+      <div class="rfield">
+        <label>Archiviazione</label>
+        <select id="rf-storage">
+          <option value="">Tutte</option>
+        </select>
+      </div>
+
+      <div class="rfield">
+        <label>Colore</label>
+        <select id="rf-color">
+          <option value="">Tutti</option>
+          <option>Nero</option>
+          <option>Bianco</option>
+          <option>Rosso</option>
+          <option>Blu</option>
+          <option>Verde</option>
+          <option>Argento</option>
+          <option>Oro</option>
+          <option>Grigio</option>
+          <option>Viola</option>
+        </select>
+      </div>
+
+      <div class="rfield">
+        <label>Kinect</label>
+        <div class="rbtn-group" id="rf-kinect">
+          <button class="rbtn active" data-val="">Tutti</button>
+          <button class="rbtn" data-val="1">Sì</button>
+          <button class="rbtn" data-val="0">No</button>
+        </div>
+      </div>
+
+      <div class="rfield rfield-avail">
+        <label class="filter-avail-label">
+          <input type="checkbox" id="rf-available" />
+          Solo disponibili
+        </label>
+      </div>
+
+      <div class="rfield rfield-action">
+        <button id="btn-ricerca" onclick="runRicerca()">Cerca</button>
+      </div>
+
+    </div><!-- .ricerca-form -->
+
+    <div id="ricerca-status"></div>
+    <div id="ricerca-results"></div>
 
   </div>
 </div>

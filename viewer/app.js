@@ -52,6 +52,7 @@ const VIEWER_STATE = window.ViewerState || {
   baseModels: [],
   storageSizes: [],
   subitoAds: [],
+  subitoOpportunities: [],
   ebaySold: [],
   currentSort: { key: 'last_price', dir: 1 },
 };
@@ -79,8 +80,10 @@ let ALL_PRODUCTS   = VIEWER_STATE.allProducts;   // da snapshot JSON (usato in "
 let ALL_DATA       = VIEWER_STATE.allData;       // { source_id: { scraped_at, products[] } }
 let DB_PRODUCTS    = VIEWER_STATE.dbProducts;    // da DB SQLite trader.db (usato in "Catalogo", escluso subito)
 let BASE_MODELS    = VIEWER_STATE.baseModels;    // DB prodotti con is_base_model=1 (usato in "Home")
+let STANDARD_GROUPS= VIEWER_STATE.standardGroups;// gruppi nome standard -> nomi originali
 let STORAGE_SIZES  = VIEWER_STATE.storageSizes;  // dimensioni archiviazione dal DB
 let SUBITO_ADS     = VIEWER_STATE.subitoAds;     // annunci Subito dal DB dedicato (subito.db)
+let SUBITO_OPPS    = VIEWER_STATE.subitoOpportunities; // score fair-value/qualita'
 let EBAY_SOLD      = VIEWER_STATE.ebaySold;      // lotti venduti eBay dal DB dedicato (ebay.db)
 let currentSort    = VIEWER_STATE.currentSort;
 
@@ -88,10 +91,31 @@ let currentSort    = VIEWER_STATE.currentSort;
 // Utilità
 // ============================================================
 function _familyKey(name) {
-  const n = name.toLowerCase();
+  const n = String(name || '').toLowerCase();
+  if (!n.trim()) return 'other';
+
+  const specificity = {
+    'series-x': 4,
+    'series-s': 4,
+    'one-x': 3,
+    'one-s': 3,
+    'one': 2,
+    '360': 2,
+  };
+
+  const candidates = [];
   for (const f of CONSOLE_FAMILIES) {
-    if (f.re.test(n)) return f.key;
+    if (f.key === 'original') continue; // fallback esplicito
+    const idx = n.search(f.re);
+    if (idx >= 0) candidates.push({ key: f.key, idx, spec: specificity[f.key] || 0 });
   }
+  if (candidates.length) {
+    candidates.sort((a, b) => (a.idx - b.idx) || (b.spec - a.spec));
+    return candidates[0].key;
+  }
+
+  if (/\boriginal\b|\bxbox\s+classic\b/i.test(n)) return 'original';
+  if (/\bxbox\b/i.test(n)) return 'original';
   return 'other';
 }
 
@@ -107,6 +131,95 @@ function _shortName(name, familyKey) {
 
 function _storeLabel(id)  { return STORE_META[id]?.label  ?? id;        }
 function _storeAccent(id) { return STORE_META[id]?.accent ?? '#cccccc'; }
+
+function enhanceProduct(p) {
+  if (p._enhanced) return p;
+
+  const fk = p.console_family || _familyKey(p.name);
+  let pf = 'Altro';
+  if (fk === 'series-x' || fk === 'series-s') pf = 'Serie';
+  else if (fk === 'one' || fk === 'one-s' || fk === 'one-x') pf = 'One';
+  else if (fk === '360') pf = '360';
+  else if (fk === 'original') pf = 'Original';
+
+  const t = (p.name || '').toLowerCase();
+  let ps = 'Base';
+  if (fk === 'series-x' || fk === 'one-x') ps = 'X';
+  else if (fk === 'series-s' || fk === 'one-s') ps = 'S';
+  else if (fk === '360') {
+    if (/\b(?:xbox\s*)?360\s*"?[eE]"?\b/.test(t)) ps = 'E';
+    else if (/\b360\s*slim\b|\bslim\b|\b360s\b/.test(t)) ps = 'Slim';
+    else if (/\belite\b/.test(t)) ps = 'Elite';
+  }
+  else if (fk === 'one') {
+    if (/\belite\b/.test(t)) ps = 'Elite';
+  }
+
+  let pk = false;
+  if (/\bkinect\b/.test(t) && !/\b(?:no|senza)\s+kinect\b|\(no\s+kinect\)/.test(t)) {
+    pk = true;
+  }
+
+  const colors = [];
+  const isMinecraft = /\bminecraft\b/.test(t);
+  const isGears = /\bgears\b/.test(t);
+  const isGoldRush = /\bgold\s*rush\b/.test(t);
+
+  if (/\brosso\b|\bred\b/.test(t) && !isGears) colors.push('Rosso');
+  if (/\bblu\b|\bblue\b/.test(t)) colors.push('Blu');
+  if (/\bverde\b|\bgreen\b/.test(t) && !isMinecraft) colors.push('Verde');
+  if (/\bbianc[oa]\b|\bwhite\b/.test(t) && !isGears) colors.push('Bianco');
+  if (/\bnero\b|\bblack\b/.test(t)) colors.push('Nero');
+  if (/\bgrigio\b|\bgrey\b|\bgray\b/.test(t) && !isGears && !isGoldRush) colors.push('Grigio');
+  if (/\bcristallo\b|\bcrystal\b/.test(t)) colors.push('Cristallo');
+  if (/\bviola\b|\bpurple\b/.test(t)) colors.push('Viola');
+  if (/\boro\b|\bgold\b/.test(t) && !isGoldRush) colors.push('Oro');
+
+  const parsed_color = colors.length ? colors.join(', ') : '';
+
+  let specialEd = '';
+  if (/\b(?:call\s+of\s+duty|cod|mw2|mw3|advanced\s+warfare|black\s+ops)\b/.test(t)) specialEd = 'Call Of Duty';
+  else if (/\bhalo\b/.test(t)) specialEd = 'Halo';
+  else if (isGears) specialEd = 'Gears Of War';
+  else if (/\bforza(?:\s+motorsport|\s*horizon)?\b/.test(t)) specialEd = 'Forza';
+  else if (isMinecraft) specialEd = 'Minecraft';
+  else if (/\bcyberpunk\b/.test(t)) specialEd = 'Cyberpunk 2077';
+  else if (/\bbattlefield\b/.test(t)) specialEd = 'Battlefield';
+  else if (/\bstar\s+wars|r2-?d2\b/.test(t)) specialEd = 'Star Wars';
+  else if (/\bfortnite\b/.test(t)) specialEd = 'Fortnite';
+  else if (/\bproject\s+scorpio\b/.test(t)) specialEd = 'Project Scorpio';
+  else if (/\bresident\s+evil|re5\b/.test(t)) specialEd = 'Resident Evil';
+  else if (/\bsimpsons?\b/.test(t)) specialEd = 'The Simpsons';
+  else if (/\bmountain\s+dew\b/.test(t)) specialEd = 'Mountain Dew';
+  else if (/\btaco\s+bell\b/.test(t)) specialEd = 'Taco Bell';
+  else if (/\bhyperspace\b/.test(t)) specialEd = 'Hyperspace';
+  else if (/\bdeep\s+blue\b/.test(t)) specialEd = 'Deep Blue';
+  else if (/\brobot\s+white\b/.test(t)) specialEd = 'Robot White';
+  else if (/\bday\s+one\b/.test(t)) specialEd = 'Day One';
+  else if (/\bconker\b/.test(t)) specialEd = 'Conker';
+  else if (/\bskeleton\b/.test(t)) specialEd = 'Skeleton';
+  else if (/\bkasumi\b/.test(t)) specialEd = 'Kasumi-Chan';
+  else if (/\bpanzer\s+dragoon\b/.test(t)) specialEd = 'Panzer Dragoon';
+  else if (isGoldRush) specialEd = 'Gold Rush';
+
+  let ed = specialEd || p.edition_class || 'standard';
+  ed = ed.charAt(0).toUpperCase() + ed.slice(1);
+  const parsed_edition = parsed_color ? parsed_color : ed;
+
+  p.parsed_family = pf;
+  p.parsed_segment = ps;
+  p.parsed_kinect = pk;
+  p.parsed_color = parsed_color;
+  p.parsed_edition = parsed_edition;
+
+  const storage = p.storage_label || '—';
+  const condition = p.condition || '—';
+  const pack = p.packaging_state || 'Imballata';
+
+  p.combo_key = `${pf}|${ps}|${parsed_edition}|${pk}|${storage}|${condition}|${pack}`;
+  p._enhanced = true;
+  return p;
+}
 
 function _fmtDate(iso) {
   if (!iso) return '—';
@@ -142,8 +255,10 @@ function _syncState() {
   VIEWER_STATE.allData = ALL_DATA;
   VIEWER_STATE.dbProducts = DB_PRODUCTS;
   VIEWER_STATE.baseModels = BASE_MODELS;
+  VIEWER_STATE.standardGroups = STANDARD_GROUPS;
   VIEWER_STATE.storageSizes = STORAGE_SIZES;
   VIEWER_STATE.subitoAds = SUBITO_ADS;
+  VIEWER_STATE.subitoOpportunities = SUBITO_OPPS;
   VIEWER_STATE.ebaySold = EBAY_SOLD;
   VIEWER_STATE.currentSort = currentSort;
 }
@@ -158,8 +273,10 @@ document.querySelectorAll('.tab').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('view-' + btn.dataset.tab).classList.add('active');
     if (btn.dataset.tab === 'home')   renderHome();
+    if (btn.dataset.tab === 'standardi') renderStandardGroups();
     if (btn.dataset.tab === 'subito') loadSubitoData();
     if (btn.dataset.tab === 'ebay')   loadEbayData();
+    if (btn.dataset.tab === 'ricerca') initRicerca();
   });
 });
 
@@ -180,96 +297,129 @@ function renderHome() {
   emptyCard.style.display = 'none';
   grid.style.display      = '';
 
-  // Raggruppa base models per famiglia
+  BASE_MODELS.forEach(p => enhanceProduct(p));
+  const baseKeys = [...new Set(BASE_MODELS.map(p => p.combo_key))];
+
+  const unifiedPool = [];
+  const sourceProducts = DB_PRODUCTS.length ? DB_PRODUCTS : ALL_PRODUCTS;
+  sourceProducts.forEach(p => {
+    enhanceProduct(p);
+    unifiedPool.push(p);
+  });
+
   const byFamily = {};
-  for (const p of BASE_MODELS) {
-    const fk = p.console_family || _familyKey(p.name);
+  for (const k of baseKeys) {
+    const matching = unifiedPool.filter(p => p.combo_key === k);
+    if (!matching.length) continue;
+
+    const rep = matching[0];
+    const fk = rep.console_family || _familyKey(rep.name);
     if (!byFamily[fk]) byFamily[fk] = [];
-    byFamily[fk].push(p);
+    byFamily[fk].push({ key: k, rep, matching });
   }
 
   const familyOrder = [...CONSOLE_FAMILIES.map(f => f.key), 'other'];
   for (const fk of familyOrder) {
-    const items = byFamily[fk];
-    if (!items?.length) continue;
+    const combos = byFamily[fk];
+    if (!combos?.length) continue;
 
     const section = document.createElement('div');
     section.className = 'home-section';
-
     const title = document.createElement('h2');
     title.className   = 'home-section-title';
     title.textContent = FAMILY_LABELS[fk] || fk;
     section.appendChild(title);
 
-    const table = document.createElement('table');
-    table.className = 'home-table';
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Prodotto</th>
-          <th style="text-align:center;">Cond.</th>
-          <th>Storage</th>
-          <th>Store</th>
-          <th style="text-align:right;">Prezzo</th>
-          <th style="text-align:center;">Disp.</th>
-        </tr>
-      </thead>
-    `;
-    const tbody = document.createElement('tbody');
+    const container = document.createElement('div');
+    container.className = 'home-combos-container';
 
-    // Ordina: disponibili prima, poi per prezzo
-    const sorted = [...items].sort((a, b) => {
-      const da = a.last_available ? 0 : 1;
-      const db = b.last_available ? 0 : 1;
-      if (da !== db) return da - db;
-      return (a.last_price ?? Infinity) - (b.last_price ?? Infinity);
-    });
+    combos.forEach(combo => {
+      const { rep, matching } = combo;
 
-    for (const p of sorted) {
-      const isAvail = !!p.last_available;
-      const condClass  = p.condition === 'Nuovo' ? 'badge-nuovo' : p.condition === 'Usato' ? 'badge-usato' : 'badge-nd';
-      const condLetter = p.condition === 'Nuovo' ? 'N' : p.condition === 'Usato' ? 'U' : '?';
+      const avail = matching.filter(p => p.last_available || p.available);
+      const prices = avail.map(p => p.last_price ?? p.price).filter(v => v != null);
+      const minPx = prices.length ? Math.min(...prices) : null;
+      const maxPx = prices.length ? Math.max(...prices) : null;
 
-      const tr = document.createElement('tr');
-      tr.className = 'home-row' + (isAvail ? '' : ' home-row-esaurito');
+      const row = document.createElement('div');
+      row.className = 'home-combo-row';
 
-      const fk2      = p.console_family || _familyKey(p.name);
-      const shortName = fk2 !== 'other' ? _shortName(p.name, fk2) : p.name;
-      const storeAcc  = _storeAccent(p.source);
+      const kinectStr = rep.parsed_kinect ? ' + Kinect' : '';
+      const titleStr = `Xbox ${rep.parsed_family} ${rep.parsed_segment} ${rep.parsed_edition}${kinectStr}`;
 
-      tr.innerHTML = `
-        <td class="home-prod-name">
-          ${p.url
-            ? `<a href="${p.url}" target="_blank" rel="noopener noreferrer" class="prod-link" title="${p.name}">${shortName || p.name}</a>`
-            : `<span class="prod-link" title="${p.name}">${shortName || p.name}</span>`
-          }
-        </td>
-        <td style="text-align:center; padding:8px 10px;">
-          <span class="badge ${condClass}" title="${p.condition}">${condLetter}</span>
-        </td>
-        <td class="home-storage">
-          ${p.storage_label
-            ? `<span class="storage-badge">${p.storage_label}</span>`
-            : '<span style="color:var(--text-muted)">—</span>'
-          }
-        </td>
-        <td class="home-store">
-          <span class="badge-source" style="border-color:${storeAcc}40; color:var(--text)">
-            ${_storeLabel(p.source)}
-          </span>
-        </td>
-        <td style="text-align:right; font-weight:600; font-size:14px; padding:8px 18px; white-space:nowrap;">
-          ${_fmtPrice(p.last_price)}
-        </td>
-        <td style="text-align:center; padding:8px 14px;">
-          <span class="avail-dot ${isAvail ? 'ok' : 'ko'}" title="${isAvail ? 'Disponibile' : 'Esaurito'}"></span>
-        </td>
+      const header = document.createElement('div');
+      header.className = 'home-combo-header';
+      header.onclick = () => row.classList.toggle('open');
+
+      header.innerHTML = `
+        <div>
+          <div class="home-combo-title">${titleStr}</div>
+          <div class="home-combo-tags">
+            <span class="badge ${rep.condition === 'Nuovo' ? 'badge-nuovo' : rep.condition === 'Usato' ? 'badge-usato' : 'badge-nd'}">${rep.condition}</span>
+            <span class="storage-badge">${rep.storage_label || '—'}</span>
+            <span>Imballo: ${rep.packaging_state || 'N/D'}</span>
+          </div>
+        </div>
+        <div class="home-combo-stats">
+          <div style="color:var(--text);">${avail.length} store disponibili</div>
+          <div style="color:var(--text-muted); font-size: 12px; margin-top:2px;">
+            ${prices.length ? (prices.length > 1 ? `da €${minPx.toFixed(0)} a €${maxPx.toFixed(0)}` : `€${minPx.toFixed(0)}`) : 'esaurito tutti gli store'}
+          </div>
+        </div>
       `;
-      tbody.appendChild(tr);
-    }
 
-    table.appendChild(tbody);
-    section.appendChild(table);
+      const details = document.createElement('div');
+      details.className = 'home-combo-details';
+
+      const table = document.createElement('table');
+      table.className = 'home-table';
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Fonte</th>
+            <th>Nome Originale</th>
+            <th style="text-align:right;">Prezzo</th>
+            <th style="text-align:center;">Disp.</th>
+          </tr>
+        </thead>
+      `;
+      const tbody = document.createElement('tbody');
+
+      matching.sort((a,b) => {
+        const da = (a.last_available || a.available) ? 0 : 1;
+        const db = (b.last_available || b.available) ? 0 : 1;
+        if (da !== db) return da - db;
+        const pa = a.last_price ?? a.price ?? Infinity;
+        const pb = b.last_price ?? b.price ?? Infinity;
+        return pa - pb;
+      });
+
+      for (const p of matching) {
+        const tr = document.createElement('tr');
+        const isA = p.last_available || p.available;
+        const px = p.last_price ?? p.price;
+        tr.innerHTML = `
+          <td><span class="badge-source" style="border-color:${_storeAccent(p.source)}40; color:var(--text)">${_storeLabel(p.source)}</span></td>
+          <td>
+            ${p.url 
+              ? `<a href="${p.url}" target="_blank" rel="noopener" class="prod-link" title="${p.name}">${p.name}</a>` 
+              : `<span class="prod-link" title="${p.name}">${p.name}</span>`
+            }
+          </td>
+          <td style="text-align:right; font-weight:600;">${px != null ? '€ ' + px.toFixed(2) : '—'}</td>
+          <td style="text-align:center;"><span class="avail-dot ${isA ? 'ok': 'ko'}"></span></td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      table.appendChild(tbody);
+      details.appendChild(table);
+
+      row.appendChild(header);
+      row.appendChild(details);
+      container.appendChild(row);
+    });
+    section.appendChild(container);
     grid.appendChild(section);
   }
 }
@@ -597,6 +747,8 @@ function applyFilters() {
   const condFilter  = document.getElementById('filter-condition').value;
   const familyFilter= document.getElementById('filter-family').value;
   const storageFilter= document.getElementById('filter-storage').value;
+  const segmentFilter = document.getElementById('filter-segment').value;
+  const editionFilter = document.getElementById('filter-edition').value;
   const onlyAvail   = document.getElementById('filter-available').checked;
   const onlyBase    = document.getElementById('filter-base').checked;
 
@@ -604,14 +756,27 @@ function applyFilters() {
   const source = DB_PRODUCTS.length ? DB_PRODUCTS : ALL_PRODUCTS.map(p => ({
     ...p, last_price: p.price, last_available: p.available ? 1 : 0,
     console_family: _familyKey(p.name),
+    model_segment: 'unknown',
+    edition_class: 'standard',
+    standard_name: '',
+    standard_key: '',
+    packaging_state: p.source === 'cex' ? 'N/D' : 'Imballata',
   }));
 
   let filtered = source.slice();
-  if (q)             filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
+
+  filtered.forEach(p => enhanceProduct(p));
+
+  if (q)             filtered = filtered.filter(p =>
+    (p.name || '').toLowerCase().includes(q) ||
+    (p.standard_name || '').toLowerCase().includes(q)
+  );
   if (srcFilter)     filtered = filtered.filter(p => p.source === srcFilter);
   if (condFilter)    filtered = filtered.filter(p => p.condition === condFilter);
-  if (familyFilter)  filtered = filtered.filter(p => p.console_family === familyFilter);
+  if (familyFilter)  filtered = filtered.filter(p => p.parsed_family === familyFilter);
   if (storageFilter) filtered = filtered.filter(p => p.storage_label === storageFilter);
+  if (segmentFilter) filtered = filtered.filter(p => p.parsed_segment === segmentFilter);
+  if (editionFilter) filtered = filtered.filter(p => (p.edition_class || 'standard').toLowerCase() === editionFilter.toLowerCase() || p.parsed_edition.toLowerCase() === editionFilter.toLowerCase());
   if (onlyAvail)     filtered = filtered.filter(p => p.last_available || p.available);
   if (onlyBase)      filtered = filtered.filter(p => p.is_base_model);
 
@@ -682,7 +847,7 @@ function _renderTable(products) {
   table.style.display = ''; emptyMsg.style.display = 'none';
 
   if (!products.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text-muted);">Nessun risultato</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Nessun risultato</td></tr>';
     return;
   }
 
@@ -703,7 +868,7 @@ function _renderTable(products) {
       star.addEventListener('click', () => _toggleBaseModel(p.id, isBase, star));
       const idLabel = document.createElement('span');
       idLabel.className   = 'id-label';
-      idLabel.textContent = p.id;
+      idLabel.textContent = p.display_id ?? p.id;
       tdId.appendChild(star);
       tdId.appendChild(idLabel);
     }
@@ -715,6 +880,30 @@ function _renderTable(products) {
     a.href = p.url || '#'; a.target = '_blank'; a.rel = 'noopener noreferrer';
     a.className = 'prod-name'; a.textContent = p.name;
     tdName.appendChild(a); tr.appendChild(tdName);
+
+    // Nuove colonne griglia
+    const tdFamily = document.createElement('td');
+    tdFamily.textContent = p.parsed_family || p.console_family || '—';
+    tr.appendChild(tdFamily);
+
+    const tdSegment = document.createElement('td');
+    tdSegment.textContent = p.parsed_segment || p.model_segment || '—';
+    tr.appendChild(tdSegment);
+
+    const tdEdition = document.createElement('td');
+    tdEdition.textContent = p.parsed_edition || '—';
+    tr.appendChild(tdEdition);
+
+    const tdKinect = document.createElement('td');
+    tdKinect.textContent = p.parsed_kinect ? '✓' : '—';
+    if (p.parsed_kinect) {
+      tdKinect.style.color = 'var(--text)';
+      tdKinect.style.fontWeight = 'bold';
+    } else {
+      tdKinect.style.color = 'var(--text-muted)';
+    }
+    tdKinect.style.textAlign = 'center';
+    tr.appendChild(tdKinect);
 
     // Storage
     const tdStorage = document.createElement('td');
@@ -733,6 +922,14 @@ function _renderTable(products) {
     badge.className   = 'badge ' + (p.condition === 'Nuovo' ? 'badge-nuovo' : p.condition === 'Usato' ? 'badge-usato' : 'badge-nd');
     badge.textContent = p.condition || '—';
     tdCond.appendChild(badge); tr.appendChild(tdCond);
+
+    // Imballo
+    const tdPack = document.createElement('td');
+    const packBadge = document.createElement('span');
+    packBadge.className = 'badge-pack';
+    packBadge.textContent = p.packaging_state || 'Imballata';
+    tdPack.appendChild(packBadge);
+    tr.appendChild(tdPack);
 
     // Fonte
     const tdSrc = document.createElement('td');
@@ -763,6 +960,100 @@ function _renderTable(products) {
 }
 
 // ============================================================
+// NOMI STANDARD VIEW
+// ============================================================
+function renderStandardGroups() {
+  const listEl = document.getElementById('standard-list');
+  if (!listEl) return;
+
+  const q = (document.getElementById('standard-search')?.value || '').toLowerCase().trim();
+  let groups = STANDARD_GROUPS.slice();
+  if (q) {
+    groups = groups.filter(g =>
+      (g.standard_name || '').toLowerCase().includes(q) ||
+      (g.standard_key || '').toLowerCase().includes(q) ||
+      (g.items || []).some(i => (i.name || '').toLowerCase().includes(q))
+    );
+  }
+
+  const countEl = document.getElementById('standard-count');
+  if (countEl) countEl.textContent = `${groups.length} nomi standard`;
+
+  listEl.innerHTML = '';
+  if (!groups.length) {
+    listEl.innerHTML = '<div class="empty-shop">Nessun gruppo standard disponibile.</div>';
+    return;
+  }
+
+  for (const group of groups) {
+    const card = document.createElement('div');
+    card.className = 'standard-group-card';
+
+    const head = document.createElement('div');
+    head.className = 'standard-group-head';
+    head.innerHTML = `
+      <div class="standard-title">${group.standard_name || 'N/D'}</div>
+      <div class="standard-meta">${group.total_products || 0} prodotti · ${((group.sources || []).join(', ')) || 'n/d'}</div>
+    `;
+    card.appendChild(head);
+
+    const key = document.createElement('div');
+    key.className = 'standard-key';
+    key.textContent = group.standard_key || '';
+    card.appendChild(key);
+
+    const tags = document.createElement('div');
+    tags.className = 'standard-tags';
+    const packaging = (group.packaging_states || []).join(' / ') || 'Imballata';
+    const conditions = (group.conditions || []).join(' / ') || 'N/D';
+    tags.innerHTML = `
+      <span class="standard-tag">Imballo: ${packaging}</span>
+      <span class="standard-tag">Condizioni: ${conditions}</span>
+    `;
+    card.appendChild(tags);
+
+    const table = document.createElement('table');
+    table.className = 'standard-items-table';
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Fonte</th>
+          <th>Nome Originale</th>
+          <th>Imballo</th>
+          <th>Cond.</th>
+        </tr>
+      </thead>
+    `;
+    const tbody = document.createElement('tbody');
+    for (const item of group.items || []) {
+      const tr = document.createElement('tr');
+
+      const tdSource = document.createElement('td');
+      tdSource.textContent = _storeLabel(item.source || '');
+      tr.appendChild(tdSource);
+
+      const tdName = document.createElement('td');
+      tdName.textContent = item.name || '—';
+      tr.appendChild(tdName);
+
+      const tdPack = document.createElement('td');
+      tdPack.textContent = item.packaging_state || 'Imballata';
+      tr.appendChild(tdPack);
+
+      const tdCond = document.createElement('td');
+      tdCond.textContent = item.condition || '—';
+      tr.appendChild(tdCond);
+
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    card.appendChild(table);
+
+    listEl.appendChild(card);
+  }
+}
+
+// ============================================================
 // SUBITO VIEW
 // ============================================================
 
@@ -789,9 +1080,10 @@ function _populateRegionFilter() {
 
 async function loadSubitoData() {
   try {
-    const [rAds, rStats] = await Promise.all([
+    const [rAds, rStats, rOpp] = await Promise.all([
       API.fetchJson('/api/subito/ads'),
       API.fetchJson('/api/subito/stats'),
+      API.fetchJson('/api/valuation/subito-opportunities?limit=500'),
     ]);
     if (rAds.ok)   SUBITO_ADS = _sanitizeRows(rAds.body);
     if (rStats.ok) {
@@ -801,6 +1093,12 @@ async function loadSubitoData() {
       set('ss-avail', s.available ?? '—');
       set('ss-min',   s.min_price != null ? '€ ' + s.min_price.toFixed(2) : '—');
       set('ss-avg',   s.avg_price != null ? '€ ' + Math.round(s.avg_price) : '—');
+    }
+    if (rOpp.ok) {
+      const payload = _sanitizeRow(rOpp.body);
+      SUBITO_OPPS = _sanitizeRows(payload.items || []);
+    } else {
+      SUBITO_OPPS = [];
     }
     _populateRegionFilter();
     renderSubito();
@@ -851,6 +1149,33 @@ function _dealBadge(price, avg) {
   return '';
 }
 
+function _buildOppMap(items) {
+  const map = {};
+  for (const item of items || []) {
+    if (item.urn_id) map[item.urn_id] = item;
+  }
+  return map;
+}
+
+function _renderOpportunityBadge(ad, opp, famAvgs) {
+  if (!opp) {
+    return _dealBadge(ad.last_price, famAvgs[ad.console_family || 'other']);
+  }
+
+  const delta = Number(opp.delta_pct || 0);
+  const quality = Number(opp.quality_score || 0);
+
+  let valueBadge = '';
+  if (delta >= 30) valueBadge = `<span class="deal-badge deal-fire">🔥 -${delta.toFixed(0)}%</span>`;
+  else if (delta >= 20) valueBadge = `<span class="deal-badge deal-great">-${delta.toFixed(0)}%</span>`;
+  else if (delta >= 10) valueBadge = `<span class="deal-badge deal-ok">-${delta.toFixed(0)}%</span>`;
+  else if (delta <= -15) valueBadge = `<span class="deal-badge deal-over">+${Math.abs(delta).toFixed(0)}%</span>`;
+
+  const qColor = quality >= 75 ? '#2e7d32' : quality >= 55 ? '#ef6c00' : '#b71c1c';
+  const qBadge = `<span class="deal-badge" style="border-color:${qColor};color:${qColor};">Q${quality.toFixed(0)}</span>`;
+  return `${valueBadge}${qBadge}`;
+}
+
 function renderSubito() {
   const grid = document.getElementById('subito-grid');
   if (!grid) return;
@@ -865,6 +1190,8 @@ function renderSubito() {
   const q         = (document.getElementById('subito-search')?.value  || '').toLowerCase().trim();
   const famFilter = document.getElementById('subito-filter-family')?.value  || '';
   const selFilter = document.getElementById('subito-filter-seller')?.value  || '';
+  const segFilter = document.getElementById('subito-filter-segment')?.value || '';
+  const edtFilter = document.getElementById('subito-filter-edition')?.value || '';
   const regFilter = document.getElementById('subito-filter-region')?.value  || '';
   const onlyAvail = document.getElementById('subito-filter-avail')?.checked || false;
 
@@ -872,6 +1199,8 @@ function renderSubito() {
   if (q)         filtered = filtered.filter(a => a.name.toLowerCase().includes(q));
   if (famFilter) filtered = filtered.filter(a => a.console_family === famFilter);
   if (selFilter) filtered = filtered.filter(a => a.seller_type === selFilter);
+  if (segFilter) filtered = filtered.filter(a => (a.model_segment || 'unknown') === segFilter);
+  if (edtFilter) filtered = filtered.filter(a => (a.edition_class || 'standard') === edtFilter);
   if (regFilter) filtered = filtered.filter(a => a.region === regFilter);
   if (onlyAvail) filtered = filtered.filter(a => !!a.last_available);
 
@@ -881,6 +1210,7 @@ function renderSubito() {
   // Raggruppa per famiglia console
   // Medie per famiglia (su TUTTI gli annunci disponibili, non solo filtrati — riferimento stabile)
   const _famAvgs = _computeFamilyAvgs(SUBITO_ADS);
+  const _oppByUrn = _buildOppMap(SUBITO_OPPS);
 
   const byFamily = {};
   for (const ad of filtered) {
@@ -1002,7 +1332,7 @@ function renderSubito() {
       // Deal Score
       const tdScore = document.createElement('td');
       tdScore.style.cssText = 'padding:6px 10px; text-align:center; white-space:nowrap;';
-      tdScore.innerHTML = _dealBadge(ad.last_price, _famAvgs[ad.console_family || 'other']);
+      tdScore.innerHTML = _renderOpportunityBadge(ad, _oppByUrn[ad.urn_id], _famAvgs);
       tr.appendChild(tdScore);
 
       // Chart button
@@ -1044,12 +1374,13 @@ document.getElementById('btn-refresh').addEventListener('click', tryAutoLoad);
 
 async function tryAutoLoad() {
   try {
-    const [rSrc, rComb, rDbProds, rBase, rStorage] = await Promise.all([
+    const [rSrc, rComb, rDbProds, rBase, rStorage, rStandard] = await Promise.all([
       API.fetchJson('/api/sources'),
       API.fetchJson('/api/combined/latest'),
       API.fetchJson('/api/db/products'),
       API.fetchJson('/api/db/base-models'),
       API.fetchJson('/api/db/storage-sizes'),
+      API.fetchJson('/api/db/standard-groups'),
     ]);
 
     if (rSrc.ok) {
@@ -1089,8 +1420,13 @@ async function tryAutoLoad() {
       _populateStorageFilter();
     }
 
+    if (rStandard.ok) {
+      STANDARD_GROUPS = _sanitizeRows(rStandard.body);
+    }
+
     renderHome();
     applyFilters();
+    renderStandardGroups();
     _syncState();
 
   } catch (e) {
@@ -1442,4 +1778,174 @@ function _showHistoryModal(urnId, adName) {
       document.getElementById('history-body').innerHTML =
         `<div class="history-empty" style="color:#c44">Errore: ${safeErr}</div>`;
     });
+}
+
+// ============================================================
+// RICERCA VIEW
+// ============================================================
+
+const _SUBMODELS = {
+  '':         ['Base','E','Slim','Elite','X','S'],
+  'Original': ['Base'],
+  '360':      ['Base','E','Slim','Elite'],
+  'One':      ['Base','S','X'],
+  'Series':   ['X','S'],
+};
+
+let _ricercaInited = false;
+
+function initRicerca() {
+  if (_ricercaInited) return;
+  _ricercaInited = true;
+
+  // Popola storage dal DB
+  ViewerApi.fetchJson('/api/db/storage-sizes').then(sizes => {
+    const sel = document.getElementById('rf-storage');
+    (sizes || []).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s.label;
+      opt.textContent = s.label;
+      sel.appendChild(opt);
+    });
+  }).catch(() => {});
+
+  // Toggle button groups
+  document.querySelectorAll('.rbtn-group').forEach(group => {
+    group.addEventListener('click', e => {
+      const btn = e.target.closest('.rbtn');
+      if (!btn) return;
+      group.querySelectorAll('.rbtn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      // Aggiorna sotto-modelli se è il gruppo famiglia
+      if (group.id === 'rf-family') _updateSubmodels(btn.dataset.val);
+    });
+  });
+
+  _updateSubmodels('');
+}
+
+function _updateSubmodels(family) {
+  const group   = document.getElementById('rf-submodel');
+  const options = _SUBMODELS[family] || _SUBMODELS[''];
+  group.innerHTML = '<button class="rbtn active" data-val="">Tutti</button>';
+  options.forEach(sm => {
+    const btn = document.createElement('button');
+    btn.className = 'rbtn';
+    btn.dataset.val = sm;
+    btn.textContent = sm;
+    group.appendChild(btn);
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.rbtn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+  // Abilita/disabilita campo sotto-modello
+  const field = document.getElementById('rfield-submodel');
+  field.style.opacity = options.length <= 1 ? '0.4' : '1';
+  field.style.pointerEvents = options.length <= 1 ? 'none' : '';
+}
+
+function _getRicercaParams() {
+  const get = id => {
+    const el = document.getElementById(id);
+    if (!el) return '';
+    if (el.tagName === 'SELECT') return el.value;
+    const active = el.querySelector('.rbtn.active');
+    return active ? active.dataset.val : '';
+  };
+  return {
+    base_family:    get('rf-family'),
+    sub_model:      get('rf-submodel'),
+    edition_name:   document.getElementById('rf-edition').value,
+    storage_label:  document.getElementById('rf-storage').value,
+    color:          document.getElementById('rf-color').value,
+    has_kinect:     get('rf-kinect'),
+    available_only: document.getElementById('rf-available').checked ? '1' : '',
+  };
+}
+
+function runRicerca() {
+  const params = _getRicercaParams();
+  const qs = Object.entries(params)
+    .filter(([, v]) => v !== '' && v !== null && v !== undefined)
+    .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+    .join('&');
+
+  const status  = document.getElementById('ricerca-status');
+  const results = document.getElementById('ricerca-results');
+  status.textContent  = 'Ricerca in corso…';
+  results.innerHTML   = '';
+
+  ViewerApi.fetchJson('/api/db/search' + (qs ? '?' + qs : ''))
+    .then(data => _renderRicercaResults(data.body, params))
+    .catch(err => {
+      status.textContent = 'Errore: ' + SAN.sanitizeText(err.message || String(err));
+    });
+}
+
+function _renderRicercaResults(rows, params) {
+  const status  = document.getElementById('ricerca-status');
+  const container = document.getElementById('ricerca-results');
+
+  if (!rows || rows.length === 0) {
+    status.textContent = 'Nessun risultato trovato.';
+    container.innerHTML = '';
+    return;
+  }
+
+  // Raggruppa per standard_key → standard_name
+  const groups = new Map();
+  rows.forEach(p => {
+    const key = p.standard_key || p.standard_name || p.name || '?';
+    if (!groups.has(key)) {
+      groups.set(key, { name: p.standard_name || p.name || '?', items: [] });
+    }
+    groups.get(key).items.push(p);
+  });
+
+  status.textContent = `${rows.length} prodotti trovati in ${groups.size} configurazioni`;
+
+  const html = [];
+  groups.forEach((group, key) => {
+    const items = group.items.sort((a, b) => (a.last_price || 0) - (b.last_price || 0));
+
+    const rows_html = items.map(p => {
+      const price    = p.last_price != null ? p.last_price.toFixed(2) + ' €' : '—';
+      const avail    = p.last_available ? '<span class="badge-avail">Disp.</span>' : '<span class="badge-unavail">Esaurito</span>';
+      const storeAcc = _storeAccent(p.source);
+      const storeLbl = _storeLabel(p.source);
+      const cond     = SAN.sanitizeText(p.condition || '');
+      const pack     = SAN.sanitizeText(p.packaging_state || '');
+      const url      = SAN.sanitizeUrl(p.url || '');
+      const nameLink = url
+        ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${storeLbl}</a>`
+        : storeLbl;
+      return `<tr>
+        <td><span class="source-badge" style="background:${storeAcc}">${nameLink}</span></td>
+        <td>${cond}</td>
+        <td>${pack}</td>
+        <td class="price-cell">${price}</td>
+        <td>${avail}</td>
+      </tr>`;
+    }).join('');
+
+    const stdName = SAN.sanitizeText(group.name);
+    html.push(`
+      <div class="ricerca-group">
+        <div class="ricerca-group-head">
+          <span class="ricerca-group-name">${stdName}</span>
+          <span class="ricerca-group-count">${items.length} offerte</span>
+        </div>
+        <table class="ricerca-table">
+          <thead><tr>
+            <th>Store</th><th>Condizione</th><th>Packaging</th>
+            <th>Prezzo</th><th>Stato</th>
+          </tr></thead>
+          <tbody>${rows_html}</tbody>
+        </table>
+      </div>
+    `);
+  });
+
+  container.innerHTML = html.join('');
 }

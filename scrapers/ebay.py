@@ -6,6 +6,13 @@ Tecnica: Playwright + channel="chrome" + parsing DOM
   Estrae lotti completati (LH_Sold=1&LH_Complete=1):
   prezzi di mercato realizzati, utili come riferimento.
 
+Ottimizzazioni attive:
+  A) Query parallele   — max PARALLEL_QUERIES contesti simultanei (semaforo)
+                         + stagger QUERY_STAGGER_S secondi tra i lanci
+  B) Context riutilizzato — un solo context+page per tutta la query (no cold-start)
+  C) domcontentloaded  — eBay è SSR: carica i .s-card nell'HTML iniziale;
+                         fallback automatico a "load" se timeout
+
 URL di ricerca:
   /sch/i.html?_nkw=<keyword>&LH_Sold=1&LH_Complete=1&_ipg=60&_pgn=<page>
 
@@ -15,8 +22,6 @@ Query tracciate:
   - "xbox one console"
   - "xbox 360 console"
   - "xbox original console"
-
-Filtri titolo: stessi blocklist/allowlist di Subito (riutilizzati).
 
 Salva in: data/ebay_YYYY-MM-DD_HH-MM-SS.json
 """
@@ -48,7 +53,9 @@ SEARCH_BASE = f"{BASE_URL}/sch/i.html"
 DATA_DIR    = Path(__file__).parent.parent / _DATA["output_dir"]
 SOURCE      = "ebay"
 
-MAX_PAGES = 10   # 10 pagine × 60 item = max 600 lotti per query
+MAX_PAGES       = 10    # 10 pagine × 60 item = max 600 lotti per query
+PARALLEL_QUERIES = 3    # max contesti simultanei (Fase A)
+QUERY_STAGGER_S  = 3.0  # secondi di stagger tra lanci (Fase A)
 
 _QUERIES = [
     ("Xbox Series X", "xbox series x console"),
@@ -57,6 +64,12 @@ _QUERIES = [
     ("Xbox 360",      "xbox 360 console"),
     ("Xbox Original", "xbox original console"),
 ]
+
+# Risorse da bloccare per velocizzare il caricamento pagina
+_BLOCK_RESOURCES = re.compile(
+    r"\.(png|jpg|jpeg|gif|webp|svg|ico|woff2?|ttf|eot|otf)(\?|$)",
+    re.IGNORECASE,
+)
 
 # Filtri specifici per eBay (diversi da Subito: titoli spesso in inglese/misti)
 _EBAY_BLOCKLIST = re.compile(
@@ -103,14 +116,11 @@ _PRICE_FLOOR = 8.0
 def _parse_ebay_price(text: str) -> float | None:
     if not text:
         return None
-    # Rimuovi "EUR", spazi, gestisci separatori IT (punto=migliaia, virgola=decimali)
     text = text.strip().replace("EUR", "").replace("\xa0", " ").strip()
-    # Prendo solo il primo prezzo (ignoro range "250,00 a 400,00")
     m = re.search(r"([\d.,]+)", text)
     if not m:
         return None
     s = m.group(1)
-    # Formato italiano: "1.350,00" → "1350.00" oppure "350,00" → "350.00"
     if re.match(r"^\d{1,3}(\.\d{3})*(,\d{1,2})?$", s):
         s = s.replace(".", "").replace(",", ".")
     elif re.match(r"^\d+(,\d{1,2})?$", s):
@@ -130,7 +140,6 @@ def _parse_item(raw: dict, query_label: str) -> dict | None:
     if not title or title.lower() == "shop on ebay":
         return None
 
-    # Filtri eBay-specifici
     if _EBAY_BLOCKLIST.search(title):
         log.debug("Blocklist eBay: %r", title)
         return None
@@ -145,7 +154,6 @@ def _parse_item(raw: dict, query_label: str) -> dict | None:
     url       = raw.get("url") or ""
     sold_date = (raw.get("sold_date") or "").strip()
 
-    # Item ID dall'URL: /itm/123456789 → EBAY-123456789
     m = re.search(r"/itm/(\d+)", url)
     item_id = f"EBAY-{m.group(1)}" if m else stable_item_id("EBAY", url)
 
@@ -176,55 +184,59 @@ async def _new_context(browser):
     )
 
 
-async def _fetch_page_items(browser, url: str) -> list[dict]:
-    """Naviga a una pagina eBay e restituisce i raw item via DOM."""
-    ctx  = await _new_context(browser)
-    page = await ctx.new_page()
-    try:
-        async def _do():
+_EXTRACT_JS = """() => {
+    const items = document.querySelectorAll('li.s-card, li[class*="s-card"]');
+    return [...items].map(el => ({
+        title: (
+            el.querySelector('img.s-card__image')?.getAttribute('alt') ||
+            el.querySelector('img[alt]')?.getAttribute('alt') ||
+            el.querySelector('[class*="title"]')?.textContent ||
+            ''
+        ).trim(),
+        price_text: (
+            el.querySelector('[class*="price"]')?.textContent ||
+            ''
+        ).trim(),
+        sold_date: (
+            el.querySelector('[class*="sold"]')?.textContent ||
+            el.querySelector('[class*="date"]')?.textContent ||
+            ''
+        ).trim(),
+        url: (
+            el.querySelector('a[href*="/itm/"]')?.href ||
+            ''
+        ),
+    }));
+}"""
+
+
+async def _fetch_page_items(page, url: str) -> list[dict]:
+    """
+    Fase C: prova domcontentloaded (SSR, più veloce).
+    Se li.s-card non appare entro 3s → fallback a load completo.
+    Riusa il page object esistente (Fase B).
+    """
+    async def _do():
+        try:
+            await page.goto(url, wait_until="domcontentloaded", timeout=20_000)
+            await page.wait_for_selector("li.s-card", timeout=3_000)
+        except PlaywrightTimeoutError:
+            log.debug("domcontentloaded timeout → fallback load: %s", url)
             await page.goto(url, wait_until="load",
                             timeout=_COMMON["nav_timeout_ms"])
-            # Aspetta che gli item siano presenti nel DOM (JS-rendered)
-            try:
-                await page.wait_for_selector(".s-item", timeout=15000)
-            except PlaywrightTimeoutError:
-                log.debug("Timeout attesa selector .s-item su %s", url)
+            await page.wait_for_selector("li.s-card", timeout=15_000)
 
-            # eBay usa ora li.s-card con titolo nell'alt dell'immagine
-            return await page.evaluate("""() => {
-                const items = document.querySelectorAll('li.s-card, li[class*="s-card"]');
-                return [...items].map(el => ({
-                    title: (
-                        el.querySelector('img.s-card__image')?.getAttribute('alt') ||
-                        el.querySelector('img[alt]')?.getAttribute('alt') ||
-                        el.querySelector('[class*="title"]')?.textContent ||
-                        ''
-                    ).trim(),
-                    price_text: (
-                        el.querySelector('[class*="price"]')?.textContent ||
-                        ''
-                    ).trim(),
-                    sold_date: (
-                        el.querySelector('[class*="sold"]')?.textContent ||
-                        el.querySelector('[class*="date"]')?.textContent ||
-                        ''
-                    ).trim(),
-                    url: (
-                        el.querySelector('a[href*="/itm/"]')?.href ||
-                        ''
-                    ),
-                }));
-            }""")
+        return await page.evaluate(_EXTRACT_JS)
+
+    try:
         return await retry(_do, retries=3, delay=2.0, label=url)
     except Exception as exc:
         log.error("Errore fetch %s: %s", url, exc)
         return []
-    finally:
-        await ctx.close()
 
 
 # --------------------------------------------------------------------------- #
-# Scraper con paginazione
+# Scraper con paginazione — Fase B: context riutilizzato per tutta la query
 # --------------------------------------------------------------------------- #
 
 async def _scrape_query(browser, label: str, keyword: str) -> list[dict]:
@@ -232,33 +244,66 @@ async def _scrape_query(browser, label: str, keyword: str) -> list[dict]:
     all_items: list[dict] = []
     q_encoded = keyword.replace(" ", "+")
 
-    for page_num in range(1, MAX_PAGES + 1):
-        url = (
-            f"{SEARCH_BASE}?_nkw={q_encoded}&LH_Sold=1&LH_Complete=1&_ipg=60"
-            if page_num == 1
-            else f"{SEARCH_BASE}?_nkw={q_encoded}&LH_Sold=1&LH_Complete=1&_ipg=60&_pgn={page_num}"
-        )
-        log.info("  Pagina %d: %s", page_num, url)
+    # Fase B: un solo context+page per tutte le pagine della query
+    ctx  = await _new_context(browser)
+    page = await ctx.new_page()
 
-        raws = await _fetch_page_items(browser, url)
-        if not raws:
-            log.info("  → Nessun item — stop.")
-            break
+    # Blocca immagini/font per ridurre tempi di caricamento
+    async def _block(route):
+        if _BLOCK_RESOURCES.search(route.request.url):
+            await route.abort()
+        else:
+            await route.continue_()
 
-        parsed     = [r for raw in raws if (r := _parse_item(raw, label)) is not None]
-        filtered_n = len(raws) - len(parsed)
-        log.info("  → %d/%d item validi (scartati %d)", len(parsed), len(raws), filtered_n)
-        all_items.extend(parsed)
+    await page.route("**/*", _block)
 
-        if len(raws) < 50:
-            log.info("  → Pagina parziale (%d items) — ultima.", len(raws))
-            break
+    try:
+        for page_num in range(1, MAX_PAGES + 1):
+            url = (
+                f"{SEARCH_BASE}?_nkw={q_encoded}&LH_Sold=1&LH_Complete=1&_ipg=60"
+                if page_num == 1
+                else f"{SEARCH_BASE}?_nkw={q_encoded}&LH_Sold=1&LH_Complete=1&_ipg=60&_pgn={page_num}"
+            )
+            log.info("  [%s] Pagina %d: %s", label, page_num, url)
 
+            raws = await _fetch_page_items(page, url)
+            if not raws:
+                log.info("  [%s] → Nessun item — stop.", label)
+                break
+
+            parsed     = [r for raw in raws if (r := _parse_item(raw, label)) is not None]
+            filtered_n = len(raws) - len(parsed)
+            log.info("  [%s] → %d/%d item validi (scartati %d)",
+                     label, len(parsed), len(raws), filtered_n)
+            all_items.extend(parsed)
+
+            if len(raws) < 50:
+                log.info("  [%s] → Pagina parziale (%d items) — ultima.", label, len(raws))
+                break
+    finally:
+        await ctx.close()
+
+    log.info("  [%s] Totale: %d item", label, len(all_items))
     return all_items
 
 
+# --------------------------------------------------------------------------- #
+# Run — Fase A: query parallele con semaforo e stagger
+# --------------------------------------------------------------------------- #
+
 async def run_scraper() -> list[dict]:
     all_items: list[dict] = []
+    sem = asyncio.Semaphore(PARALLEL_QUERIES)
+
+    async def _run_bounded(idx: int, label: str, keyword: str) -> list[dict]:
+        # Stagger: ogni query aspetta idx * QUERY_STAGGER_S prima di partire
+        await asyncio.sleep(idx * QUERY_STAGGER_S)
+        async with sem:
+            try:
+                return await _scrape_query(browser, label, keyword)
+            except Exception as exc:
+                log.error("Errore query %r: %s", label, exc)
+                return []
 
     async with async_playwright() as p:
         browser = await launch_chromium(
@@ -267,17 +312,20 @@ async def run_scraper() -> list[dict]:
             preferred_channel=_COMMON.get("playwright_channel", "chrome"),
         )
 
-        for label, keyword in _QUERIES:
-            try:
-                items = await _scrape_query(browser, label, keyword)
-                all_items.extend(items)
-            except Exception as exc:
-                log.error("Errore query %r: %s", label, exc)
+        tasks = [
+            _run_bounded(i, label, keyword)
+            for i, (label, keyword) in enumerate(_QUERIES)
+        ]
+        results = await asyncio.gather(*tasks)
+
+        for result in results:
+            all_items.extend(result)
 
         await browser.close()
 
     unique = deduplicate(all_items)
-    log.info("eBay item unici dopo deduplica: %d (da %d totali)", len(unique), len(all_items))
+    log.info("eBay item unici dopo deduplica: %d (da %d totali)",
+             len(unique), len(all_items))
     return unique
 
 

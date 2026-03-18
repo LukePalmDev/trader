@@ -1,5 +1,5 @@
 """
-Scraper Gameshock (gameshock.it) — Console Xbox (usato + nuovo)
+Scraper Gameshock (gameshock.it) — Console Xbox
 PrestaShop 1.x legacy, server-side rendering.
 Salva in: data/gameshock_YYYY-MM-DD_HH-MM-SS.json
 
@@ -8,7 +8,9 @@ Categorie tracciate (solo console, non giochi né accessori):
   - /45-console-xbox-one  (Xbox One)
   - /46-console-xbox360   (Xbox 360)
 
-Condizione: rilevata dal nome del prodotto (contiene "usata"/"usato")
+Condizione:
+  - "Usato" solo con marker espliciti nel titolo/url
+  - default "Nuovo" per tutte le altre
 Paginazione: ?p=N
 """
 
@@ -40,9 +42,9 @@ DELAY    = _COMMON["request_delay"]
 
 # Categorie console Xbox (solo hardware, no giochi)
 _CATEGORIES = [
+    ("Xbox 360",        f"{BASE_URL}/46-console-xbox360?n=20&id_category=46"),
+    ("Xbox One",        f"{BASE_URL}/45-console-xbox-one?n=20&id_category=45"),
     ("Xbox Series X/S", f"{BASE_URL}/77-xbox-serie-x-e-s"),
-    ("Xbox One",        f"{BASE_URL}/45-console-xbox-one"),
-    ("Xbox 360",        f"{BASE_URL}/46-console-xbox360"),
 ]
 
 _HEADERS = {
@@ -80,7 +82,7 @@ def _parse_page(html: str, category_label: str) -> list[dict]:
         name_el = card.select_one("h3 a")
         if not name_el:
             continue
-        name = name_el.get_text(strip=True)
+        name = (name_el.get("title") or name_el.get_text(strip=True)).strip()
         if not name:
             continue
 
@@ -105,9 +107,11 @@ def _parse_page(html: str, category_label: str) -> list[dict]:
         if img_url and not img_url.startswith("http"):
             img_url = BASE_URL + img_url
 
-        # Condizione: rilevata dal nome prodotto O dall'URL (slug URL spesso
-        # contiene "usata" anche quando il nome display non lo esplicita)
-        condition = "Usato" if (_USATO_PATTERN.search(name) or _USATO_PATTERN.search(url)) else "Nuovo"
+        # Condizione: Usato solo con marker espliciti; default Nuovo.
+        if _USATO_PATTERN.search(name) or _USATO_PATTERN.search(url):
+            condition = "Usato"
+        else:
+            condition = "Nuovo"
 
         # Disponibilità: legge elemento .availability ("Disponibile" / "Non disponibile")
         avail_el = card.select_one(".availability")
@@ -155,7 +159,11 @@ def _scrape_category(label: str, base_url: str) -> list[dict]:
     page = 1
 
     while True:
-        url = base_url if page == 1 else f"{base_url}?p={page}"
+        if page == 1:
+            url = base_url
+        else:
+            sep = "&" if "?" in base_url else "?"
+            url = f"{base_url}{sep}p={page}"
         log.info("  Pagina %d: %s", page, url)
         html = _get(url)
         products = _parse_page(html, label)

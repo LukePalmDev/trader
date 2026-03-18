@@ -279,10 +279,12 @@ def cmd_cleanup() -> dict:
         _apply_retention(source)
 
     archived = _archive_old_snapshots()
+    db_clean = _db.clean_db()
     vacuumed = _vacuum_databases()
 
     return {
         "archived_snapshots": archived,
+        "db_clean": db_clean,
         "vacuumed": vacuumed,
     }
 
@@ -406,6 +408,8 @@ def cmd_view(
                 self._json(_db.get_all_products())
             elif self.path == "/api/db/base-models":
                 self._json(_db.get_base_models())
+            elif self.path == "/api/db/standard-groups":
+                self._json(_db.get_standard_groups())
             elif path == "/api/db/changes":
                 days = int(query.get("days", 30))
                 self._json(_db.get_recent_changes(days))
@@ -423,10 +427,40 @@ def cmd_view(
                 self._json(_db_ebay.get_all_sold())
             elif self.path == "/api/ebay/stats":
                 self._json(_db_ebay.get_stats())
+            elif self.path == "/api/valuation/fair-values":
+                import valuation as _valuation
+
+                self._json(_valuation.compute_fair_values())
+            elif path == "/api/valuation/subito-opportunities":
+                limit = int(query.get("limit", 300))
+                import valuation as _valuation
+
+                self._json(_valuation.score_subito_opportunities(limit=limit))
+            elif path == "/api/valuation/explain":
+                limit = int(query.get("limit", 100))
+                import valuation as _valuation
+
+                self._json(_valuation.explain_fair_values(limit=limit))
+            elif self.path == "/api/valuation/backtest":
+                import valuation as _valuation
+
+                self._json(_valuation.backtest_fair_values())
             elif self.path == "/api/db/storage-sizes":
                 self._json(_db.get_storage_sizes())
             elif self.path == "/api/db/categories":
                 self._json(_db.get_categories())
+            elif path == "/api/db/search":
+                kinect_raw = query.get("has_kinect", "")
+                results = _db.search_products(
+                    base_family=query.get("base_family") or None,
+                    sub_model=query.get("sub_model") or None,
+                    edition_name=query.get("edition_name") or None,
+                    color=query.get("color") or None,
+                    storage_label=query.get("storage_label") or None,
+                    has_kinect=(int(kinect_raw) if kinect_raw in ("0", "1") else None),
+                    available_only=query.get("available_only", "") == "1",
+                )
+                self._json(results)
             else:
                 super().do_GET()
 
@@ -558,6 +592,16 @@ def main() -> None:
     )
     parser.add_argument("--classify-limit", type=int, default=None, help="Limite annunci da classificare")
     parser.add_argument("--classify-dry-run", action="store_true", help="Classificazione AI senza salvare")
+    parser.add_argument(
+        "--valuation-report",
+        action="store_true",
+        help="Stampa fair value + spiegazioni + backtest",
+    )
+    parser.add_argument(
+        "--tune-valuation",
+        action="store_true",
+        help="Esegue tuning pesi fair value e salva logs/valuation_tuning_latest.json",
+    )
     parser.add_argument("--api-token", default=DEFAULT_API_TOKEN, help="Token bearer per endpoint POST viewer")
     args = parser.parse_args()
 
@@ -593,6 +637,40 @@ def main() -> None:
 
             with report.step("classify"):
                 _classifier.run_classifier(limit=args.classify_limit, dry_run=args.classify_dry_run)
+            ok = True
+            return
+
+        if args.valuation_report:
+            import valuation as _valuation
+
+            with report.step("valuation_report"):
+                fair = _valuation.compute_fair_values()
+                explain = _valuation.explain_fair_values(limit=20)
+                backtest = _valuation.backtest_fair_values()
+                log.info(
+                    "Fair values: %d modelli | Backtest count=%s MAPE=%s MAE=%s",
+                    fair.get("total_models", 0),
+                    backtest.get("count"),
+                    backtest.get("mape"),
+                    backtest.get("mae"),
+                )
+                for row in explain.get("items", [])[:10]:
+                    log.info(
+                        "  %s -> FV €%.2f | conf %.2f | %s",
+                        row.get("key"),
+                        row.get("fair_value", 0.0),
+                        row.get("confidence", 0.0),
+                        row.get("explanation"),
+                    )
+            ok = True
+            return
+
+        if args.tune_valuation:
+            import valuation as _valuation
+
+            with report.step("tune_valuation"):
+                tuned = _valuation.tune_weights()
+                log.info("Tuning completato: %s", tuned.get("best"))
             ok = True
             return
 

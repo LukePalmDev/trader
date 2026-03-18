@@ -8,8 +8,10 @@
       allData: {},
       dbProducts: [],
       baseModels: [],
+      standardGroups: [],
       storageSizes: [],
       subitoAds: [],
+      subitoOpportunities: [],
       ebaySold: [],
       currentSort: { key: 'last_price', dir: 1 },
     };

@@ -3,7 +3,7 @@ Scraper rebuy.it — Console Xbox (usato)
 Angular SPA con SSR: accessibile tramite requests standard.
 Salva in: data/rebuy_YYYY-MM-DD_HH-MM-SS.json
 
-Categorie tracciate (solo console, non giochi né accessori):
+Categorie tracciate (solo console):
   - /comprare/console-e-accessori/xbox/xbox-series-x/console
   - /comprare/console-e-accessori/xbox/xbox-series-s/console
   - /comprare/console-e-accessori/xbox/xbox-one/console
@@ -57,6 +57,21 @@ _HEADERS = {
 _GRADE_PATTERN = re.compile(
     r"\b(Eccellente|Molto buono|Buono|Accettabile)\b", re.IGNORECASE
 )
+_CONSOLE_FAMILY_PATTERN = re.compile(
+    r"\bxbox\s*(?:series\s*[xs]|one(?:\s*[xs])?|360|original)\b",
+    re.IGNORECASE,
+)
+_CONSOLE_HINT_PATTERN = re.compile(
+    r"\bconsole\b|\b\d+\s*(?:gb|tb)\b|\ball-digital\b|\bkinect\b|\bedition\b|\bedizione\b",
+    re.IGNORECASE,
+)
+_ACCESSORY_PATTERN = re.compile(
+    r"\b(controller|gamepad|joypad|joystick|headset|cuffie|alimentatore|cavo|charger|caricatore|dock|batteria|battery)\b",
+    re.IGNORECASE,
+)
+_NON_AVAILABLE_PATTERN = re.compile(r"non\s+disponibile", re.IGNORECASE)
+_VARIANT_CODE_PATTERN = re.compile(r"select-variant-([A-Za-z0-9_-]+)", re.IGNORECASE)
+_DELTA_PRICE_PATTERN = re.compile(r"([+-])\s*([\d]+(?:[.,]\d+)?)\s*€")
 
 
 # --------------------------------------------------------------------------- #
@@ -75,6 +90,119 @@ def _get(url: str) -> str:
 # Parsing
 # --------------------------------------------------------------------------- #
 
+def _is_console_candidate(name: str) -> bool:
+    """True se il titolo sembra una console (bundle inclusi), non accessorio standalone."""
+    if not _CONSOLE_FAMILY_PATTERN.search(name):
+        return False
+
+    has_console_hint = bool(_CONSOLE_HINT_PATTERN.search(name))
+    has_accessory_kw = bool(_ACCESSORY_PATTERN.search(name))
+
+    if has_console_hint:
+        return True
+    if has_accessory_kw:
+        return False
+    return False
+
+
+def _format_price_it(value: float | None) -> str:
+    if value is None:
+        return "N/D"
+    return f"{value:.2f}".replace(".", ",") + " €"
+
+
+def _parse_variant_options(html: str, fallback_price: float | None) -> list[dict]:
+    """Estrae le varianti stato/qualità dalla pagina dettaglio prodotto.
+
+    Restituisce lista di dict:
+      - code: codice variante (es. A1/A2/A3/A4)
+      - grade: etichetta (Eccellente/Molto buono/Buono/Accettabile)
+      - available: disponibilità variante
+      - price: prezzo calcolato della variante
+      - price_display: prezzo formattato
+    """
+    soup = BeautifulSoup(html, "html.parser")
+
+    base_price_el = soup.select_one('[data-cy="product-price"]')
+    base_price_raw = base_price_el.get_text(strip=True) if base_price_el else ""
+    base_price = clean_price(base_price_raw) if base_price_raw else fallback_price
+
+    buttons = soup.select('button[data-cy^="select-variant-"]')
+    if not buttons:
+        return []
+
+    variants: list[dict] = []
+    for btn in buttons:
+        data_cy = btn.get("data-cy", "")
+        code_m = _VARIANT_CODE_PATTERN.search(data_cy)
+        code = (code_m.group(1).upper() if code_m else "").strip()
+
+        grade_el = btn.select_one(".choice-tile__title")
+        grade = (grade_el.get_text(" ", strip=True) if grade_el else "").strip() or code
+
+        btn_text = " ".join(btn.stripped_strings).replace("\xa0", " ").replace("\u202f", " ")
+        unavailable = btn.has_attr("disabled") or bool(_NON_AVAILABLE_PATTERN.search(btn_text))
+        available = not unavailable
+
+        delta_m = _DELTA_PRICE_PATTERN.search(btn_text)
+        delta = 0.0
+        if delta_m:
+            sign = -1.0 if delta_m.group(1) == "-" else 1.0
+            delta_value = clean_price(delta_m.group(2)) or 0.0
+            delta = sign * delta_value
+
+        if available and base_price is not None:
+            price = round(base_price + delta, 2)
+        else:
+            price = None
+
+        variants.append(
+            {
+                "code": code,
+                "grade": grade,
+                "available": available,
+                "price": price,
+                "price_display": _format_price_it(price),
+            }
+        )
+
+    return variants
+
+
+def _expand_variants(product: dict, cache: dict[str, list[dict]]) -> list[dict]:
+    """Espande una card prodotto in più righe (una per variante qualità)."""
+    url = product["url"]
+    variants = cache.get(url)
+    if variants is None:
+        detail_html = _get(url)
+        variants = _parse_variant_options(detail_html, fallback_price=product["price"])
+        cache[url] = variants
+
+    if not variants:
+        return [product]
+
+    expanded: list[dict] = []
+    base_name = product["name"]
+    base_sku = product["sku"]
+    for idx, variant in enumerate(variants, start=1):
+        code = variant["code"] or f"V{idx}"
+        grade = variant["grade"]
+        variant_name = f"{base_name} [{grade}]" if grade else base_name
+        expanded.append(
+            {
+                **product,
+                "name": variant_name,
+                "sku": f"{base_sku}-{code}",
+                "price": variant["price"],
+                "price_display": variant["price_display"],
+                "available": bool(variant["available"]),
+                "grade": grade,
+            }
+        )
+
+    return expanded
+
+
 def _parse_page(html: str, category_label: str) -> list[dict]:
     """Estrae prodotti da una pagina categoria rebuy.it.
 
@@ -82,7 +210,7 @@ def _parse_page(html: str, category_label: str) -> list[dict]:
     i prodotti in lista con classe `.host-product-link`).
     """
     soup = BeautifulSoup(html, "html.parser")
-    products = []
+    products: list[dict] = []
 
     for card in soup.select(".ry-card"):
         # Nome: usa `.title` (presente sia nel card evidenziato sia nella lista)
@@ -106,9 +234,9 @@ def _parse_page(html: str, category_label: str) -> list[dict]:
             continue
         sku = f"RBY-{sku_match.group(1)}"
 
-        # Filtro: solo prodotti Xbox/Microsoft (esclude Samsung, ecc.)
-        if not re.search(r"\bxbox\b|\bmicrosoft\b", name, re.IGNORECASE):
-            log.debug("Escluso prodotto non-Xbox: %r", name)
+        # Filtro: include solo console/bundle console; esclude accessori standalone.
+        if not _is_console_candidate(name):
+            log.debug("Escluso prodotto non-console: %r", name)
             continue
 
         # Prezzo: cerca "NNN,NN €" nel testo del card
@@ -160,7 +288,7 @@ def _has_next_page(html: str) -> bool:
     return False
 
 
-def _scrape_category(label: str, url: str) -> list[dict]:
+def _scrape_category(label: str, url: str, variants_cache: dict[str, list[dict]]) -> list[dict]:
     """Scarica e analizza tutte le pagine di una categoria rebuy.it."""
     log.info("Categoria: %s — %s", label, url)
     all_products: list[dict] = []
@@ -176,8 +304,17 @@ def _scrape_category(label: str, url: str) -> list[dict]:
             log.info("  → Pagina vuota, stop.")
             break
 
-        all_products.extend(products)
-        log.info("  → %d prodotti trovati", len(products))
+        expanded: list[dict] = []
+        for product in products:
+            try:
+                expanded.extend(_expand_variants(product, variants_cache))
+            except Exception as exc:
+                log.warning("  Variante non disponibile per %s: %s", product.get("sku"), exc)
+                expanded.append(product)
+            time.sleep(DELAY)
+
+        all_products.extend(expanded)
+        log.info("  → %d card console | %d righe finali (con varianti)", len(products), len(expanded))
 
         if not _has_next_page(html):
             break
@@ -191,10 +328,11 @@ def _scrape_category(label: str, url: str) -> list[dict]:
 def run_scraper() -> list[dict]:
     """Scrape tutte le categorie console Xbox su rebuy.it."""
     all_products = []
+    variants_cache: dict[str, list[dict]] = {}
 
     for label, url in _CATEGORIES:
         try:
-            products = _scrape_category(label, url)
+            products = _scrape_category(label, url, variants_cache)
             all_products.extend(products)
         except Exception as exc:
             log.error("Errore categoria %r: %s", label, exc)

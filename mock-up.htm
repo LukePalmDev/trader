@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xbox Tracker — Liquid Glass</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:    #14C014;
+      --green-d:  #0E8A0E;
+      --blue:     #3B82F6;
+      --purple:   #8B5CF6;
+      --text:     #F0F0F8;
+      --text-2:   #9090B0;
+      --text-3:   #5A5A7A;
+      --glass-bg: rgba(255,255,255,0.055);
+      --glass-bd: rgba(255,255,255,0.11);
+      --glass-sh: 0 8px 40px rgba(0,0,0,0.45);
+      --radius:   22px;
+      --sidebar:  72px;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #080812;
+      color: var(--text);
+      display: flex;
+    }
+
+    /* ── Background blobs ─────────────────────────────────── */
+    .bg {
+      position: fixed; inset: 0; overflow: hidden; z-index: 0;
+      background: radial-gradient(ellipse at 20% 80%, #0a2a0a 0%, transparent 55%),
+                  radial-gradient(ellipse at 80% 10%, #0a0a30 0%, transparent 55%),
+                  radial-gradient(ellipse at 55% 55%, #12001c 0%, transparent 50%),
+                  #080812;
+    }
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: .55;
+      animation: drift 12s ease-in-out infinite;
+    }
+    .blob-1 { width: 500px; height: 500px; background: #107C10; left: -100px; bottom: -80px; animation-duration: 15s; }
+    .blob-2 { width: 400px; height: 400px; background: #1a1a80; top: -80px; right: 100px; animation-duration: 18s; animation-delay: -6s; }
+    .blob-3 { width: 350px; height: 350px; background: #4a0080; top: 30%; right: -60px; animation-duration: 20s; animation-delay: -3s; }
+    .blob-4 { width: 250px; height: 250px; background: #003060; bottom: 20%; left: 30%; animation-duration: 14s; animation-delay: -9s; }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33%       { transform: translate(25px, -20px) scale(1.04); }
+      66%       { transform: translate(-18px, 15px) scale(.97); }
+    }
+
+    /* ── Sidebar ──────────────────────────────────────────── */
+    .sidebar {
+      position: relative; z-index: 10;
+      width: var(--sidebar); flex-shrink: 0;
+      height: 100vh;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 20px 0;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(40px) saturate(160%);
+      -webkit-backdrop-filter: blur(40px) saturate(160%);
+      border-right: 1px solid var(--glass-bd);
+    }
+
+    .sidebar-logo {
+      width: 42px; height: 42px; border-radius: 14px;
+      background: linear-gradient(135deg, #107C10, #0A5A0A);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 16px rgba(16,124,16,.5);
+    }
+    .sidebar-logo svg { width: 22px; height: 22px; fill: white; }
+
+    .nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+
+    .nav-item {
+      width: 46px; height: 46px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .25s ease;
+      color: var(--text-3); position: relative;
+    }
+    .nav-item svg { width: 20px; height: 20px; }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: var(--text-2); }
+    .nav-item.active {
+      background: rgba(20,192,20,.15);
+      color: var(--green);
+      box-shadow: 0 0 0 1px rgba(20,192,20,.25);
+    }
+    .nav-item.active::before {
+      content: ''; position: absolute; left: -10px;
+      width: 3px; height: 22px; border-radius: 0 3px 3px 0;
+      background: var(--green);
+    }
+
+    .sidebar-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: white;
+      box-shadow: 0 2px 12px rgba(59,130,246,.4);
+      cursor: pointer;
+    }
+
+    /* ── Main ─────────────────────────────────────────────── */
+    .main {
+      flex: 1; display: flex; flex-direction: column;
+      height: 100vh; overflow: hidden;
+      position: relative; z-index: 5;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    .header {
+      display: flex; align-items: center; gap: 16px;
+      padding: 0 28px; height: 68px; flex-shrink: 0;
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid var(--glass-bd);
+    }
+
+    .header-title {
+      font-size: 17px; font-weight: 600; letter-spacing: -.4px;
+      background: linear-gradient(90deg, var(--text), var(--text-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .header-title span { color: var(--green); -webkit-text-fill-color: var(--green); }
+
+    .search {
+      flex: 1; max-width: 320px; margin-left: 24px;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--glass-bd);
+      border-radius: 12px; padding: 0 14px;
+      height: 38px; transition: all .2s;
+    }
+    .search:focus-within {
+      background: rgba(255,255,255,0.09);
+      border-color: rgba(20,192,20,.4);
+      box-shadow: 0 0 0 3px rgba(20,192,20,.1);
+    }
+    .search svg { width: 15px; height: 15px; color: var(--text-3); flex-shrink: 0; }
+    .search input {
+      background: none; border: none; outline: none;
+      color: var(--text); font: 400 14px 'Inter', sans-serif;
+      width: 100%;
+    }
+    .search input::placeholder { color: var(--text-3); }
+
+    .header-spacer { flex: 1; }
+
+    .chip {
+      display: flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.06); border: 1px solid var(--glass-bd);
+      border-radius: 10px; padding: 0 12px; height: 36px;
+      font-size: 13px; color: var(--text-2); cursor: pointer;
+      transition: all .2s;
+    }
+    .chip:hover { background: rgba(255,255,255,0.10); color: var(--text); }
+    .chip svg { width: 14px; height: 14px; }
+    .chip .badge {
+      width: 18px; height: 18px; border-radius: 6px;
+      background: var(--green); color: #000; font-size: 10px;
+      font-weight: 700; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Scroll area ──────────────────────────────────────── */
+    .content {
+      flex: 1; overflow-y: auto; padding: 24px 28px;
+      display: flex; flex-direction: column; gap: 20px;
+    }
+    .content::-webkit-scrollbar { width: 5px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+    /* ── Glass card ───────────────────────────────────────── */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid var(--glass-bd);
+      border-radius: var(--radius);
+      box-shadow: var(--glass-sh), inset 0 1px 0 rgba(255,255,255,0.13);
+      position: relative; overflow: hidden;
+      transition: transform .3s cubic-bezier(.22,1,.36,1), box-shadow .3s ease;
+    }
+    .glass::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+      pointer-events: none; border-radius: inherit;
+    }
+    .glass:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 16px 56px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.18);
+    }
+
+    /* ── Stat cards ───────────────────────────────────────── */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+    .stat-card { padding: 22px 22px 18px; }
+    .stat-label {
+      font-size: 11px; font-weight: 500; letter-spacing: .6px;
+      text-transform: uppercase; color: var(--text-3); margin-bottom: 10px;
+    }
+    .stat-value {
+      font-size: 36px; font-weight: 700; letter-spacing: -1.5px;
+      color: var(--text); line-height: 1;
+    }
+    .stat-value small { font-size: 16px; font-weight: 500; color: var(--text-2); margin-left: 2px; }
+    .stat-meta {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 10px; font-size: 12px; color: var(--text-3);
+    }
+    .stat-meta .trend {
+      display: flex; align-items: center; gap: 3px;
+      font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 6px;
+    }
+    .trend.up   { color: #34D399; background: rgba(52,211,153,.12); }
+    .trend.down { color: #F87171; background: rgba(248,113,113,.12); }
+    .trend.neu  { color: var(--text-2); background: rgba(255,255,255,.06); }
+
+    .stat-accent {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+      border-radius: 0 0 22px 22px;
+    }
+
+    /* ── Charts row ───────────────────────────────────────── */
+    .charts-row { display: grid; grid-template-columns: 1.65fr 1fr; gap: 14px; }
+
+    .chart-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 22px 0; margin-bottom: 4px;
+    }
+    .chart-title { font-size: 14px; font-weight: 600; }
+    .chart-sub   { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+    .chart-tabs {
+      display: flex; gap: 4px;
+      background: rgba(255,255,255,0.05); border-radius: 10px; padding: 3px;
+    }
+    .chart-tab {
+      font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 7px;
+      cursor: pointer; color: var(--text-3); transition: all .2s;
+    }
+    .chart-tab.active { background: rgba(20,192,20,.2); color: var(--green); }
+
+    .chart-wrap { padding: 10px 18px 18px; height: 230px; }
+
+    /* ── Bottom row ───────────────────────────────────────── */
+    .bottom-row { display: grid; grid-template-columns: 1.8fr 1fr; gap: 14px; }
+
+    /* ── Products table ───────────────────────────────────── */
+    .table-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 22px 12px;
+    }
+    .table-title { font-size: 14px; font-weight: 600; }
+    .see-all {
+      font-size: 12px; color: var(--green); cursor: pointer;
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      font-size: 10px; font-weight: 600; letter-spacing: .7px;
+      text-transform: uppercase; color: var(--text-3);
+      padding: 0 22px 10px; text-align: left;
+    }
+    tbody tr {
+      border-top: 1px solid rgba(255,255,255,0.05);
+      transition: background .2s;
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.035); }
+    tbody td { padding: 11px 22px; font-size: 13px; }
+
+    .td-name { font-weight: 500; color: var(--text); }
+    .td-sub  { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+
+    .pill {
+      display: inline-flex; align-items: center;
+      padding: 3px 9px; border-radius: 7px; font-size: 11px; font-weight: 500;
+    }
+    .pill-green  { background: rgba(20,192,20,.15);  color: #4ADE80; }
+    .pill-blue   { background: rgba(59,130,246,.15); color: #60A5FA; }
+    .pill-purple { background: rgba(139,92,246,.15); color: #A78BFA; }
+    .pill-amber  { background: rgba(245,158,11,.15); color: #FCD34D; }
+    .pill-gray   { background: rgba(255,255,255,.08); color: var(--text-2); }
+
+    .badge-n { background: rgba(59,130,246,.18); color: #60A5FA; border-radius: 5px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
+    .badge-u { background: rgba(255,255,255,.08);  color: var(--text-2);  border-radius: 5px; padding: 2px 7px; font-size: 10px; font-weight: 600; }
+
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .dot-on  { background: #34D399; box-shadow: 0 0 6px rgba(52,211,153,.6); }
+    .dot-off { background: var(--text-3); }
+
+    /* ── Mini widget ──────────────────────────────────────── */
+    .widget-body { padding: 18px 22px; }
+    .widget-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 11px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .widget-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .widget-store { display: flex; align-items: center; gap: 12px; }
+    .store-dot {
+      width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+    }
+    .store-name  { font-size: 13px; font-weight: 500; }
+    .store-count { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+    .store-bar-wrap { flex: 1; margin: 0 16px; height: 4px; background: rgba(255,255,255,.07); border-radius: 2px; overflow: hidden; }
+    .store-bar { height: 100%; border-radius: 2px; }
+    .store-pct { font-size: 12px; font-weight: 600; color: var(--text-2); width: 32px; text-align: right; }
+
+    /* ── Animations ───────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .glass { animation: fadeUp .5s cubic-bezier(.22,1,.36,1) both; }
+    .stat-card:nth-child(1) { animation-delay: .05s; }
+    .stat-card:nth-child(2) { animation-delay: .10s; }
+    .stat-card:nth-child(3) { animation-delay: .15s; }
+    .stat-card:nth-child(4) { animation-delay: .20s; }
+    .charts-row .glass:nth-child(1) { animation-delay: .25s; }
+    .charts-row .glass:nth-child(2) { animation-delay: .30s; }
+    .bottom-row .glass:nth-child(1) { animation-delay: .35s; }
+    .bottom-row .glass:nth-child(2) { animation-delay: .40s; }
+  </style>
+</head>
+<body>
+
+<!-- Background blobs -->
+<div class="bg">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="blob blob-4"></div>
+</div>
+
+<!-- Sidebar -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l7 4.5-7 4.5z"/></svg>
+  </div>
+  <div class="nav">
+    <div class="nav-item active" title="Dashboard">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    </div>
+    <div class="nav-item" title="Cerca">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </div>
+    <div class="nav-item" title="Consolle">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 6H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5S14.67 12 15.5 12s1.5.67 1.5 1.5S16.33 15 15.5 15zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5S19.33 12 18.5 12z"/></svg>
+    </div>
+    <div class="nav-item" title="Confronta">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    </div>
+    <div class="nav-item" title="Storico">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+  </div>
+  <div class="nav-item" title="Impostazioni" style="margin-bottom: 12px;">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="sidebar-avatar">LM</div>
+</nav>
+
+<!-- Main -->
+<div class="main">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-title">Xbox <span>Tracker</span></div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Cerca console, store, prezzo…">
+    </div>
+    <div class="header-spacer"></div>
+    <div class="chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="badge">3</div>
+    </div>
+    <div class="chip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.53"/></svg>
+      Aggiorna
+    </div>
+    <div class="chip" style="gap:8px;">
+      <div style="width:8px;height:8px;border-radius:50%;background:#34D399;box-shadow:0 0 6px rgba(52,211,153,.7);"></div>
+      Agg. 16/03 · 20:22
+    </div>
+  </header>
+
+  <!-- Scrollable content -->
+  <div class="content">
+
+    <!-- Stats row -->
+    <div class="stats-row">
+
+      <div class="glass stat-card">
+        <div class="stat-label">Prodotti totali</div>
+        <div class="stat-value" id="v1">332</div>
+        <div class="stat-meta">
+          <span class="trend up">↑ +14</span>
+          <span>rispetto a ieri</span>
+        </div>
+        <div class="stat-accent" style="background: linear-gradient(90deg, #107C10, #14C014);"></div>
+      </div>
+
+      <div class="glass stat-card">
+        <div class="stat-label">Disponibili ora</div>
+        <div class="stat-value" style="color:#34D399;" id="v2">69</div>
+        <div class="stat-meta">
+          <span class="trend up">↑ 20.8%</span>
+          <span>del totale</span>
+        </div>
+        <div class="stat-accent" style="background: linear-gradient(90deg, #059669, #34D399);"></div>
+      </div>
+
+      <div class="glass stat-card">
+        <div class="stat-label">Prezzo medio usato</div>
+        <div class="stat-value" id="v3">179<small>€</small></div>
+        <div class="stat-meta">
+          <span class="trend down">↓ €4</span>
+          <span>ultima settimana</span>
+        </div>
+        <div class="stat-accent" style="background: linear-gradient(90deg, #2563EB, #60A5FA);"></div>
+      </div>
+
+      <div class="glass stat-card">
+        <div class="stat-label">Store attivi</div>
+        <div class="stat-value" id="v4">5</div>
+        <div class="stat-meta">
+          <span class="trend neu">+1</span>
+          <span>CEX aggiunto</span>
+        </div>
+        <div class="stat-accent" style="background: linear-gradient(90deg, #7C3AED, #A78BFA);"></div>
+      </div>
+
+    </div>
+
+    <!-- Charts row -->
+    <div class="charts-row">
+
+      <div class="glass">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Andamento prezzi</div>
+            <div class="chart-sub">Ultime 4 settimane · minimo disponibile per categoria</div>
+          </div>
+          <div class="chart-tabs">
+            <div class="chart-tab active">4W</div>
+            <div class="chart-tab">3M</div>
+            <div class="chart-tab">1A</div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+      </div>
+
+      <div class="glass">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Prodotti per store</div>
+            <div class="chart-sub">Totale catalogati</div>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+      </div>
+
+    </div>
+
+    <!-- Bottom row -->
+    <div class="bottom-row">
+
+      <!-- Products table -->
+      <div class="glass" style="padding-bottom: 4px;">
+        <div class="table-header">
+          <div class="table-title">Ultime rilevazioni</div>
+          <div class="see-all">Vedi tutto <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Prodotto</th>
+              <th>Store</th>
+              <th>Prezzo</th>
+              <th>Cond.</th>
+              <th>Disp.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><div class="td-name">Xbox Series X 1TB, Nero</div><div class="td-sub">Imballata · CEX-SXB1XBLKFR</div></td>
+              <td><span class="pill pill-amber">CEX</span></td>
+              <td style="font-weight:600;">€ 510</td>
+              <td><span class="badge-u">U</span></td>
+              <td><span class="dot dot-on"></span></td>
+            </tr>
+            <tr>
+              <td><div class="td-name">Xbox Series S 512GB, Bianca</div><div class="td-sub">GL-001204 · Console</div></td>
+              <td><span class="pill pill-blue">GameLife</span></td>
+              <td style="font-weight:600;">€ 269</td>
+              <td><span class="badge-n">N</span></td>
+              <td><span class="dot dot-on"></span></td>
+            </tr>
+            <tr>
+              <td><div class="td-name">Xbox One X 1TB</div><div class="td-sub">Console Xbox One S (NUOVA) · GS-000512</div></td>
+              <td><span class="pill pill-green">GameShock</span></td>
+              <td style="font-weight:600;">€ 280</td>
+              <td><span class="badge-n">N</span></td>
+              <td><span class="dot dot-on"></span></td>
+            </tr>
+            <tr>
+              <td><div class="td-name">Xbox One 500GB, Bianco</div><div class="td-sub">Controller wireless incluso · RBY-10405935</div></td>
+              <td><span class="pill pill-purple">ReBuy</span></td>
+              <td style="font-weight:600;">€ 89</td>
+              <td><span class="badge-u">U</span></td>
+              <td><span class="dot dot-on"></span></td>
+            </tr>
+            <tr>
+              <td><div class="td-name">Xbox Series S 512GB</div><div class="td-sub">Scontata · CEX-SXSS512GBW003</div></td>
+              <td><span class="pill pill-amber">CEX</span></td>
+              <td style="font-weight:600;">€ 235</td>
+              <td><span class="badge-u">U</span></td>
+              <td><span class="dot dot-on"></span></td>
+            </tr>
+            <tr>
+              <td><div class="td-name">Xbox 360 E 250GB</div><div class="td-sub">Non Imballata · CEX-SXBOX360E250G</div></td>
+              <td><span class="pill pill-amber">CEX</span></td>
+              <td style="font-weight:600;">€ 85</td>
+              <td><span class="badge-u">U</span></td>
+              <td><span class="dot dot-on"></span></td>
+            </tr>
+            <tr style="opacity:.55;">
+              <td><div class="td-name">Xbox One X 1TB Noir</div><div class="td-sub">CEX-SXB1X1TBBLK</div></td>
+              <td><span class="pill pill-amber">CEX</span></td>
+              <td style="font-weight:600;">€ 195</td>
+              <td><span class="badge-u">U</span></td>
+              <td><span class="dot dot-off"></span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Store breakdown widget -->
+      <div class="glass">
+        <div class="table-header">
+          <div class="table-title">Store breakdown</div>
+          <div class="see-all">Dettaglio</div>
+        </div>
+        <div class="widget-body">
+          <div class="widget-row">
+            <div class="widget-store">
+              <div class="store-dot" style="background:#e6b800;"></div>
+              <div><div class="store-name">CEX</div><div class="store-count">168 prodotti · 45 disp.</div></div>
+            </div>
+            <div class="store-bar-wrap"><div class="store-bar" style="width:50.6%;background:#e6b800;"></div></div>
+            <div class="store-pct">51%</div>
+          </div>
+          <div class="widget-row">
+            <div class="widget-store">
+              <div class="store-dot" style="background:#82b8d8;"></div>
+              <div><div class="store-name">GameLife</div><div class="store-count">47 prodotti · 9 disp.</div></div>
+            </div>
+            <div class="store-bar-wrap"><div class="store-bar" style="width:14.2%;background:#82b8d8;"></div></div>
+            <div class="store-pct">14%</div>
+          </div>
+          <div class="widget-row">
+            <div class="widget-store">
+              <div class="store-dot" style="background:#82c882;"></div>
+              <div><div class="store-name">GameShock</div><div class="store-count">32 prodotti · 8 disp.</div></div>
+            </div>
+            <div class="store-bar-wrap"><div class="store-bar" style="width:9.6%;background:#82c882;"></div></div>
+            <div class="store-pct">10%</div>
+          </div>
+          <div class="widget-row">
+            <div class="widget-store">
+              <div class="store-dot" style="background:#d4a870;"></div>
+              <div><div class="store-name">ReBuy</div><div class="store-count">35 prodotti · 6 disp.</div></div>
+            </div>
+            <div class="store-bar-wrap"><div class="store-bar" style="width:10.5%;background:#d4a870;"></div></div>
+            <div class="store-pct">11%</div>
+          </div>
+          <div class="widget-row">
+            <div class="widget-store">
+              <div class="store-dot" style="background:#c082d0;"></div>
+              <div><div class="store-name">GamePeople</div><div class="store-count">4 prodotti · 1 disp.</div></div>
+            </div>
+            <div class="store-bar-wrap"><div class="store-bar" style="width:1.2%;background:#c082d0;"></div></div>
+            <div class="store-pct">1%</div>
+          </div>
+
+          <!-- Min prezzo summary -->
+          <div style="margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06);">
+            <div style="font-size:11px;color:var(--text-3);font-weight:500;letter-spacing:.6px;text-transform:uppercase;margin-bottom:10px;">Minimo per generazione</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px 12px;">
+                <div style="font-size:10px;color:var(--text-3);">Series X/S</div>
+                <div style="font-size:17px;font-weight:700;color:#34D399;letter-spacing:-.5px;">€ 235</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px 12px;">
+                <div style="font-size:10px;color:var(--text-3);">Xbox One</div>
+                <div style="font-size:17px;font-weight:700;color:#60A5FA;letter-spacing:-.5px;">€ 80</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px 12px;">
+                <div style="font-size:10px;color:var(--text-3);">Xbox 360</div>
+                <div style="font-size:17px;font-weight:700;color:#A78BFA;letter-spacing:-.5px;">€ 48</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:10px 12px;">
+                <div style="font-size:10px;color:var(--text-3);">Xbox OG</div>
+                <div style="font-size:17px;font-weight:700;color:#FCD34D;letter-spacing:-.5px;">€ 85</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ── Chart defaults ─────────────────────────────────────────
+Chart.defaults.color = '#9090B0';
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 11;
+
+const gridColor  = 'rgba(255,255,255,0.06)';
+const tooltipBg  = 'rgba(10,10,30,0.92)';
+
+// ── Line chart — price trend ───────────────────────────────
+const labels = ['24 Feb','3 Mar','10 Mar','17 Mar','24 Mar','31 Mar','7 Apr','14 Apr'];
+
+new Chart(document.getElementById('lineChart'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'Series X/S',
+        data: [285, 278, 265, 255, 248, 242, 238, 235],
+        borderColor: '#14C014',
+        backgroundColor: 'rgba(20,192,20,0.10)',
+        borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 6,
+        pointBackgroundColor: '#14C014',
+        tension: .45, fill: true,
+      },
+      {
+        label: 'Xbox One',
+        data: [98, 95, 92, 90, 88, 85, 83, 80],
+        borderColor: '#60A5FA',
+        backgroundColor: 'rgba(96,165,250,0.07)',
+        borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 6,
+        pointBackgroundColor: '#60A5FA',
+        tension: .45, fill: true,
+      },
+      {
+        label: 'Xbox 360',
+        data: [62, 60, 58, 55, 53, 52, 50, 48],
+        borderColor: '#A78BFA',
+        backgroundColor: 'rgba(167,139,250,0.07)',
+        borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 6,
+        pointBackgroundColor: '#A78BFA',
+        tension: .45, fill: true,
+      },
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { usePointStyle: true, pointStyleWidth: 8, boxHeight: 8, padding: 16 }
+      },
+      tooltip: {
+        backgroundColor: tooltipBg,
+        borderColor: 'rgba(255,255,255,0.12)', borderWidth: 1,
+        padding: 12, cornerRadius: 12,
+        callbacks: { label: c => ` € ${c.parsed.y}` }
+      }
+    },
+    scales: {
+      x: { grid: { color: gridColor }, border: { display: false } },
+      y: {
+        grid: { color: gridColor }, border: { display: false },
+        ticks: { callback: v => '€ ' + v }
+      }
+    }
+  }
+});
+
+// ── Bar chart — products per store ─────────────────────────
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels: ['CEX', 'GameLife', 'GameShock', 'ReBuy', 'GamePeople'],
+    datasets: [
+      {
+        label: 'Totale',
+        data: [168, 47, 32, 35, 4],
+        backgroundColor: ['rgba(230,184,0,.6)','rgba(130,184,216,.6)','rgba(130,200,130,.6)','rgba(212,168,112,.6)','rgba(192,130,208,.6)'],
+        borderColor:      ['#e6b800','#82b8d8','#82c882','#d4a870','#c082d0'],
+        borderWidth: 1.5, borderRadius: 8,
+      },
+      {
+        label: 'Disponibili',
+        data: [45, 9, 8, 6, 1],
+        backgroundColor: ['rgba(230,184,0,.25)','rgba(130,184,216,.25)','rgba(130,200,130,.25)','rgba(212,168,112,.25)','rgba(192,130,208,.25)'],
+        borderColor:      ['#e6b800','#82b8d8','#82c882','#d4a870','#c082d0'],
+        borderWidth: 1, borderRadius: 8,
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { usePointStyle: true, pointStyleWidth: 8, boxHeight: 8, padding: 16 }
+      },
+      tooltip: {
+        backgroundColor: tooltipBg,
+        borderColor: 'rgba(255,255,255,0.12)', borderWidth: 1,
+        padding: 12, cornerRadius: 12,
+      }
+    },
+    scales: {
+      x: { grid: { color: gridColor }, border: { display: false } },
+      y: { grid: { color: gridColor }, border: { display: false }, ticks: { stepSize: 40 } }
+    }
+  }
+});
+
+// ── Animated counters ──────────────────────────────────────
+function animCount(id, target, suffix = '') {
+  const el = document.getElementById(id);
+  let start = 0, dur = 1200, startTime = null;
+  function step(ts) {
+    if (!startTime) startTime = ts;
+    const p = Math.min((ts - startTime) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.childNodes[0].textContent = Math.round(ease * target) + suffix;
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+setTimeout(() => {
+  animCount('v1', 332);
+  animCount('v2', 69);
+  animCount('v3', 179);
+  animCount('v4', 5);
+}, 300);
+
+// ── Tab switcher ───────────────────────────────────────────
+document.querySelectorAll('.chart-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    t.closest('.chart-tabs').querySelectorAll('.chart-tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+  });
+});
+
+// ── Nav items ─────────────────────────────────────────────
+document.querySelectorAll('.nav-item').forEach(n => {
+  n.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+    n.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
