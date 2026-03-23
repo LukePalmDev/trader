@@ -7,9 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).parent
-TRADER_DB = ROOT / "trader.db"
-SUBITO_DB = ROOT / "subito.db"
-EBAY_DB = ROOT / "ebay.db"
+DB_PATH = ROOT / "tracker.db"
 LOGS_DIR = ROOT / "logs"
 
 VAT_RATE = 0.22
@@ -68,7 +66,7 @@ def _safe_key(canonical_model: str | None, family: str | None) -> str:
 
 
 def _collect_cex() -> dict[str, tuple[str, list[float]]]:
-    if not TRADER_DB.exists():
+    if not DB_PATH.exists():
         return {}
 
     query = """
@@ -82,7 +80,7 @@ def _collect_cex() -> dict[str, tuple[str, list[float]]]:
     """
 
     buckets: dict[str, tuple[str, list[float]]] = {}
-    with _connect(TRADER_DB) as conn:
+    with _connect(DB_PATH) as conn:
         rows = conn.execute(query).fetchall()
 
     for row in rows:
@@ -97,7 +95,7 @@ def _collect_cex() -> dict[str, tuple[str, list[float]]]:
 
 
 def _collect_subito() -> dict[str, tuple[str, list[float]]]:
-    if not SUBITO_DB.exists():
+    if not DB_PATH.exists():
         return {}
 
     query = """
@@ -110,7 +108,7 @@ def _collect_subito() -> dict[str, tuple[str, list[float]]]:
     """
 
     buckets: dict[str, tuple[str, list[float]]] = {}
-    with _connect(SUBITO_DB) as conn:
+    with _connect(DB_PATH) as conn:
         rows = conn.execute(query).fetchall()
 
     for row in rows:
@@ -125,7 +123,7 @@ def _collect_subito() -> dict[str, tuple[str, list[float]]]:
 
 
 def _collect_ebay() -> dict[str, tuple[str, list[float]]]:
-    if not EBAY_DB.exists():
+    if not DB_PATH.exists():
         return {}
 
     query = """
@@ -137,7 +135,7 @@ def _collect_ebay() -> dict[str, tuple[str, list[float]]]:
     """
 
     buckets: dict[str, tuple[str, list[float]]] = {}
-    with _connect(EBAY_DB) as conn:
+    with _connect(DB_PATH) as conn:
         rows = conn.execute(query).fetchall()
 
     for row in rows:
@@ -294,7 +292,7 @@ def score_subito_opportunities(limit: int = 300) -> dict:
     fair = compute_fair_values()
     by_canonical, by_family = _build_lookup(fair["values"])
 
-    if not SUBITO_DB.exists():
+    if not DB_PATH.exists():
         return {"total": 0, "items": []}
 
     query = """
@@ -310,7 +308,7 @@ def score_subito_opportunities(limit: int = 300) -> dict:
         LIMIT ?
     """
 
-    with _connect(SUBITO_DB) as conn:
+    with _connect(DB_PATH) as conn:
         rows = conn.execute(query, (int(limit),)).fetchall()
 
     items: list[dict] = []

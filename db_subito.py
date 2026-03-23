@@ -1,8 +1,8 @@
 """
-Database SQLite dedicato a Subito.it — tracking annunci e storico prezzi.
+Database SQLite — tracking annunci Subito.it e storico prezzi.
 
-Schema separato dal DB principale (trader.db) perché gli annunci Subito
-sono entità diverse dai prodotti shop:
+Tabelle: ads, ad_changes (in tracker.db condiviso).
+Gli annunci Subito sono entità diverse dai prodotti shop:
   - chiave univoca: urn_id (es. "SUBITO-639766302")
   - campi specifici: city, region, published_at, seller_type
   - nessun concetto di "storage_sizes" o "categories" normalizzate
@@ -25,7 +25,7 @@ from model_rules import classify_title, detect_family
 
 log = logging.getLogger(__name__)
 
-DB_PATH = Path(__file__).parent / "subito.db"
+DB_PATH = Path(__file__).parent / "tracker.db"
 
 def _table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
     rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
@@ -82,6 +82,12 @@ def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
     conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_segment ON ads(model_segment)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_canonical ON ads(canonical_model)")
 
+def _migration_v5_ai_columns(conn: sqlite3.Connection) -> None:
+    _add_column_if_missing(conn, "ads", "ai_status TEXT NOT NULL DEFAULT 'pending'")
+    _add_column_if_missing(conn, "ads", "ai_confidence REAL")
+    _add_column_if_missing(conn, "ads", "sold_at TEXT")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_ai_status ON ads(ai_status)")
+
 _MIGRATIONS = (
     Migration(
         1,
@@ -105,6 +111,49 @@ _MIGRATIONS = (
         3,
         "subito-segment-models",
         callback=_migration_v3_segment_models,
+    ),
+    Migration(
+        4,
+        "add-check-triggers",
+        (
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_ads_price_insert
+            BEFORE INSERT ON ads
+            WHEN NEW.last_price < 0
+            BEGIN
+                SELECT RAISE(ABORT, 'last_price must be >= 0');
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_ads_price_update
+            BEFORE UPDATE ON ads
+            WHEN NEW.last_price < 0
+            BEGIN
+                SELECT RAISE(ABORT, 'last_price must be >= 0');
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_ads_avail_insert
+            BEFORE INSERT ON ads
+            WHEN NEW.last_available NOT IN (0, 1)
+            BEGIN
+                SELECT RAISE(ABORT, 'last_available must be 0 or 1');
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_ads_avail_update
+            BEFORE UPDATE ON ads
+            WHEN NEW.last_available NOT IN (0, 1)
+            BEGIN
+                SELECT RAISE(ABORT, 'last_available must be 0 or 1');
+            END;
+            """,
+        ),
+    ),
+    Migration(
+        5,
+        "add-ai-columns",
+        callback=_migration_v5_ai_columns,
     ),
 )
 
@@ -152,7 +201,10 @@ def init_db(db_path: Path = DB_PATH) -> None:
             first_seen     TEXT    NOT NULL,
             last_seen      TEXT    NOT NULL,
             last_price     REAL,
-            last_available INTEGER NOT NULL DEFAULT 1
+            last_available INTEGER NOT NULL DEFAULT 1,
+            ai_status      TEXT    NOT NULL DEFAULT 'pending',
+            ai_confidence  REAL,
+            sold_at        TEXT
         );
 
         CREATE TABLE IF NOT EXISTS ad_changes (
@@ -171,9 +223,9 @@ def init_db(db_path: Path = DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_ads_family     ON ads(console_family);
         CREATE INDEX IF NOT EXISTS idx_ads_price      ON ads(last_price);
         """)
-    applied = run_migrations(db_path, _MIGRATIONS)
+    applied = run_migrations(db_path, _MIGRATIONS, namespace="ads")
     if applied:
-        log.info("Migrazioni subito.db applicate: %s", applied)
+        log.info("Migrazioni ads (subito) applicate: %s", applied)
     log.info("Subito DB pronto: %s", db_path)
 
 
@@ -195,7 +247,10 @@ def process_ads(
     now   = datetime.now(timezone.utc).isoformat()
     stats = {"new": 0, "price_changes": 0, "avail_changes": 0, "unchanged": 0}
 
-    with _connect(db_path) as conn:
+    conn = _connect(db_path)
+    conn.isolation_level = None
+    conn.execute("BEGIN IMMEDIATE")
+    try:
         for p in products:
             urn_id    = (p.get("sku") or "").strip()
             name      = (p.get("name") or "").strip()
@@ -318,6 +373,13 @@ def process_ads(
                 else:
                     stats["unchanged"] += 1
 
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
     return stats
 
 
@@ -326,22 +388,26 @@ def process_ads(
 # ---------------------------------------------------------------------------
 
 def get_all_ads(db_path: Path = DB_PATH) -> list[dict]:
-    """Tutti gli annunci, ordinati per famiglia e prezzo."""
+    """Tutti gli annunci, ordinati per famiglia e prezzo.
+    Restituisce solo i campi usati dal viewer (payload ridotto ~40%)."""
     with _connect(db_path) as conn:
         rows = conn.execute("""
             SELECT
                 id, urn_id, name, console_family,
-                model_segment, edition_class, canonical_model,
-                classify_confidence, classify_method,
-                url, image_url, city, region,
+                model_segment, edition_class,
+                url, city, region,
                 seller_type, published_at,
-                first_seen, last_seen,
-                last_price, last_available
+                last_price, last_available,
+                ai_status, ai_confidence
             FROM ads
             ORDER BY console_family, last_price ASC NULLS LAST
         """).fetchall()
     return [dict(r) for r in rows]
 
+def update_ai_status(ad_id: int, status: str, db_path: Path = DB_PATH) -> None:
+    """Aggiorna lo stato AI di un annuncio."""
+    with _connect(db_path) as conn:
+        conn.execute("UPDATE ads SET ai_status = ? WHERE id = ?", (status, ad_id))
 
 def get_recent_changes(days: int = 30, db_path: Path = DB_PATH) -> list[dict]:
     """Cambi di prezzo/disponibilità degli ultimi N giorni."""
@@ -454,3 +520,59 @@ def get_stats(db_path: Path = DB_PATH) -> dict:
             FROM ads
         """).fetchone()
     return dict(row) if row else {}
+
+
+def get_sold_ads(db_path: Path = DB_PATH) -> list[dict]:
+    """Annunci rilevati come venduti (sold_at IS NOT NULL), più recenti prima."""
+    with _connect(db_path) as conn:
+        rows = conn.execute("""
+            SELECT
+                id, urn_id, name, console_family,
+                model_segment, edition_class, canonical_model,
+                url, city, region,
+                seller_type, published_at,
+                first_seen, sold_at,
+                last_price, ai_status
+            FROM ads
+            WHERE sold_at IS NOT NULL
+            ORDER BY sold_at DESC
+        """).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_sold_stats(db_path: Path = DB_PATH) -> dict:
+    """Statistiche sui venduti: prezzo medio/min/max e tempo attivo per famiglia."""
+    with _connect(db_path) as conn:
+        g = conn.execute("""
+            SELECT
+                COUNT(*)                                             AS total_sold,
+                AVG(CASE WHEN last_price > 0 THEN last_price END)   AS avg_price,
+                MIN(CASE WHEN last_price > 0 THEN last_price END)   AS min_price,
+                MAX(CASE WHEN last_price > 0 THEN last_price END)   AS max_price
+            FROM ads
+            WHERE sold_at IS NOT NULL
+        """).fetchone()
+
+        fam = conn.execute("""
+            SELECT
+                console_family,
+                COUNT(*)                                                         AS count,
+                AVG(CASE WHEN last_price > 0 THEN last_price END)               AS avg_price,
+                MIN(CASE WHEN last_price > 0 THEN last_price END)               AS min_price,
+                MAX(CASE WHEN last_price > 0 THEN last_price END)               AS max_price,
+                AVG(
+                    CASE
+                        WHEN first_seen IS NOT NULL AND sold_at IS NOT NULL
+                        THEN (julianday(sold_at) - julianday(first_seen)) * 24.0
+                    END
+                )                                                                AS avg_hours_active
+            FROM ads
+            WHERE sold_at IS NOT NULL
+            GROUP BY console_family
+            ORDER BY count DESC
+        """).fetchall()
+
+    return {
+        "global":    dict(g) if g else {},
+        "by_family": [dict(r) for r in fam],
+    }
