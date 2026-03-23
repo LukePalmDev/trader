@@ -81,12 +81,32 @@ MAX_PAGES = 300
 
 # Query per scraping massivo (senza "console" per prendere anche i giochi/bundle)
 _QUERIES = [
-    ("Xbox",           "xbox"),
-    ("Xbox Series X",  "xbox series x"),
-    ("Xbox Series S",  "xbox series s"),
-    ("Xbox One",       "xbox one"),
-    ("Xbox 360",       "xbox 360"),
-    ("Xbox Original",  "xbox original"),
+    # ── Modelli principali ──────────────────────────────────────────────────
+    ("Xbox",             "xbox"),
+    ("Xbox Series X",    "xbox series x"),
+    ("Xbox Series S",    "xbox series s"),
+    ("Xbox One",         "xbox one"),
+    ("Xbox One X",       "xbox one x"),
+    ("Xbox One S",       "xbox one s"),
+    ("Xbox 360",         "xbox 360"),
+    ("Xbox 360 E",       "xbox 360 e"),
+    ("Xbox 360 Slim",    "xbox 360 slim"),
+    ("Xbox Original",    "xbox original"),
+    ("Xbox Classic",     "xbox classic"),
+    ("Xbox Crystal",     "xbox crystal"),
+    # ── Abbreviazioni comuni ───────────────────────────────────────────────
+    ("Xbox Serie",       "xbox serie"),       # singolare — errore frequente in italiano
+    ("Xbox Serie X",     "xbox serie x"),
+    ("Xbox Serie S",     "xbox serie s"),
+    ("Xbox 1",           "xbox 1"),           # "uno" scritto come numero
+    # ── Storpiature e typo ────────────────────────────────────────────────
+    ("X Box",            "x box"),            # spazio nel nome
+    ("X-Box",            "x-box"),            # trattino
+    ("Xboks",            "xboks"),            # k finale
+    ("Xbox Ome",         "xbox ome"),         # n→m (one)
+    ("Xbox On",          "xbox on"),          # "one" troncato
+    ("Xbox Seres",       "xbox seres"),       # typo di "series"
+    ("Xbox Sereis",      "xbox sereis"),      # inversione lettere
 ]
 
 

@@ -1,21 +1,20 @@
-name: Daily Scrape
+name: Scrape eBay (venduti)
 
 on:
   schedule:
-    # 05:00 UTC = 07:00 CEST (estate) / 06:00 CET (inverno)
-    - cron: '0 5 * * *'
+    # 22:00 UTC = 00:00 CEST (estate) | 23:00 CET (inverno)
+    - cron: '0 22 * * *'
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
 jobs:
-  scrape:
+  scrape-ebay:
     runs-on: ubuntu-latest
     env:
-      TRADER_PLAYWRIGHT_CHANNEL: chromium
       TRADER_VIEWER_OPEN_BROWSER: "false"
       TRADER_TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TRADER_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
     permissions:
-      contents: write   # serve per fare git push
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -29,16 +28,11 @@ jobs:
           python-version: '3.11'
           cache: pip
 
-      - name: Install Python dependencies (locked)
+      - name: Install Python dependencies
         run: pip install -r requirements.lock
 
-      - name: Install Playwright browsers
-        run: |
-          python -m playwright install chromium
-          python -m playwright install-deps chromium
-
-      - name: Run scrapers
-        run: python run.py
+      - name: Scrape eBay venduti
+        run: python run.py --source ebay
 
       - name: Cleanup and archive old data
         run: python run.py --cleanup
@@ -50,5 +44,5 @@ jobs:
           git add tracker.db
           git add logs/run_report_latest.json || true
           git diff --staged --quiet \
-            || git commit -m "chore: scrape $(date -u +%Y-%m-%d)"
+            || git commit -m "chore: scrape ebay $(date -u +%Y-%m-%d)"
           git push

@@ -143,9 +143,16 @@ def _run_scraper(source: str, report: RunReport | None = None) -> Path | None:
     return path
 
 
-def cmd_scrape(sources: list[str], report: RunReport | None = None) -> list[Path]:
-    """Esegue lo scrape per le sorgenti indicate, poi retention e update DB."""
+def cmd_scrape(
+    sources: list[str], report: RunReport | None = None
+) -> tuple[list[Path], dict[str, dict]]:
+    """Esegue lo scrape per le sorgenti indicate, poi retention e update DB.
+
+    Returns:
+        (paths, stats_by_source) dove stats_by_source è {source: {total, new, ...}}
+    """
     results: list[Path] = []
+    stats_by_source: dict[str, dict] = {}
     for source in sources:
         ctx = report.step("scrape_source", {"source": source}) if report else nullcontext({})
         with ctx:
@@ -154,13 +161,22 @@ def cmd_scrape(sources: list[str], report: RunReport | None = None) -> list[Path
             path = _run_scraper(source, report=report)
             if path:
                 results.append(path)
-                _update_db_from_snapshot(path, report=report)
+                s = _update_db_from_snapshot(path, report=report)
+                if s:
+                    stats_by_source[source] = s
             _apply_retention(source)
-    return results
+    return results, stats_by_source
 
 
-def _update_db_from_snapshot(snapshot_path: Path, report: RunReport | None = None) -> None:
-    """Legge uno snapshot JSON e aggiorna il DB con change detection."""
+def _update_db_from_snapshot(
+    snapshot_path: Path, report: RunReport | None = None
+) -> dict:
+    """Legge uno snapshot JSON e aggiorna il DB con change detection.
+
+    Returns:
+        dict con chiavi: source, total, new, price_changes, avail_changes, unchanged
+    """
+    empty: dict = {}
     try:
         data = json.loads(snapshot_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -168,12 +184,12 @@ def _update_db_from_snapshot(snapshot_path: Path, report: RunReport | None = Non
         log.error(msg)
         if report:
             report.note_error("update_db", msg, snapshot=str(snapshot_path))
-        return
+        return empty
 
     products = data.get("products", [])
     source = data.get("source", "")
     if not products:
-        return
+        return empty
 
     try:
         if source == "ebay":
@@ -195,7 +211,6 @@ def _update_db_from_snapshot(snapshot_path: Path, report: RunReport | None = Non
                 stats["unchanged"],
             )
 
-
             import alerts as _alerts
 
             _alerts.check_alerts()
@@ -209,11 +224,13 @@ def _update_db_from_snapshot(snapshot_path: Path, report: RunReport | None = Non
                 stats["avail_changes"],
                 stats["unchanged"],
             )
+        return {"source": source, "total": len(products), **stats}
     except Exception as exc:  # noqa: BLE001
         msg = f"Errore aggiornamento DB da {snapshot_path.name}: {exc}"
         log.exception(msg)
         if report:
             report.note_error("update_db", msg, snapshot=str(snapshot_path), source=source)
+        return empty
 
 
 def _apply_retention(source: str) -> None:
@@ -482,10 +499,10 @@ def main() -> None:
 
         if args.full:
             log.info("[ 1/6 ] Scrape Subito…")
-            cmd_scrape(["subito"], report=report)
+            _, _s1 = cmd_scrape(["subito"], report=report)
 
             log.info("[ 2/6 ] Scrape eBay sold…")
-            cmd_scrape(["ebay"], report=report)
+            _, _s2 = cmd_scrape(["ebay"], report=report)
 
             log.info("[ 3/6 ] Verifica venduti Subito (verify_sold)…")
             import asyncio
@@ -526,7 +543,7 @@ def main() -> None:
                     api_token=args.api_token,
                 )
         elif args.all:
-            cmd_scrape(sources, report=report)
+            _, _scrape_stats = cmd_scrape(sources, report=report)
             with report.step("view"):
                 cmd_view(
                     port=args.port,
@@ -535,8 +552,11 @@ def main() -> None:
                     api_token=args.api_token,
                 )
         else:
-            cmd_scrape(sources, report=report)
+            _, _scrape_stats = cmd_scrape(sources, report=report)
             _archive_old_snapshots()
+            if _scrape_stats:
+                import alerts as _alerts
+                _alerts.send_run_summary(_scrape_stats)
 
         ok = True
 

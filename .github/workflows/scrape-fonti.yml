@@ -1,0 +1,54 @@
+name: Scrape Fonti (CEX · GameLife · GamePeople · GameShock · ReBuy)
+
+on:
+  schedule:
+    # 05:00 UTC = 07:00 CEST (estate) | 06:00 CET (inverno)
+    - cron: '0 5 * * *'
+  workflow_dispatch:  # trigger manuale dalla UI GitHub
+
+jobs:
+  scrape-fonti:
+    runs-on: ubuntu-latest
+    env:
+      TRADER_PLAYWRIGHT_CHANNEL: chromium
+      TRADER_VIEWER_OPEN_BROWSER: "false"
+      TRADER_TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TRADER_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.lock
+
+      - name: Install Playwright browsers
+        run: |
+          python -m playwright install chromium
+          python -m playwright install-deps chromium
+
+      - name: Scrape fonti store
+        run: python run.py --source gamelife,gamepeople,gameshock,rebuy,cex
+
+      - name: Cleanup and archive old data
+        run: python run.py --cleanup
+
+      - name: Commit and push DB/artifacts
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add tracker.db
+          git add logs/run_report_latest.json || true
+          git diff --staged --quiet \
+            || git commit -m "chore: scrape fonti $(date -u +%Y-%m-%d)"
+          git push
