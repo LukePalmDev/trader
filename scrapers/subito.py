@@ -56,6 +56,7 @@ from scrapers.base import (
     save_snapshot,
 )
 from settings import load_config
+from db_subito import DB_PATH, _connect
 
 log = logging.getLogger("subito")
 
@@ -75,15 +76,17 @@ SOURCE      = "subito"
 # Limite massimo pagine per query (ogni pagina ≈ 30 annunci)
 # Subito.it supporta fino a 300 pagine per query (≈9.000 risultati/query)
 # 30 pagine × 5 query = max ~4.500 annunci lordi (deduplicati a fine run)
-MAX_PAGES = 30
+# 300 pagine massime supportate da Subito (≈9.000 annunci/query)
+MAX_PAGES = 300
 
-# Query di ricerca: (label, keyword_per_URL)
+# Query per scraping massivo (senza "console" per prendere anche i giochi/bundle)
 _QUERIES = [
-    ("Xbox Series X",  "xbox series x console"),
-    ("Xbox Series S",  "xbox series s console"),
-    ("Xbox One",       "xbox one console"),
-    ("Xbox 360",       "xbox 360 console"),
-    ("Xbox Original",  "xbox original console"),
+    ("Xbox",           "xbox"),
+    ("Xbox Series X",  "xbox series x"),
+    ("Xbox Series S",  "xbox series s"),
+    ("Xbox One",       "xbox one"),
+    ("Xbox 360",       "xbox 360"),
+    ("Xbox Original",  "xbox original"),
 ]
 
 
@@ -91,54 +94,8 @@ _QUERIES = [
 # Filtri titolo annuncio
 # --------------------------------------------------------------------------- #
 
-_BLOCKLIST = re.compile(
-    r"""
-    \b(
-      # Input / periferiche
-      controller | gamepad | joypad | joystick | \bpad\b | manett[ae]
-      # Audio
-    | headset | cuffie? | auricolari | microfono
-      # Cavi / alimentazione
-    | \bcavo\b | \bcavi\b | alimentator[ei] | adattattor[ei] | \bpsu\b | caricatore
-      # Storage esterno
-    | hard\s*disk | \bhdd\b | \bssd\b | disco\s+rigido | pendrive | chiavetta
-      # Digitale / software / abbonamenti
-    | game\s*pass | xbox\s*live | \bgold\b | abbonamento | \bdlc\b
-    | \bcodice\b | voucher | gift\s*card | carta\s*regalo
-      # Video output
-    | \bhdmi\b | \bmonitor\b | \bschermo\b | televisore
-      # Accessori fisici
-    | kinect | \bstand\b | \bventola\b | \bdock\b | batterie? | stazione\s+di\s+ricarica
-    | \bskin\b | pellicola | \bcover\b | copertura | antipolvere | custodia
-    | \bsupporto\b | \blettore\b | mascherina | \bricambi?\b | \bmanuale\b
-    | \bcopertine?\b | \blotto\b | \bpezzi\b | \bparte\b | \bricambio\b
-      # Giochi (keywords generici + titoli noti)
-    | \bgioco\b | \bgiochi\b | videogioco | videogiochi | \bedizione\s+classic
-    | \bfifa\d* | \bnba\b | \bpes\b | \bcall\s+of\b | minecraft | battlefield
-    | \bassassin | \bforza\b | \bgta\b | \bhalo\b(?!\s+console)
-    | \bcod\b | \boverwatch\b | \briders?\b | \bcrysis\b | \balone\b
-    | dead\s+or\s+alive | resident\s+evil | burnout | lego\b | \bfor\s+honor\b
-    | def\s+jam | \bthe\s+club\b | \bwwe\b | \bufc\b | \bmortal\b | \bdoom\b
-    )\b
-    """,
-    re.IGNORECASE | re.VERBOSE,
-)
-
-_IS_CONSOLE = re.compile(
-    r"""
-    \b(
-      console
-    | xbox\s+series\s+x\b
-    | xbox\s+series\s+s\b
-    | xbox\s+one\s+x\b
-    | xbox\s+one\s+s\b
-    | xbox\s+one\b
-    | xbox\s+360\b
-    | xbox\s+original\b
-    )\b
-    """,
-    re.IGNORECASE | re.VERBOSE,
-)
+# I filtri hardware precedentemente qui presenti (_BLOCKLIST e _IS_CONSOLE)
+# sono stati rimossi. Ora classifichiamo tutto tramite intelligenza artificiale.
 
 # Mappa chiave condizione Subito → label standard
 _CONDITION_MAP = {
@@ -160,13 +117,7 @@ def _parse_ad(item: dict) -> dict | None:
     if not subject:
         return None
 
-    # --- Filtri ---
-    if _BLOCKLIST.search(subject):
-        log.debug("Blocklist: %r", subject)
-        return None
-    if not _IS_CONSOLE.search(subject):
-        log.debug("Non console: %r", subject)
-        return None
+    # Niente filtri Regex hardware: prendiamo tutto per farglielo classificare dall'AI
 
     # --- URL ---
     urls = item.get("urls") or {}
@@ -279,11 +230,14 @@ async def _fetch_next_data(browser, url: str) -> dict | None:
 # Scraper con paginazione
 # --------------------------------------------------------------------------- #
 
-async def _scrape_query(browser, label: str, keyword: str) -> list[dict]:
-    """Scarica e analizza tutte le pagine per una singola query."""
+async def _scrape_query(browser, label: str, keyword: str, known_urns: set[str]) -> list[dict]:
+    """Scarica e analizza tutte le pagine per una singola query, con stop cronologico."""
     log.info("Query: %s — %r", label, keyword)
     all_ads: list[dict] = []
     q_encoded = keyword.replace(" ", "+")
+    
+    consecutive_known = 0
+    MAX_CONSECUTIVE = 15 # Supera abbondantemente gli annunci "Vetrina/In Cima" in una singola pagina
 
     for page_num in range(1, MAX_PAGES + 1):
         url = (
@@ -311,10 +265,27 @@ async def _scrape_query(browser, label: str, keyword: str) -> list[dict]:
             log.info("  → Pagina vuota, stop.")
             break
 
-        parsed     = [ad for item in items if (ad := _parse_ad(item)) is not None]
-        filtered_n = len(items) - len(parsed)
-        log.info("  → %d/%d annunci validi (scartati %d)", len(parsed), len(items), filtered_n)
-        all_ads.extend(parsed)
+        parsed_this_page = []
+        for item in items:
+            ad = _parse_ad(item)
+            if not ad:
+                continue
+            parsed_this_page.append(ad)
+            
+            # Check for chronological stop
+            if ad["sku"] in known_urns:
+                consecutive_known += 1
+            else:
+                consecutive_known = 0
+
+        filtered_n = len(items) - len(parsed_this_page)
+        log.info("  → %d/%d annunci estratti (scartati vuoti %d). Known consecutivi: %d", 
+                 len(parsed_this_page), len(items), filtered_n, consecutive_known)
+        all_ads.extend(parsed_this_page)
+
+        if consecutive_known >= MAX_CONSECUTIVE:
+            log.info("  → Raggiunto limite STOP cronologico (%d annunci noti consecutivi). Query completata.", MAX_CONSECUTIVE)
+            break
 
         # Se la pagina restituisce meno di 25 annunci è probabilmente l'ultima
         if len(items) < 25:
@@ -325,8 +296,18 @@ async def _scrape_query(browser, label: str, keyword: str) -> list[dict]:
 
 
 async def run_scraper() -> list[dict]:
-    """Scrape di tutte le query console Xbox su Subito.it."""
+    """Scrape massivo di tutte le query console Xbox su Subito.it."""
     all_ads: list[dict] = []
+
+    # Recupero URN già noti dal database per lo stop cronologico
+    known_urns = set()
+    try:
+        conn = _connect(DB_PATH)
+        rows = conn.execute("SELECT urn_id FROM ads").fetchall()
+        known_urns = {row[0] for row in rows}
+        log.info("Trovati %d annunci gia noti nel DB per filtro cronologico.", len(known_urns))
+    except Exception as exc:
+        log.warning("Impossibile caricare known_urns: %s", exc)
 
     async with async_playwright() as p:
         browser = await launch_chromium(
@@ -337,7 +318,7 @@ async def run_scraper() -> list[dict]:
 
         for label, keyword in _QUERIES:
             try:
-                ads = await _scrape_query(browser, label, keyword)
+                ads = await _scrape_query(browser, label, keyword, known_urns)
                 all_ads.extend(ads)
             except Exception as exc:
                 log.error("Errore query %r: %s", label, exc)

@@ -12,6 +12,7 @@ Categorie tracciate (solo console):
 Condizione: sempre "Usato" (rebuy vende solo ricondizionato).
 Grading qualità: Eccellente / Molto buono / Buono / Accettabile
 """
+from __future__ import annotations
 
 import logging
 import re

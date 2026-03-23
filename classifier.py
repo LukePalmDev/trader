@@ -30,51 +30,34 @@ logging.basicConfig(
 )
 
 ROOT = Path(__file__).parent
-DB_SUBITO = ROOT / "subito.db"
-DB_TRADER = ROOT / "trader.db"
+DB_PATH = ROOT / "tracker.db"
 
 VALID_FAMILIES = {"series-x", "series-s", "one-x", "one-s", "one", "360", "original", "other"}
 
-SYSTEM_PROMPT = """\
-Sei un esperto di console Xbox. Ricevi titoli annunci Subito e devi classificare:
-- family: series-x|series-s|one-x|one-s|one|360|original|other
-- segment: base|premium|unknown
-- edition_class: standard|limited|special|bundle
-- canonical_model: slug breve (es: series-x-1tb, series-s-512gb, one-s-1tb, 360-250gb, original, unknown)
-- confidence: numero 0..1
-
-Rispondi SOLO con JSON:
-{
-  "classifications": [
-    {
-      "id": <int>,
-      "family": "<value>",
-      "segment": "<value>",
-      "edition_class": "<value>",
-      "canonical_model": "<slug>",
-      "confidence": <float>
-    }
-  ]
-}
-"""
-
-BATCH_SIZE = 25
+SYSTEM_PROMPT = """Classifica titoli Xbox Subito.
+JSON: classifications [{id, family, segment, edition_class, canonical_model, confidence}].
+Values: family(series-x|series-s|one-x|one-s|one|360|original|other), segment(base|premium|unknown), edition(standard|limited|special|bundle).
+No text, only JSON."""
 
 
-def _connect_subito() -> sqlite3.Connection:
-    conn = sqlite3.connect(str(DB_SUBITO))
-    conn.row_factory = sqlite3.Row
-    return conn
+BATCH_SIZE = 15  # ridotto per evitare troncatura JSON (max_tokens=4096)
+
+HAIKU_MODELS = [
+    "claude-haiku-4-5-20251001",   # Haiku attuale (più economico)
+    "claude-3-5-haiku-20241022",   # Haiku legacy fallback
+    "claude-sonnet-4-6",           # Sonnet attuale (fallback finale)
+]
+SELECTED_MODEL = os.environ.get("ANTHROPIC_MODEL")
 
 
-def _connect_trader() -> sqlite3.Connection:
-    conn = sqlite3.connect(str(DB_TRADER))
+def _connect() -> sqlite3.Connection:
+    conn = sqlite3.connect(str(DB_PATH))
     conn.row_factory = sqlite3.Row
     return conn
 
 
 def _get_candidates(limit: int | None = None) -> list[dict]:
-    with _connect_subito() as conn:
+    with _connect() as conn:
         q = """
             SELECT
                 id, urn_id, name,
@@ -112,10 +95,10 @@ def _jaccard(a: set[str], b: set[str]) -> float:
 
 
 def _load_cex_anchors() -> dict[str, list[dict]]:
-    if not DB_TRADER.exists():
+    if not DB_PATH.exists():
         return {}
 
-    with _connect_trader() as conn:
+    with _connect() as conn:
         rows = conn.execute(
             """
             SELECT name, console_family, canonical_model
@@ -177,7 +160,7 @@ def _apply_classifications(updates: list[dict], dry_run: bool = False) -> int:
             )
         return len(updates)
 
-    with _connect_subito() as conn:
+    with _connect() as conn:
         for u in updates:
             conn.execute(
                 """
@@ -249,8 +232,8 @@ def classify_batch(ads: list[dict], client) -> list[dict]:
 
     try:
         response = client.messages.create(
-            model="claude-haiku-4-5",
-            max_tokens=900,
+            model=os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
+            max_tokens=4096,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_msg}],
         )
@@ -289,7 +272,7 @@ def classify_batch(ads: list[dict], client) -> list[dict]:
                     "edition_class": edition_class,
                     "canonical_model": canonical,
                     "confidence": round(min(max(confidence_f, 0.0), 1.0), 3),
-                    "method": "ai:claude-haiku-4-5",
+                    "method": f"ai:{os.environ.get('ANTHROPIC_MODEL', 'claude-haiku-4-5-20251001')}",
                 }
             )
         return result
@@ -336,6 +319,27 @@ def run_classifier(
                 client = None
 
             if client is not None:
+                global SELECTED_MODEL
+                if not SELECTED_MODEL:
+                    log.info("Rilevamento modello Haiku disponibile per Classifier...")
+                    for model in HAIKU_MODELS:
+                        try:
+                            # Test veloce
+                            client.messages.create(
+                                model=model,
+                                max_tokens=1,
+                                messages=[{"role": "user", "content": "ping"}]
+                            )
+                            SELECTED_MODEL = model
+                            log.info("Modello rilevato e selezionato: %s", SELECTED_MODEL)
+                            break
+                        except Exception:
+                            continue
+                    
+                    if not SELECTED_MODEL:
+                        log.error("Nessun modello disponibile per fallback AI in Classifier.")
+                        SELECTED_MODEL = "claude-sonnet-4-6"
+                
                 for i in range(0, len(unresolved), BATCH_SIZE):
                     batch = unresolved[i : i + BATCH_SIZE]
                     log.info(

@@ -169,8 +169,30 @@ def load_config(config_path: Path) -> dict:
                 _as_str(viewer.get("api_token", ""), field="viewer.api_token", allow_empty=True),
             ),
         },
+        "telegram": {},
         "sources": {},
     }
+
+    # Telegram (opzionale)
+    telegram = raw.get("telegram")
+    if isinstance(telegram, dict):
+        tg_enabled = _env_bool(
+            "TRADER_TELEGRAM_ENABLED",
+            _as_bool(telegram.get("enabled", False), field="telegram.enabled"),
+        )
+        tg_token = _env_str(
+            "TRADER_TELEGRAM_TOKEN",
+            _as_str(telegram.get("bot_token", ""), field="telegram.bot_token", allow_empty=True),
+        )
+        tg_chat = _env_str(
+            "TRADER_TELEGRAM_CHAT_ID",
+            _as_str(telegram.get("chat_id", ""), field="telegram.chat_id", allow_empty=True),
+        )
+        validated["telegram"] = {
+            "enabled": tg_enabled and bool(tg_token) and bool(tg_chat),
+            "bot_token": tg_token,
+            "chat_id": tg_chat,
+        }
 
     for source_name, cfg in sources.items():
         if not isinstance(cfg, dict):

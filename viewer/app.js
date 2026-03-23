@@ -77,6 +77,7 @@ const API = window.ViewerApi || {
 // ============================================================
 let SOURCES_META   = VIEWER_STATE.sourcesMeta;
 let ALL_PRODUCTS   = VIEWER_STATE.allProducts;   // da snapshot JSON (usato in "Tutto", escluso subito)
+let PRICE_HISTORY  = [];                         // Storico prezzi globali (Statistiche 3,4,5)
 let ALL_DATA       = VIEWER_STATE.allData;       // { source_id: { scraped_at, products[] } }
 let DB_PRODUCTS    = VIEWER_STATE.dbProducts;    // da DB SQLite trader.db (usato in "Catalogo", escluso subito)
 let BASE_MODELS    = VIEWER_STATE.baseModels;    // DB prodotti con is_base_model=1 (usato in "Home")
@@ -90,6 +91,19 @@ let currentSort    = VIEWER_STATE.currentSort;
 // ============================================================
 // Utilità
 // ============================================================
+
+/**
+ * Estrae i valori da Promise.allSettled: fulfilled → valore, rejected → fallback.
+ * Permette al viewer di caricare dati parziali se un endpoint fallisce.
+ */
+function _settled(results, fallbacks) {
+  return results.map((r, i) => {
+    if (r.status === 'fulfilled') return r.value;
+    console.warn(`API #${i} fallita:`, r.reason?.message || r.reason);
+    return fallbacks[i] !== undefined ? fallbacks[i] : { ok: false, body: null };
+  });
+}
+
 function _familyKey(name) {
   const n = String(name || '').toLowerCase();
   if (!n.trim()) return 'other';
@@ -132,8 +146,60 @@ function _shortName(name, familyKey) {
 function _storeLabel(id)  { return STORE_META[id]?.label  ?? id;        }
 function _storeAccent(id) { return STORE_META[id]?.accent ?? '#cccccc'; }
 
+const MANUAL_OVERRIDES = {
+  1122: { e: 'Digital' },
+  1123: { e: 'Digital' },
+  1124: { e: 'Digital' },
+  1154: { e: 'Halo Infinite' },
+  1155: { e: 'Halo Infinite' },
+  1156: { e: 'Halo Infinite' },
+  2021: { c: 'Bianco' },
+  2022: { c: 'Bianco' },
+  2029: { e: 'Anthem' },
+  2030: { e: 'Anthem' },
+  2037: { e: 'Digital' },
+  2038: { e: 'Digital' },
+  2039: { c: 'Bianco' },
+  2040: { c: 'Bianco' },
+  2041: { c: 'Bianco' },
+  2042: { c: 'Bianco' },
+  2049: { c: 'Nero' },
+  2050: { c: 'Nero' },
+  2065: { s: '512 GB', c: 'Bianco' },
+  2066: { s: '512 GB', c: 'Bianco' },
+  2067: { s: '512 GB' },
+  2068: { s: '512 GB' },
+  2069: { s: '512 GB' },
+  2070: { s: '512 GB' },
+  2071: { s: '512 GB', c: 'Bianco' },
+  2072: { s: '512 GB', c: 'Bianco' },
+  2076: { s: '1 TB', c: 'Nero' },
+  2077: { s: '1 TB', c: 'Nero' },
+  2078: { s: '1 TB' },
+  2079: { s: '1 TB' },
+  2080: { s: '1 TB' },
+  2081: { s: '1 TB', e: 'Diablo IV' },
+  2082: { s: '1 TB' },
+  2083: { s: '1 TB' },
+  3002: { c: 'Bianco' },
+  3003: { e: 'Diablo IV' },
+  3004: { c: 'Nero' },
+  3032: { c: 'Nero' },
+  4018: { c: 'Bianco' },
+  4019: { s: '1 TB', c: 'Bianco' },
+  4031: { s: '512 GB', c: 'Bianco' },
+  4032: { s: '1 TB', c: 'Nero' }
+};
+
 function enhanceProduct(p) {
   if (p._enhanced) return p;
+
+  if (MANUAL_OVERRIDES[p.display_id]) {
+    const ov = MANUAL_OVERRIDES[p.display_id];
+    if (ov.s) p.storage_label = ov.s;
+    if (ov.c) p._manual_color = ov.c;
+    if (ov.e) p._manual_edition = ov.e;
+  }
 
   const fk = p.console_family || _familyKey(p.name);
   let pf = 'Altro';
@@ -175,6 +241,10 @@ function enhanceProduct(p) {
   if (/\bviola\b|\bpurple\b/.test(t)) colors.push('Viola');
   if (/\boro\b|\bgold\b/.test(t) && !isGoldRush) colors.push('Oro');
 
+  if (p._manual_color && !colors.includes(p._manual_color)) {
+    colors.push(p._manual_color);
+  }
+
   const parsed_color = colors.length ? colors.join(', ') : '';
 
   let specialEd = '';
@@ -201,10 +271,13 @@ function enhanceProduct(p) {
   else if (/\bkasumi\b/.test(t)) specialEd = 'Kasumi-Chan';
   else if (/\bpanzer\s+dragoon\b/.test(t)) specialEd = 'Panzer Dragoon';
   else if (isGoldRush) specialEd = 'Gold Rush';
+  else if (/\bdiablo\b/.test(t)) specialEd = 'Diablo';
+  else if (/\bcelebrity\b/.test(t)) specialEd = 'Celebrity';
+  else if (/(?:bundle|\+\s*.+gioco|\+\s*.+game)/i.test(t) && t.indexOf('controller') === -1) specialEd = 'Bundle';
 
-  let ed = specialEd || p.edition_class || 'standard';
+  let ed = p._manual_edition || specialEd || p.edition_class || 'standard';
   ed = ed.charAt(0).toUpperCase() + ed.slice(1);
-  const parsed_edition = parsed_color ? parsed_color : ed;
+  const parsed_edition = p._manual_edition ? p._manual_edition : (parsed_color ? parsed_color : ed);
 
   p.parsed_family = pf;
   p.parsed_segment = ps;
@@ -212,8 +285,19 @@ function enhanceProduct(p) {
   p.parsed_color = parsed_color;
   p.parsed_edition = parsed_edition;
 
+  p.parsed_edition = parsed_edition;
+
+  if (!p.storage_label) {
+    const tb = t.match(/(\d+(?:[.,]\d+)?)\s*tb/i);
+    if (tb) p.storage_label = tb[1].replace(',', '.') + ' TB';
+    else {
+      const gb = t.match(/(\d+(?:[.,]\d+)?)\s*gb/i);
+      if (gb) p.storage_label = gb[1].replace(',', '.') + ' GB';
+    }
+  }
+
   const storage = p.storage_label || '—';
-  const condition = p.condition || '—';
+  const condition = p.condition || (p.seller_type ? 'Usato' : '—'); // Se ha seller_type è un ad Subito
   const pack = p.packaging_state || 'Imballata';
 
   p.combo_key = `${pf}|${ps}|${parsed_edition}|${pk}|${storage}|${condition}|${pack}`;
@@ -273,49 +357,143 @@ document.querySelectorAll('.tab').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('view-' + btn.dataset.tab).classList.add('active');
     if (btn.dataset.tab === 'home')   renderHome();
+    if (btn.dataset.tab === 'mercato') renderMercato();
     if (btn.dataset.tab === 'standardi') renderStandardGroups();
     if (btn.dataset.tab === 'subito') loadSubitoData();
     if (btn.dataset.tab === 'ebay')   loadEbayData();
+    if (btn.dataset.tab === 'statistiche') renderStatistiche();
+    if (btn.dataset.tab === 'trend') renderTrend();
     if (btn.dataset.tab === 'ricerca') initRicerca();
   });
 });
 
 // ============================================================
-// HOME VIEW
+// Dark mode toggle con persistenza localStorage
 // ============================================================
-function renderHome() {
-  const grid      = document.getElementById('home-grid');
-  const emptyCard = document.getElementById('home-empty');
-  grid.innerHTML  = '';
+(function _initTheme() {
+  const saved = localStorage.getItem('xbox-tracker-theme');
+  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  const btn = document.getElementById('btn-theme');
+  if (!btn) return;
+  _updateThemeIcon();
+  btn.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('xbox-tracker-theme', 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('xbox-tracker-theme', 'dark');
+    }
+    _updateThemeIcon();
+  });
+})();
+
+function _updateThemeIcon() {
+  const btn = document.getElementById('btn-theme');
+  if (!btn) return;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  btn.textContent = isDark ? '☀️' : '🌙';
+  btn.title = isDark ? 'Passa al tema chiaro' : 'Passa al tema scuro';
+}
+
+// ============================================================
+// Helpers condivisi per Home/Mercato
+// ============================================================
+function _comboCondOrder(combo) {
+  const c = combo.rep.condition || '';
+  const p = (combo.rep.packaging_state || '').toLowerCase();
+  if (c === 'Nuovo') return 1;
+  if (c === 'Usato' && p.includes('non imball')) return 3;
+  if (c === 'Usato' && p.includes('imball')) return 2;
+  return 3;
+}
+
+function _comboTitle(combo) {
+  const r = combo.rep;
+  const kinect = r.parsed_kinect ? ' + Kinect' : '';
+  const ed = r.parsed_edition && r.parsed_edition.toLowerCase() !== 'standard' ? ` ${r.parsed_edition}` : '';
+  return `Xbox ${r.parsed_family || ''} ${r.parsed_segment || ''}${ed}${kinect}`.trim();
+}
+
+function _comboStorageGb(combo) {
+  const s = (combo.rep.storage_label || '').toLowerCase().trim();
+  const tb = s.match(/(\d+(\.\d+)?)\s*tb/);
+  if (tb) return parseFloat(tb[1]) * 1024;
+  const gb = s.match(/(\d+(\.\d+)?)\s*gb/);
+  if (gb) return parseFloat(gb[1]);
+  return 0;
+}
+
+function _comboShortTitle(rep) {
+  const kinectStr = rep.parsed_kinect ? ' + Kinect' : '';
+  const edStr = rep.parsed_edition && rep.parsed_edition.toLowerCase() !== 'standard' ? ` ${rep.parsed_edition}` : '';
+  return `${rep.parsed_segment || ''}${edStr}${kinectStr}`.trim() || `Xbox ${rep.parsed_family}`;
+}
+
+function _comboPackBadge(rep) {
+  const packState = (rep.packaging_state || '').toLowerCase();
+  if (packState.includes('non imball')) return '<span class="badge-pack badge-pack-nonimb">Non Imballata</span>';
+  if (packState.includes('imball')) return '<span class="badge-pack badge-pack-imb">Imballata</span>';
+  return '';
+}
+
+function _renderSourceCell(p) {
+  const storeLabel = _storeLabel(p.source);
+  const accent = _storeAccent(p.source);
+  return p.url
+    ? `<a href="${p.url}" target="_blank" rel="noopener" title="${p.name}" style="text-decoration:none;"><span class="badge-source" style="border-color:${accent}40; color:var(--text)">${storeLabel} ↗</span></a>`
+    : `<span class="badge-source" style="border-color:${accent}40; color:var(--text)">${storeLabel}</span>`;
+}
+
+/**
+ * Funzione unificata per renderizzare la griglia base models.
+ * @param {Object} opts
+ * @param {string} opts.gridId       — ID del container grid
+ * @param {string} opts.emptyId      — ID del messaggio empty
+ * @param {boolean} opts.availOnly   — true = mostra solo combo con almeno 1 disponibile (Mercato)
+ */
+function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
+  const grid  = document.getElementById(gridId);
+  const empty = document.getElementById(emptyId);
+  grid.innerHTML = '';
 
   if (!BASE_MODELS.length) {
-    emptyCard.style.display = '';
-    grid.style.display      = 'none';
+    empty.style.display = availOnly ? 'block' : '';
+    grid.style.display  = availOnly ? '' : 'none';
     return;
   }
 
-  emptyCard.style.display = 'none';
-  grid.style.display      = '';
+  empty.style.display = 'none';
+  grid.style.display  = '';
 
-  BASE_MODELS.forEach(p => enhanceProduct(p));
-  const baseKeys = [...new Set(BASE_MODELS.map(p => p.combo_key))];
-
-  const unifiedPool = [];
-  const sourceProducts = DB_PRODUCTS.length ? DB_PRODUCTS : ALL_PRODUCTS;
-  sourceProducts.forEach(p => {
-    enhanceProduct(p);
-    unifiedPool.push(p);
-  });
+  const uniqueGroups = getUniqueBaseModels();
 
   const byFamily = {};
-  for (const k of baseKeys) {
-    const matching = unifiedPool.filter(p => p.combo_key === k);
+  const totalByFamily = {};
+  for (const group of uniqueGroups) {
+    const matching = group.items;
     if (!matching.length) continue;
 
     const rep = matching[0];
     const fk = rep.console_family || _familyKey(rep.name);
-    if (!byFamily[fk]) byFamily[fk] = [];
-    byFamily[fk].push({ key: k, rep, matching });
+    if (!totalByFamily[fk]) totalByFamily[fk] = 0;
+    totalByFamily[fk]++;
+
+    if (availOnly) {
+      const availItems = matching.filter(p => p.last_available || p.available);
+      if (!availItems.length) continue;
+      if (!byFamily[fk]) byFamily[fk] = [];
+      byFamily[fk].push({ key: group.key, rep, matching, availItems });
+    } else {
+      if (!byFamily[fk]) byFamily[fk] = [];
+      byFamily[fk].push({ key: group.key, rep, matching });
+    }
+  }
+
+  if (availOnly) {
+    const hasAny = Object.values(byFamily).some(arr => arr.length > 0);
+    if (!hasAny) { empty.style.display = 'block'; return; }
   }
 
   const familyOrder = [...CONSOLE_FAMILIES.map(f => f.key), 'other'];
@@ -323,29 +501,60 @@ function renderHome() {
     const combos = byFamily[fk];
     if (!combos?.length) continue;
 
+    // Counter label
+    const countLabel = availOnly
+      ? `${combos.length}/${totalByFamily[fk]}`
+      : `${combos.filter(c => c.matching.some(p => p.last_available || p.available)).length}/${combos.length}`;
+
     const section = document.createElement('div');
     section.className = 'home-section';
     const title = document.createElement('h2');
-    title.className   = 'home-section-title';
-    title.textContent = FAMILY_LABELS[fk] || fk;
+    title.className = 'home-section-title';
+    title.innerHTML = `${FAMILY_LABELS[fk] || fk} <span style="font-size:16px; font-weight:normal; color:var(--text-muted); margin-left:12px;">${countLabel}</span>`;
     section.appendChild(title);
 
     const container = document.createElement('div');
     container.className = 'home-combos-container';
 
-    combos.forEach(combo => {
+    combos.sort((a, b) => {
+      const diff = _comboCondOrder(a) - _comboCondOrder(b);
+      if (diff !== 0) return diff;
+      const titleDiff = _comboTitle(a).localeCompare(_comboTitle(b), 'it');
+      if (titleDiff !== 0) return titleDiff;
+      return _comboStorageGb(b) - _comboStorageGb(a);
+    });
+
+    for (const combo of combos) {
       const { rep, matching } = combo;
 
-      const avail = matching.filter(p => p.last_available || p.available);
-      const prices = avail.map(p => p.last_price ?? p.price).filter(v => v != null);
+      // Items da mostrare nella tabella dettagli (solo fonti store, no Subito/eBay)
+      const STORE_SOURCES = new Set(['cex', 'gamelife', 'gamepeople', 'gameshock', 'rebuy']);
+      const displayItems = availOnly
+        ? [...combo.availItems].filter(p => STORE_SOURCES.has(p.source)).sort((a, b) => (a.last_price ?? a.price ?? Infinity) - (b.last_price ?? b.price ?? Infinity))
+        : [...matching].filter(p => STORE_SOURCES.has(p.source)).sort((a, b) => {
+            const da = (a.last_available || a.available) ? 0 : 1;
+            const db2 = (b.last_available || b.available) ? 0 : 1;
+            if (da !== db2) return da - db2;
+            return (a.last_price ?? a.price ?? Infinity) - (b.last_price ?? b.price ?? Infinity);
+          });
+
+      const prices = displayItems.map(p => p.last_price ?? p.price).filter(v => v != null);
       const minPx = prices.length ? Math.min(...prices) : null;
       const maxPx = prices.length ? Math.max(...prices) : null;
 
+      const shortTitle = _comboShortTitle(rep);
+      const packBadge = _comboPackBadge(rep);
+
+      // Stats line
+      const statsLine = availOnly
+        ? `<div style="color:var(--avail-ok); font-weight:600;">${displayItems.length} disponibili</div>`
+        : `<div style="color:var(--text);">${displayItems.filter(p => p.last_available || p.available).length} store disponibili</div>`;
+      const priceLine = prices.length
+        ? (prices.length > 1 ? `da €${Math.round(minPx)} a €${Math.round(maxPx)}` : `€${Math.round(minPx)}`)
+        : (availOnly ? '—' : 'esaurito');
+
       const row = document.createElement('div');
       row.className = 'home-combo-row';
-
-      const kinectStr = rep.parsed_kinect ? ' + Kinect' : '';
-      const titleStr = `Xbox ${rep.parsed_family} ${rep.parsed_segment} ${rep.parsed_edition}${kinectStr}`;
 
       const header = document.createElement('div');
       header.className = 'home-combo-header';
@@ -353,18 +562,16 @@ function renderHome() {
 
       header.innerHTML = `
         <div>
-          <div class="home-combo-title">${titleStr}</div>
+          <div class="home-combo-title">${shortTitle}</div>
           <div class="home-combo-tags">
             <span class="badge ${rep.condition === 'Nuovo' ? 'badge-nuovo' : rep.condition === 'Usato' ? 'badge-usato' : 'badge-nd'}">${rep.condition}</span>
             <span class="storage-badge">${rep.storage_label || '—'}</span>
-            <span>Imballo: ${rep.packaging_state || 'N/D'}</span>
+            ${packBadge}
           </div>
         </div>
         <div class="home-combo-stats">
-          <div style="color:var(--text);">${avail.length} store disponibili</div>
-          <div style="color:var(--text-muted); font-size: 12px; margin-top:2px;">
-            ${prices.length ? (prices.length > 1 ? `da €${minPx.toFixed(0)} a €${maxPx.toFixed(0)}` : `€${minPx.toFixed(0)}`) : 'esaurito tutti gli store'}
-          </div>
+          ${statsLine}
+          <div style="color:var(--text-muted); font-size: 12px; margin-top:2px;">${priceLine}</div>
         </div>
       `;
 
@@ -373,40 +580,16 @@ function renderHome() {
 
       const table = document.createElement('table');
       table.className = 'home-table';
-      table.innerHTML = `
-        <thead>
-          <tr>
-            <th>Fonte</th>
-            <th>Nome Originale</th>
-            <th style="text-align:right;">Prezzo</th>
-            <th style="text-align:center;">Disp.</th>
-          </tr>
-        </thead>
-      `;
+      table.innerHTML = '<thead><tr><th>Fonte</th><th style="text-align:right;">Prezzo</th><th style="text-align:center;">Disp.</th></tr></thead>';
       const tbody = document.createElement('tbody');
 
-      matching.sort((a,b) => {
-        const da = (a.last_available || a.available) ? 0 : 1;
-        const db = (b.last_available || b.available) ? 0 : 1;
-        if (da !== db) return da - db;
-        const pa = a.last_price ?? a.price ?? Infinity;
-        const pb = b.last_price ?? b.price ?? Infinity;
-        return pa - pb;
-      });
-
-      for (const p of matching) {
+      for (const p of displayItems) {
         const tr = document.createElement('tr');
         const isA = p.last_available || p.available;
         const px = p.last_price ?? p.price;
         tr.innerHTML = `
-          <td><span class="badge-source" style="border-color:${_storeAccent(p.source)}40; color:var(--text)">${_storeLabel(p.source)}</span></td>
-          <td>
-            ${p.url 
-              ? `<a href="${p.url}" target="_blank" rel="noopener" class="prod-link" title="${p.name}">${p.name}</a>` 
-              : `<span class="prod-link" title="${p.name}">${p.name}</span>`
-            }
-          </td>
-          <td style="text-align:right; font-weight:600;">${px != null ? '€ ' + px.toFixed(2) : '—'}</td>
+          <td>${_renderSourceCell(p)}</td>
+          <td style="text-align:right; font-weight:600;">${px != null ? '€ ' + Math.round(px) : '—'}</td>
           <td style="text-align:center;"><span class="avail-dot ${isA ? 'ok': 'ko'}"></span></td>
         `;
         tbody.appendChild(tr);
@@ -414,14 +597,28 @@ function renderHome() {
 
       table.appendChild(tbody);
       details.appendChild(table);
-
       row.appendChild(header);
       row.appendChild(details);
       container.appendChild(row);
-    });
+    }
+
     section.appendChild(container);
     grid.appendChild(section);
   }
+}
+
+// ============================================================
+// HOME VIEW
+// ============================================================
+function renderHome() {
+  _renderBaseModelGrid({ gridId: 'home-grid', emptyId: 'home-empty', availOnly: false });
+}
+
+// ============================================================
+// MERCATO VIEW — preferiti con disponibilità attiva
+// ============================================================
+function renderMercato() {
+  _renderBaseModelGrid({ gridId: 'mercato-grid', emptyId: 'mercato-empty', availOnly: true });
 }
 
 // ============================================================
@@ -606,7 +803,10 @@ function _renderStoreCards() {
     }
 
     table.appendChild(tbody);
-    card.appendChild(table);
+    const tableWrapper = document.createElement('div');
+    tableWrapper.className = 'console-table-wrapper';
+    tableWrapper.appendChild(table);
+    card.appendChild(tableWrapper);
     grid.appendChild(card);
   }
 }
@@ -644,14 +844,12 @@ function _renderGlobalStats() {
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('gs-total',  ALL_PRODUCTS.length);
   set('gs-avail',  avail.length);
-  set('gs-stores', SOURCES_META.filter(s => ALL_DATA[s.id]).length);
-  set('gs-avg-u',  uPrices.length ? '€ ' + (_avg(uPrices) ?? 0).toFixed(0) : '—');
-  set('gs-avg-n',  nPrices.length ? '€ ' + (_avg(nPrices) ?? 0).toFixed(0) : '—');
-  set('gs-min',    allPx.length   ? '€ ' + Math.min(...allPx).toFixed(2)   : '—');
+  set('gs-stores', SOURCES_META.filter(s => ALL_DATA[s.id] && s.id !== 'subito' && s.id !== 'ebay').length);
 }
 
 function _renderConsoleSummary() {
-  const sources = SOURCES_META.filter(s => ALL_DATA[s.id]).map(s => s.id);
+  const STORE_ONLY = new Set(['cex', 'gamelife', 'gamepeople', 'gameshock', 'rebuy']);
+  const sources = SOURCES_META.filter(s => ALL_DATA[s.id] && STORE_ONLY.has(s.id)).map(s => s.id);
   if (!sources.length) return;
 
   const thead = document.getElementById('summary-thead');
@@ -789,8 +987,554 @@ function applyFilters() {
     return va < vb ? -currentSort.dir : va > vb ? currentSort.dir : 0;
   });
 
-  document.getElementById('count-label').textContent = filtered.length + ' prodotti';
+  const rcEl = document.getElementById('ricerca-count');
+  if (rcEl) rcEl.textContent = `Trovati ${filtered.length} prodotti (${source.length} corrispondono ai modelli cercati)`;
   _renderTable(filtered);
+}
+
+/* ============================================================
+   STATISTICHE (Analisi Matematica)
+   ============================================================ */
+
+const StatEngine = {
+  mean(arr) {
+    if (!arr.length) return 0;
+    return arr.reduce((a, b) => a + b, 0) / arr.length;
+  },
+  stdDev(arr, mean) {
+    if (arr.length <= 1) return 0;
+    let sum = 0;
+    for (const val of arr) sum += Math.pow(val - mean, 2);
+    return Math.sqrt(sum / (arr.length - 1));
+  },
+  zScore(val, arr) {
+    if (arr.length <= 1) return null;
+    const m = this.mean(arr);
+    const sd = this.stdDev(arr, m);
+    if (sd === 0) return 0;
+    return (val - m) / sd;
+  },
+  bidAskSpread(items) {
+    const b2c = ['cex', 'rebuy', 'gameshock'];
+    const c2c = ['subito', 'ebay'];
+    
+    const askPrices = items.filter(i => b2c.includes(i.source)).map(i => i.last_price ?? i.price).filter(px => px != null && px > 0);
+    const bidPrices = items.filter(i => c2c.includes(i.source)).map(i => i.last_price ?? i.price).filter(px => px != null && px > 0);
+    
+    if (askPrices.length === 0 || bidPrices.length === 0) return null;
+    
+    const askMin = Math.min(...askPrices);
+    const bidAvg = this.mean(bidPrices);
+    
+    return askMin - bidAvg;
+  },
+  getDailyHistory(productIds) {
+    if (!PRICE_HISTORY || !PRICE_HISTORY.length) return [];
+    const items = PRICE_HISTORY.filter(h => productIds.includes(h.product_id) && h.price_new > 0);
+    const byDate = {};
+    for (const h of items) {
+      const d = h.changed_at.split('T')[0];
+      if (!byDate[d] || h.price_new < byDate[d]) {
+        byDate[d] = h.price_new;
+      }
+    }
+    const dates = Object.keys(byDate).sort();
+    return dates.map(d => ({ date: d, price: byDate[d] }));
+  },
+  ema(productIds, periods = 7) {
+    const series = this.getDailyHistory(productIds);
+    if (series.length < 2) return null;
+    let emaVal = series[0].price;
+    const k = 2 / (periods + 1);
+    for (let i = 1; i < series.length; i++) {
+        emaVal = (series[i].price * k) + (emaVal * (1 - k));
+    }
+    return emaVal;
+  },
+  linearRegressionSlope(productIds) {
+    const series = this.getDailyHistory(productIds);
+    if (series.length < 2) return null;
+    const x = Array.from({length: series.length}, (_, i) => i);
+    const y = series.map(s => s.price);
+    const xMean = this.mean(x);
+    const yMean = this.mean(y);
+    let num = 0, den = 0;
+    for (let i = 0; i < series.length; i++) {
+      num += (x[i] - xMean) * (y[i] - yMean);
+      den += Math.pow(x[i] - xMean, 2);
+    }
+    if (den === 0) return 0;
+    return num / den;
+  },
+  poissonProbOutofStock(productIds) {
+    if (!PRICE_HISTORY || !PRICE_HISTORY.length) return null;
+    const items = PRICE_HISTORY.filter(h => productIds.includes(h.product_id));
+    if (items.length === 0) return null;
+    
+    // Sort array in chronological order
+    const sorted = [...items].sort((a,b) => a.changed_at.localeCompare(b.changed_at));
+    
+    let soldEvents = 0;
+    const firstDate = new Date(sorted[0].changed_at);
+    const lastDate = new Date(); 
+    const daysDiff = Math.max(1, (lastDate - firstDate) / (1000 * 3600 * 24));
+    
+    let lastAvail = {}; 
+    for(const ev of sorted) {
+      if (lastAvail[ev.product_id] === 1 && ev.available_new === 0) {
+        soldEvents++;
+      }
+      lastAvail[ev.product_id] = ev.available_new;
+    }
+    
+    const lambdaDay = soldEvents / daysDiff;
+    if (lambdaDay === 0) return 0;
+    
+    // Prob di almeno 1 vendita nel prossimo giorno: 1 - e^(-lambda)
+    return 1 - Math.exp(-lambdaDay);
+  },
+  pearsonCorrelation(x, y) {
+    if (x.length !== y.length || x.length < 2) return null;
+    const xM = this.mean(x);
+    const yM = this.mean(y);
+    let num = 0, denX = 0, denY = 0;
+    for (let i = 0; i < x.length; i++) {
+        const dx = x[i] - xM;
+        const dy = y[i] - yM;
+        num += dx * dy;
+        denX += dx * dx;
+        denY += dy * dy;
+    }
+    if (denX === 0 || denY === 0) return 0;
+    return num / Math.sqrt(denX * denY);
+  },
+  storagePriceCorrelation(family, segment) {
+    const products = ALL_PRODUCTS.filter(p => p.parsed_family === family && p.parsed_segment === segment && p.last_price > 0);
+    const x = [], y = [];
+    for (const p of products) {
+        if (!p.storage_label) continue;
+        let gb = 0;
+        if (p.storage_label.toUpperCase().includes('TB')) gb = parseFloat(p.storage_label) * 1000;
+        else gb = parseFloat(p.storage_label);
+        
+        if (gb > 0) {
+            x.push(gb);
+            y.push(p.last_price);
+        }
+    }
+    const uniqueStorage = new Set(x);
+    if (uniqueStorage.size < 2) return null; // Must have variation to correlate
+    
+    return this.pearsonCorrelation(x, y);
+  },
+  kMeans1D(coords, k = 3) {
+    if (coords.length < k) {
+        return coords.map(p => ({ centroid: p, items: [p] })).sort((a,b) => a.centroid - b.centroid);
+    }
+    const min = Math.min(...coords);
+    const max = Math.max(...coords);
+    let centroids = [];
+    for (let i = 0; i < k; i++) centroids.push(min + (max - min) * (i / (k - 1)));
+    
+    let clusters = [];
+    let changed = true, maxIter = 50, it = 0;
+    while(changed && it < maxIter) {
+      changed = false;
+      it++;
+      clusters = Array.from({length: k}, () => []);
+      for(const p of coords) {
+        let minDist = Infinity, cIdx = 0;
+        for(let j=0; j<k; j++) {
+           let d = Math.abs(p - centroids[j]);
+           if (d < minDist) { minDist = d; cIdx = j; }
+        }
+        clusters[cIdx].push(p);
+      }
+      for(let j=0; j<k; j++) {
+        if(clusters[j].length > 0) {
+          const newC = this.mean(clusters[j]);
+          if(Math.abs(newC - centroids[j]) > 0.1) {
+             centroids[j] = newC;
+             changed = true;
+          }
+        }
+      }
+    }
+    return clusters.map((c, i) => ({ centroid: centroids[i], items: c })).sort((a,b) => a.centroid - b.centroid);
+  },
+  bayesianPremium(g) {
+    if (!g.family || !g.segment) return null;
+    // Identifica i prezzi dell'edizione Standard per questo esatto modello/spazio
+    const stdItems = ALL_PRODUCTS.filter(p => p.parsed_family === g.family && p.parsed_segment === g.segment && p.storage_label === g.storage && (!p.parsed_edition || p.parsed_edition.toLowerCase() === 'standard') && p.last_price > 0);
+    
+    // Trova i prezzi di QUESTA combo (potrebbe essere una special edition)
+    const comboPrices = g.items.map(i => i.last_price ?? i.price).filter(p => p != null && p > 0);
+    
+    if (stdItems.length === 0 || comboPrices.length === 0) return null;
+    
+    const stdMean = this.mean(stdItems.map(i => i.last_price));
+    const thisMean = this.mean(comboPrices);
+    
+    const rawPremium = thisMean - stdMean;
+    
+    // Bayesian shrinking towards a prior of +30 EUR with weight C=3
+    const priorPremium = 30; 
+    const C = 3;
+    const N = comboPrices.length;
+    
+    return ((N * rawPremium) + (C * priorPremium)) / (N + C);
+  },
+  confidenceInterval(prices) {
+    if (prices.length < 2) return null;
+    const m = this.mean(prices);
+    const s = this.stdDev(prices, m);
+    if (s === 0) return { lower: m, upper: m, margin: 0, volatile: false };
+    
+    const margin = 1.96 * (s / Math.sqrt(prices.length));
+    const lower = Math.max(0, m - margin);
+    const upper = m + margin;
+    const volatile = (margin / m) > 0.25; 
+    
+    return { lower, upper, margin, volatile };
+  },
+  shapleyKinect(g) {
+    if (g.family !== '360' && g.family !== 'One') return null;
+    
+    const withKinect = ALL_PRODUCTS.filter(p => p.parsed_family === g.family && p.has_kinect === 1 && p.last_price > 0);
+    const woKinect = ALL_PRODUCTS.filter(p => p.parsed_family === g.family && p.has_kinect === 0 && p.last_price > 0);
+    
+    if (withKinect.length === 0 || woKinect.length === 0) return null;
+    
+    const mWith = this.mean(withKinect.map(p => p.last_price));
+    const mWo = this.mean(woKinect.map(p => p.last_price));
+    
+    return mWith - mWo;
+  }
+};
+
+/**
+ * Raggruppa tutti i BASE_MODELS per combo_key.
+ */
+function _buildComboTitle(p) {
+  const kinect = p.parsed_kinect ? ' + Kinect' : '';
+  const edition = p.parsed_edition && p.parsed_edition.toLowerCase() !== 'standard' ? ` ${p.parsed_edition}` : '';
+  const storage = p.storage_label ? ` · ${p.storage_label}` : '';
+  const cond = p.condition ? ` [${p.condition}]` : '';
+  return `Xbox ${p.parsed_family || '?'} ${p.parsed_segment || ''}${edition}${kinect}${storage}${cond}`.trim();
+}
+
+function getUniqueBaseModels() {
+  // BASE_MODELS dal DB ha standard_key, model_segment, edition_class ma NON parsed_*.
+  // ALL_PRODUCTS viene arricchito da enhanceProduct() e ha combo_key e parsed_*.
+  // Strategia: raggruppiamo ALL_PRODUCTS per combo_key, poi teniamo solo i gruppi
+  // il cui representative ha uno standard_key che è presente in BASE_MODELS.
+  
+  // Raggruppiamo ALL_PRODUCTS che hanno un combo_key presente in BASE_MODELS.
+  const baseKeys = new Set(BASE_MODELS.map(bm => {
+    enhanceProduct(bm);
+    return bm.combo_key;
+  }));
+  
+  // Se nessun preferito, fallback: nessun risultato.
+  if (baseKeys.size === 0) {
+    return [];
+  }
+
+  // Passo 2: raggruppa tutti i prodotti per combo_key
+  const groups = {};
+  const unifiedPool = [];
+  const seenUrls = new Set();
+  const addPool = (list) => {
+    if (!list) return;
+    for (const p of list) {
+      if (p.url && seenUrls.has(p.url)) continue;
+      if (p.url) seenUrls.add(p.url);
+      enhanceProduct(p);
+      unifiedPool.push(p);
+    }
+  };
+  addPool(BASE_MODELS);
+  addPool(DB_PRODUCTS);
+  addPool(ALL_PRODUCTS);
+  
+  // Aggiungiamo anche gli annunci Subito approvati dall'AI
+  const approvedSubito = SUBITO_ADS
+    .filter(a => a.ai_status === 'approved')
+    .map(a => ({
+      ...a,
+      source: 'subito',
+      condition: 'Usato',
+      price: a.last_price,
+      available: a.last_available === 1
+    }));
+  addPool(approvedSubito);
+
+  unifiedPool.forEach(p => {
+    const gkey = p.combo_key;
+    if (!gkey) return;
+    if (!groups[gkey]) {
+      groups[gkey] = {
+        key: gkey,
+        title: _buildComboTitle(p),
+        family: p.parsed_family,
+        segment: p.parsed_segment,
+        storage: p.storage_label,
+        condition: p.condition,
+        count: 0,
+        items: []
+      };
+    }
+    groups[gkey].items.push(p);
+    groups[gkey].count++;
+  });
+
+  // Passo 3: teniamo solo i combo_key presenti nei preferiti
+  const favCombos = new Set();
+  unifiedPool.forEach(p => {
+    if (baseKeys.has(p.combo_key)) {
+      favCombos.add(p.combo_key);
+    }
+  });
+
+  // Ritorna i gruppi preferiti, o TUTTI se nessun match (fallback per mostrare qualcosa)
+  const filtered = Object.values(groups).filter(g => favCombos.has(g.key));
+  
+  // Applica deduplica per ReBuy: tenere solo il prodotto col prezzo più alto
+  filtered.forEach(g => {
+    const rebuyItems = g.items.filter(p => p.source === 'rebuy');
+    if (rebuyItems.length > 1) {
+      const highestRebuy = rebuyItems.reduce((prev, curr) => {
+        const pPrice = prev.last_price ?? prev.price ?? 0;
+        const cPrice = curr.last_price ?? curr.price ?? 0;
+        return cPrice > pPrice ? curr : prev;
+      });
+      g.items = [...g.items.filter(p => p.source !== 'rebuy'), highestRebuy];
+    }
+  });
+
+  return filtered.length > 0 ? filtered : Object.values(groups);
+}
+
+function renderStatistiche() {
+  const container = document.getElementById('stats-grid');
+  if (!container) return;
+  
+  const uniqueModels = getUniqueBaseModels();
+  
+  console.log('[Statistiche] BASE_MODELS:', BASE_MODELS.length, 'uniqueModels:', uniqueModels.length);
+
+  if (uniqueModels.length === 0) {
+    container.innerHTML = `
+      <div style="padding:40px;text-align:center;color:var(--text-muted);">
+        <div style="font-size:48px;margin-bottom:16px;">⭐</div>
+        <div style="font-size:18px;font-weight:600;margin-bottom:8px;">Nessun modello preferito trovato</div>
+        <div>Vai nella sezione <strong>Home</strong> e clicca ⭐ accanto ai modelli che vuoi monitorare.<br>
+        Oppure verifica che BASE_MODELS sia caricato correttamente (${BASE_MODELS.length} prodotti ora in memoria).</div>
+      </div>`;
+    return;
+  }
+  
+  let html = `
+    <div style="overflow-x:auto;">
+    <table class="home-table" style="white-space: nowrap;">
+      <thead>
+        <tr>
+          <th>Modello Unico</th>
+          <th style="text-align:center;">Campioni (N)</th>
+          <th style="text-align:right;">Prezzo Minimo</th>
+          <th style="text-align:center;">Z-Score (Anomalia)</th>
+          <th style="text-align:center;">Spread B2C-C2C</th>
+          <th style="text-align:center;">EMA (7g)</th>
+          <th style="text-align:center;">Trend Regr.</th>
+          <th style="text-align:center;">Rischio Esaur.</th>
+          <th style="text-align:center;">Impatto Storage</th>
+          <th style="text-align:center;">Clustering (Fasce Prezzo)</th>
+          <th style="text-align:center;">Premium Apparente</th>
+          <th style="text-align:center;">Affidabilità (CI 95%)</th>
+          <th style="text-align:center;">Valore Kinect</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  uniqueModels.forEach((g, idx) => {
+    // Stat 1: Z-Score sul prezzo min
+    const prices = g.items
+      .map(i => i.last_price ?? i.price)
+      .filter(px => px != null && px > 0);
+      
+    let zScoreStr = 'N/D';
+    let minPxStr = '—';
+    
+    if (prices.length > 0) {
+      const currentMin = Math.min(...prices);
+      minPxStr = '€ ' + currentMin.toFixed(2);
+      
+      if (prices.length > 2) {
+        const z = StatEngine.zScore(currentMin, prices);
+        if (z !== null) {
+          zScoreStr = z.toFixed(2);
+          if (z <= -1.5) zScoreStr = `<strong style="color:var(--avail-ok)">${zScoreStr} 🔥</strong>`;
+          else if (z >= 1.5) zScoreStr = `<span style="color:var(--avail-ko)">${zScoreStr}</span>`;
+        }
+      }
+    }
+    
+    // Stat 2: Spread
+    const spread = StatEngine.bidAskSpread(g.items);
+    let spreadStr = 'N/D';
+    if (spread !== null) {
+      spreadStr = (spread > 0 ? '+' : '') + spread.toFixed(2) + ' €';
+      if (spread > 50) spreadStr = `<strong style="color:var(--avail-ok)">${spreadStr}</strong>`;
+      else if (spread < 0) spreadStr = `<strong style="color:var(--avail-ko)">${spreadStr}</strong>`;
+    }
+
+    // Stat 3 & 4
+    const pIds = g.items.map(i => i.id);
+    const emaVal = StatEngine.ema(pIds, 7);
+    let emaStr = 'N/D';
+    if (emaVal !== null) emaStr = '€ ' + emaVal.toFixed(2);
+    
+    const slope = StatEngine.linearRegressionSlope(pIds);
+    let slopeStr = 'N/D';
+    if (slope !== null) {
+        slopeStr = (slope > 0 ? '+' : '') + slope.toFixed(2) + ' €/g';
+        if (slope < -1) slopeStr = `<span style="color:var(--avail-ok)">${slopeStr} 📉</span>`;
+        if (slope > 1) slopeStr = `<span style="color:var(--avail-ko)">${slopeStr} 📈</span>`;
+    }
+
+    // Stat 5
+    const probOut = StatEngine.poissonProbOutofStock(pIds);
+    let pOutStr = 'N/D';
+    if (probOut !== null) {
+      const pct = (probOut * 100).toFixed(1);
+      pOutStr = pct + '%';
+      if (probOut > 0.5) pOutStr = `<strong style="color:var(--avail-ko)">${pOutStr} ⚠️</strong>`;
+      else if (probOut < 0.1) pOutStr = `<span style="color:var(--text-muted)">${pOutStr}</span>`;
+    }
+    
+    // Stat 6
+    const pearson = StatEngine.storagePriceCorrelation(g.family, g.segment);
+    let pearsonStr = 'N/D';
+    if (pearson !== null) {
+      pearsonStr = pearson.toFixed(2);
+      if (pearson > 0.5) pearsonStr = `<strong style="color:var(--avail-ok)">${pearsonStr} (Forte)</strong>`;
+      else if (pearson < 0.2 && pearson > -0.2) pearsonStr = `<strong style="color:var(--text-muted)">${pearsonStr} (Nullo)</strong>`;
+    }
+    
+    // Stat 7
+    let clusterStr = 'N/D';
+    if (prices.length >= 3) {
+      const clusters = StatEngine.kMeans1D(prices, 3);
+      const cStr = clusters.filter(c => c.items.length > 0).map(c => Math.round(c.centroid) + '€').join(' | ');
+      clusterStr = `<span style="font-size:11px; letter-spacing:-0.5px;">${cStr}</span>`;
+    }
+    
+    // Stat 8
+    const bayesPrem = StatEngine.bayesianPremium(g);
+    let premStr = '—'; // If standard, we might leave it as — or 0
+    if (bayesPrem !== null) {
+      premStr = (bayesPrem > 0 ? '+' : '') + bayesPrem.toFixed(0) + '€';
+      if (bayesPrem > 40) premStr = `<strong style="color:var(--avail-ok)">${premStr}</strong>`;
+    }
+    
+    // Stat 9
+    const ci = StatEngine.confidenceInterval(prices);
+    let ciStr = 'N/D';
+    if (ci !== null) {
+      ciStr = `±${ci.margin.toFixed(0)}€`;
+      if (ci.volatile) ciStr = `<span style="color:var(--avail-ko)" title="Alta Varietà">${ciStr} ⚠️</span>`;
+      else ciStr = `<span style="color:var(--avail-ok)">${ciStr} ✓</span>`;
+    }
+    
+    // Stat 10
+    const kVal = StatEngine.shapleyKinect(g);
+    let kStr = 'N/D';
+    if (kVal !== null) {
+        kStr = (kVal > 0 ? '+' : '') + kVal.toFixed(0) + '€';
+    }
+
+    // Costruisci sub-panel con i link ai prodotti del gruppo
+    const rowId = `stat-row-${idx}`;
+    const availItems = g.items.filter(p => p.last_available || p.available);
+    const allItemsSorted = [...g.items].sort((a, b) => {
+      const pa = a.last_price ?? a.price ?? Infinity;
+      const pb = b.last_price ?? b.price ?? Infinity;
+      return pa - pb;
+    });
+
+    const detailRows = allItemsSorted.map(p => {
+      const px = p.last_price ?? p.price;
+      const isAvail = p.last_available || p.available;
+      const pxStr = px != null ? `€ ${px.toFixed(2)}` : '—';
+      const availBadge = isAvail
+        ? `<span style="color:var(--avail-ok);font-size:11px;">● Dispon.</span>`
+        : `<span style="color:var(--avail-ko);font-size:11px;">● Esaurito</span>`;
+      const store = _storeLabel(p.source || '');
+      const linkEl = p.url
+        ? `<a href="${p.url}" target="_blank" rel="noopener" style="color:var(--accent);font-size:12px;">🔗 Apri</a>`
+        : `<span style="color:var(--text-muted);font-size:12px;">nessun link</span>`;
+      const pack = p.packaging_state ? `<span style="font-size:10px;color:var(--text-muted);">${p.packaging_state}</span>` : '';
+      return `<tr style="background:var(--bg);border-top:1px solid var(--border);">
+        <td style="padding:4px 8px;font-size:12px;">${store}</td>
+        <td style="padding:4px 8px;font-size:12px;">${p.name || '—'}</td>
+        <td style="padding:4px 8px;font-size:12px;">${pack}</td>
+        <td style="padding:4px 8px;font-weight:600;color:var(--text);">${pxStr}</td>
+        <td style="padding:4px 8px;">${availBadge}</td>
+        <td style="padding:4px 8px;">${linkEl}</td>
+      </tr>`;
+    }).join('');
+
+    const expandPanel = `<tr id="${rowId}" style="display:none;">
+      <td colspan="13" style="padding:0;background:var(--card);">
+        <div style="padding:8px 16px 12px;">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">
+            ${g.items.length} prodotti trovati · ${availItems.length} disponibili
+          </div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead>
+              <tr style="color:var(--text-muted);font-size:11px;text-align:left;">
+                <th style="padding:2px 8px;">Store</th>
+                <th style="padding:2px 8px;">Nome</th>
+                <th style="padding:2px 8px;">Imballo</th>
+                <th style="padding:2px 8px;">Prezzo</th>
+                <th style="padding:2px 8px;">Stato</th>
+                <th style="padding:2px 8px;">Link</th>
+              </tr>
+            </thead>
+            <tbody>${detailRows || '<tr><td colspan="6" style="padding:8px;color:var(--text-muted);">Nessun prodotto</td></tr>'}</tbody>
+          </table>
+        </div>
+      </td>
+    </tr>`;
+
+    html += `
+      <tr class="stat-summary-row" style="cursor:pointer;" onclick="
+        const el = document.getElementById('${rowId}');
+        const isOpen = el.style.display !== 'none';
+        el.style.display = isOpen ? 'none' : 'table-row';
+        this.style.background = isOpen ? '' : 'var(--card)';
+      " title="Clicca per vedere tutti i prodotti con i link">
+        <td><strong>${g.title}</strong> <span style="font-size:10px;color:var(--text-muted);">▼</span></td>
+        <td style="text-align:center;">${prices.length}</td>
+        <td style="text-align:right;">${minPxStr}</td>
+        <td style="text-align:center;">${zScoreStr}</td>
+        <td style="text-align:center;">${spreadStr}</td>
+        <td style="text-align:center;">${emaStr}</td>
+        <td style="text-align:center;">${slopeStr}</td>
+        <td style="text-align:center;">${pOutStr}</td>
+        <td style="text-align:center;">${pearsonStr}</td>
+        <td style="text-align:center;">${clusterStr}</td>
+        <td style="text-align:center;">${premStr}</td>
+        <td style="text-align:center;">${ciStr}</td>
+        <td style="text-align:center;">${kStr}</td>
+      </tr>
+      ${expandPanel}
+    `;
+  });
+
+  html += '</tbody></table></div>';
+  container.innerHTML = html;
 }
 
 function toggleSort(key) {
@@ -865,7 +1609,8 @@ function _renderTable(products) {
       star.className   = 'star-btn' + (isBase ? ' star-active' : '');
       star.textContent = isBase ? '★' : '☆';
       star.title       = isBase ? 'Rimuovi dai modelli base' : 'Aggiungi ai modelli base';
-      star.addEventListener('click', () => _toggleBaseModel(p.id, isBase, star));
+      star.dataset.productId = p.id;
+      star.dataset.isBase    = isBase ? '1' : '0';
       const idLabel = document.createElement('span');
       idLabel.className   = 'id-label';
       idLabel.textContent = p.display_id ?? p.id;
@@ -958,6 +1703,15 @@ function _renderTable(products) {
     tbody.appendChild(tr);
   }
 }
+
+// Delegated click handler per star buttons nella tabella Catalogo (un solo listener)
+document.getElementById('products-table')?.addEventListener('click', e => {
+  const star = e.target.closest('.star-btn[data-product-id]');
+  if (!star) return;
+  const productId = parseInt(star.dataset.productId, 10);
+  const isBase = star.dataset.isBase === '1';
+  _toggleBaseModel(productId, isBase, star);
+});
 
 // ============================================================
 // NOMI STANDARD VIEW
@@ -1080,11 +1834,15 @@ function _populateRegionFilter() {
 
 async function loadSubitoData() {
   try {
-    const [rAds, rStats, rOpp] = await Promise.all([
-      API.fetchJson('/api/subito/ads'),
-      API.fetchJson('/api/subito/stats'),
-      API.fetchJson('/api/valuation/subito-opportunities?limit=500'),
-    ]);
+    const _fb = { ok: false, body: null };
+    const [rAds, rStats, rOpp] = _settled(
+      await Promise.allSettled([
+        API.fetchJson('/api/subito/ads'),
+        API.fetchJson('/api/subito/stats'),
+        API.fetchJson('/api/valuation/subito-opportunities?limit=500'),
+      ]),
+      [_fb, _fb, _fb],
+    );
     if (rAds.ok)   SUBITO_ADS = _sanitizeRows(rAds.body);
     if (rStats.ok) {
       const s   = _sanitizeRow(rStats.body);
@@ -1186,8 +1944,8 @@ function renderSubito() {
     return;
   }
 
-  // Filtri
   const q         = (document.getElementById('subito-search')?.value  || '').toLowerCase().trim();
+  const aiFilter  = document.getElementById('subito-filter-ai')?.value || 'approved';
   const famFilter = document.getElementById('subito-filter-family')?.value  || '';
   const selFilter = document.getElementById('subito-filter-seller')?.value  || '';
   const segFilter = document.getElementById('subito-filter-segment')?.value || '';
@@ -1196,6 +1954,9 @@ function renderSubito() {
   const onlyAvail = document.getElementById('subito-filter-avail')?.checked || false;
 
   let filtered = SUBITO_ADS.slice();
+  if (aiFilter !== 'all') {
+    filtered = filtered.filter(a => (a.ai_status || 'pending') === aiFilter);
+  }
   if (q)         filtered = filtered.filter(a => a.name.toLowerCase().includes(q));
   if (famFilter) filtered = filtered.filter(a => a.console_family === famFilter);
   if (selFilter) filtered = filtered.filter(a => a.seller_type === selFilter);
@@ -1281,19 +2042,37 @@ function renderSubito() {
       const tr = document.createElement('tr');
       tr.className = 'product-row' + (isAvail ? '' : ' product-row-esaurito');
 
-      // Annuncio (link)
+      // Annuncio (link + badge AI)
       const tdName = document.createElement('td');
       tdName.className = 'prod-name-cell';
+      tdName.style.position = 'relative';
+      let titleHtml = '';
       if (ad.url) {
-        const a = document.createElement('a');
-        a.href = ad.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
-        a.className = 'prod-link'; a.textContent = ad.name; a.title = ad.name;
-        tdName.appendChild(a);
+        titleHtml = `<a href="${ad.url}" target="_blank" rel="noopener noreferrer" class="prod-link" title="${ad.name}">${ad.name}</a>`;
       } else {
-        const span = document.createElement('span');
-        span.className = 'prod-link'; span.textContent = ad.name;
-        tdName.appendChild(span);
+        titleHtml = `<span class="prod-link">${ad.name}</span>`;
       }
+      
+      // Aggiungi score AI se disponibile
+      let aiBadge = '';
+      if (ad.ai_confidence != null) {
+        const conf = ad.ai_confidence;
+        let c = conf >= 75 ? '#2e7d32' : conf <= 25 ? '#b71c1c' : '#ef6c00';
+        aiBadge = `<span style="font-size:9px; font-weight:bold; color:${c}; margin-left:5px; border:1px solid ${c}; border-radius:3px; padding:0 3px;">AI:${conf}%</span>`;
+      }
+      
+      // Aggiungi pulsanti per revisione (delegation via data-* attributes)
+      let reviewActions = '';
+      if (aiFilter === 'pending' || ad.ai_status === 'pending') {
+         reviewActions = `
+           <div style="margin-top:4px;">
+             <button data-ai-action="approved" data-ad-id="${ad.id}" style="font-size:10px; cursor:pointer; background:#2e7d32; color:white; border:none; border-radius:3px; margin-right:4px;">Approva</button>
+             <button data-ai-action="rejected" data-ad-id="${ad.id}" style="font-size:10px; cursor:pointer; background:#b71c1c; color:white; border:none; border-radius:3px;">Scarta</button>
+           </div>
+         `;
+      }
+      
+      tdName.innerHTML = titleHtml + aiBadge + reviewActions;
       tr.appendChild(tdName);
 
       // Città
@@ -1342,11 +2121,8 @@ function renderSubito() {
       chartBtn.className = 'chart-btn';
       chartBtn.textContent = '📈';
       chartBtn.title = 'Storico prezzi';
-      chartBtn.addEventListener('click', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        _showHistoryModal(ad.urn_id, ad.name);
-      });
+      chartBtn.dataset.chartUrn  = ad.urn_id;
+      chartBtn.dataset.chartName = ad.name;
       tdChart.appendChild(chartBtn);
       tr.appendChild(tdChart);
 
@@ -1367,25 +2143,206 @@ function renderSubito() {
   }
 }
 
+// Delegated click handler per Subito: AI buttons + chart buttons (un solo listener)
+document.getElementById('subito-grid')?.addEventListener('click', e => {
+  // AI review buttons
+  const aiBtn = e.target.closest('[data-ai-action]');
+  if (aiBtn) {
+    const adId  = parseInt(aiBtn.dataset.adId, 10);
+    const action = aiBtn.dataset.aiAction;
+    if (adId && action) updateAiStatus(adId, action);
+    return;
+  }
+  // Chart buttons
+  const chartBtn = e.target.closest('.chart-btn[data-chart-urn]');
+  if (chartBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    _showHistoryModal(chartBtn.dataset.chartUrn, chartBtn.dataset.chartName);
+    return;
+  }
+});
+
+// ============================================================
+// SUBITO — VENDUTI
+// ============================================================
+let SUBITO_SOLD      = [];
+let SUBITO_SOLD_STATS = {};
+
+async function loadSubitoSoldData() {
+  const btn = document.getElementById('btn-load-sold');
+  if (btn) btn.disabled = true;
+  try {
+    const _fb = { ok: false, body: null };
+    const [rSold, rStats] = _settled(
+      await Promise.allSettled([
+        API.fetchJson('/api/subito/sold'),
+        API.fetchJson('/api/subito/sold-stats'),
+      ]),
+      [_fb, _fb],
+    );
+    if (rSold.ok)  SUBITO_SOLD       = _sanitizeRows(rSold.body);
+    if (rStats.ok) SUBITO_SOLD_STATS = _sanitizeRow(rStats.body);
+    _renderSubitoSoldStats();
+    renderSubitoSold();
+  } catch (e) {
+    console.warn('Subito sold load:', e.message);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+function _renderSubitoSoldStats() {
+  const cont = document.getElementById('subito-sold-stats');
+  if (!cont) return;
+  const byFam = (SUBITO_SOLD_STATS.by_family || []);
+  if (!byFam.length) { cont.innerHTML = ''; return; }
+
+  cont.innerHTML = byFam.map(r => {
+    const fk    = r.console_family || 'other';
+    const label = FAMILY_LABELS[fk] || fk;
+    const avg   = r.avg_price != null ? '€ ' + Math.round(r.avg_price) : '—';
+    const range = (r.min_price != null && r.max_price != null)
+      ? `€ ${Math.round(r.min_price)} – € ${Math.round(r.max_price)}`
+      : '—';
+    const hours = r.avg_hours_active != null
+      ? (r.avg_hours_active < 48
+          ? Math.round(r.avg_hours_active) + ' ore'
+          : Math.round(r.avg_hours_active / 24) + ' giorni')
+      : '—';
+    return `
+      <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:14px 16px;">
+        <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#ff6600; margin-bottom:6px;">${label}</div>
+        <div style="font-size:22px; font-weight:800; color:var(--text);">${avg}</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">media · ${r.count} venduti</div>
+        <div style="font-size:11px; color:var(--text-muted);">range ${range}</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px; border-top:1px solid var(--border); padding-top:4px;">⏱ attivo in media ${hours}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderSubitoSold() {
+  const grid    = document.getElementById('subito-sold-grid');
+  const countEl = document.getElementById('subito-sold-count');
+  if (!grid) return;
+
+  if (!SUBITO_SOLD.length) {
+    grid.innerHTML = '<div style="color:var(--text-muted); font-size:13px; padding:12px 0;">Nessun venduto rilevato — esegui <code>python3 verify_sold.py</code></div>';
+    if (countEl) countEl.textContent = '';
+    return;
+  }
+
+  const q      = (document.getElementById('subito-sold-search')?.value || '').toLowerCase().trim();
+  const famF   = document.getElementById('subito-sold-family')?.value || '';
+
+  let rows = SUBITO_SOLD.slice();
+  if (q)    rows = rows.filter(a => a.name.toLowerCase().includes(q));
+  if (famF) rows = rows.filter(a => a.console_family === famF);
+
+  if (countEl) countEl.textContent = rows.length + ' venduti';
+
+  const thSt = 'padding:6px 10px; font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--text-muted);';
+  const table = document.createElement('table');
+  table.className = 'console-table';
+  table.innerHTML = `<thead><tr style="background:var(--bg); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <th style="${thSt} padding-left:18px;">Annuncio</th>
+    <th style="${thSt}">Famiglia</th>
+    <th style="${thSt}">Città</th>
+    <th style="${thSt}">Venduto il</th>
+    <th style="${thSt}">Attivo per</th>
+    <th style="${thSt} text-align:right;">Prezzo</th>
+  </tr></thead>`;
+
+  const tbody = document.createElement('tbody');
+  for (const ad of rows) {
+    const tr = document.createElement('tr');
+    tr.className = 'product-row product-row-esaurito';
+
+    // Calcola tempo attivo
+    let activeStr = '—';
+    if (ad.first_seen && ad.sold_at) {
+      const ms   = new Date(ad.sold_at) - new Date(ad.first_seen);
+      const hrs  = Math.round(ms / 3600000);
+      activeStr  = hrs < 48 ? hrs + ' ore' : Math.round(hrs / 24) + ' giorni';
+    }
+
+    const famLabel = FAMILY_LABELS[ad.console_family || 'other'] || ad.console_family || '—';
+    const soldDate = ad.sold_at ? _fmtSubitoDate(ad.sold_at.replace('T', ' ').substring(0, 16)) : '—';
+
+    tr.innerHTML = `
+      <td class="prod-name-cell" style="max-width:320px;">
+        ${ad.url ? `<a href="${ad.url}" target="_blank" rel="noopener noreferrer" class="prod-link" title="${ad.name}">${ad.name}</a>` : `<span>${ad.name}</span>`}
+      </td>
+      <td style="padding:6px 10px; font-size:12px; color:#ff6600; font-weight:600; white-space:nowrap;">${famLabel}</td>
+      <td style="padding:6px 10px; font-size:12px; color:var(--text-muted); white-space:nowrap;">${ad.city || '—'}</td>
+      <td style="padding:6px 10px; font-size:11px; color:var(--text-muted); white-space:nowrap;">${soldDate}</td>
+      <td style="padding:6px 10px; font-size:11px; color:var(--text-muted); white-space:nowrap;">${activeStr}</td>
+      <td class="prod-price-cell">${ad.last_price != null ? '€ ' + ad.last_price.toFixed(2) : '—'}</td>`;
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+  grid.innerHTML = '';
+  grid.appendChild(table);
+}
+
+// ============================================================
+// Subito — aggiornamento stato AI (chiamata dai bottoni Approva/Scarta)
+// ============================================================
+async function updateAiStatus(adId, status) {
+  try {
+    const res = await API.fetchJson('/api/subito/update-ai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: adId, status }),
+    });
+    if (!res.ok) {
+      console.warn('updateAiStatus fallito:', res.status, res.body);
+      alert('Errore aggiornamento stato: ' + (res.body?.error || res.status));
+      return;
+    }
+    // Aggiorna localmente senza ricaricare tutto
+    const ad = SUBITO_ADS.find(a => a.id === adId);
+    if (ad) ad.ai_status = status;
+    renderSubito();
+  } catch (e) {
+    console.error('updateAiStatus eccezione:', e);
+  }
+}
+
 // ============================================================
 // Caricamento dati
 // ============================================================
-document.getElementById('btn-refresh').addEventListener('click', tryAutoLoad);
+document.getElementById('btn-refresh').addEventListener('click', () => {
+  tryAutoLoad();
+  // Se il tab Subito è attivo, ricarica anche i suoi dati
+  const activeTab = document.querySelector('.tab.active');
+  if (activeTab && activeTab.dataset.tab === 'subito') loadSubitoData();
+  if (activeTab && activeTab.dataset.tab === 'ebay')   loadEbayData();
+});
 
 async function tryAutoLoad() {
   try {
-    const [rSrc, rComb, rDbProds, rBase, rStorage, rStandard] = await Promise.all([
-      API.fetchJson('/api/sources'),
-      API.fetchJson('/api/combined/latest'),
-      API.fetchJson('/api/db/products'),
-      API.fetchJson('/api/db/base-models'),
-      API.fetchJson('/api/db/storage-sizes'),
-      API.fetchJson('/api/db/standard-groups'),
-    ]);
+    const _fb = { ok: false, body: null };
+    const [rSrc, rComb, rDbProds, rBase, rStorage, rStandard, rHistory] = _settled(
+      await Promise.allSettled([
+        API.fetchJson('/api/sources'),
+        API.fetchJson('/api/combined/latest'),
+        API.fetchJson('/api/db/products'),
+        API.fetchJson('/api/db/base-models'),
+        API.fetchJson('/api/db/storage-sizes'),
+        API.fetchJson('/api/db/standard-groups'),
+        API.fetchJson('/api/db/price-history'),
+      ]),
+      [_fb, _fb, _fb, _fb, _fb, _fb, _fb],
+    );
 
     if (rSrc.ok) {
       SOURCES_META = _sanitizeRows(rSrc.body);
       _populateSourceFilter();
+    }
+    
+    if (rHistory && rHistory.ok) {
+      PRICE_HISTORY = rHistory.body || [];
     }
 
     if (rComb.ok) {
@@ -1434,7 +2391,11 @@ async function tryAutoLoad() {
   }
 }
 
-tryAutoLoad();
+// Bootstrap token dal server (senza query string), poi carica i dati
+(async () => {
+  if (API.bootstrapToken) await API.bootstrapToken();
+  tryAutoLoad();
+})();
 
 // ============================================================
 // EBAY VIEW (Feature 6)
@@ -1442,10 +2403,14 @@ tryAutoLoad();
 
 async function loadEbayData() {
   try {
-    const [rSold, rStats] = await Promise.all([
-      API.fetchJson('/api/ebay/sold'),
-      API.fetchJson('/api/ebay/stats'),
-    ]);
+    const _fb = { ok: false, body: null };
+    const [rSold, rStats] = _settled(
+      await Promise.allSettled([
+        API.fetchJson('/api/ebay/sold'),
+        API.fetchJson('/api/ebay/stats'),
+      ]),
+      [_fb, _fb],
+    );
     if (rSold.ok)  EBAY_SOLD = _sanitizeRows(rSold.body);
     if (rStats.ok) {
       const s = _sanitizeRow(rStats.body);
@@ -1685,14 +2650,22 @@ function _buildChartSVG(points) {
 }
 
 function _showHistoryModal(urnId, adName) {
-  document.getElementById('price-history-modal')?.remove();
+  // Cleanup: rimuovi overlay precedente e i suoi listener
+  const old = document.getElementById('price-history-modal');
+  if (old) old.remove();
+
   const safeUrnId = SAN.sanitizeText(urnId);
   const safeAdName = SAN.sanitizeText(adName);
 
   const overlay = document.createElement('div');
   overlay.id = 'price-history-modal';
   overlay.className = 'history-overlay';
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  // Un solo handler delegato: click su sfondo o su bottone close
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay || e.target.closest('.history-close')) {
+      overlay.remove();
+    }
+  });
 
   const card = document.createElement('div');
   card.className = 'history-card';
@@ -1703,7 +2676,7 @@ function _showHistoryModal(urnId, adName) {
         <div class="history-title">${safeAdName}</div>
         <div class="history-urn">${safeUrnId}</div>
       </div>
-      <button class="history-close" onclick="document.getElementById('price-history-modal').remove()">×</button>
+      <button class="history-close" aria-label="Chiudi">×</button>
     </div>
     <div id="history-body" class="history-body">
       <div class="history-loading">Caricamento…</div>
@@ -1778,6 +2751,191 @@ function _showHistoryModal(urnId, adName) {
       document.getElementById('history-body').innerHTML =
         `<div class="history-empty" style="color:#c44">Errore: ${safeErr}</div>`;
     });
+}
+
+// ============================================================
+// TREND VIEW — Grafici storici prezzi
+// ============================================================
+
+function _buildTrendSvg(series, { width = 520, height = 200, padding = { top: 20, right: 20, bottom: 30, left: 50 } } = {}) {
+  if (!series.length) return '<div class="history-empty">Nessun dato storico</div>';
+
+  const w = width - padding.left - padding.right;
+  const h = height - padding.top - padding.bottom;
+
+  const prices = series.map(s => s.price);
+  const minP = Math.min(...prices);
+  const maxP = Math.max(...prices);
+  const range = maxP - minP || 1;
+
+  // Parse dates
+  const dates = series.map(s => new Date(s.date));
+  const minT = dates[0].getTime();
+  const maxT = dates[dates.length - 1].getTime();
+  const spanT = maxT - minT || 1;
+
+  const x = (d) => padding.left + ((d.getTime() - minT) / spanT) * w;
+  const y = (p) => padding.top + h - ((p - minP) / range) * h;
+
+  // Build polyline
+  const points = series.map((s, i) => `${x(dates[i]).toFixed(1)},${y(s.price).toFixed(1)}`).join(' ');
+
+  // Area fill
+  const areaPoints = points + ` ${x(dates[dates.length - 1]).toFixed(1)},${(padding.top + h).toFixed(1)} ${x(dates[0]).toFixed(1)},${(padding.top + h).toFixed(1)}`;
+
+  // Y-axis ticks (5 ticks)
+  const yTicks = [];
+  for (let i = 0; i <= 4; i++) {
+    const val = minP + (range * i / 4);
+    yTicks.push({ val, cy: y(val) });
+  }
+
+  // X-axis ticks (max 5 date labels)
+  const xTicks = [];
+  const step = Math.max(1, Math.floor(series.length / 5));
+  for (let i = 0; i < series.length; i += step) {
+    xTicks.push({ label: series[i].date.slice(5), cx: x(dates[i]) });
+  }
+  // Always add last
+  if (xTicks.length && xTicks[xTicks.length - 1].label !== series[series.length - 1].date.slice(5)) {
+    xTicks.push({ label: series[series.length - 1].date.slice(5), cx: x(dates[dates.length - 1]) });
+  }
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const gridColor = isDark ? '#333' : '#eee';
+  const textColor = isDark ? '#888' : '#999';
+  const lineColor = '#4a90d9';
+  const fillColor = isDark ? 'rgba(74,144,217,0.12)' : 'rgba(74,144,217,0.08)';
+  const dotColor = lineColor;
+
+  // Price delta
+  const first = prices[0];
+  const last = prices[prices.length - 1];
+  const delta = last - first;
+  const deltaPct = ((delta / first) * 100).toFixed(1);
+  const deltaColor = delta < 0 ? '#00a040' : delta > 0 ? '#c44' : textColor;
+  const deltaSign = delta > 0 ? '+' : '';
+
+  return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:auto;">
+    <!-- Grid lines -->
+    ${yTicks.map(t => `<line x1="${padding.left}" y1="${t.cy.toFixed(1)}" x2="${width - padding.right}" y2="${t.cy.toFixed(1)}" stroke="${gridColor}" stroke-width="0.5"/>`).join('')}
+    <!-- Y labels -->
+    ${yTicks.map(t => `<text x="${padding.left - 6}" y="${(t.cy + 3).toFixed(1)}" text-anchor="end" font-size="9" fill="${textColor}">€${Math.round(t.val)}</text>`).join('')}
+    <!-- X labels -->
+    ${xTicks.map(t => `<text x="${t.cx.toFixed(1)}" y="${height - 6}" text-anchor="middle" font-size="9" fill="${textColor}">${t.label}</text>`).join('')}
+    <!-- Area -->
+    <polygon points="${areaPoints}" fill="${fillColor}"/>
+    <!-- Line -->
+    <polyline points="${points}" fill="none" stroke="${lineColor}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- Dots start/end -->
+    <circle cx="${x(dates[0]).toFixed(1)}" cy="${y(first).toFixed(1)}" r="3" fill="${dotColor}"/>
+    <circle cx="${x(dates[dates.length - 1]).toFixed(1)}" cy="${y(last).toFixed(1)}" r="3" fill="${dotColor}"/>
+    <!-- Delta label -->
+    <text x="${width - padding.right}" y="${padding.top - 4}" text-anchor="end" font-size="11" font-weight="600" fill="${deltaColor}">${deltaSign}€${Math.round(delta)} (${deltaSign}${deltaPct}%)</text>
+  </svg>`;
+}
+
+function renderTrend() {
+  const grid  = document.getElementById('trend-grid');
+  const empty = document.getElementById('trend-empty');
+  const count = document.getElementById('trend-count');
+  grid.innerHTML = '';
+
+  if (!BASE_MODELS.length || !PRICE_HISTORY.length) {
+    empty.style.display = 'block';
+    grid.style.display  = 'none';
+    count.textContent   = '';
+    return;
+  }
+
+  const filterFamily = document.getElementById('trend-filter-family').value;
+  const periodDays   = parseInt(document.getElementById('trend-period').value, 10);
+
+  // Cutoff date
+  let cutoff = null;
+  if (periodDays > 0) {
+    const d = new Date();
+    d.setDate(d.getDate() - periodDays);
+    cutoff = d.toISOString().split('T')[0];
+  }
+
+  const uniqueGroups = getUniqueBaseModels();
+
+  const cards = [];
+  for (const group of uniqueGroups) {
+    const rep = group.items[0];
+    const fk = rep.console_family || _familyKey(rep.name);
+
+    // Filter by family
+    if (filterFamily && fk !== filterFamily) continue;
+
+    // Get product IDs for this group
+    const productIds = group.items.map(p => p.id).filter(Boolean);
+    if (!productIds.length) continue;
+
+    // Get daily series using StatEngine
+    let series = StatEngine.getDailyHistory(productIds);
+    if (!series.length) continue;
+
+    // Filter by period
+    if (cutoff) {
+      series = series.filter(s => s.date >= cutoff);
+    }
+    if (series.length < 2) continue;
+
+    const title = _comboTitle({ rep });
+    const storageLabel = rep.storage_label || '';
+    const condBadge = rep.condition === 'Nuovo'
+      ? '<span class="badge badge-nuovo">Nuovo</span>'
+      : rep.condition === 'Usato'
+        ? '<span class="badge badge-usato">Usato</span>'
+        : '';
+
+    const currentPrice = series[series.length - 1].price;
+    const minPrice = Math.min(...series.map(s => s.price));
+    const maxPrice = Math.max(...series.map(s => s.price));
+
+    cards.push({
+      fk,
+      title,
+      html: `
+        <div class="trend-card">
+          <div class="trend-card-header">
+            <div class="trend-card-title">${SAN.sanitizeText(title)}</div>
+            <div class="trend-card-meta">
+              ${condBadge}
+              ${storageLabel ? `<span class="storage-badge">${SAN.sanitizeText(storageLabel)}</span>` : ''}
+            </div>
+          </div>
+          <div class="trend-card-chart">${_buildTrendSvg(series)}</div>
+          <div class="trend-card-footer">
+            <span>Attuale: <strong>€${Math.round(currentPrice)}</strong></span>
+            <span>Min: €${Math.round(minPrice)}</span>
+            <span>Max: €${Math.round(maxPrice)}</span>
+            <span>${series.length} giorni</span>
+          </div>
+        </div>
+      `
+    });
+  }
+
+  if (!cards.length) {
+    empty.style.display = 'block';
+    grid.style.display  = 'none';
+    count.textContent   = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  grid.style.display  = '';
+  count.textContent   = `${cards.length} grafici`;
+
+  // Sort by family order, then title
+  const familyIdx = {};
+  CONSOLE_FAMILIES.forEach((f, i) => { familyIdx[f.key] = i; });
+  cards.sort((a, b) => (familyIdx[a.fk] ?? 99) - (familyIdx[b.fk] ?? 99) || a.title.localeCompare(b.title, 'it'));
+
+  grid.innerHTML = cards.map(c => c.html).join('');
 }
 
 // ============================================================

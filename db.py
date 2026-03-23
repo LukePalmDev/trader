@@ -25,7 +25,7 @@ from model_rules import (
 
 log = logging.getLogger(__name__)
 
-DB_PATH = Path(__file__).parent / "trader.db"
+DB_PATH = Path(__file__).parent / "tracker.db"
 
 # Regex per estrarre dimensione archiviazione dal nome prodotto
 _STORAGE_RE = re.compile(r'(\d[\d.]*)\s*(GB|TB)', re.IGNORECASE)
@@ -767,6 +767,44 @@ _MIGRATIONS = (
         "search-attributes",
         callback=_migration_v11_search_attributes,
     ),
+    Migration(
+        12,
+        "add-check-triggers",
+        (
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_products_last_price_insert
+            BEFORE INSERT ON products
+            WHEN NEW.last_price < 0
+            BEGIN
+                SELECT RAISE(ABORT, 'last_price must be >= 0');
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_products_last_price_update
+            BEFORE UPDATE ON products
+            WHEN NEW.last_price < 0
+            BEGIN
+                SELECT RAISE(ABORT, 'last_price must be >= 0');
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_products_last_available_insert
+            BEFORE INSERT ON products
+            WHEN NEW.last_available NOT IN (0, 1)
+            BEGIN
+                SELECT RAISE(ABORT, 'last_available must be 0 or 1');
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_products_last_available_update
+            BEFORE UPDATE ON products
+            WHEN NEW.last_available NOT IN (0, 1)
+            BEGIN
+                SELECT RAISE(ABORT, 'last_available must be 0 or 1');
+            END;
+            """,
+        ),
+    ),
 )
 
 
@@ -886,9 +924,9 @@ def init_db(db_path: Path = DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_products_source ON products(source);
         CREATE INDEX IF NOT EXISTS idx_products_family ON products(console_family);
         """)
-    applied = run_migrations(db_path, _MIGRATIONS)
+    applied = run_migrations(db_path, _MIGRATIONS, namespace="products")
     if applied:
-        log.info("Migrazioni trader.db applicate: %s", applied)
+        log.info("Migrazioni products applicate: %s", applied)
     log.info("DB pronto: %s", db_path)
 
 
@@ -914,9 +952,11 @@ def process_products(
     """
     now   = datetime.now(timezone.utc).isoformat()
     stats = {"new": 0, "price_changes": 0, "avail_changes": 0, "unchanged": 0}
-    sources_seen: set[str] = set()
-
-    with _connect(db_path) as conn:
+    sources_seen = set()
+    conn = _connect(db_path)
+    conn.isolation_level = None
+    conn.execute("BEGIN IMMEDIATE")
+    try:
         for p in products:
             name      = (p.get("name") or "").strip()
             source    = (p.get("source") or "").strip()
@@ -1063,6 +1103,13 @@ def process_products(
             _normalize_rebuy_records(conn)
         _rebuild_display_ids(conn)
 
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
     return stats
 
 
@@ -1090,7 +1137,10 @@ def clean_db(db_path: Path = DB_PATH) -> dict[str, int]:
         "orphan_changes_removed": 0,
     }
 
-    with _connect(db_path) as conn:
+    conn = _connect(db_path)
+    conn.isolation_level = None
+    conn.execute("BEGIN IMMEDIATE")
+    try:
         conn.row_factory = sqlite3.Row
 
         # 1) Rimuove residui legacy di fonti gestite in DB dedicati.
@@ -1145,6 +1195,13 @@ def clean_db(db_path: Path = DB_PATH) -> dict[str, int]:
         summary["orphan_changes_removed"] = int(before - after)
 
         _rebuild_display_ids(conn)
+
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
     return summary
 
@@ -1367,6 +1424,18 @@ def get_recent_changes(days: int = 30, db_path: Path = DB_PATH) -> list[dict]:
             WHERE sc.changed_at >= datetime('now', ?)
             ORDER BY sc.changed_at DESC
         """, (f"-{days} days",)).fetchall()
+    return [dict(r) for r in rows]
+
+def get_price_history(db_path: Path = DB_PATH) -> list[dict]:
+    """Recupera l'intero storico limitato a id, date e prezzo per i grafici Javascript (Stat 3, 4, 5)."""
+    with _connect(db_path) as conn:
+        rows = conn.execute("""
+            SELECT
+                sc.product_id, sc.changed_at, sc.price_new, sc.available_new
+            FROM state_changes sc
+            WHERE sc.change_type IN ('new', 'price', 'availability')
+            ORDER BY sc.changed_at ASC
+        """).fetchall()
     return [dict(r) for r in rows]
 
 

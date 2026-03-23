@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Xbox Tracker</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=13" />
 </head>
 <body>
 
@@ -13,14 +13,18 @@
   <div class="logo">🎮 Xbox Tracker</div>
   <nav class="tabs">
     <button class="tab active" data-tab="home">Home</button>
-    <button class="tab" data-tab="shop">Tutto</button>
+    <button class="tab" data-tab="mercato">🛒 Mercato</button>
+    <button class="tab" data-tab="shop">Riepilogo</button>
     <button class="tab" data-tab="catalogo">Catalogo</button>
     <button class="tab" data-tab="subito">Subito.it</button>
     <button class="tab" data-tab="ebay">eBay</button>
+    <button class="tab" data-tab="statistiche">📊 Statistiche</button>
+    <button class="tab" data-tab="trend">📈 Trend</button>
     <button class="tab" data-tab="ricerca">🔍 Ricerca</button>
   </nav>
   <div class="header-right">
     <span id="last-update">—</span>
+    <button id="btn-theme" title="Tema chiaro/scuro">🌙</button>
     <button id="btn-refresh" title="Aggiorna dati">↻</button>
   </div>
 </header>
@@ -50,8 +54,37 @@
     </div>
 
     <!-- Griglia modelli base per famiglia -->
-    <div id="home-grid"></div>
+    <div id="home-grid" class="results-grid"></div>
 
+  </div>
+</div>
+
+<!-- ======== MERCATO VIEW ======== -->
+<div id="view-mercato" class="view">
+  <div class="home-inner">
+    <div class="home-header">
+      <h1 class="home-title">🛒 Mercato</h1>
+      <p class="home-sub">Modelli preferiti con disponibilità attiva — solo le fonti con stock disponibile.</p>
+    </div>
+    <div id="mercato-empty" style="display:none;">
+      <div class="home-empty-card">
+        <div class="home-empty-icon">📦</div>
+        <h2>Nessun modello disponibile al momento</h2>
+        <p>Tutti i modelli preferiti risultano esauriti in tutti gli store.</p>
+      </div>
+    </div>
+    <div id="mercato-grid" class="results-grid"></div>
+  </div>
+</div>
+
+<!-- ======== STATISTICHE VIEW ======== -->
+<div id="view-statistiche" class="view">
+  <div class="home-inner">
+    <div class="home-header">
+      <h1 class="home-title">Dashboard Statistiche</h1>
+      <p class="home-sub">Analisi matematica avanzata (Z-Score, Spread, Trend) sui modelli base preferiti.</p>
+    </div>
+    <div id="stats-grid"></div>
   </div>
 </div>
 
@@ -63,9 +96,6 @@
     <div class="gstat"><span id="gs-total">—</span><label>Prodotti totali</label></div>
     <div class="gstat gstat-accent"><span id="gs-avail">—</span><label>Disponibili</label></div>
     <div class="gstat"><span id="gs-stores">—</span><label>Store attivi</label></div>
-    <div class="gstat"><span id="gs-avg-u">—</span><label>Media usato</label></div>
-    <div class="gstat"><span id="gs-avg-n">—</span><label>Media nuovo</label></div>
-    <div class="gstat"><span id="gs-min">—</span><label>Minimo disponibile</label></div>
   </div>
 
   <div class="shop-inner">
@@ -183,6 +213,12 @@
 
     <div id="subito-filters">
       <input type="text"  id="subito-search"    placeholder="🔍  Cerca annuncio…" oninput="renderSubito()" />
+      <select id="subito-filter-ai" onchange="renderSubito()" style="font-weight: 600; color: #ff6600;">
+        <option value="approved" selected>✅ Approvati AI</option>
+        <option value="pending">⏳ In Revisione</option>
+        <option value="rejected">❌ Scartati AI</option>
+        <option value="all">Tutti</option>
+      </select>
       <select id="subito-filter-family"   onchange="renderSubito()">
         <option value="">Tutte le console</option>
         <option value="series-x">Series X</option>
@@ -220,6 +256,40 @@
     </div>
 
     <div id="subito-grid"></div>
+
+  <!-- Sezione Venduti Subito -->
+  <div id="subito-sold-section" style="margin-top:32px; border-top:2px solid var(--border); padding-top:24px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding:0 4px;">
+      <h2 style="margin:0; font-size:18px; font-weight:700; color:var(--text);">
+        🏷️ Venduti su Subito.it
+        <span id="subito-sold-count" style="font-size:13px; font-weight:400; color:var(--text-muted); margin-left:8px;"></span>
+      </h2>
+      <button id="btn-load-sold" onclick="loadSubitoSoldData()" style="font-size:12px; padding:5px 14px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); cursor:pointer; color:var(--text);">Carica venduti</button>
+    </div>
+
+    <!-- Stats summary per famiglia -->
+    <div id="subito-sold-stats" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:20px;"></div>
+
+    <!-- Filtri -->
+    <div id="subito-sold-filters" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
+      <input type="text" id="subito-sold-search" placeholder="🔍 Cerca…" oninput="renderSubitoSold()"
+             style="flex:1; min-width:180px; max-width:280px; padding:6px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); font-size:13px;" />
+      <select id="subito-sold-family" onchange="renderSubitoSold()"
+              style="padding:6px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); font-size:13px;">
+        <option value="">Tutte le console</option>
+        <option value="series-x">Series X</option>
+        <option value="series-s">Series S</option>
+        <option value="one-x">One X</option>
+        <option value="one-s">One S</option>
+        <option value="one">One</option>
+        <option value="360">360</option>
+        <option value="original">Original</option>
+      </select>
+    </div>
+
+    <!-- Tabella venduti -->
+    <div id="subito-sold-grid"></div>
+  </div>
 
   </div>
 </div>
@@ -356,9 +426,46 @@
   </div>
 </div>
 
-<script src="modules/state.js"></script>
-<script src="modules/sanitize.js"></script>
-<script src="modules/api.js"></script>
-<script src="app.js"></script>
+<!-- ======== TREND VIEW ======== -->
+<div id="view-trend" class="view">
+  <div class="home-inner">
+    <div class="home-header">
+      <h1 class="home-title">📈 Trend Prezzi</h1>
+      <p class="home-sub">Andamento storico dei prezzi per i modelli base selezionati. I grafici mostrano il prezzo minimo giornaliero.</p>
+    </div>
+    <div id="trend-filters" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:20px;">
+      <select id="trend-filter-family" onchange="renderTrend()">
+        <option value="">Tutte le famiglie</option>
+        <option value="series-x">Series X</option>
+        <option value="series-s">Series S</option>
+        <option value="one-x">One X</option>
+        <option value="one-s">One S</option>
+        <option value="one">One</option>
+        <option value="360">360</option>
+        <option value="original">Original</option>
+      </select>
+      <select id="trend-period" onchange="renderTrend()">
+        <option value="30">Ultimi 30 giorni</option>
+        <option value="90" selected>Ultimi 90 giorni</option>
+        <option value="180">Ultimi 6 mesi</option>
+        <option value="0">Tutto lo storico</option>
+      </select>
+      <span id="trend-count" style="margin-left:auto; font-size:12px; color:var(--text-muted);"></span>
+    </div>
+    <div id="trend-empty" style="display:none;">
+      <div class="home-empty-card">
+        <div class="home-empty-icon">📈</div>
+        <h2>Nessun dato storico disponibile</h2>
+        <p>Seleziona dei modelli base nel Catalogo. I grafici appariranno quando ci saranno variazioni di prezzo registrate.</p>
+      </div>
+    </div>
+    <div id="trend-grid"></div>
+  </div>
+</div>
+
+<script src="modules/state.js?v=13"></script>
+<script src="modules/sanitize.js?v=13"></script>
+<script src="modules/api.js?v=13"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>

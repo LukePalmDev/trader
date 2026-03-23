@@ -1,5 +1,5 @@
 /* ============================================================
-   Variabili
+   Variabili — Light theme (default)
    ============================================================ */
 :root {
   --bg:          #f5f4f1;
@@ -23,6 +23,57 @@
   --radius:    14px;
   --radius-sm:  8px;
   --shadow:    0 1px 6px rgba(0,0,0,0.06);
+
+  --hover-row:   #fafaf8;
+  --combo-open:  #fafaf8;
+  --combo-detail:#fafaf8;
+  --storage-bg:  #e8f0fe;
+  --storage-text:#2355a0;
+  --ref-bg:      #f9f8f9;
+  --summary-th:  #f0eff0;
+  --pack-imb-bg: #e9e0f7;
+  --pack-imb-cl: #7c4dbe;
+  --pack-nonimb-bg: #f5ece3;
+  --pack-nonimb-cl: #9c6b3c;
+}
+
+/* ============================================================
+   Variabili — Dark theme
+   ============================================================ */
+[data-theme="dark"] {
+  --bg:          #141418;
+  --card-bg:     #1e1e24;
+  --border:      #2e2e36;
+  --text:        #e4e4e8;
+  --text-light:  #a0a0aa;
+  --text-muted:  #606068;
+  --accent:      #e4e4e8;
+
+  --nuovo-bg:    #1a3a1a;
+  --nuovo-text:  #6fcf6f;
+  --usato-bg:    #3a2a18;
+  --usato-text:  #e0a868;
+
+  --avail-ok:    #50c050;
+  --avail-ko:    #444450;
+
+  --star-active: #f5a623;
+
+  --shadow:    0 1px 8px rgba(0,0,0,0.30);
+
+  --hover-row:   #24242c;
+  --combo-open:  #24242c;
+  --combo-detail:#1a1a22;
+  --storage-bg:  #1a2a44;
+  --storage-text:#6ab0f0;
+  --ref-bg:      #1a1a22;
+  --summary-th:  #1a1a22;
+  --pack-imb-bg: #2a2040;
+  --pack-imb-cl: #b080e0;
+  --pack-nonimb-bg: #302818;
+  --pack-nonimb-cl: #d0a060;
+
+  color-scheme: dark;
 }
 
 /* ============================================================
@@ -111,9 +162,9 @@ header {
    HOME VIEW
    ============================================================ */
 .home-inner {
-  max-width: 100%;
+  max-width: 1700px;
   margin: 0 auto;
-  padding: 32px 40px;
+  padding: 15px 10px 40px;
 }
 
 .home-header {
@@ -168,22 +219,29 @@ header {
   color: var(--text-muted);
 }
 
-/* Sezioni per famiglia */
-#home-grid {
+/* Layout Griglia Comune a tutte le Dashboard */
+.results-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
   align-items: start;
 }
 
 @media (max-width: 1200px) {
-  #home-grid {
+  .results-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1000px) {
+  .results-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (max-width: 768px) {
-  #home-grid {
+
+@media (max-width: 600px) {
+  .results-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -197,14 +255,17 @@ header {
 }
 
 .home-section-title {
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-light);
-  padding: 14px 20px 12px;
+  padding: 8px 10px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Accordion row per combinazioni uniche */
@@ -223,45 +284,58 @@ header {
 }
 
 .home-combo-header {
-  padding: 14px 16px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   cursor: pointer;
   background: var(--card-bg);
   transition: background 0.2s;
+  border-bottom: 1px solid transparent;
 }
+
 .home-combo-header:hover {
   background: var(--bg);
 }
 
 .home-combo-title {
-  font-size: 14px;
+  font-size: 11px; /* Reduced font size */
   font-weight: 700;
   color: var(--text);
-  margin-bottom: 4px;
+  margin-bottom: 2px; /* Reduced margin */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%; /* Changed from max-width */
 }
 
 .home-combo-tags {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 11px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 10px;
   color: var(--text-light);
 }
 
 .home-combo-stats {
+  width: 100%;
   text-align: left;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid var(--border);
+  padding-top: 8px;
+  margin-top: 4px;
+  font-size: 11px;
 }
 
 .home-combo-details {
   display: none;
   border-top: 1px solid var(--border);
-  background: #fafaf8;
+  background: var(--combo-detail);
   padding: 10px 14px 14px;
   overflow-x: auto;
 }
@@ -269,7 +343,7 @@ header {
   display: block;
 }
 .home-combo-row.open .home-combo-header {
-  background: #fafaf8;
+  background: var(--combo-open);
 }
 
 /* Tabella interna */
@@ -298,7 +372,7 @@ header {
   border-bottom: none;
 }
 .home-table tbody tr:hover td {
-  background: #fdfdfd;
+  background: var(--hover-row);
 }
 
 /* Storage badge */
@@ -308,8 +382,8 @@ header {
   border-radius: 20px;
   font-size: 10.5px;
   font-weight: 600;
-  background: #e8f0fe;
-  color: #2355a0;
+  background: var(--storage-bg);
+  color: var(--storage-text);
   letter-spacing: 0.2px;
 }
 
@@ -390,8 +464,23 @@ header {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  overflow: hidden;
+  overflow: clip;
   border-top: 3px solid var(--store-accent, #ccc);
+  max-height: 50vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.console-table-wrapper {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.console-table-wrapper thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg);
 }
 
 .store-card-header {
@@ -480,7 +569,7 @@ header {
 }
 
 .product-row td { border-top: 1px solid var(--border); }
-.product-row:hover td { background: #fafaf8; }
+.product-row:hover td { background: var(--hover-row); }
 .product-row-esaurito { opacity: 0.45; }
 
 .prod-name-cell {
@@ -544,6 +633,19 @@ header {
 .badge-usato { background: var(--usato-bg); color: var(--usato-text); }
 .badge-nd    { background: var(--border);   color: var(--text-muted); }
 
+/* Badge imballo */
+.badge-pack {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.badge-pack-imb    { background: var(--pack-imb-bg); color: var(--pack-imb-cl); }
+.badge-pack-nonimb { background: var(--pack-nonimb-bg); color: var(--pack-nonimb-cl); }
+
 /* ============================================================
    Summary Section
    ============================================================ */
@@ -592,7 +694,7 @@ header {
 
 #summary-table th.th-ref {
   color: var(--text-light);
-  background: #f0eff0;
+  background: var(--summary-th);
 }
 
 #summary-table td {
@@ -601,7 +703,7 @@ header {
   vertical-align: middle;
 }
 #summary-table tr:last-child td  { border-bottom: none; }
-#summary-table tbody tr:hover td { background: #fafaf8; }
+#summary-table tbody tr:hover td { background: var(--hover-row); }
 
 .summ-family {
   font-weight: 700;
@@ -634,7 +736,7 @@ header {
   white-space: nowrap;
   color: var(--text-light);
   min-width: 90px;
-  background: #f9f8f9 !important;
+  background: var(--ref-bg) !important;
 }
 
 /* ============================================================
@@ -714,7 +816,7 @@ header {
   vertical-align: middle;
 }
 #products-table tr:last-child td { border-bottom: none; }
-#products-table tbody tr:hover td { background: #fafaf8; }
+#products-table tbody tr:hover td { background: var(--hover-row); }
 
 /* ID column */
 .td-id {
@@ -1443,7 +1545,114 @@ header {
   header           { padding: 0 16px; gap: 10px; }
   .shop-inner      { padding: 14px; }
   #view-catalogo   { padding: 14px; }
-  .home-inner      { padding: 16px; }
   #global-stats    { flex-wrap: wrap; }
   .gstat           { min-width: 33%; border-bottom: 1px solid var(--border); }
 }
+
+/* ============================================================
+   Dark mode toggle button
+   ============================================================ */
+#btn-theme {
+  width: 30px; height: 30px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text-light);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s;
+  line-height: 1;
+}
+#btn-theme:hover { background: var(--bg); color: var(--text); }
+
+/* ============================================================
+   Dark theme — hardcoded color overrides
+   ============================================================ */
+[data-theme="dark"] .ricerca-esaurito {
+  background: #3a1a1a; color: #f08080;
+}
+[data-theme="dark"] .ricerca-disp {
+  background: #1a3a1a; color: #80e080;
+}
+[data-theme="dark"] .ricerca-table tr:hover td {
+  background: rgba(140,140,180,0.08);
+}
+[data-theme="dark"] .history-overlay {
+  background: rgba(0,0,0,0.65);
+}
+[data-theme="dark"] .badge-pack {
+  background: var(--border); color: var(--text-light);
+}
+
+/* ============================================================
+   Trend View — grafici storici prezzi
+   ============================================================ */
+#trend-filters select {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+#trend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 16px;
+}
+
+.trend-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.trend-card-header {
+  padding: 14px 16px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.trend-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trend-card-meta {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.trend-card-chart {
+  padding: 4px 12px;
+}
+
+.trend-card-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 16px 12px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.trend-card-footer strong {
+  color: var(--text);
+}
+
+@media (max-width: 600px) {
+  #trend-grid { grid-template-columns: 1fr; }
+}
+

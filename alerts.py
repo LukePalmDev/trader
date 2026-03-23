@@ -18,7 +18,9 @@ from __future__ import annotations
 import json
 import logging
 import subprocess
-from datetime import datetime, timezone
+import urllib.request
+import urllib.parse
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -26,6 +28,7 @@ log = logging.getLogger(__name__)
 _ROOT      = Path(__file__).parent
 _LOG_PATH  = _ROOT / "alert_log.json"
 IVA_RATE   = 0.22   # sconto IVA applicato al prezzo CEX
+_ALERT_LOG_RETENTION_DAYS = 90  # purge entry più vecchie di N giorni
 
 
 # ---------------------------------------------------------------------------
@@ -88,15 +91,73 @@ def _save_log(log_data: dict) -> None:
     )
 
 
+def _purge_old_entries(log_data: dict) -> int:
+    """Rimuove dal log le entry più vecchie di _ALERT_LOG_RETENTION_DAYS giorni.
+
+    Returns:
+        Numero di entry rimosse.
+    """
+    notified = log_data.get("notified", {})
+    if not notified:
+        return 0
+
+    cutoff = datetime.now(timezone.utc) - timedelta(days=_ALERT_LOG_RETENTION_DAYS)
+    to_remove: list[str] = []
+
+    for urn_id, ts_str in notified.items():
+        try:
+            ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+            if ts < cutoff:
+                to_remove.append(urn_id)
+        except (ValueError, TypeError, AttributeError):
+            # Entry malformata → rimuovi per sicurezza
+            to_remove.append(urn_id)
+
+    for urn_id in to_remove:
+        del notified[urn_id]
+
+    if to_remove:
+        log.info("Alert log: purgate %d entry più vecchie di %d giorni.", len(to_remove), _ALERT_LOG_RETENTION_DAYS)
+
+    return len(to_remove)
+
+
+# ---------------------------------------------------------------------------
+# Config Telegram (caricata lazy)
+# ---------------------------------------------------------------------------
+
+_telegram_cfg: dict | None = None
+
+def _get_telegram_cfg() -> dict:
+    """Carica la config Telegram da config.toml (lazy, una sola volta)."""
+    global _telegram_cfg
+    if _telegram_cfg is not None:
+        return _telegram_cfg
+    try:
+        from settings import load_default_config
+        cfg = load_default_config()
+        _telegram_cfg = cfg.get("telegram", {})
+    except Exception:  # noqa: BLE001
+        _telegram_cfg = {}
+    return _telegram_cfg
+
+
 # ---------------------------------------------------------------------------
 # Notifica macOS
 # ---------------------------------------------------------------------------
 
-def _notify(title: str, message: str) -> None:
+def _escape_applescript(text: str) -> str:
+    """Escape per stringhe AppleScript: backslash e virgolette doppie."""
+    return text.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def _notify_macos(title: str, message: str) -> None:
     """Invia una notifica nativa macOS tramite osascript."""
+    safe_title = _escape_applescript(title)
+    safe_message = _escape_applescript(message)
     script = (
-        f'display notification "{message}" '
-        f'with title "{title}" '
+        f'display notification "{safe_message}" '
+        f'with title "{safe_title}" '
         f'sound name "Ping"'
     )
     try:
@@ -104,9 +165,59 @@ def _notify(title: str, message: str) -> None:
             ["osascript", "-e", script],
             capture_output=True, timeout=5,
         )
-        log.info("Notifica inviata: %s — %s", title, message)
+        log.info("Notifica macOS: %s — %s", title, message)
     except Exception as exc:
-        log.warning("Notifica fallita: %s", exc)
+        log.warning("Notifica macOS fallita: %s", exc)
+
+
+# ---------------------------------------------------------------------------
+# Notifica Telegram
+# ---------------------------------------------------------------------------
+
+def _send_telegram(title: str, message: str) -> bool:
+    """Invia un messaggio Telegram via Bot API (urllib, zero dipendenze extra).
+
+    Returns:
+        True se il messaggio è stato inviato con successo, False altrimenti.
+    """
+    cfg = _get_telegram_cfg()
+    if not cfg.get("enabled"):
+        return False
+
+    bot_token = cfg.get("bot_token", "")
+    chat_id = cfg.get("chat_id", "")
+    if not bot_token or not chat_id:
+        return False
+
+    text = f"*{title}*\n{message}"
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    payload = urllib.parse.urlencode({
+        "chat_id": chat_id,
+        "text": text,
+        "parse_mode": "Markdown",
+        "disable_web_page_preview": "true",
+    }).encode("utf-8")
+
+    try:
+        req = urllib.request.Request(url, data=payload, method="POST")
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            ok = resp.status == 200
+        if ok:
+            log.info("Telegram inviato: %s", title)
+        return ok
+    except Exception as exc:
+        log.warning("Telegram fallito: %s", exc)
+        return False
+
+
+# ---------------------------------------------------------------------------
+# Notifica unificata (macOS + Telegram)
+# ---------------------------------------------------------------------------
+
+def _notify(title: str, message: str) -> None:
+    """Invia notifica via tutti i canali attivi (macOS + Telegram)."""
+    _notify_macos(title, message)
+    _send_telegram(title, message)
 
 
 # ---------------------------------------------------------------------------
@@ -135,6 +246,7 @@ def check_alerts() -> int:
 
     ads     = _db_subito.get_all_ads()
     log_data = _load_log()
+    _purge_old_entries(log_data)
     already_notified: set[str] = set(log_data.get("notified", {}).keys())
 
     sent = 0
@@ -143,6 +255,11 @@ def check_alerts() -> int:
     for ad in ads:
         if not ad["last_available"]:
             continue
+            
+        # Saltiamo gli annunci non esplicitamente approvati dall'AI
+        if ad.get("ai_status") != "approved":
+            continue
+
         price  = ad["last_price"]
         family = ad["console_family"] or "other"
         urn_id = ad["urn_id"]

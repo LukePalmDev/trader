@@ -22,7 +22,7 @@ from model_rules import classify_title, detect_family
 
 log = logging.getLogger(__name__)
 
-DB_PATH = Path(__file__).parent / "ebay.db"
+DB_PATH = Path(__file__).parent / "tracker.db"
 
 def _table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
     rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
@@ -103,6 +103,28 @@ _MIGRATIONS = (
         "ebay-segment-models",
         callback=_migration_v3_segment_models,
     ),
+    Migration(
+        4,
+        "add-check-triggers",
+        (
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_sold_items_price_insert
+            BEFORE INSERT ON sold_items
+            WHEN NEW.sold_price < 0
+            BEGIN
+                SELECT RAISE(ABORT, 'sold_price must be >= 0');
+            END;
+            """,
+            """
+            CREATE TRIGGER IF NOT EXISTS chk_sold_items_price_update
+            BEFORE UPDATE ON sold_items
+            WHEN NEW.sold_price < 0
+            BEGIN
+                SELECT RAISE(ABORT, 'sold_price must be >= 0');
+            END;
+            """,
+        ),
+    ),
 )
 
 
@@ -156,9 +178,9 @@ def init_db(db_path: Path = DB_PATH) -> None:
         CREATE INDEX IF NOT EXISTS idx_sold_price  ON sold_items(sold_price);
         CREATE INDEX IF NOT EXISTS idx_sold_date   ON sold_items(sold_date);
         """)
-    applied = run_migrations(db_path, _MIGRATIONS)
+    applied = run_migrations(db_path, _MIGRATIONS, namespace="ebay")
     if applied:
-        log.info("Migrazioni ebay.db applicate: %s", applied)
+        log.info("Migrazioni sold_items (ebay) applicate: %s", applied)
     log.info("eBay DB pronto: %s", db_path)
 
 
@@ -180,7 +202,10 @@ def process_sold_items(
     now   = datetime.now(timezone.utc).isoformat()
     stats = {"new": 0, "price_changes": 0, "unchanged": 0}
 
-    with _connect(db_path) as conn:
+    conn = _connect(db_path)
+    conn.isolation_level = None
+    conn.execute("BEGIN IMMEDIATE")
+    try:
         for p in products:
             item_id = (p.get("sku") or "").strip()
             name    = (p.get("name") or "").strip()
@@ -265,6 +290,13 @@ def process_sold_items(
                     stats["price_changes"] += 1
                 else:
                     stats["unchanged"] += 1
+
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
     return stats
 
