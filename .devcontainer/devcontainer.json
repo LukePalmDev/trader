@@ -1,0 +1,33 @@
+{
+  "name": "Xbox Price Tracker",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
+
+  "postCreateCommand": "pip install -r requirements.lock && python -m playwright install chromium && python -m playwright install-deps chromium",
+
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "Viewer",
+      "onAutoForward": "openBrowser"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "alexcvzz.vscode-sqlite"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python"
+      }
+    }
+  },
+
+  "remoteEnv": {
+    "TRADER_PLAYWRIGHT_CHANNEL": "chromium",
+    "TRADER_VIEWER_HOST": "0.0.0.0",
+    "TRADER_VIEWER_OPEN_BROWSER": "false"
+  }
+}
