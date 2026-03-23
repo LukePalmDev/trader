@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import json
 import logging
+import ssl
 import subprocess
 import urllib.request
 import urllib.parse
@@ -199,8 +200,14 @@ def _send_telegram(title: str, message: str) -> bool:
     }).encode("utf-8")
 
     try:
+        ctx = ssl.create_default_context()
+        try:
+            import certifi
+            ctx.load_verify_locations(certifi.where())
+        except ImportError:
+            pass
         req = urllib.request.Request(url, data=payload, method="POST")
-        with urllib.request.urlopen(req, timeout=10) as resp:
+        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
             ok = resp.status == 200
         if ok:
             log.info("Telegram inviato: %s", title)
@@ -218,6 +225,63 @@ def _notify(title: str, message: str) -> None:
     """Invia notifica via tutti i canali attivi (macOS + Telegram)."""
     _notify_macos(title, message)
     _send_telegram(title, message)
+
+
+# ---------------------------------------------------------------------------
+# Riepilogo run completo
+# ---------------------------------------------------------------------------
+
+_SOURCE_LABEL: dict[str, str] = {
+    "gamelife":   "GameLife",
+    "gamepeople": "GamePeople",
+    "gameshock":  "GameShock",
+    "rebuy":      "ReBuy",
+    "cex":        "CEX",
+    "ebay":       "eBay",
+    "subito":     "Subito",
+}
+
+_STORE_ORDER = ["gamelife", "gamepeople", "gameshock", "rebuy", "cex"]
+
+
+def send_run_summary(stats_by_source: dict[str, dict]) -> None:
+    """Invia via Telegram il riepilogo dello scrape completo.
+
+    Args:
+        stats_by_source: {source: {total, new, price_changes, ...}}
+    """
+    now_str = datetime.now().strftime("%d/%m/%Y %H:%M")
+
+    lines: list[str] = [f"✅ Scrape completato — {now_str}\n"]
+
+    # Store (ordine fisso)
+    store_lines: list[str] = []
+    for src in _STORE_ORDER:
+        if src in stats_by_source:
+            s = stats_by_source[src]
+            label = _SOURCE_LABEL.get(src, src.title())
+            store_lines.append(f"  • {label}: {s.get('total', 0)} prodotti")
+
+    if store_lines:
+        lines.append("🏪 *Store:*")
+        lines.extend(store_lines)
+
+    # Subito
+    if "subito" in stats_by_source:
+        s = stats_by_source["subito"]
+        total = s.get("total", 0)
+        new   = s.get("new", 0)
+        nuovi_str = f" ({new} nuovi)" if new else ""
+        lines.append(f"\n📋 Subito: {total} annunci{nuovi_str}")
+
+    # eBay
+    if "ebay" in stats_by_source:
+        s = stats_by_source["ebay"]
+        lines.append(f"📦 eBay venduti: {s.get('total', 0)}")
+
+    body = "\n".join(lines)
+    _send_telegram("🎮 Xbox Tracker", body)
+    log.info("Riepilogo run inviato via Telegram.")
 
 
 # ---------------------------------------------------------------------------
