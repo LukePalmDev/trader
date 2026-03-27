@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from migrations import Migration, run_migrations
-from model_rules import detect_family
+from model_rules import classify_title, detect_family
 
 log = logging.getLogger(__name__)
 
