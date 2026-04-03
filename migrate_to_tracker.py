@@ -10,7 +10,6 @@ I vecchi file .db rimangono come backup (puoi eliminarli manualmente dopo verifi
 """
 
 import sqlite3
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
@@ -147,12 +146,12 @@ def migrate():
         a = conn.execute("SELECT COUNT(*) FROM ads").fetchone()[0]
         s = conn.execute("SELECT COUNT(*) FROM sold_items").fetchone()[0]
 
-    print(f"\n✅ Migrazione completata: tracker.db")
+    print("\n✅ Migrazione completata: tracker.db")
     print(f"   products:   {p} record")
     print(f"   ads:        {a} record")
     print(f"   sold_items: {s} record")
-    print(f"\n   I vecchi DB (trader.db, subito.db, ebay.db) sono stati mantenuti come backup.")
-    print(f"   Dopo aver verificato, puoi eliminarli manualmente.")
+    print("\n   I vecchi DB (trader.db, subito.db, ebay.db) sono stati mantenuti come backup.")
+    print("   Dopo aver verificato, puoi eliminarli manualmente.")
 
 
 if __name__ == "__main__":

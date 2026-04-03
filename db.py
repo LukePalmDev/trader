@@ -20,7 +20,6 @@ from migrations import Migration, run_migrations
 from model_rules import (
     classify_title, detect_family, standardize_title,
     extract_sub_model, extract_edition_name, extract_color_str, extract_kinect,
-    base_family_label,
 )
 
 log = logging.getLogger(__name__)

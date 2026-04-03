@@ -45,4 +45,5 @@ jobs:
           git add logs/run_report_latest.json || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape ebay $(date -u +%Y-%m-%d)"
+          git pull --rebase
           git push
