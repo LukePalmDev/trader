@@ -6,7 +6,9 @@ import json
 import logging
 import os
 import sqlite3
-from pathlib import Path
+import sys
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Configurazione logging
 logging.basicConfig(
@@ -16,10 +18,7 @@ logging.basicConfig(
 )
 log = logging.getLogger("ai_classifier")
 
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-from db_subito import DB_PATH, _connect
+from db_subito import DB_PATH, _connect  # noqa: E402
 
 try:
     from anthropic import AsyncAnthropic
