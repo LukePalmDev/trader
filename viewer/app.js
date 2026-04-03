@@ -357,7 +357,6 @@ document.querySelectorAll('.tab').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('view-' + btn.dataset.tab).classList.add('active');
     if (btn.dataset.tab === 'home')   renderHome();
-    if (btn.dataset.tab === 'mercato') renderMercato();
     if (btn.dataset.tab === 'standardi') renderStandardGroups();
     if (btn.dataset.tab === 'subito') loadSubitoData();
     if (btn.dataset.tab === 'ebay')   loadEbayData();
@@ -371,8 +370,9 @@ document.querySelectorAll('.tab').forEach(btn => {
 // Dark mode toggle con persistenza localStorage
 // ============================================================
 (function _initTheme() {
+  // Dark è il tema predefinito — light solo se esplicitamente scelto
   const saved = localStorage.getItem('xbox-tracker-theme');
-  if (saved === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+  if (saved !== 'light') document.documentElement.setAttribute('data-theme', 'dark');
   const btn = document.getElementById('btn-theme');
   if (!btn) return;
   _updateThemeIcon();
@@ -611,14 +611,8 @@ function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
 // HOME VIEW
 // ============================================================
 function renderHome() {
-  _renderBaseModelGrid({ gridId: 'home-grid', emptyId: 'home-empty', availOnly: false });
-}
-
-// ============================================================
-// MERCATO VIEW — preferiti con disponibilità attiva
-// ============================================================
-function renderMercato() {
-  _renderBaseModelGrid({ gridId: 'mercato-grid', emptyId: 'mercato-empty', availOnly: true });
+  const availOnly = document.getElementById('home-filter-avail')?.checked ?? false;
+  _renderBaseModelGrid({ gridId: 'home-grid', emptyId: 'home-empty', availOnly });
 }
 
 // ============================================================
@@ -939,13 +933,58 @@ function _populateStorageFilter() {
   }
 }
 
+function _populateCatalogoFilters() {
+  // Populate edition dropdown dynamically from DB_PRODUCTS or ALL_PRODUCTS parsed_edition
+  const edSel = document.getElementById('filter-edition');
+  if (!edSel) return;
+
+  const source = DB_PRODUCTS.length ? DB_PRODUCTS : ALL_PRODUCTS;
+
+  // Keep first option and the 4 static types (indices 0-4), remove the rest
+  while (edSel.options.length > 5) edSel.remove(5);
+
+  // Collect unique parsed_edition values that are "specific" (not the 4 generic types)
+  const genericTypes = new Set(['standard', 'limited', 'special', 'bundle', '']);
+  const editions = new Map(); // edition → count
+  source.forEach(p => {
+    const ed = (p.parsed_edition || '').trim();
+    if (ed && !genericTypes.has(ed.toLowerCase())) {
+      editions.set(ed, (editions.get(ed) || 0) + 1);
+    }
+  });
+
+  // Sort by count descending, add separator optgroup then options
+  if (editions.size > 0) {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = '── Edizioni specifiche ──';
+    edSel.appendChild(optgroup);
+
+    [...editions.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .forEach(([ed, count]) => {
+        const opt = new Option(`${ed} (${count})`, ed);
+        edSel.appendChild(opt);
+      });
+  }
+}
+
+function toggleChip(btn, groupId) {
+  btn.classList.toggle('active');
+  applyFilters();
+}
+
+function _getChipValues(groupId) {
+  const chips = document.querySelectorAll(`#${groupId} .chip.active`);
+  return [...chips].map(c => c.dataset.value);
+}
+
 function applyFilters() {
   const q           = document.getElementById('search').value.toLowerCase().trim();
   const srcFilter   = document.getElementById('filter-source').value;
-  const condFilter  = document.getElementById('filter-condition').value;
-  const familyFilter= document.getElementById('filter-family').value;
+  const familyValues  = _getChipValues('chips-family');
+  const conditionValues = _getChipValues('chips-condition');
   const storageFilter= document.getElementById('filter-storage').value;
-  const segmentFilter = document.getElementById('filter-segment').value;
+  const segmentValues = _getChipValues('chips-segment');
   const editionFilter = document.getElementById('filter-edition').value;
   const onlyAvail   = document.getElementById('filter-available').checked;
   const onlyBase    = document.getElementById('filter-base').checked;
@@ -969,12 +1008,12 @@ function applyFilters() {
     (p.name || '').toLowerCase().includes(q) ||
     (p.standard_name || '').toLowerCase().includes(q)
   );
-  if (srcFilter)     filtered = filtered.filter(p => p.source === srcFilter);
-  if (condFilter)    filtered = filtered.filter(p => p.condition === condFilter);
-  if (familyFilter)  filtered = filtered.filter(p => p.parsed_family === familyFilter);
-  if (storageFilter) filtered = filtered.filter(p => p.storage_label === storageFilter);
-  if (segmentFilter) filtered = filtered.filter(p => p.parsed_segment === segmentFilter);
-  if (editionFilter) filtered = filtered.filter(p => (p.edition_class || 'standard').toLowerCase() === editionFilter.toLowerCase() || p.parsed_edition.toLowerCase() === editionFilter.toLowerCase());
+  if (srcFilter)       filtered = filtered.filter(p => p.source === srcFilter);
+  if (familyValues.length)    filtered = filtered.filter(p => familyValues.some(v => (p.console_family||'').toLowerCase().includes(v.toLowerCase())));
+  if (conditionValues.length) filtered = filtered.filter(p => conditionValues.includes(p.condition));
+  if (storageFilter)   filtered = filtered.filter(p => p.storage_label === storageFilter);
+  if (segmentValues.length)   filtered = filtered.filter(p => segmentValues.includes(p.parsed_segment));
+  if (editionFilter)   filtered = filtered.filter(p => (p.edition_class || 'standard').toLowerCase() === editionFilter.toLowerCase() || (p.parsed_edition || '').toLowerCase().includes(editionFilter.toLowerCase()) || (p.edition_name || '').toLowerCase().includes(editionFilter.toLowerCase()));
   if (onlyAvail)     filtered = filtered.filter(p => p.last_available || p.available);
   if (onlyBase)      filtered = filtered.filter(p => p.is_base_model);
 
@@ -1318,8 +1357,23 @@ function getUniqueBaseModels() {
 function renderStatistiche() {
   const container = document.getElementById('stats-grid');
   if (!container) return;
-  
-  const uniqueModels = getUniqueBaseModels();
+
+  // Ordine: Original → 360 → One → Serie (parsed_family values)
+  const STAT_FAMILY_ORDER = ['Original', '360', 'One', 'Serie', 'Altro'];
+  const STAT_SEG_ORDER    = ['Base', 'S', 'X', 'Slim', 'E', 'Elite'];
+  const uniqueModels = getUniqueBaseModels().sort((a, b) => {
+    const af = STAT_FAMILY_ORDER.indexOf(a.family || 'Altro');
+    const bf = STAT_FAMILY_ORDER.indexOf(b.family || 'Altro');
+    if (af !== bf) return (af < 0 ? 99 : af) - (bf < 0 ? 99 : bf);
+    // Stesso family → ordina per segmento
+    const as_ = STAT_SEG_ORDER.indexOf(a.segment || '');
+    const bs_ = STAT_SEG_ORDER.indexOf(b.segment || '');
+    if (as_ !== bs_) return (as_ < 0 ? 99 : as_) - (bs_ < 0 ? 99 : bs_);
+    // Stesso segmento → ordina per storage (numerico)
+    const aGB = parseInt(a.storage) || 0;
+    const bGB = parseInt(b.storage) || 0;
+    return aGB - bGB;
+  });
   
   console.log('[Statistiche] BASE_MODELS:', BASE_MODELS.length, 'uniqueModels:', uniqueModels.length);
 
@@ -1342,16 +1396,16 @@ function renderStatistiche() {
           <th>Modello Unico</th>
           <th style="text-align:center;">Campioni (N)</th>
           <th style="text-align:right;">Prezzo Minimo</th>
-          <th style="text-align:center;">Z-Score (Anomalia)</th>
-          <th style="text-align:center;">Spread B2C-C2C</th>
-          <th style="text-align:center;">EMA (7g)</th>
-          <th style="text-align:center;">Trend Regr.</th>
-          <th style="text-align:center;">Rischio Esaur.</th>
-          <th style="text-align:center;">Impatto Storage</th>
-          <th style="text-align:center;">Clustering (Fasce Prezzo)</th>
-          <th style="text-align:center;">Premium Apparente</th>
-          <th style="text-align:center;">Affidabilità (CI 95%)</th>
-          <th style="text-align:center;">Valore Kinect</th>
+          <th style="text-align:center;">Z-Score (Anomalia) <span class="info-icon" tabindex="0" data-tip="Misura quanto il prezzo minimo è anomalo. Sopra 2 = prezzo insolito, possibile errore o affare.">ℹ️</span></th>
+          <th style="text-align:center;">Spread B2C-C2C <span class="info-icon" tabindex="0" data-tip="Differenza tra prezzo store (B2C) e prezzo privato (C2C). Alto = ampio margine di arbitraggio.">ℹ️</span></th>
+          <th style="text-align:center;">EMA (7g) <span class="info-icon" tabindex="0" data-tip="Media mobile esponenziale ultimi 7 giorni. Più reattiva della media semplice ai cambiamenti recenti.">ℹ️</span></th>
+          <th style="text-align:center;">Trend Regr. <span class="info-icon" tabindex="0" data-tip="Variazione prezzo giornaliera (€/giorno) dalla regressione lineare. Positivo = prezzi in salita.">ℹ️</span></th>
+          <th style="text-align:center;">Rischio Esaur. <span class="info-icon" tabindex="0" data-tip="Probabilità (modello Poisson) che il prodotto vada esaurito. Alto = raro/scarso.">ℹ️</span></th>
+          <th style="text-align:center;">Impatto Storage <span class="info-icon" tabindex="0" data-tip="Correlazione Pearson tra capienza GB e prezzo. Vicino a 1 = più storage = più costoso.">ℹ️</span></th>
+          <th style="text-align:center;">Clustering (Fasce Prezzo) <span class="info-icon" tabindex="0" data-tip="Fasce di prezzo naturali rilevate con k-means (3 cluster). Mostra la distribuzione reale dei prezzi.">ℹ️</span></th>
+          <th style="text-align:center;">Premium Apparente <span class="info-icon" tabindex="0" data-tip="Stima bayesiana del valore aggiunto rispetto alla versione standard. Quanto vale l'edizione speciale?">ℹ️</span></th>
+          <th style="text-align:center;">Affidabilità (CI 95%) <span class="info-icon" tabindex="0" data-tip="Margine di errore con 95% di confidenza: la media reale cade nell'intervallo ±X€.">ℹ️</span></th>
+          <th style="text-align:center;">Valore Kinect <span class="info-icon" tabindex="0" data-tip="Valore medio aggiunto dal Kinect (metodo Shapley). Quanto paga in più chi compra con Kinect?">ℹ️</span></th>
         </tr>
       </thead>
       <tbody>
@@ -2028,7 +2082,7 @@ function renderSubito() {
         <th style="${thSt} text-align:center;">Tipo</th>
         <th style="${thSt}">Pubblicato</th>
         <th style="${thSt} text-align:right;">Prezzo</th>
-        <th style="${thSt} text-align:center;">Score</th>
+        <th style="${thSt} text-align:center;">Score <span class="info-icon" tabindex="0" data-tip="Sconto % vs media CEX (🔥≥30%, 🟢≥20%, 🟡≥10%). Q = qualità annuncio 0-100 (foto, città, tipo venditore).">ℹ️</span></th>
         <th style="${thSt} text-align:center; width:32px;"></th>
         <th style="${thSt} text-align:center;">Disp.</th>
       </tr>`;
@@ -2120,7 +2174,7 @@ function renderSubito() {
       const chartBtn = document.createElement('button');
       chartBtn.className = 'chart-btn';
       chartBtn.textContent = '📈';
-      chartBtn.title = 'Storico prezzi';
+      chartBtn.title = 'Mostra storico prezzi';
       chartBtn.dataset.chartUrn  = ad.urn_id;
       chartBtn.dataset.chartName = ad.name;
       tdChart.appendChild(chartBtn);
@@ -2138,7 +2192,10 @@ function renderSubito() {
       tbody.appendChild(tr);
     }
     table.appendChild(tbody);
-    card.appendChild(table);
+    const tableWrapper = document.createElement('div');
+    tableWrapper.className = 'console-table-wrapper';
+    tableWrapper.appendChild(table);
+    card.appendChild(tableWrapper);
     grid.appendChild(card);
   }
 }
@@ -2196,9 +2253,54 @@ function _renderSubitoSoldStats() {
   const cont = document.getElementById('subito-sold-stats');
   if (!cont) return;
   const byFam = (SUBITO_SOLD_STATS.by_family || []);
-  if (!byFam.length) { cont.innerHTML = ''; return; }
+  const global = SUBITO_SOLD_STATS.global || {};
+  const byWeekday = SUBITO_SOLD_STATS.by_weekday || [];
+  const byHour = SUBITO_SOLD_STATS.by_hour || [];
+  const byPeriod = SUBITO_SOLD_STATS.by_period || [];
+  if (!byFam.length && !global.total_sold) { cont.innerHTML = ''; return; }
 
-  cont.innerHTML = byFam.map(r => {
+  const weekdayMap = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
+  const periodMap = {
+    night: 'notte',
+    morning: 'mattina',
+    afternoon: 'pomeriggio',
+    evening: 'sera',
+  };
+
+  const peakDay = byWeekday.length ? byWeekday[0] : null;
+  const peakHour = byHour.length ? byHour[0] : null;
+  const peakPeriod = byPeriod.length ? byPeriod[0] : null;
+
+  const globalCards = [];
+  if (global.total_sold) {
+    const avgGlobal = global.avg_price != null ? '€ ' + Math.round(global.avg_price) : '—';
+    const activeGlobal = global.avg_hours_active != null
+      ? (global.avg_hours_active < 48
+          ? Math.round(global.avg_hours_active) + ' ore'
+          : Math.round(global.avg_hours_active / 24) + ' giorni')
+      : '—';
+    const windowGlobal = global.avg_sold_window_hours != null
+      ? (global.avg_sold_window_hours < 48
+          ? Math.round(global.avg_sold_window_hours) + ' ore'
+          : Math.round(global.avg_sold_window_hours / 24) + ' giorni')
+      : '—';
+    const dayText = peakDay ? `${weekdayMap[peakDay.weekday_idx] || peakDay.weekday_idx} (${peakDay.count})` : '—';
+    const hourText = peakHour ? `${String(peakHour.hour).padStart(2, '0')}:00 (${peakHour.count})` : '—';
+    const periodText = peakPeriod ? `${periodMap[peakPeriod.period] || peakPeriod.period} (${peakPeriod.count})` : '—';
+
+    globalCards.push(`
+      <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:14px 16px;">
+        <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#ff6600; margin-bottom:6px;">Panoramica Vendite</div>
+        <div style="font-size:20px; font-weight:800; color:var(--text);">${global.total_sold} venduti</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">prezzo medio ${avgGlobal}</div>
+        <div style="font-size:11px; color:var(--text-muted);">tempo attivo medio ${activeGlobal}</div>
+        <div style="font-size:11px; color:var(--text-muted);">finestra stima vendita ${windowGlobal}</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px; border-top:1px solid var(--border); padding-top:4px;">picco: giorno ${dayText} · ora ${hourText} · fascia ${periodText}</div>
+      </div>
+    `);
+  }
+
+  const familyCards = byFam.map(r => {
     const fk    = r.console_family || 'other';
     const label = FAMILY_LABELS[fk] || fk;
     const avg   = r.avg_price != null ? '€ ' + Math.round(r.avg_price) : '—';
@@ -2210,15 +2312,23 @@ function _renderSubitoSoldStats() {
           ? Math.round(r.avg_hours_active) + ' ore'
           : Math.round(r.avg_hours_active / 24) + ' giorni')
       : '—';
+    const soldWindow = r.avg_sold_window_hours != null
+      ? (r.avg_sold_window_hours < 48
+          ? Math.round(r.avg_sold_window_hours) + ' ore'
+          : Math.round(r.avg_sold_window_hours / 24) + ' giorni')
+      : '—';
     return `
       <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:10px; padding:14px 16px;">
         <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#ff6600; margin-bottom:6px;">${label}</div>
         <div style="font-size:22px; font-weight:800; color:var(--text);">${avg}</div>
         <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">media · ${r.count} venduti</div>
         <div style="font-size:11px; color:var(--text-muted);">range ${range}</div>
-        <div style="font-size:11px; color:var(--text-muted); margin-top:4px; border-top:1px solid var(--border); padding-top:4px;">⏱ attivo in media ${hours}</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-top:4px; border-top:1px solid var(--border); padding-top:4px;">⏱ attivo medio ${hours}</div>
+        <div style="font-size:11px; color:var(--text-muted);">⏳ finestra vendita ${soldWindow}</div>
       </div>`;
-  }).join('');
+  });
+
+  cont.innerHTML = [...globalCards, ...familyCards].join('');
 }
 
 function renderSubitoSold() {
@@ -2250,6 +2360,7 @@ function renderSubitoSold() {
     <th style="${thSt}">Città</th>
     <th style="${thSt}">Venduto il</th>
     <th style="${thSt}">Attivo per</th>
+    <th style="${thSt}">Finestra</th>
     <th style="${thSt} text-align:right;">Prezzo</th>
   </tr></thead>`;
 
@@ -2258,16 +2369,25 @@ function renderSubitoSold() {
     const tr = document.createElement('tr');
     tr.className = 'product-row product-row-esaurito';
 
-    // Calcola tempo attivo
+    // Calcola tempo attivo: usa published_at (data pubblicazione reale su Subito)
+    // con fallback a first_seen (quando lo scraper lo ha trovato per la prima volta)
     let activeStr = '—';
-    if (ad.first_seen && ad.sold_at) {
-      const ms   = new Date(ad.sold_at) - new Date(ad.first_seen);
-      const hrs  = Math.round(ms / 3600000);
-      activeStr  = hrs < 48 ? hrs + ' ore' : Math.round(hrs / 24) + ' giorni';
+    let soldWindowStr = '—';
+    const startDate = ad.published_at || ad.first_seen;
+    const soldRefRaw = ad.sold_at_estimated || ad.sold_at;
+    if (startDate && soldRefRaw) {
+      const ms  = new Date(soldRefRaw) - new Date(startDate);
+      const hrs = Math.round(ms / 3600000);
+      activeStr = hrs < 48 ? hrs + ' ore' : Math.round(hrs / 24) + ' giorni';
+    }
+    if (ad.sold_window_hours != null) {
+      const wh = Math.round(Number(ad.sold_window_hours));
+      soldWindowStr = wh < 48 ? wh + ' ore' : Math.round(wh / 24) + ' giorni';
     }
 
     const famLabel = FAMILY_LABELS[ad.console_family || 'other'] || ad.console_family || '—';
-    const soldDate = ad.sold_at ? _fmtSubitoDate(ad.sold_at.replace('T', ' ').substring(0, 16)) : '—';
+    const soldDate = soldRefRaw ? _fmtSubitoDate(String(soldRefRaw).replace('T', ' ').substring(0, 16)) : '—';
+    const soldPrefix = ad.sold_at_estimated ? '~' : '';
 
     tr.innerHTML = `
       <td class="prod-name-cell" style="max-width:320px;">
@@ -2275,14 +2395,90 @@ function renderSubitoSold() {
       </td>
       <td style="padding:6px 10px; font-size:12px; color:#ff6600; font-weight:600; white-space:nowrap;">${famLabel}</td>
       <td style="padding:6px 10px; font-size:12px; color:var(--text-muted); white-space:nowrap;">${ad.city || '—'}</td>
-      <td style="padding:6px 10px; font-size:11px; color:var(--text-muted); white-space:nowrap;">${soldDate}</td>
+      <td style="padding:6px 10px; font-size:11px; color:var(--text-muted); white-space:nowrap;">${soldPrefix}${soldDate}</td>
       <td style="padding:6px 10px; font-size:11px; color:var(--text-muted); white-space:nowrap;">${activeStr}</td>
+      <td style="padding:6px 10px; font-size:11px; color:var(--text-muted); white-space:nowrap;">${soldWindowStr}</td>
       <td class="prod-price-cell">${ad.last_price != null ? '€ ' + ad.last_price.toFixed(2) : '—'}</td>`;
     tbody.appendChild(tr);
   }
   table.appendChild(tbody);
   grid.innerHTML = '';
   grid.appendChild(table);
+}
+
+// ============================================================
+// ============================================================
+// Subito — Scrape dal browser
+// ============================================================
+let _scrapePoller = null;
+
+async function startSubitoScrape() {
+  const btn  = document.getElementById('btn-scrape-subito');
+  const bar  = document.getElementById('subito-scrape-bar');
+  const prog = document.getElementById('subito-scrape-progress');
+  const msg  = document.getElementById('subito-scrape-msg');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ In corso…';
+  bar.style.display = 'block';
+  prog.className = 'running';
+  msg.textContent = 'Avvio scraper Subito.it…';
+
+  try {
+    const res = await API.fetchJson('/api/scrape/run', { method: 'POST' });
+    if (!res.ok && res.error === 'already-running') {
+      msg.textContent = '⚠️ Scraper già in esecuzione.';
+      _pollScrapeStatus();
+      return;
+    }
+    if (!res.ok) throw new Error(res.error || 'Errore avvio');
+    _pollScrapeStatus();
+  } catch(e) {
+    prog.className = 'done-err';
+    msg.textContent = '❌ ' + e.message;
+    btn.disabled = false;
+    btn.textContent = '▶ Scrapa';
+  }
+}
+
+function _pollScrapeStatus() {
+  if (_scrapePoller) clearInterval(_scrapePoller);
+  _scrapePoller = setInterval(async () => {
+    try {
+      const s    = await API.fetchJson('/api/scrape/status');
+      const bar  = document.getElementById('subito-scrape-bar');
+      const prog = document.getElementById('subito-scrape-progress');
+      const msg  = document.getElementById('subito-scrape-msg');
+      const btn  = document.getElementById('btn-scrape-subito');
+
+      // Mostra ultima riga di log significativa
+      const lines = (s.lines || []).filter(l => l.includes('[INFO]') || l.includes('[WARNING]') || l.includes('[ERROR]'));
+      const last  = lines[lines.length - 1] || '';
+      const clean = last.replace(/^\d{2}:\d{2}:\d{2} \[.*?\] /, '').trim();
+      if (clean) msg.textContent = clean;
+
+      if (s.done || !s.running) {
+        clearInterval(_scrapePoller);
+        _scrapePoller = null;
+        if (s.ok) {
+          prog.className = 'done-ok';
+          msg.textContent = '✅ Scrape completato! Ricarico i dati…';
+          btn.textContent = '▶ Scrapa';
+          btn.disabled = false;
+          setTimeout(async () => {
+            await loadSubitoData();
+            msg.textContent = '✅ Dati aggiornati.';
+            setTimeout(() => { bar.style.display = 'none'; prog.className = ''; }, 3000);
+          }, 1000);
+        } else {
+          prog.className = 'done-err';
+          msg.textContent = '❌ Errore: ' + (s.error || 'scraper terminato con errore');
+          btn.textContent = '▶ Scrapa';
+          btn.disabled = false;
+        }
+      }
+    } catch(e) { /* ignora errori di rete transitori */ }
+  }, 2000);
 }
 
 // ============================================================
@@ -2308,6 +2504,42 @@ async function updateAiStatus(adId, status) {
     console.error('updateAiStatus eccezione:', e);
   }
 }
+
+// ============================================================
+// Tooltip globale (non viene tagliato da overflow dei container)
+// ============================================================
+(function _initGlobalTooltip() {
+  const tip = document.createElement('div');
+  tip.id = 'global-tooltip';
+  document.body.appendChild(tip);
+
+  let _visible = false;
+
+  document.addEventListener('mouseover', e => {
+    const icon = e.target.closest('.info-icon[data-tip]');
+    if (icon) {
+      tip.textContent = icon.dataset.tip;
+      tip.style.display = 'block';
+      _visible = true;
+    }
+  });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest('.info-icon[data-tip]')) {
+      tip.style.display = 'none';
+      _visible = false;
+    }
+  });
+  document.addEventListener('mousemove', e => {
+    if (!_visible) return;
+    const x = e.clientX + 14;
+    const y = e.clientY - 10;
+    const tw = tip.offsetWidth;
+    const th = tip.offsetHeight;
+    // Evita uscita dallo schermo
+    tip.style.left = (x + tw > window.innerWidth  ? x - tw - 28 : x) + 'px';
+    tip.style.top  = (y + th > window.innerHeight ? y - th - 4  : y) + 'px';
+  });
+})();
 
 // ============================================================
 // Caricamento dati
@@ -2381,6 +2613,7 @@ async function tryAutoLoad() {
       STANDARD_GROUPS = _sanitizeRows(rStandard.body);
     }
 
+    _populateCatalogoFilters();
     renderHome();
     applyFilters();
     renderStandardGroups();
@@ -2401,6 +2634,8 @@ async function tryAutoLoad() {
 // EBAY VIEW (Feature 6)
 // ============================================================
 
+const PARTS_RE = /ricamb[io]|per pezzi|for parts|non funzionante|rott[ao]|difettosa|malfunzionante|cannibalizz/i;
+
 async function loadEbayData() {
   try {
     const _fb = { ok: false, body: null };
@@ -2411,7 +2646,16 @@ async function loadEbayData() {
       ]),
       [_fb, _fb],
     );
-    if (rSold.ok)  EBAY_SOLD = _sanitizeRows(rSold.body);
+    if (rSold.ok) {
+      let items = _sanitizeRows(rSold.body);
+      const excluded = items.filter(item => PARTS_RE.test(item.name || ''));
+      items = items.filter(item => !PARTS_RE.test(item.name || ''));
+      EBAY_SOLD = items;
+      const countEl = document.getElementById('ebay-count');
+      if (countEl && excluded.length > 0) {
+        countEl.dataset.excludedParts = excluded.length;
+      }
+    }
     if (rStats.ok) {
       const s = _sanitizeRow(rStats.body);
       const o = s.overall || {};
@@ -2444,8 +2688,9 @@ function _renderEbaySummary(byFamily) {
   for (const r of sorted) {
     const fk    = r.console_family || 'other';
     const label = FAMILY_LABELS[fk] || fk;
+    const familyKey = fk.replace(/[^a-z0-9]/gi, '-').toLowerCase();
     html += `
-      <div class="ebay-summary-card">
+      <div class="ebay-summary-card" style="cursor:pointer" onclick="(function(){const el=document.getElementById('ebay-section-${familyKey}');if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.add('ebay-flash');setTimeout(()=>el.classList.remove('ebay-flash'),1000);}})()">
         <div class="ebay-sum-family">${label}</div>
         <div class="ebay-sum-avg">€ ${r.avg_price != null ? Math.round(r.avg_price) : '—'}</div>
         <div class="ebay-sum-meta">media · ${r.count} venduti</div>
@@ -2477,7 +2722,12 @@ function renderEbay() {
   if (famFilter) filtered = filtered.filter(i => i.console_family === famFilter);
 
   const countEl = document.getElementById('ebay-count');
-  if (countEl) countEl.textContent = filtered.length + ' lotti';
+  if (countEl) {
+    const excludedParts = parseInt(countEl.dataset.excludedParts || '0', 10);
+    let countText = filtered.length + ' lotti';
+    if (excludedParts > 0) countText += ` · ${excludedParts} esclusi (ricambi)`;
+    countEl.textContent = countText;
+  }
 
   // Raggruppa per famiglia
   const byFamily = {};
@@ -2508,6 +2758,7 @@ function renderEbay() {
 
     const card = document.createElement('div');
     card.className = 'store-card';
+    card.id = 'ebay-section-' + fk.replace(/[^a-z0-9]/gi, '-').toLowerCase();
     card.style.setProperty('--store-accent', '#e53935');
 
     const header = document.createElement('div');
@@ -2565,7 +2816,10 @@ function renderEbay() {
       tbody.appendChild(tr);
     }
     table.appendChild(tbody);
-    card.appendChild(table);
+    const tableWrapper = document.createElement('div');
+    tableWrapper.className = 'console-table-wrapper';
+    tableWrapper.appendChild(table);
+    card.appendChild(tableWrapper);
     grid.appendChild(card);
   }
 }

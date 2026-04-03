@@ -167,6 +167,17 @@ python3 run.py --cleanup
 
 # Crontab per scraping automatico (ogni 6 ore)
 python3 run.py --setup-cron
+
+# Scrape Subito mirato (una o più regioni)
+python3 run.py --source subito --subito-region lombardia
+python3 run.py --source subito --subito-region "lombardia,veneto" --subito-max-pages 120
+
+# Deduplica snapshot Subito senza rieseguire scraping
+python3 run.py --subito-dedup --subito-dedup-latest 5
+python3 run.py --subito-dedup --subito-dedup-files "data/subito_a.json,data/subito_b.json" --subito-dedup-update-db
+
+# Verify sold mirata su annunci Xbox-only
+python3 run.py --verify-sold 500 --verify-xbox-only --verify-chunk-size 200
 ```
 
 ## Configurazione

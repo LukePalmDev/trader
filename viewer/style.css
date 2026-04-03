@@ -130,6 +130,12 @@ header {
 .tab:hover  { background: var(--bg); color: var(--text); }
 .tab.active { background: var(--text); color: #fff; }
 
+[data-theme="dark"] .tab.active {
+  background: #2a2a32;
+  color: #e4e4e8;
+  border-bottom-color: #e4e4e8;
+}
+
 .header-right {
   margin-left: auto;
   display: flex;
@@ -464,16 +470,22 @@ header {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow);
-  overflow: clip;
+  overflow: hidden;
   border-top: 3px solid var(--store-accent, #ccc);
   max-height: 50vh;
   display: flex;
   flex-direction: column;
+  align-self: start;
 }
 
 .console-table-wrapper {
+  overflow-x: auto;
   overflow-y: auto;
   flex: 1;
+}
+
+.console-table td, .console-table th {
+  white-space: nowrap;
 }
 
 .console-table-wrapper thead th {
@@ -1060,6 +1072,60 @@ header {
 }
 #subito-stats .gstat-accent span { color: #ff6600; }
 
+/* Scrape button */
+#btn-scrape-subito {
+  margin-left: auto;
+  padding: 5px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #ff6600;
+  border-radius: 6px;
+  background: transparent;
+  color: #ff6600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+#btn-scrape-subito:hover  { background: #ff6600; color: #fff; }
+#btn-scrape-subito:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Scrape status bar */
+#subito-scrape-bar {
+  margin-bottom: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+}
+#subito-scrape-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+#subito-scrape-progress::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: #ff6600;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+#subito-scrape-progress.running::after {
+  animation: scrape-indeterminate 1.4s ease-in-out infinite;
+  width: 100%;
+}
+#subito-scrape-progress.done-ok::after  { width: 100%; background: #00a040; }
+#subito-scrape-progress.done-err::after { width: 100%; background: #e53935; }
+@keyframes scrape-indeterminate {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%);  }
+}
+#subito-scrape-msg { color: var(--text-muted); line-height: 1.5; }
+
 .subito-inner {
   max-width: 1340px;
   margin: 0 auto;
@@ -1102,7 +1168,7 @@ header {
 
 #subito-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
   gap: 20px;
 }
 
@@ -1444,6 +1510,40 @@ header {
   color: #fff;
   font-weight: 600;
 }
+
+/* Filter chips — Catalogo multi-select */
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.filter-chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.chip {
+  padding: 3px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.chip:hover { border-color: var(--accent); color: var(--text); }
+.chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .rfield-action {
   display: flex;
   align-items: center;
@@ -1654,5 +1754,69 @@ header {
 
 @media (max-width: 600px) {
   #trend-grid { grid-template-columns: 1fr; }
+}
+
+/* Info icon tooltip */
+.info-icon {
+  cursor: help;
+  font-size: 11px;
+  display: inline-block;
+  opacity: 0.6;
+  user-select: none;
+}
+.info-icon:hover { opacity: 1; }
+
+/* Tooltip globale — posizionato via JS su document.body, non viene tagliato da overflow */
+#global-tooltip {
+  display: none;
+  position: fixed;
+  background: #1c1c1c;
+  color: #f0f0f0;
+  padding: 7px 11px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  font-weight: 400;
+  max-width: 260px;
+  line-height: 1.5;
+  z-index: 99999;
+  pointer-events: none;
+  white-space: normal;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+[data-theme="dark"] #global-tooltip {
+  background: #e4e4e8;
+  color: #141418;
+}
+
+/* eBay scroll flash */
+@keyframes ebay-flash {
+  0%   { outline: 2px solid #e53935; outline-offset: 2px; }
+  100% { outline: none; }
+}
+.ebay-flash { animation: ebay-flash 0.8s ease-out; }
+
+/* Ricerca — colori brand Xbox per famiglia */
+.rbtn[data-family="series-x"].active,
+.rbtn[data-family="series-s"].active { background: #107C10; border-color: #107C10; }
+
+.rbtn[data-family="one"].active,
+.rbtn[data-family="one-x"].active,
+.rbtn[data-family="one-s"].active { background: #0078D4; border-color: #0078D4; }
+
+.rbtn[data-family="360"].active { background: #FF8C00; border-color: #FF8C00; }
+
+.rbtn[data-family="original"].active { background: #6B69D6; border-color: #6B69D6; }
+
+.rbtn[data-family="series-x"]:hover,
+.rbtn[data-family="series-s"]:hover { border-color: #107C10; color: #107C10; }
+.rbtn[data-family="one"]:hover,
+.rbtn[data-family="one-x"]:hover,
+.rbtn[data-family="one-s"]:hover { border-color: #0078D4; color: #0078D4; }
+.rbtn[data-family="360"]:hover { border-color: #FF8C00; color: #FF8C00; }
+.rbtn[data-family="original"]:hover { border-color: #6B69D6; color: #6B69D6; }
+
+/* Home filter */
+#home-filters {
+  margin-bottom: 14px;
 }
 

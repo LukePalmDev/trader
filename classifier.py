@@ -33,8 +33,10 @@ ROOT = Path(__file__).parent
 DB_PATH = ROOT / "tracker.db"
 
 VALID_FAMILIES = {"series-x", "series-s", "one-x", "one-s", "one", "360", "original", "other"}
+HAIKU_MODEL = "claude-haiku-4-5-20251001"
+CLASSIFY_VERSION = "rules+ai:title+body:v2"
 
-SYSTEM_PROMPT = """Classifica titoli Xbox Subito.
+SYSTEM_PROMPT = """Classifica annunci Xbox Subito usando titolo + descrizione.
 JSON: classifications [{id, family, segment, edition_class, canonical_model, confidence}].
 Values: family(series-x|series-s|one-x|one-s|one|360|original|other), segment(base|premium|unknown), edition(standard|limited|special|bundle).
 No text, only JSON."""
@@ -42,12 +44,7 @@ No text, only JSON."""
 
 BATCH_SIZE = 15  # ridotto per evitare troncatura JSON (max_tokens=4096)
 
-HAIKU_MODELS = [
-    "claude-haiku-4-5-20251001",   # Haiku attuale (più economico)
-    "claude-3-5-haiku-20241022",   # Haiku legacy fallback
-    "claude-sonnet-4-6",           # Sonnet attuale (fallback finale)
-]
-SELECTED_MODEL = os.environ.get("ANTHROPIC_MODEL")
+SELECTED_MODEL = os.environ.get("ANTHROPIC_MODEL") or HAIKU_MODEL
 
 
 def _connect() -> sqlite3.Connection:
@@ -56,14 +53,47 @@ def _connect() -> sqlite3.Connection:
     return conn
 
 
-def _get_candidates(limit: int | None = None) -> list[dict]:
+def _normalize_text(raw: str | None) -> str:
+    if not raw:
+        return ""
+    return " ".join(str(raw).split()).strip()
+
+
+def _shorten(text: str, max_len: int = 1200) -> str:
+    value = _normalize_text(text)
+    if len(value) <= max_len:
+        return value
+    return value[: max_len - 1] + "…"
+
+
+def _selected_model() -> str:
+    global SELECTED_MODEL
+    if SELECTED_MODEL != HAIKU_MODEL:
+        log.warning(
+            "ANTHROPIC_MODEL=%s non supportato in questa pipeline. Uso forzato: %s",
+            SELECTED_MODEL,
+            HAIKU_MODEL,
+        )
+    SELECTED_MODEL = HAIKU_MODEL
+    return SELECTED_MODEL
+
+
+def _get_candidates(
+    limit: int | None = None,
+    *,
+    rebuild_all: bool = False,
+) -> list[dict]:
     with _connect() as conn:
         q = """
             SELECT
-                id, urn_id, name,
+                id, urn_id, name, body_text,
                 console_family, model_segment, edition_class, canonical_model,
-                classify_confidence, classify_method
+                classify_confidence, classify_method,
+                classify_version
             FROM ads
+        """
+        if not rebuild_all:
+            q += """
             WHERE
                 console_family = 'other'
                 OR model_segment = 'unknown'
@@ -71,11 +101,14 @@ def _get_candidates(limit: int | None = None) -> list[dict]:
                 OR TRIM(canonical_model) = ''
                 OR classify_method IS NULL
                 OR TRIM(classify_method) = ''
-            ORDER BY id
-        """
+                OR classify_version IS NULL
+                OR TRIM(classify_version) <> ?
+            """
+        q += " ORDER BY id"
+        params: tuple = () if rebuild_all else (CLASSIFY_VERSION,)
         if limit:
             q += f" LIMIT {int(limit)}"
-        rows = conn.execute(q).fetchall()
+        rows = conn.execute(q, params).fetchall()
     return [dict(r) for r in rows]
 
 
@@ -170,7 +203,8 @@ def _apply_classifications(updates: list[dict], dry_run: bool = False) -> int:
                     edition_class = ?,
                     canonical_model = ?,
                     classify_confidence = ?,
-                    classify_method = ?
+                    classify_method = ?,
+                    classify_version = ?
                 WHERE id = ?
                 """,
                 (
@@ -180,6 +214,7 @@ def _apply_classifications(updates: list[dict], dry_run: bool = False) -> int:
                     u["canonical_model"],
                     float(u["confidence"]),
                     u["method"],
+                    CLASSIFY_VERSION,
                     int(u["id"]),
                 ),
             )
@@ -191,7 +226,10 @@ def _rule_and_cex_pass(candidates: list[dict], anchors: dict[str, list[dict]]) -
     unresolved: list[dict] = []
 
     for ad in candidates:
-        classified = classify_title(ad["name"], family_hint=ad.get("console_family"))
+        name = ad["name"]
+        body_text = _normalize_text(ad.get("body_text"))
+        rules_text = f"{name}\n{body_text}".strip()
+        classified = classify_title(rules_text, family_hint=ad.get("console_family"))
         family = classified.console_family
         segment = classified.model_segment
         edition_class = classified.edition_class
@@ -218,21 +256,24 @@ def _rule_and_cex_pass(candidates: list[dict], anchors: dict[str, list[dict]]) -
         updates.append(update)
 
         if family == "other" or segment == "unknown" or update["confidence"] < 0.6:
-            unresolved.append({"id": int(ad["id"]), "name": ad["name"]})
+            unresolved.append(
+                {"id": int(ad["id"]), "name": name, "body_text": body_text}
+            )
 
     return updates, unresolved
 
 
 def classify_batch(ads: list[dict], client) -> list[dict]:
     items_text = "\n".join(
-        f'{{"id": {ad["id"]}, "title": {json.dumps(ad["name"])}}}'
+        f'{{"id": {ad["id"]}, "title": {json.dumps(_shorten(ad["name"], 240))}, '
+        f'"body": {json.dumps(_shorten(ad.get("body_text") or "", 1200))}}}'
         for ad in ads
     )
     user_msg = f"Classifica i seguenti annunci:\n{items_text}"
 
     try:
         response = client.messages.create(
-            model=os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
+            model=_selected_model(),
             max_tokens=4096,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_msg}],
@@ -245,8 +286,13 @@ def classify_batch(ads: list[dict], client) -> list[dict]:
             raw = raw.rsplit("```", 1)[0].strip()
 
         data = json.loads(raw)
+        # L'AI può restituire {"classifications": [...]} oppure direttamente [...]
+        if isinstance(data, list):
+            classifications = data
+        else:
+            classifications = data.get("classifications", [])
         result: list[dict] = []
-        for c in data.get("classifications", []):
+        for c in classifications:
             family = c.get("family", "other")
             segment = c.get("segment", "unknown")
             edition_class = c.get("edition_class", "standard")
@@ -272,7 +318,7 @@ def classify_batch(ads: list[dict], client) -> list[dict]:
                     "edition_class": edition_class,
                     "canonical_model": canonical,
                     "confidence": round(min(max(confidence_f, 0.0), 1.0), 3),
-                    "method": f"ai:{os.environ.get('ANTHROPIC_MODEL', 'claude-haiku-4-5-20251001')}",
+                    "method": f"ai:{_selected_model()}",
                 }
             )
         return result
@@ -286,8 +332,9 @@ def run_classifier(
     limit: int | None = None,
     dry_run: bool = False,
     rules_only: bool = False,
+    rebuild_all: bool = False,
 ) -> dict[str, int]:
-    candidates = _get_candidates(limit)
+    candidates = _get_candidates(limit, rebuild_all=rebuild_all)
     log.info("Annunci da arricchire: %d", len(candidates))
     if not candidates:
         return {
@@ -319,26 +366,8 @@ def run_classifier(
                 client = None
 
             if client is not None:
-                global SELECTED_MODEL
-                if not SELECTED_MODEL:
-                    log.info("Rilevamento modello Haiku disponibile per Classifier...")
-                    for model in HAIKU_MODELS:
-                        try:
-                            # Test veloce
-                            client.messages.create(
-                                model=model,
-                                max_tokens=1,
-                                messages=[{"role": "user", "content": "ping"}]
-                            )
-                            SELECTED_MODEL = model
-                            log.info("Modello rilevato e selezionato: %s", SELECTED_MODEL)
-                            break
-                        except Exception:
-                            continue
-                    
-                    if not SELECTED_MODEL:
-                        log.error("Nessun modello disponibile per fallback AI in Classifier.")
-                        SELECTED_MODEL = "claude-sonnet-4-6"
+                selected = _selected_model()
+                log.info("Fallback AI attivo con modello: %s", selected)
                 
                 for i in range(0, len(unresolved), BATCH_SIZE):
                     batch = unresolved[i : i + BATCH_SIZE]
@@ -379,9 +408,19 @@ def main() -> None:
     parser.add_argument("--dry-run", action="store_true", help="Mostra senza salvare")
     parser.add_argument("--limit", type=int, default=None, help="Limite annunci")
     parser.add_argument("--rules-only", action="store_true", help="Salta fallback AI")
+    parser.add_argument(
+        "--rebuild-all",
+        action="store_true",
+        help="Riclassifica tutti gli annunci (non solo unresolved).",
+    )
     args = parser.parse_args()
 
-    result = run_classifier(limit=args.limit, dry_run=args.dry_run, rules_only=args.rules_only)
+    result = run_classifier(
+        limit=args.limit,
+        dry_run=args.dry_run,
+        rules_only=args.rules_only,
+        rebuild_all=args.rebuild_all,
+    )
     print("\nRisultati:")
     print(f"  Candidati:      {result['total_candidates']}")
     print(f"  Agg. rules/CEX: {result['rule_updates']}")

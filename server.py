@@ -12,6 +12,10 @@ import json
 import logging
 import os
 import secrets
+import subprocess
+import sys
+import threading
+import time
 import webbrowser
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -21,6 +25,52 @@ import db_subito as _db_subito
 import db_ebay as _db_ebay
 
 log = logging.getLogger("trader.server")
+
+# ---------------------------------------------------------------------------
+# Scrape job state (singleton — un solo job alla volta)
+# ---------------------------------------------------------------------------
+
+_scrape_lock = threading.Lock()
+_scrape_job: dict = {
+    "running": False,
+    "source": None,
+    "started_at": None,
+    "lines": [],
+    "done": False,
+    "ok": None,
+    "error": None,
+}
+
+
+def _run_scrape_job(source: str) -> None:
+    """Esegue lo scraper in un thread separato, cattura l'output riga per riga."""
+    global _scrape_job
+    cmd = [sys.executable, str(_ROOT / "run.py"), "--source", source]
+    try:
+        proc = subprocess.Popen(
+            cmd,
+            cwd=str(_ROOT),
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+        )
+        for line in proc.stdout:
+            line = line.rstrip()
+            with _scrape_lock:
+                _scrape_job["lines"].append(line)
+                if len(_scrape_job["lines"]) > 200:
+                    _scrape_job["lines"] = _scrape_job["lines"][-200:]
+        proc.wait()
+        with _scrape_lock:
+            _scrape_job["ok"] = proc.returncode == 0
+            _scrape_job["done"] = True
+            _scrape_job["running"] = False
+    except Exception as exc:
+        with _scrape_lock:
+            _scrape_job["error"] = str(exc)
+            _scrape_job["done"] = True
+            _scrape_job["running"] = False
 
 _ROOT = Path(__file__).parent
 
@@ -78,6 +128,14 @@ def _make_handler(
 
         def log_message(self, fmt, *args):
             log.debug("HTTP: " + fmt, *args)
+
+        def end_headers(self):
+            # Nessuna cache per i file statici — il browser scarica sempre la versione aggiornata
+            if self.path.startswith("/viewer/"):
+                self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+                self.send_header("Pragma", "no-cache")
+                self.send_header("Expires", "0")
+            super().end_headers()
 
         # --- Utilità ---
 
@@ -268,8 +326,20 @@ def _make_handler(
                     available_only=query.get("available_only", "") == "1",
                 )
                 self._json(results)
-            else:
+            elif path == "/api/scrape/status":
+                with _scrape_lock:
+                    snap = dict(_scrape_job)
+                self._json(snap)
+            elif path == "/" or path == "":
+                # Redirect root → viewer
+                self.send_response(302)
+                self.send_header("Location", "/viewer/index.html")
+                self.end_headers()
+            elif path.startswith("/viewer/"):
+                # Serve solo la cartella viewer — nient'altro è accessibile
                 super().do_GET()
+            else:
+                self._json({"error": "not-found"}, status=404)
 
         # --- POST routing ---
 
@@ -281,7 +351,26 @@ def _make_handler(
                     self._json({"ok": False, "error": "unauthorized"}, status=401)
                     return
 
-            if path == "/api/db/set-base":
+            if path == "/api/scrape/run":
+                source = "subito"
+                with _scrape_lock:
+                    if _scrape_job["running"]:
+                        self._json({"ok": False, "error": "already-running"})
+                        return
+                    _scrape_job.update({
+                        "running": True,
+                        "source": source,
+                        "started_at": time.strftime("%H:%M:%S"),
+                        "lines": [],
+                        "done": False,
+                        "ok": None,
+                        "error": None,
+                    })
+                t = threading.Thread(target=_run_scrape_job, args=(source,), daemon=True)
+                t.start()
+                self._json({"ok": True, "source": source})
+                return
+            elif path == "/api/db/set-base":
                 pass
             elif path == "/api/subito/update-ai":
                 pass
