@@ -13,7 +13,6 @@
   <div class="logo">🎮 Xbox Tracker</div>
   <nav class="tabs">
     <button class="tab active" data-tab="home">Home</button>
-    <button class="tab" data-tab="mercato">🛒 Mercato</button>
     <button class="tab" data-tab="shop">Riepilogo</button>
     <button class="tab" data-tab="catalogo">Catalogo</button>
     <button class="tab" data-tab="subito">Subito.it</button>
@@ -53,27 +52,17 @@
       </div>
     </div>
 
+    <!-- Filtri Home -->
+    <div id="home-filters">
+      <label class="filter-avail-label">
+        <input type="checkbox" id="home-filter-avail" onchange="renderHome()" />
+        Solo disponibili
+      </label>
+    </div>
+
     <!-- Griglia modelli base per famiglia -->
     <div id="home-grid" class="results-grid"></div>
 
-  </div>
-</div>
-
-<!-- ======== MERCATO VIEW ======== -->
-<div id="view-mercato" class="view">
-  <div class="home-inner">
-    <div class="home-header">
-      <h1 class="home-title">🛒 Mercato</h1>
-      <p class="home-sub">Modelli preferiti con disponibilità attiva — solo le fonti con stock disponibile.</p>
-    </div>
-    <div id="mercato-empty" style="display:none;">
-      <div class="home-empty-card">
-        <div class="home-empty-icon">📦</div>
-        <h2>Nessun modello disponibile al momento</h2>
-        <p>Tutti i modelli preferiti risultano esauriti in tutti gli store.</p>
-      </div>
-    </div>
-    <div id="mercato-grid" class="results-grid"></div>
   </div>
 </div>
 
@@ -129,30 +118,36 @@
     <select id="filter-source" onchange="applyFilters()">
       <option value="">Tutte le fonti</option>
     </select>
-    <select id="filter-condition" onchange="applyFilters()">
-      <option value="">Tutte le condizioni</option>
-      <option value="Usato">Usato</option>
-      <option value="Nuovo">Nuovo</option>
-    </select>
-    <select id="filter-family" onchange="applyFilters()">
-      <option value="">Tutte le famiglie</option>
-      <option value="Serie">Serie</option>
-      <option value="One">One</option>
-      <option value="360">360</option>
-      <option value="Original">Original</option>
-    </select>
+    <div class="filter-group">
+      <span class="filter-label">Famiglia</span>
+      <div class="filter-chips" id="chips-family">
+        <button class="chip" data-value="series" onclick="toggleChip(this,'chips-family')">Series</button>
+        <button class="chip" data-value="one" onclick="toggleChip(this,'chips-family')">One</button>
+        <button class="chip" data-value="360" onclick="toggleChip(this,'chips-family')">360</button>
+        <button class="chip" data-value="original" onclick="toggleChip(this,'chips-family')">Original</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">Condizione</span>
+      <div class="filter-chips" id="chips-condition">
+        <button class="chip" data-value="Usato" onclick="toggleChip(this,'chips-condition')">Usato</button>
+        <button class="chip" data-value="Nuovo" onclick="toggleChip(this,'chips-condition')">Nuovo</button>
+      </div>
+    </div>
     <select id="filter-storage" onchange="applyFilters()">
       <option value="">Tutti gli storage</option>
     </select>
-    <select id="filter-segment" onchange="applyFilters()">
-      <option value="">Tutti i segmenti</option>
-      <option value="Base">Base</option>
-      <option value="S">S</option>
-      <option value="X">X</option>
-      <option value="Slim">Slim</option>
-      <option value="Elite">Elite</option>
-      <option value="E">E</option>
-    </select>
+    <div class="filter-group">
+      <span class="filter-label">Segmento</span>
+      <div class="filter-chips" id="chips-segment">
+        <button class="chip" data-value="Base" onclick="toggleChip(this,'chips-segment')">Base</button>
+        <button class="chip" data-value="S" onclick="toggleChip(this,'chips-segment')">S</button>
+        <button class="chip" data-value="X" onclick="toggleChip(this,'chips-segment')">X</button>
+        <button class="chip" data-value="Slim" onclick="toggleChip(this,'chips-segment')">Slim</button>
+        <button class="chip" data-value="Elite" onclick="toggleChip(this,'chips-segment')">Elite</button>
+        <button class="chip" data-value="E" onclick="toggleChip(this,'chips-segment')">E</button>
+      </div>
+    </div>
     <select id="filter-edition" onchange="applyFilters()">
       <option value="">Tutte le edizioni</option>
       <option value="standard">Standard</option>
@@ -253,6 +248,12 @@
         Solo disponibili
       </label>
       <span id="subito-count"></span>
+      <button id="btn-scrape-subito" onclick="startSubitoScrape()" title="Avvia scraper Subito.it">▶ Scrapa</button>
+    </div>
+
+    <div id="subito-scrape-bar" style="display:none;">
+      <div id="subito-scrape-progress"></div>
+      <div id="subito-scrape-msg"></div>
     </div>
 
     <div id="subito-grid"></div>
@@ -342,10 +343,10 @@
         <label>Modello</label>
         <div class="rbtn-group" id="rf-family">
           <button class="rbtn active" data-val="">Tutti</button>
-          <button class="rbtn" data-val="Original">Original</button>
-          <button class="rbtn" data-val="360">360</button>
-          <button class="rbtn" data-val="One">One</button>
-          <button class="rbtn" data-val="Series">Series</button>
+          <button class="rbtn" data-val="Original" data-family="original">Original</button>
+          <button class="rbtn" data-val="360" data-family="360">360</button>
+          <button class="rbtn" data-val="One" data-family="one">One</button>
+          <button class="rbtn" data-val="Series" data-family="series-x">Series</button>
         </div>
       </div>
 
