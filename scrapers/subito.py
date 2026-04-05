@@ -14,12 +14,15 @@ Campi estratti: titolo, descrizione (body), prezzo, geo, seller, pubblicazione.
 from __future__ import annotations
 
 import asyncio
+import json as _json
 import logging
 import re
 import unicodedata
 from pathlib import Path
 from typing import Sequence
 
+import requests as _requests
+from bs4 import BeautifulSoup as _BS
 from playwright.async_api import async_playwright
 
 from id_utils import stable_item_id
@@ -254,9 +257,39 @@ async def _new_context(browser):
     )
 
 
+_HTTP_HEADERS = {
+    "User-Agent": _COMMON["user_agent"],
+    "Accept-Language": f"{_COMMON['locale']},{_COMMON['locale'].split('-')[0]};q=0.9",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+}
+
+
+def _fetch_next_data_http(url: str) -> dict | None:
+    """Estrae __NEXT_DATA__ tramite HTTP GET + parsing HTML (no browser)."""
+    try:
+        resp = _requests.get(url, headers=_HTTP_HEADERS, timeout=20)
+        if resp.status_code != 200:
+            return None
+        soup = _BS(resp.text, "html.parser")
+        script = soup.find("script", {"id": "__NEXT_DATA__"})
+        if script and script.string:
+            return _json.loads(script.string)
+    except Exception:  # noqa: BLE001
+        pass
+    return None
+
+
 async def _fetch_next_data(browser, url: str) -> dict | None:
-    """Apre la pagina in un context fresco e restituisce window.__NEXT_DATA__."""
-    ctx  = await _new_context(browser)
+    """Estrae __NEXT_DATA__: prova prima HTTP, poi Playwright come fallback."""
+    # Fast path — HTTP puro (funziona anche da IP cloud)
+    data = await asyncio.get_event_loop().run_in_executor(
+        None, _fetch_next_data_http, url
+    )
+    if data:
+        return data
+
+    # Slow path — Playwright (per IP bloccati da Akamai via HTTP)
+    ctx = await _new_context(browser)
     page = await ctx.new_page()
     try:
         async def _do():

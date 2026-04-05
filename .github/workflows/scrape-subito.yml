@@ -5,6 +5,10 @@ on:
     - cron: '0 * * * *'   # ogni ora, minuto 0
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
+concurrency:
+  group: scrape-db
+  cancel-in-progress: false
+
 jobs:
   scrape-subito:
     runs-on: ubuntu-latest
@@ -37,18 +41,33 @@ jobs:
           python -m playwright install-deps chromium
 
       - name: Scrape Subito.it
-        run: python run.py --source subito
+        id: scrape
+        run: |
+          # Salva hash DB pre-scrape per confronto
+          sha_before=$(sha256sum tracker.db | cut -d' ' -f1)
+          python run.py --source subito 2>&1 | tee /tmp/scrape.log
+          sha_after=$(sha256sum tracker.db | cut -d' ' -f1)
+          if [ "$sha_before" = "$sha_after" ]; then
+            echo "⚠️  DB invariato dopo scrape — possibile fallimento silenzioso"
+            echo "db_changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "✅ DB aggiornato con nuovi dati"
+            echo "db_changed=true" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Classifica annunci con AI (Haiku)
+        if: steps.scrape.outputs.db_changed == 'true'
         run: python ai_classifier.py
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        continue-on-error: true   # non blocca il workflow se manca la chiave
+        continue-on-error: true
 
       - name: Cleanup and archive old data
+        if: steps.scrape.outputs.db_changed == 'true'
         run: python run.py --cleanup
 
       - name: Commit and push DB/artifacts
+        if: steps.scrape.outputs.db_changed == 'true'
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
@@ -56,4 +75,13 @@ jobs:
           git add logs/run_report_latest.json || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)"
+          git pull --rebase
           git push
+
+      - name: Upload scrape log (debug)
+        if: steps.scrape.outputs.db_changed == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: scrape-log-${{ github.run_id }}
+          path: /tmp/scrape.log
+          retention-days: 3
