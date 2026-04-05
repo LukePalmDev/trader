@@ -6,6 +6,10 @@ on:
     - cron: '0 5 * * *'
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
+concurrency:
+  group: scrape-db
+  cancel-in-progress: false
+
 jobs:
   scrape-fonti:
     runs-on: ubuntu-latest
@@ -51,4 +55,5 @@ jobs:
           git add logs/run_report_latest.json || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape fonti $(date -u +%Y-%m-%d)"
+          git pull --rebase
           git push
