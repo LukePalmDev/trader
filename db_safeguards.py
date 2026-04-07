@@ -201,7 +201,7 @@ class DatabaseHealthCheck:
                 try:
                     cursor.execute(f"SELECT COUNT(*) FROM {table}")
                     counts[table] = cursor.fetchone()[0]
-                except:
+                except Exception:
                     counts[table] = "error"
 
             conn.close()
@@ -247,9 +247,6 @@ class DatabaseBackupManager:
             # Copy file
             shutil.copy2(self.db_path, backup_path)
             logger.info(f"✅ Backup created: {backup_path}")
-
-            # Calculate hash
-            file_hash = self._calculate_hash(backup_path)
 
             # Clean old backups
             self._cleanup_old_backups()
@@ -333,7 +330,7 @@ class IOErrorRecovery:
             try:
                 with open(self.error_log_path, 'r') as f:
                     errors = json.load(f)
-            except:
+            except Exception:
                 errors = []
 
         errors.append(error_entry)
@@ -378,7 +375,7 @@ class IOErrorRecovery:
             ]
 
             return recent
-        except:
+        except Exception:
             return []
 
 
