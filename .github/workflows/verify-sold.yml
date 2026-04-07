@@ -1,0 +1,53 @@
+name: Verify Sold Subito
+
+on:
+  schedule:
+    # 03:00 UTC = 05:00 CEST (estate) — dopo lo scrape notturno di Subito
+    - cron: '0 3 * * *'
+  workflow_dispatch:  # trigger manuale dalla UI GitHub
+
+concurrency:
+  group: scrape-db
+  cancel-in-progress: false
+
+jobs:
+  verify-sold:
+    runs-on: self-hosted
+    env:
+      TRADER_PLAYWRIGHT_CHANNEL: chromium
+      TRADER_VIEWER_OPEN_BROWSER: "false"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Pull latest DB
+        run: git pull --rebase
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.lock
+
+      - name: Install Playwright browsers
+        run: python -m playwright install chromium
+
+      - name: Verifica annunci venduti
+        run: python verify_sold.py --all --max-runtime-minutes 45
+
+      - name: Commit e push DB aggiornato
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add tracker.db
+          git diff --staged --quiet \
+            || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"
+          git pull --rebase
+          git push

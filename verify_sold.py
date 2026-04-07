@@ -385,7 +385,8 @@ async def _process_rows(
 
             conn.execute("COMMIT")
         except Exception as e:
-            conn.execute("ROLLBACK")
+            if conn.in_transaction:
+                conn.execute("ROLLBACK")
             log.error("DB error for ad %s: %s", ad_id, e)
 
     conn.close()

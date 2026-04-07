@@ -1,0 +1,54 @@
+name: AI Classify Subito (Haiku)
+
+on:
+  workflow_run:
+    workflows: ["Scrape Subito.it (ogni ora)"]
+    types: [completed]
+  workflow_dispatch:  # trigger manuale; disabilita il workflow da GitHub UI per sospenderlo
+
+concurrency:
+  group: scrape-db
+  cancel-in-progress: false
+
+jobs:
+  classify:
+    # Salta se triggered da workflow_run che è fallito o non ha prodotto nuovi dati
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      TRADER_VIEWER_OPEN_BROWSER: "false"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Pull latest DB (aggiornato dallo scrape precedente)
+        run: git pull --rebase
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.lock
+
+      - name: Classifica annunci pending con AI (Haiku)
+        run: python ai_classifier.py
+
+      - name: Commit e push DB aggiornato
+        run: |
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git add tracker.db
+          git diff --staged --quiet \
+            || git commit -m "chore: ai-classify $(date -u +%Y-%m-%dT%H:%M)"
+          git pull --rebase
+          git push
