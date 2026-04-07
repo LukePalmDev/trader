@@ -26,24 +26,18 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
-
       - name: Install Python dependencies
-        run: pip install -r requirements.lock
+        run: python3.11 -m pip install -r requirements.lock
 
       - name: Install Playwright browsers
-        run: python -m playwright install chromium
+        run: python3.11 -m playwright install chromium
 
       - name: Scrape Subito.it
         id: scrape
         run: |
           # Salva hash DB pre-scrape per confronto
           sha_before=$(shasum -a 256 tracker.db | cut -d' ' -f1)
-          python run.py --source subito 2>&1 | tee /tmp/scrape.log
+          python3.11 run.py --source subito 2>&1 | tee /tmp/scrape.log
           sha_after=$(shasum -a 256 tracker.db | cut -d' ' -f1)
           if [ "$sha_before" = "$sha_after" ]; then
             echo "⚠️  DB invariato dopo scrape — possibile fallimento silenzioso"
@@ -55,7 +49,7 @@ jobs:
 
       - name: Cleanup and archive old data
         if: steps.scrape.outputs.db_changed == 'true'
-        run: python run.py --cleanup
+        run: python3.11 run.py --cleanup
 
       - name: Commit and push DB/artifacts
         if: steps.scrape.outputs.db_changed == 'true'

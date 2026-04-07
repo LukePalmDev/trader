@@ -27,20 +27,14 @@ jobs:
       - name: Pull latest DB
         run: git pull --rebase
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: pip
-
       - name: Install Python dependencies
-        run: pip install -r requirements.lock
+        run: python3.11 -m pip install -r requirements.lock
 
       - name: Install Playwright browsers
-        run: python -m playwright install chromium
+        run: python3.11 -m playwright install chromium
 
       - name: Verifica annunci venduti
-        run: python verify_sold.py --all --max-runtime-minutes 45
+        run: python3.11 verify_sold.py --all --max-runtime-minutes 45
 
       - name: Commit e push DB aggiornato
         run: |
