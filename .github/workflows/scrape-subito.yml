@@ -53,13 +53,6 @@ jobs:
             echo "db_changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Classifica annunci con AI (Haiku)
-        if: steps.scrape.outputs.db_changed == 'true'
-        run: python ai_classifier.py
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        continue-on-error: true
-
       - name: Cleanup and archive old data
         if: steps.scrape.outputs.db_changed == 'true'
         run: python run.py --cleanup
