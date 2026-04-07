@@ -13,7 +13,7 @@ jobs:
   scrape-subito:
     runs-on: self-hosted
     env:
-      TRADER_PLAYWRIGHT_CHANNEL: chromium
+      TRADER_PLAYWRIGHT_CHANNEL: chrome
       TRADER_VIEWER_OPEN_BROWSER: "false"
       TRADER_TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TRADER_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -30,7 +30,7 @@ jobs:
         run: python3.11 -m pip install -r requirements.lock
 
       - name: Install Playwright browsers
-        run: python3.11 -m playwright install chromium
+        run: python3.11 -m playwright install chrome
 
       - name: Scrape Subito.it
         id: scrape
