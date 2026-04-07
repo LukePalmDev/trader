@@ -15,7 +15,6 @@ from db_safeguards import (
     DatabaseHealthCheck,
     DatabaseBackupManager,
     IOErrorRecovery,
-    create_diagnostic_report
 )
 
 # Setup logging

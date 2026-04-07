@@ -30,6 +30,9 @@ jobs:
       - name: Install Python dependencies
         run: python3.11 -m pip install -r requirements.lock
 
+      - name: Install Playwright browsers
+        run: python3.11 -m playwright install chrome
+
       - name: Verifica annunci venduti
         run: python3.11 verify_sold.py --all --max-runtime-minutes 45
 

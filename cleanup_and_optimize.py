@@ -270,7 +270,7 @@ def main():
     with open(report_path, 'w') as f:
         json.dump(report, f, indent=2, default=str)
 
-    logger.info(f"✅ CLEANUP COMPLETED")
+    logger.info("✅ CLEANUP COMPLETED")
     logger.info(f"📝 Report saved: {report_path}")
     logger.info("=" * 70)
 

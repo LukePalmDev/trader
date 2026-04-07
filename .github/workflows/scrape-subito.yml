@@ -29,6 +29,9 @@ jobs:
       - name: Install Python dependencies
         run: python3.11 -m pip install -r requirements.lock
 
+      - name: Install Playwright browsers
+        run: python3.11 -m playwright install chrome
+
       - name: Scrape Subito.it
         id: scrape
         run: |
