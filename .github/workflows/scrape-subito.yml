@@ -57,7 +57,7 @@ jobs:
           git add logs/run_report_latest.json || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)"
-          git pull --rebase --autostash
+          git pull --rebase --autostash -X theirs
           git push
 
       - name: Upload scrape log (debug)
