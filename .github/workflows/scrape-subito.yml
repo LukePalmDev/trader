@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   scrape-subito:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     env:
       TRADER_PLAYWRIGHT_CHANNEL: chromium
       TRADER_VIEWER_OPEN_BROWSER: "false"
@@ -36,17 +36,15 @@ jobs:
         run: pip install -r requirements.lock
 
       - name: Install Playwright browsers
-        run: |
-          python -m playwright install chromium
-          python -m playwright install-deps chromium
+        run: python -m playwright install chromium
 
       - name: Scrape Subito.it
         id: scrape
         run: |
           # Salva hash DB pre-scrape per confronto
-          sha_before=$(sha256sum tracker.db | cut -d' ' -f1)
+          sha_before=$(shasum -a 256 tracker.db | cut -d' ' -f1)
           python run.py --source subito 2>&1 | tee /tmp/scrape.log
-          sha_after=$(sha256sum tracker.db | cut -d' ' -f1)
+          sha_after=$(shasum -a 256 tracker.db | cut -d' ' -f1)
           if [ "$sha_before" = "$sha_after" ]; then
             echo "⚠️  DB invariato dopo scrape — possibile fallimento silenzioso"
             echo "db_changed=false" >> "$GITHUB_OUTPUT"
