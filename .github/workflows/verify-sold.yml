@@ -14,7 +14,7 @@ jobs:
   verify-sold:
     runs-on: self-hosted
     env:
-      TRADER_PLAYWRIGHT_CHANNEL: chromium
+      TRADER_PLAYWRIGHT_CHANNEL: chrome
       TRADER_VIEWER_OPEN_BROWSER: "false"
 
     steps:
@@ -31,7 +31,7 @@ jobs:
         run: python3.11 -m pip install -r requirements.lock
 
       - name: Install Playwright browsers
-        run: python3.11 -m playwright install chromium
+        run: python3.11 -m playwright install chrome
 
       - name: Verifica annunci venduti
         run: python3.11 verify_sold.py --all --max-runtime-minutes 45
