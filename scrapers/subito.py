@@ -21,8 +21,7 @@ import unicodedata
 from pathlib import Path
 from typing import Sequence
 
-import requests as _requests
-from bs4 import BeautifulSoup as _BS
+import aiohttp
 from playwright.async_api import async_playwright
 
 from id_utils import stable_item_id
@@ -54,27 +53,40 @@ MAX_PAGES = 300
 PAGE_SIZE = 30
 MAX_CONSECUTIVE_PAGE_ERRORS = 3
 
+# Delay in secondi tra pagine consecutive (anti-ban adattivo).
+# Con concurrency=4 e 0.3s → ~13 req/s globali, accettabile per Subito.
+PAGE_DELAY_S: float = float(_COMMON.get("subito_page_delay_s", 0.3))
+
+# Regex per estrarre __NEXT_DATA__ dall'HTML senza parsare l'intero DOM.
+# Next.js garantisce che il JSON interno non contenga "</script>" non escaped.
+_NEXT_DATA_RE = re.compile(
+    r'<script[^>]+id=["\']__NEXT_DATA__["\'][^>]*>(.*?)</script>',
+    re.DOTALL,
+)
+
 REGIONS: list[tuple[str, str]] = [
-    ("Lombardia", "lombardia"),
-    ("Campania", "campania"),
-    ("Lazio", "lazio"),
-    ("Veneto", "veneto"),
-    ("Puglia", "puglia"),
-    ("Sicilia", "sicilia"),
-    ("Piemonte", "piemonte"),
-    ("Emilia-Romagna", "emilia-romagna"),
-    ("Toscana", "toscana"),
-    ("Marche", "marche"),
-    ("Sardegna", "sardegna"),
-    ("Liguria", "liguria"),
-    ("Friuli-Venezia Giulia", "friuli-venezia-giulia"),
-    ("Calabria", "calabria"),
-    ("Abruzzo", "abruzzo"),
-    ("Trentino-Alto Adige", "trentino-alto-adige"),
-    ("Umbria", "umbria"),
-    ("Molise", "molise"),
-    ("Basilicata", "basilicata"),
-    ("Valle d'Aosta", "valle-d-aosta"),
+    # Ordinate per volume annunci atteso (pop. + attività marketplace).
+    # Con concurrency=4 le prime 4 formano la wave iniziale più importante.
+    ("Lombardia", "lombardia"),         # 1 — Milano, massimo volume
+    ("Lazio", "lazio"),                 # 2 — Roma
+    ("Campania", "campania"),           # 3 — Napoli
+    ("Sicilia", "sicilia"),             # 4 — alta popolazione
+    ("Veneto", "veneto"),               # 5 — Venezia/Padova/Verona
+    ("Piemonte", "piemonte"),           # 6 — Torino
+    ("Emilia-Romagna", "emilia-romagna"),  # 7 — Bologna
+    ("Toscana", "toscana"),             # 8 — Firenze
+    ("Puglia", "puglia"),               # 9 — Bari/Taranto
+    ("Calabria", "calabria"),           # 10
+    ("Sardegna", "sardegna"),           # 11
+    ("Liguria", "liguria"),             # 12 — Genova
+    ("Abruzzo", "abruzzo"),             # 13
+    ("Marche", "marche"),               # 14
+    ("Friuli-Venezia Giulia", "friuli-venezia-giulia"),  # 15
+    ("Trentino-Alto Adige", "trentino-alto-adige"),      # 16
+    ("Umbria", "umbria"),               # 17
+    ("Basilicata", "basilicata"),       # 18
+    ("Molise", "molise"),               # 19
+    ("Valle d'Aosta", "valle-d-aosta"),  # 20 — minimo volume
 ]
 
 
@@ -264,32 +276,23 @@ _HTTP_HEADERS = {
 }
 
 
-def _fetch_next_data_http(url: str) -> dict | None:
-    """Estrae __NEXT_DATA__ tramite HTTP GET + parsing HTML (no browser)."""
+async def _fetch_next_data_http(session: aiohttp.ClientSession, url: str) -> dict | None:
+    """Estrae __NEXT_DATA__ tramite aiohttp GET + regex (async nativo, no browser)."""
     try:
-        resp = _requests.get(url, headers=_HTTP_HEADERS, timeout=20)
-        if resp.status_code != 200:
-            return None
-        soup = _BS(resp.text, "html.parser")
-        script = soup.find("script", {"id": "__NEXT_DATA__"})
-        if script and script.string:
-            return _json.loads(script.string)
+        async with session.get(url, timeout=aiohttp.ClientTimeout(total=15)) as resp:
+            if resp.status != 200:
+                return None
+            text = await resp.text()
+            m = _NEXT_DATA_RE.search(text)
+            if m:
+                return _json.loads(m.group(1))
     except Exception:  # noqa: BLE001
         pass
     return None
 
 
-async def _fetch_next_data(browser, url: str) -> dict | None:
-    """Estrae __NEXT_DATA__: prova prima HTTP, poi Playwright come fallback."""
-    # Fast path — HTTP puro (funziona anche da IP cloud)
-    data = await asyncio.get_event_loop().run_in_executor(
-        None, _fetch_next_data_http, url
-    )
-    if data:
-        return data
-
-    # Slow path — Playwright (per IP bloccati da Akamai via HTTP)
-    ctx = await _new_context(browser)
+async def _fetch_pw_with_ctx(ctx, url: str) -> dict | None:
+    """Estrae __NEXT_DATA__ tramite Playwright usando un context già esistente."""
     page = await ctx.new_page()
     try:
         async def _do():
@@ -299,10 +302,10 @@ async def _fetch_next_data(browser, url: str) -> dict | None:
 
         return await retry(_do, retries=3, delay=2.0, label=url)
     except Exception as exc:
-        log.error("Errore fetch %s: %s", url, exc)
+        log.error("Errore fetch Playwright %s: %s", url, exc)
         return None
     finally:
-        await ctx.close()
+        await page.close()
 
 
 # --------------------------------------------------------------------------- #
@@ -314,12 +317,14 @@ def _region_search_base(region_slug: str) -> str:
 
 
 async def _scrape_region(
+    session: aiohttp.ClientSession,
     browser,
     region_label: str,
     region_slug: str,
     keyword: str,
     *,
     strict_xbox: bool = True,
+    max_pages: int = MAX_PAGES,
 ) -> list[dict]:
     """Scarica tutte le pagine della query keyword in una regione."""
     log.info("Regione: %s — query %r", region_label, keyword)
@@ -328,84 +333,103 @@ async def _scrape_region(
     search_base = _region_search_base(region_slug)
     page_num = 1
     consecutive_errors = 0
+    _pw_ctx = None  # Context Playwright creato lazy al primo fallback HTTP
 
-    while page_num <= MAX_PAGES:
-        url = (
-            f"{search_base}?q={q_encoded}"
-            if page_num == 1
-            else f"{search_base}?q={q_encoded}&o={page_num}"
-        )
-        log.info("  Pagina %d: %s", page_num, url)
+    async def _fetch(url: str) -> dict | None:
+        nonlocal _pw_ctx
+        data = await _fetch_next_data_http(session, url)
+        if data:
+            return data
+        # HTTP fallback: Playwright con context riusato per tutta la regione
+        if _pw_ctx is None:
+            log.info("  HTTP fallback Playwright — regione %s", region_label)
+            _pw_ctx = await _new_context(browser)
+        return await _fetch_pw_with_ctx(_pw_ctx, url)
 
-        next_data = await _fetch_next_data(browser, url)
-        if not next_data:
-            consecutive_errors += 1
-            if consecutive_errors >= MAX_CONSECUTIVE_PAGE_ERRORS:
+    try:
+        while page_num <= max_pages:
+            url = (
+                f"{search_base}?q={q_encoded}"
+                if page_num == 1
+                else f"{search_base}?q={q_encoded}&o={page_num}"
+            )
+            log.info("  Pagina %d: %s", page_num, url)
+
+            next_data = await _fetch(url)
+            if not next_data:
+                consecutive_errors += 1
+                if consecutive_errors >= MAX_CONSECUTIVE_PAGE_ERRORS:
+                    log.warning(
+                        "  __NEXT_DATA__ non disponibile per %d volte consecutive — stop query.",
+                        consecutive_errors,
+                    )
+                    break
+                wait_s = min(8.0, 2.0 * consecutive_errors)
                 log.warning(
-                    "  __NEXT_DATA__ non disponibile per %d volte consecutive — stop query.",
+                    "  __NEXT_DATA__ non disponibile (tentativo locale %d/%d). Retry pagina tra %.1fs…",
                     consecutive_errors,
+                    MAX_CONSECUTIVE_PAGE_ERRORS,
+                    wait_s,
                 )
-                break
-            wait_s = min(8.0, 2.0 * consecutive_errors)
-            log.warning(
-                "  __NEXT_DATA__ non disponibile (tentativo locale %d/%d). Retry pagina tra %.1fs…",
-                consecutive_errors,
-                MAX_CONSECUTIVE_PAGE_ERRORS,
-                wait_s,
-            )
-            await asyncio.sleep(wait_s)
-            continue
-
-        try:
-            items = (
-                next_data["props"]["pageProps"]["initialState"]["items"]["originalList"]
-                or []
-            )
-        except (KeyError, TypeError):
-            consecutive_errors += 1
-            if consecutive_errors >= MAX_CONSECUTIVE_PAGE_ERRORS:
-                log.warning(
-                    "  Struttura originalList non trovata per %d volte consecutive — stop query.",
-                    consecutive_errors,
-                )
-                break
-            wait_s = min(8.0, 2.0 * consecutive_errors)
-            log.warning(
-                "  Struttura originalList non trovata (tentativo locale %d/%d). Retry pagina tra %.1fs…",
-                consecutive_errors,
-                MAX_CONSECUTIVE_PAGE_ERRORS,
-                wait_s,
-            )
-            await asyncio.sleep(wait_s)
-            continue
-
-        consecutive_errors = 0
-
-        if not items:
-            log.info("  → Pagina vuota, stop.")
-            break
-
-        parsed_this_page = []
-        for item in items:
-            ad = _parse_ad(item, strict_xbox=strict_xbox)
-            if not ad:
+                await asyncio.sleep(wait_s)
                 continue
-            parsed_this_page.append(ad)
 
-        filtered_n = len(items) - len(parsed_this_page)
-        log.info(
-            "  → %d/%d annunci estratti (scartati vuoti %d).",
-            len(parsed_this_page),
-            len(items),
-            filtered_n,
-        )
-        all_ads.extend(parsed_this_page)
+            try:
+                items = (
+                    next_data["props"]["pageProps"]["initialState"]["items"]["originalList"]
+                    or []
+                )
+            except (KeyError, TypeError):
+                consecutive_errors += 1
+                if consecutive_errors >= MAX_CONSECUTIVE_PAGE_ERRORS:
+                    log.warning(
+                        "  Struttura originalList non trovata per %d volte consecutive — stop query.",
+                        consecutive_errors,
+                    )
+                    break
+                wait_s = min(8.0, 2.0 * consecutive_errors)
+                log.warning(
+                    "  Struttura originalList non trovata (tentativo locale %d/%d). Retry pagina tra %.1fs…",
+                    consecutive_errors,
+                    MAX_CONSECUTIVE_PAGE_ERRORS,
+                    wait_s,
+                )
+                await asyncio.sleep(wait_s)
+                continue
 
-        # Subito espone max 30 risultati/pagina: pagina parziale => ultima.
-        if len(items) < PAGE_SIZE:
-            log.info("  → Pagina parziale (%d items) — ultima pagina.", len(items))
-            break
-        page_num += 1
+            consecutive_errors = 0
+
+            if not items:
+                log.info("  → Pagina vuota, stop.")
+                break
+
+            parsed_this_page = []
+            for item in items:
+                ad = _parse_ad(item, strict_xbox=strict_xbox)
+                if not ad:
+                    continue
+                parsed_this_page.append(ad)
+
+            filtered_n = len(items) - len(parsed_this_page)
+            log.info(
+                "  → %d/%d annunci estratti (scartati vuoti %d).",
+                len(parsed_this_page),
+                len(items),
+                filtered_n,
+            )
+            all_ads.extend(parsed_this_page)
+
+            # Subito espone max 30 risultati/pagina: pagina parziale => ultima.
+            if len(items) < PAGE_SIZE:
+                log.info("  → Pagina parziale (%d items) — ultima pagina.", len(items))
+                break
+            page_num += 1
+            if PAGE_DELAY_S > 0:
+                await asyncio.sleep(PAGE_DELAY_S)
+
+    finally:
+        if _pw_ctx is not None:
+            await _pw_ctx.close()
 
     return all_ads
 
@@ -417,7 +441,7 @@ async def run_scraper(
     max_pages: int = MAX_PAGES,
     strict_xbox: bool = True,
     dedup_results: bool = True,
-    region_concurrency: int = 1,
+    region_concurrency: int = 4,
 ) -> list[dict]:
     """Scrape Subito per keyword/regioni con dedup opzionale."""
     all_ads: list[dict] = []
@@ -426,29 +450,28 @@ async def run_scraper(
     effective_max_pages = max(1, int(max_pages))
     effective_region_concurrency = max(1, int(region_concurrency))
 
-    async with async_playwright() as p:
+    connector = aiohttp.TCPConnector(limit=20, ttl_dns_cache=300)
+    async with aiohttp.ClientSession(
+        headers=_HTTP_HEADERS,
+        connector=connector,
+    ) as session, async_playwright() as p:
         browser = await launch_chromium(
             p,
             headless=True,
             preferred_channel=_COMMON.get("playwright_channel", "chrome"),
         )
-        old_max_pages = None
-
-        # MAX_PAGES è un valore modulo-level usato da _scrape_region.
-        # Lo forziamo runtime per evitare una refactor più invasiva.
-        global MAX_PAGES
-        old_max_pages = MAX_PAGES
-        MAX_PAGES = effective_max_pages
         try:
             if effective_region_concurrency <= 1:
                 for region_label, region_slug in selected_regions:
                     try:
                         ads = await _scrape_region(
+                            session,
                             browser,
                             region_label,
                             region_slug,
                             keyword,
                             strict_xbox=strict_xbox,
+                            max_pages=effective_max_pages,
                         )
                         all_ads.extend(ads)
                     except Exception as exc:
@@ -459,11 +482,13 @@ async def run_scraper(
                 async def _worker(region_label: str, region_slug: str) -> list[dict]:
                     async with sem:
                         return await _scrape_region(
+                            session,
                             browser,
                             region_label,
                             region_slug,
                             keyword,
                             strict_xbox=strict_xbox,
+                            max_pages=effective_max_pages,
                         )
 
                 jobs = [_worker(label, slug) for label, slug in selected_regions]
@@ -473,10 +498,7 @@ async def run_scraper(
                         continue
                     all_ads.extend(result)
         finally:
-            if old_max_pages is not None:
-                MAX_PAGES = old_max_pages
-
-        await browser.close()
+            await browser.close()
 
     if dedup_results:
         unique = deduplicate(all_ads)
@@ -498,7 +520,7 @@ def main(
     max_pages: int = MAX_PAGES,
     strict_xbox: bool = True,
     dedup_results: bool = True,
-    region_concurrency: int = 1,
+    region_concurrency: int = 4,
 ) -> Path:
     log.info("=" * 60)
     log.info("Subito.it Scraper — Console Xbox")
