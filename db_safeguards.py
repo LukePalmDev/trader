@@ -12,8 +12,7 @@ import shutil
 import logging
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
-import tempfile
+from typing import Dict, List, Optional
 
 # Setup logging
 logging.basicConfig(
