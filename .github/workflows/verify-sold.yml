@@ -13,6 +13,7 @@ concurrency:
 jobs:
   verify-sold:
     runs-on: self-hosted
+    timeout-minutes: 60   # hard ceiling: --max-runtime-minutes 45 è il soft limit Python
     env:
       TRADER_PLAYWRIGHT_CHANNEL: chrome
       TRADER_VIEWER_OPEN_BROWSER: "false"
