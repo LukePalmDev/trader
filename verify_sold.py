@@ -120,6 +120,8 @@ async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
 
 async def check_url(ctx, url: str) -> bool:
     """Visita l'URL con un context dal pool.
+    Usa wait_until="commit" + resp.text() per leggere il body HTTP direttamente,
+    senza attendere il parsing DOM (Subito usa SSR: il testo è nel HTML iniziale).
     Apre e chiude solo la page; il context rimane aperto per il riuso.
     Restituisce True se ancora attivo, False se venduto/eliminato.
     """
@@ -127,30 +129,32 @@ async def check_url(ctx, url: str) -> bool:
     res = True
     try:
         async def _do() -> bool:
-            resp = await page.goto(url, wait_until="domcontentloaded", timeout=20000)
+            # "commit" = appena ricevuti gli header della risposta finale (dopo redirect).
+            # Molto più veloce di "domcontentloaded": non aspetta il parsing HTML.
+            resp = await page.goto(url, wait_until="commit", timeout=10000)
             if not resp:
                 return False
 
-            # Verifica redirect (Subito a volte reindirizza alla home o ricerca se assente)
-            if page.url == "https://www.subito.it/" or (
-                "annunci-italia/vendita" in page.url and "q=" in page.url
+            # Verifica redirect tramite URL finale della risposta
+            final_url = str(resp.url)
+            if final_url.rstrip("/") == "https://www.subito.it" or (
+                "annunci-italia/vendita" in final_url and "q=" in final_url
             ):
-                log.debug("  Redirect rilevato: %s -> %s", url, page.url)
+                log.debug("  Redirect rilevato: %s -> %s", url, final_url)
                 return False
 
-            if resp.status == 404 or resp.status == 410:
+            if resp.status in (404, 410):
                 return False
 
-            # Verifica testo in pagina per annunci "venduti" ma con URL mantenuto
-            sold_count = await page.locator(
-                "text=/non più disponibile/i"
-            ).count()
-            if sold_count > 0:
+            # Legge il body HTTP direttamente dalla response.
+            # Con SSR di Next.js il testo "non più disponibile" è nel HTML iniziale.
+            body = await resp.text()
+            if "non più disponibile" in body:
                 return False
 
             return True
 
-        res = bool(await retry(_do, retries=2, delay=2.0, label=url))
+        res = bool(await retry(_do, retries=1, delay=2.0, label=url))
     except Exception as exc:
         log.warning("Errore navigazione %s: %s", url, exc)
         res = True  # In caso di errore strano assumiamo sia ancora vivo per prudenza
