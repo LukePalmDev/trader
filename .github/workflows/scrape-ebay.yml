@@ -45,9 +45,10 @@ jobs:
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
+          git fetch origin
+          git reset --mixed origin/main
           git add tracker.db
           git add logs/run_report_latest.json || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape ebay $(date -u +%Y-%m-%d)"
-          git pull --rebase
           git push
