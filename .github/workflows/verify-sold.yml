@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
@@ -34,7 +34,17 @@ jobs:
         run: python3.11 -m pip install -r requirements.lock
 
       - name: Verifica annunci venduti
-        run: python3.11 verify_sold.py --all --max-runtime-minutes 45
+        run: >
+          python3.11 verify_sold.py
+          --all
+          --max-runtime-minutes 45
+          --concurrency 18
+          --chunk-size 350
+          --browser-restart-every 3
+          --body-timeout-seconds 2.5
+          --dom-fallback-timeout-ms 1200
+          --max-http403-ratio 0.02
+          --selection-sample 5
 
       - name: Commit e push DB aggiornato
         run: |
