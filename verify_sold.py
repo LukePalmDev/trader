@@ -120,8 +120,6 @@ async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
 
 async def check_url(ctx, url: str) -> bool:
     """Visita l'URL con un context dal pool.
-    Usa wait_until="commit" + resp.text() per leggere il body HTTP direttamente,
-    senza attendere il parsing DOM (Subito usa SSR: il testo è nel HTML iniziale).
     Apre e chiude solo la page; il context rimane aperto per il riuso.
     Restituisce True se ancora attivo, False se venduto/eliminato.
     """
@@ -129,27 +127,23 @@ async def check_url(ctx, url: str) -> bool:
     res = True
     try:
         async def _do() -> bool:
-            # "commit" = appena ricevuti gli header della risposta finale (dopo redirect).
-            # Molto più veloce di "domcontentloaded": non aspetta il parsing HTML.
-            resp = await page.goto(url, wait_until="commit", timeout=10000)
+            resp = await page.goto(url, wait_until="domcontentloaded", timeout=10000)
             if not resp:
                 return False
 
-            # Verifica redirect tramite URL finale della risposta
-            final_url = str(resp.url)
-            if final_url.rstrip("/") == "https://www.subito.it" or (
-                "annunci-italia/vendita" in final_url and "q=" in final_url
+            # Verifica redirect (Subito a volte reindirizza alla home o ricerca se assente)
+            if page.url == "https://www.subito.it/" or (
+                "annunci-italia/vendita" in page.url and "q=" in page.url
             ):
-                log.debug("  Redirect rilevato: %s -> %s", url, final_url)
+                log.debug("  Redirect rilevato: %s -> %s", url, page.url)
                 return False
 
             if resp.status in (404, 410):
                 return False
 
-            # Legge il body HTTP direttamente dalla response.
-            # Con SSR di Next.js il testo "non più disponibile" è nel HTML iniziale.
-            body = await resp.text()
-            if "non più disponibile" in body:
+            # Verifica testo in pagina per annunci "venduti" ma con URL mantenuto
+            sold_count = await page.locator("text=/non più disponibile/i").count()
+            if sold_count > 0:
                 return False
 
             return True
