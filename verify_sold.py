@@ -37,7 +37,7 @@ DEFAULT_RECHECK_DAYS = 7
 DEFAULT_CHUNK_SIZE = 350
 DEFAULT_MAX_RUNTIME_MINUTES = 45
 DEFAULT_BROWSER_RESTART_EVERY = 3
-DEFAULT_CONCURRENCY = 20
+DEFAULT_CONCURRENCY = 30
 _WARNED_NO_AIOHTTP = False
 
 _XBOX_SQL_FILTER = """
@@ -120,6 +120,12 @@ async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
 
 async def check_url(ctx, url: str) -> bool:
     """Visita l'URL con un context dal pool.
+
+    Usa wait_until="commit" (headers ricevuti, PRIMA del parsing DOM) per evitare
+    di attendere i bundle JS di Next.js (~2-2.5s per URL risparmiati).
+    Il body SSR viene letto con asyncio.wait_for per proteggere dai throttle Akamai:
+    se il body non arriva entro 7s si assume attivo (fallback conservativo).
+
     Apre e chiude solo la page; il context rimane aperto per il riuso.
     Restituisce True se ancora attivo, False se venduto/eliminato.
     """
@@ -127,31 +133,41 @@ async def check_url(ctx, url: str) -> bool:
     res = True
     try:
         async def _do() -> bool:
-            resp = await page.goto(url, wait_until="domcontentloaded", timeout=10000)
+            # "commit" = appena ricevuti gli header della risposta finale (dopo redirect).
+            # Non aspetta il parsing HTML né i bundle JS: risparmia ~2-2.5s per URL.
+            resp = await page.goto(url, wait_until="commit", timeout=10000)
             if not resp:
                 return False
 
-            # Verifica redirect (Subito a volte reindirizza alla home o ricerca se assente)
-            if page.url == "https://www.subito.it/" or (
-                "annunci-italia/vendita" in page.url and "q=" in page.url
+            # Redirect check via URL finale della risposta (affidabile con "commit")
+            final_url = str(resp.url)
+            if final_url.rstrip("/") == "https://www.subito.it" or (
+                "annunci-italia/vendita" in final_url and "q=" in final_url
             ):
-                log.debug("  Redirect rilevato: %s -> %s", url, page.url)
+                log.debug("  Redirect rilevato: %s -> %s", url, final_url)
                 return False
 
             if resp.status in (404, 410):
                 return False
 
-            # Verifica testo in pagina per annunci "venduti" ma con URL mantenuto
-            sold_count = await page.locator("text=/non più disponibile/i").count()
-            if sold_count > 0:
-                return False
+            # Legge il body HTTP con timeout esplicito.
+            # Subito usa Next.js SSR: "non più disponibile" è nell'HTML iniziale.
+            # asyncio.wait_for previene il blocco se Akamai throttles la consegna del body
+            # (problema osservato in run precedente: chunk 12 bloccato 358s senza timeout).
+            try:
+                body = await asyncio.wait_for(resp.text(), timeout=7.0)
+            except asyncio.TimeoutError:
+                # Body non arriva in tempo → fallback conservativo: assume attivo.
+                # Meglio saltare un venduto che marcare come venduto un annuncio vivo.
+                log.debug("  resp.text() timeout su %s → assume attivo", url)
+                return True
 
-            return True
+            return "non più disponibile" not in body
 
         res = bool(await retry(_do, retries=1, delay=2.0, label=url))
     except Exception as exc:
         log.warning("Errore navigazione %s: %s", url, exc)
-        res = True  # In caso di errore strano assumiamo sia ancora vivo per prudenza
+        res = True
     finally:
         try:
             await page.close()
