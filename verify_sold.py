@@ -5,6 +5,7 @@ import asyncio
 import logging
 import os
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -26,7 +27,7 @@ except ImportError:  # pragma: no cover - fallback runtime
 from scrapers.base import launch_chromium, retry  # noqa: E402
 from settings import load_config  # noqa: E402
 from db_subito import DB_PATH, _connect, _estimate_sold_window  # noqa: E402
-from playwright.async_api import async_playwright  # noqa: E402
+from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError  # noqa: E402
 
 _CONFIG_PATH = Path("config.toml")
 _CFG = load_config(_CONFIG_PATH)
@@ -37,11 +38,15 @@ DEFAULT_RECHECK_DAYS = 7
 DEFAULT_CHUNK_SIZE = 350
 DEFAULT_MAX_RUNTIME_MINUTES = 45
 DEFAULT_BROWSER_RESTART_EVERY = 3
-DEFAULT_CONCURRENCY = 20
+DEFAULT_CONCURRENCY = 30
+DEFAULT_NAV_TIMEOUT_MS = 10_000
+DEFAULT_BODY_TIMEOUT_SECONDS = 2.5
+DEFAULT_DOM_FALLBACK_TIMEOUT_MS = 1_200
+DEFAULT_MAX_HTTP403_RATIO = 0.02
 _WARNED_NO_AIOHTTP = False
 
-_XBOX_SQL_FILTER = """
-AND (
+_XBOX_MATCH_CONDITION = """
+(
     lower(name) LIKE '%xbox%'
     OR lower(body_text) LIKE '%xbox%'
     OR lower(url) LIKE '%xbox%'
@@ -65,6 +70,85 @@ AND (
     )
 )
 """
+
+_XBOX_SQL_FILTER = f"\nAND {_XBOX_MATCH_CONDITION}\n"
+
+_SOLD_MARKERS = (
+    "non più disponibile",
+    "annuncio non più disponibile",
+    "questo annuncio non è più disponibile",
+)
+
+
+def _is_sold_redirect(url: str) -> bool:
+    final_url = (url or "").rstrip("/")
+    return final_url == "https://www.subito.it" or (
+        "annunci-italia/vendita" in final_url and "q=" in final_url
+    )
+
+
+def _contains_sold_marker(text: str) -> bool:
+    normalized = (text or "").lower()
+    return any(marker in normalized for marker in _SOLD_MARKERS)
+
+
+def _build_selection_breakdown(
+    conn,
+    statuses: list[str],
+    *,
+    xbox_only: bool,
+) -> dict[str, int]:
+    placeholders = ",".join("?" * len(statuses))
+    base_where = f"ai_status IN ({placeholders})"
+    status_ok = conn.execute(
+        f"SELECT COUNT(*) FROM ads WHERE {base_where}",
+        statuses,
+    ).fetchone()[0]
+    active_unsold = conn.execute(
+        (
+            f"SELECT COUNT(*) FROM ads WHERE {base_where} "
+            "AND last_available = 1 AND sold_at IS NULL"
+        ),
+        statuses,
+    ).fetchone()[0]
+    if xbox_only:
+        xbox_subset = conn.execute(
+            (
+                f"SELECT COUNT(*) FROM ads WHERE {base_where} "
+                "AND last_available = 1 AND sold_at IS NULL "
+                f"AND {_XBOX_MATCH_CONDITION}"
+            ),
+            statuses,
+        ).fetchone()[0]
+    else:
+        xbox_subset = active_unsold
+    return {
+        "total_ads": int(conn.execute("SELECT COUNT(*) FROM ads").fetchone()[0]),
+        "status_ok": int(status_ok),
+        "active_unsold": int(active_unsold),
+        "xbox_subset": int(xbox_subset),
+        "excluded_by_xbox": int(active_unsold - xbox_subset),
+    }
+
+
+def _pick_excluded_by_xbox_sample(
+    conn,
+    statuses: list[str],
+    *,
+    limit: int,
+) -> list[tuple]:
+    if limit <= 0:
+        return []
+    placeholders = ",".join("?" * len(statuses))
+    query = (
+        "SELECT id, url, name FROM ads "
+        f"WHERE ai_status IN ({placeholders}) "
+        "AND last_available = 1 AND sold_at IS NULL "
+        f"AND NOT {_XBOX_MATCH_CONDITION} "
+        "ORDER BY COALESCE(last_seen, first_seen) DESC "
+        "LIMIT ?"
+    )
+    return conn.execute(query, list(statuses) + [int(limit)]).fetchall()
 
 
 async def _new_context(browser):
@@ -118,48 +202,80 @@ async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
         return "unknown"
 
 
-async def check_url(ctx, url: str) -> bool:
-    """Visita l'URL con un context dal pool.
+async def check_url(
+    worker: dict,
+    url: str,
+    *,
+    nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
+    body_timeout_seconds: float = DEFAULT_BODY_TIMEOUT_SECONDS,
+    dom_fallback_timeout_ms: int = DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
+) -> tuple[bool, str]:
+    """Verifica URL con strategia strict (accuratezza > velocità).
 
-    Usa wait_until="domcontentloaded": Playwright gestisce internamente body+parsing
-    con un unico timeout da 10s. Più affidabile di commit+resp.text() perché il body
-    di Subito è lento (100-500KB) e con molte connessioni simultanee resp.text()
-    blocca più a lungo del parsing DOM completo.
-
-    Apre e chiude solo la page; il context rimane aperto per il riuso.
-    Restituisce True se ancora attivo, False se venduto/eliminato.
+    Nota: gli argomenti body_timeout_seconds/dom_fallback_timeout_ms restano per
+    compatibilità CLI, ma la verifica usa una singola navigazione domcontentloaded.
     """
-    page = await ctx.new_page()
-    res = True
-    try:
-        async def _do() -> bool:
-            resp = await page.goto(url, wait_until="domcontentloaded", timeout=10000)
-            if not resp:
-                return False
+    ctx = worker["ctx"]
+    page = worker.get("page")
+    if page is None or page.is_closed():
+        page = await ctx.new_page()
+        worker["page"] = page
 
-            if page.url == "https://www.subito.it/" or (
-                "annunci-italia/vendita" in page.url and "q=" in page.url
-            ):
+    try:
+        async def _do() -> tuple[bool, str]:
+            resp = await page.goto(url, wait_until="domcontentloaded", timeout=int(nav_timeout_ms))
+            if not resp:
+                return True, "blocked:no-response"
+
+            if _is_sold_redirect(page.url):
                 log.debug("  Redirect rilevato: %s -> %s", url, page.url)
-                return False
+                return False, "sold:redirect"
 
             if resp.status in (404, 410):
-                return False
+                return False, "sold:http-status"
+
+            if resp.status == 403:
+                return True, "blocked:http-403"
+            if resp.status == 429:
+                return True, "blocked:http-429"
+            if resp.status in (500, 502, 503, 504):
+                return True, f"blocked:http-{resp.status}"
 
             sold_count = await page.locator("text=/non più disponibile/i").count()
-            return sold_count == 0
+            if sold_count > 0:
+                return False, "sold:dom-marker"
 
-        res = bool(await retry(_do, retries=1, delay=2.0, label=url))
+            return True, "active:dom-ok"
+
+        is_active, reason = await retry(_do, retries=1, delay=2.0, label=url)
+        return bool(is_active), str(reason)
+    except PlaywrightTimeoutError:
+        return True, "blocked:timeout"
     except Exception as exc:
         log.warning("Errore navigazione %s: %s", url, exc)
-        res = True
-    finally:
+        return True, "blocked:error"
+
+
+async def _reset_worker_session(worker: dict) -> None:
+    """Ricrea context+page del worker dopo blocchi/timeout, per isolare la sessione."""
+    page = worker.get("page")
+    if page is not None:
         try:
-            await page.close()
+            if not page.is_closed():
+                await page.close()
         except Exception:
             pass
-
-    return res
+    ctx = worker.get("ctx")
+    if ctx is not None:
+        try:
+            await ctx.close()
+        except Exception:
+            pass
+    browser = worker["browser"]
+    new_ctx = await _new_context(browser)
+    new_page = await new_ctx.new_page()
+    worker["ctx"] = new_ctx
+    worker["page"] = new_page
 
 
 def _deadline_reached(deadline_utc: datetime | None) -> bool:
@@ -167,13 +283,16 @@ def _deadline_reached(deadline_utc: datetime | None) -> bool:
 
 
 async def _process_rows(
-    ctx_pool: asyncio.Queue,
+    worker_pool: asyncio.Queue,
     rows: list,
     *,
     deadline_utc: datetime | None = None,
     http_precheck: bool = False,
     http_batch_size: int = 120,
     stagger_secs: float = 0.0,
+    nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
+    body_timeout_seconds: float = DEFAULT_BODY_TIMEOUT_SECONDS,
+    dom_fallback_timeout_ms: int = DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
 ) -> dict:
     """Verifica concorrente con Playwright (+ pre-check HTTP opzionale).
 
@@ -187,7 +306,7 @@ async def _process_rows(
     Va usato solo sul primo chunk dopo un browser restart per evitare che 20 contesti
     freschi aprano 20 TCP connection simultanee verso Subito (trigger ban Akamai).
 
-    La concorrenza Playwright è controllata dal pool di context (ctx_pool.qsize()).
+    La concorrenza Playwright è controllata dal pool di worker (worker_pool.qsize()).
 
     Returns:
         dict con chiavi: verified, active, sold, avg_price_sold, avg_hours_active
@@ -254,21 +373,43 @@ async def _process_rows(
     needs_playwright = [r for r in rows if r["id"] not in http_sold_ids]
 
     # ---------- Fase 2: Playwright solo per gli "unknown" ----------
-    # La concorrenza è governata dal pool: solo ctx_pool.qsize() check girano in parallelo.
-    playwright_results: dict[int, bool] = {}  # ad_id → is_active
+    # La concorrenza è governata dal pool: solo worker_pool.qsize() check girano in parallelo.
+    playwright_results: dict[int, tuple[bool | None, str]] = {}  # ad_id → (is_active|None, reason)
+    reason_counts: dict[str, int] = {}
 
-    # Numero di contesti disponibili all'inizio del chunk (tutti in coda dopo un restart).
-    pool_size = ctx_pool.qsize()
+    # Numero di worker disponibili all'inizio del chunk (tutti in coda dopo un restart).
+    pool_size = worker_pool.qsize()
 
     async def _check_one_pw(row, stagger: float = 0.0) -> None:
         if stagger > 0.0:
             await asyncio.sleep(stagger)
-        ctx = await ctx_pool.get()
+        worker = await worker_pool.get()
         try:
-            is_active = await check_url(ctx, row["url"])
+            is_active, reason = await check_url(
+                worker,
+                row["url"],
+                nav_timeout_ms=nav_timeout_ms,
+                body_timeout_seconds=body_timeout_seconds,
+                dom_fallback_timeout_ms=dom_fallback_timeout_ms,
+            )
+            if reason.startswith("blocked:http-403"):
+                # Retry hard su sessione fresca: alcuni blocchi Akamai sono session-bound.
+                await _reset_worker_session(worker)
+                await asyncio.sleep(0.35)
+                is_active, reason = await check_url(
+                    worker,
+                    row["url"],
+                    nav_timeout_ms=nav_timeout_ms,
+                    body_timeout_seconds=body_timeout_seconds,
+                    dom_fallback_timeout_ms=dom_fallback_timeout_ms,
+                )
         finally:
-            await ctx_pool.put(ctx)
-        playwright_results[row["id"]] = is_active
+            await worker_pool.put(worker)
+        if reason.startswith("blocked:"):
+            playwright_results[row["id"]] = (None, reason)
+        else:
+            playwright_results[row["id"]] = (is_active, reason)
+        reason_counts[reason] = reason_counts.get(reason, 0) + 1
 
     if needs_playwright:
         for batch_idx, start in enumerate(range(0, len(needs_playwright), 200)):
@@ -299,7 +440,11 @@ async def _process_rows(
     for row in needs_playwright:
         ad_id = row["id"]
         if ad_id in playwright_results:
-            results.append((row, playwright_results[ad_id]))
+            is_active, _ = playwright_results[ad_id]
+            if is_active is None:
+                skipped_rows += 1
+            else:
+                results.append((row, is_active))
         else:
             # deadline raggiunta prima del check Playwright
             skipped_rows += 1
@@ -439,6 +584,7 @@ async def _process_rows(
         "avg_hours_active": avg_hours_active,
         "skipped": skipped_rows,
         "time_limit_hit": time_limit_hit,
+        "reason_counts": reason_counts,
     }
 
 
@@ -453,6 +599,11 @@ async def verify_batch(
     max_runtime_minutes: int | None = DEFAULT_MAX_RUNTIME_MINUTES,
     browser_restart_every: int = DEFAULT_BROWSER_RESTART_EVERY,
     http_precheck: bool = False,
+    nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
+    body_timeout_seconds: float = DEFAULT_BODY_TIMEOUT_SECONDS,
+    dom_fallback_timeout_ms: int = DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
+    max_http403_ratio: float = DEFAULT_MAX_HTTP403_RATIO,
+    selection_sample: int = 0,
 ) -> dict:
     """Recupera un batch di annunci e li verifica online con concorrenza.
 
@@ -460,7 +611,7 @@ async def verify_batch(
         batch_size:    Numero massimo di annunci da verificare (ignorato se verify_all=True).
         verify_all:    Se True, verifica tutti gli annunci attivi non verificati.
         recheck_days:  Se impostato, ri-verifica anche i venduti degli ultimi N giorni.
-        concurrency:   Numero massimo di URL verificati in parallelo (default 20).
+        concurrency:   Numero massimo di URL verificati in parallelo (default 30).
         include_rejected: include anche annunci ai_status='rejected' (default False).
         xbox_only: verifica solo annunci rilevanti Xbox (default True).
         chunk_size: numero record per chunk operativo.
@@ -468,6 +619,11 @@ async def verify_batch(
         browser_restart_every: riavvia browser ogni N chunk.
         http_precheck: pre-check HTTP prima di Playwright (default False).
                        Subito risponde 200 per tutto; non filtra nulla di utile.
+        nav_timeout_ms: timeout navigazione `goto(..., wait_until="domcontentloaded")`.
+        body_timeout_seconds: parametro legacy (compatibilità CLI).
+        dom_fallback_timeout_ms: parametro legacy (compatibilità CLI).
+        max_http403_ratio: soglia massima tollerata di 403 sul totale verificato.
+        selection_sample: numero di annunci esclusi da xbox-only da mostrare a log.
 
     Returns:
         Statistiche della sessione di verifica.
@@ -512,6 +668,17 @@ async def verify_batch(
         recheck_params = list(statuses) + [cutoff]
         recheck_rows = conn.execute(recheck_query, recheck_params).fetchall()
 
+    selection_breakdown = _build_selection_breakdown(
+        conn,
+        statuses,
+        xbox_only=xbox_only,
+    )
+    excluded_sample = _pick_excluded_by_xbox_sample(
+        conn,
+        statuses,
+        limit=max(0, int(selection_sample)),
+    ) if xbox_only and selection_sample else []
+
     conn.close()
 
     all_rows = list(rows) + list(recheck_rows)
@@ -528,6 +695,30 @@ async def verify_batch(
             "skipped": 0,
             "time_limit_hit": False,
         }
+
+    log.info(
+        (
+            "Selezione verify-sold: totale=%d | status_ok=%d | attivi_non_venduti=%d "
+            "| subset_finale=%d%s"
+        ),
+        selection_breakdown["total_ads"],
+        selection_breakdown["status_ok"],
+        selection_breakdown["active_unsold"],
+        selection_breakdown["xbox_subset"] if xbox_only else selection_breakdown["active_unsold"],
+        (
+            f" | esclusi_da_xbox_only={selection_breakdown['excluded_by_xbox']}"
+            if xbox_only
+            else ""
+        ),
+    )
+    if excluded_sample:
+        for row in excluded_sample:
+            log.info(
+                "  escluso xbox-only id=%s | %s | %s",
+                row["id"],
+                row["name"],
+                row["url"],
+            )
 
     log.info(
         "Inizio verifica di %d annunci (concorrenza=%d, chunk=%d, stati=%s)%s…",
@@ -558,27 +749,43 @@ async def verify_batch(
         "avg_price_sold": None,
         "avg_hours_active": None,
         "skipped": 0,
+        "blocked_403": 0,
+        "blocked_total": 0,
         "time_limit_hit": False,
     }
+    session_reason_counts: dict[str, int] = {}
     sold_price_sum = 0.0
     sold_price_count = 0
     sold_hour_sum = 0.0
     sold_hour_count = 0
     chunk_len = max(1, int(chunk_size))
     restart_every = max(1, int(browser_restart_every))
+    target_concurrency = max(1, int(concurrency))
+    min_concurrency = max(8, target_concurrency // 2)
+    current_concurrency = target_concurrency
+    force_restart_next = False
 
     async def _close_pool(pool: asyncio.Queue) -> None:
-        """Chiude tutti i context nel pool."""
+        """Chiude worker pool (page + context)."""
         while not pool.empty():
-            ctx = pool.get_nowait()
-            try:
-                await ctx.close()
-            except Exception:
-                pass
+            worker = pool.get_nowait()
+            page = worker.get("page")
+            if page is not None:
+                try:
+                    if not page.is_closed():
+                        await page.close()
+                except Exception:
+                    pass
+            ctx = worker.get("ctx")
+            if ctx is not None:
+                try:
+                    await ctx.close()
+                except Exception:
+                    pass
 
     async with async_playwright() as p:
         browser = None
-        ctx_pool: asyncio.Queue | None = None
+        worker_pool: asyncio.Queue | None = None
         try:
             for idx in range(0, len(all_rows), chunk_len):
                 if max_runtime is not None and datetime.now(timezone.utc) - start_ts >= max_runtime:
@@ -592,27 +799,36 @@ async def verify_batch(
 
                 chunk = all_rows[idx : idx + chunk_len]
                 chunk_no = idx // chunk_len
-                is_restart = browser is None or (chunk_no > 0 and chunk_no % restart_every == 0)
+                is_restart = (
+                    force_restart_next
+                    or browser is None
+                    or (chunk_no > 0 and chunk_no % restart_every == 0)
+                )
                 if is_restart:
+                    force_restart_next = False
                     # Chiudi pool e browser esistenti prima del restart
-                    if ctx_pool is not None:
-                        await _close_pool(ctx_pool)
-                        ctx_pool = None
+                    if worker_pool is not None:
+                        await _close_pool(worker_pool)
+                        worker_pool = None
                     if browser is not None:
                         await browser.close()
-                    # Avvia nuovo browser e pre-crea pool di context
+                    # Avvia nuovo browser e pre-crea pool di worker (context + page).
                     browser = await launch_chromium(
                         p,
                         headless=True,
                         preferred_channel=_COMMON.get("playwright_channel", "chrome"),
                     )
-                    ctx_pool = asyncio.Queue()
-                    for _ in range(concurrency):
-                        ctx_pool.put_nowait(await _new_context(browser))
+                    worker_pool = asyncio.Queue()
+                    for idx_worker in range(current_concurrency):
+                        ctx = await _new_context(browser)
+                        page = await ctx.new_page()
+                        worker_pool.put_nowait(
+                            {"id": idx_worker, "browser": browser, "ctx": ctx, "page": page}
+                        )
                     log.info(
-                        "Browser session restart (chunk %d), pool=%d context.",
+                        "Browser session restart (chunk %d), pool=%d worker.",
                         chunk_no + 1,
-                        concurrency,
+                        current_concurrency,
                     )
 
                 log.info(
@@ -622,15 +838,72 @@ async def verify_batch(
                     min(idx + len(chunk), len(all_rows)),
                     len(all_rows),
                 )
-                # Dopo ogni browser restart scagliona le prime N navigazioni di 0.15s l'una:
-                # 20 contesti × 0.15s = 3s di rampa invece di 20 TCP simultanée → meno Akamai ban.
+                if worker_pool is None:
+                    raise RuntimeError("worker_pool non inizializzato prima della verifica chunk")
+                # Dopo ogni browser restart scagliona le prime N navigazioni di 0.15s l'una
+                # per evitare spike di connessioni simultanee verso Subito.
+                chunk_t0 = time.perf_counter()
                 stats = await _process_rows(
-                    ctx_pool,
+                    worker_pool,
                     chunk,
                     deadline_utc=deadline_utc,
                     http_precheck=http_precheck,
                     stagger_secs=0.15 if is_restart else 0.0,
+                    nav_timeout_ms=nav_timeout_ms,
+                    body_timeout_seconds=body_timeout_seconds,
+                    dom_fallback_timeout_ms=dom_fallback_timeout_ms,
                 )
+                chunk_elapsed = max(0.001, time.perf_counter() - chunk_t0)
+                chunk_rate = stats["verified"] / chunk_elapsed
+                reason_counts = stats.get("reason_counts") or {}
+                for reason, count in reason_counts.items():
+                    session_reason_counts[reason] = session_reason_counts.get(reason, 0) + int(count)
+                top_reasons = ", ".join(
+                    f"{k}={v}"
+                    for k, v in sorted(reason_counts.items(), key=lambda item: item[1], reverse=True)[:4]
+                ) if reason_counts else "n/a"
+                log.info(
+                    "Chunk %d completato in %.1fs (%.2f annunci/s) | reason: %s",
+                    chunk_no + 1,
+                    chunk_elapsed,
+                    chunk_rate,
+                    top_reasons,
+                )
+                unstable_hits = sum(
+                    count
+                    for reason, count in reason_counts.items()
+                    if (
+                        "active:error" in reason
+                        or "http-403" in reason
+                        or "http-429" in reason
+                        or "text-timeout" in reason
+                    )
+                )
+                unstable_ratio = unstable_hits / max(1, int(stats["verified"]))
+                if unstable_ratio >= 0.25 and current_concurrency > min_concurrency:
+                    new_concurrency = max(min_concurrency, current_concurrency - 4)
+                    if new_concurrency != current_concurrency:
+                        log.warning(
+                            "Chunk %d instabile (%.1f%% error/ban): concorrenza %d -> %d",
+                            chunk_no + 1,
+                            unstable_ratio * 100,
+                            current_concurrency,
+                            new_concurrency,
+                        )
+                        current_concurrency = new_concurrency
+                        force_restart_next = True
+                elif unstable_ratio <= 0.05 and current_concurrency < target_concurrency:
+                    new_concurrency = min(target_concurrency, current_concurrency + 2)
+                    if new_concurrency != current_concurrency:
+                        log.info(
+                            "Chunk %d stabile (%.1f%% error/ban): concorrenza %d -> %d",
+                            chunk_no + 1,
+                            unstable_ratio * 100,
+                            current_concurrency,
+                            new_concurrency,
+                        )
+                        current_concurrency = new_concurrency
+                        force_restart_next = True
 
                 total_stats["verified"] += stats["verified"]
                 total_stats["active"] += stats["active"]
@@ -638,6 +911,12 @@ async def verify_batch(
                 total_stats["already_sold"] += stats["already_sold"]
                 total_stats["recovered"] += stats["recovered"]
                 total_stats["skipped"] += int(stats.get("skipped", 0) or 0)
+                total_stats["blocked_403"] += int(
+                    sum(v for k, v in reason_counts.items() if "http-403" in k)
+                )
+                total_stats["blocked_total"] += int(
+                    sum(v for k, v in reason_counts.items() if str(k).startswith("blocked:"))
+                )
                 sold_price_sum += float(stats["sold_price_sum"] or 0.0)
                 sold_price_count += int(stats["sold_price_count"] or 0)
                 sold_hour_sum += float(stats["sold_hour_sum"] or 0.0)
@@ -652,8 +931,8 @@ async def verify_batch(
                     )
                     break
         finally:
-            if ctx_pool is not None:
-                await _close_pool(ctx_pool)
+            if worker_pool is not None:
+                await _close_pool(worker_pool)
             if browser is not None:
                 await browser.close()
 
@@ -661,6 +940,30 @@ async def verify_batch(
         total_stats["avg_price_sold"] = sold_price_sum / sold_price_count
     if sold_hour_count:
         total_stats["avg_hours_active"] = sold_hour_sum / sold_hour_count
+
+    verified_total = max(1, int(total_stats["verified"]))
+    blocked_403_ratio = float(total_stats["blocked_403"]) / float(verified_total)
+    blocked_total_ratio = float(total_stats["blocked_total"]) / float(verified_total)
+    total_stats["blocked_403_ratio"] = blocked_403_ratio
+    total_stats["blocked_total_ratio"] = blocked_total_ratio
+
+    top_session_reasons = ", ".join(
+        f"{k}={v}"
+        for k, v in sorted(session_reason_counts.items(), key=lambda item: item[1], reverse=True)[:8]
+    ) if session_reason_counts else "n/a"
+    log.info(
+        "Reason summary sessione: %s",
+        top_session_reasons,
+    )
+    log.info(
+        "HTTP block summary: 403=%d/%d (%.2f%%) | blocked_totali=%d/%d (%.2f%%)",
+        total_stats["blocked_403"],
+        verified_total,
+        blocked_403_ratio * 100,
+        total_stats["blocked_total"],
+        verified_total,
+        blocked_total_ratio * 100,
+    )
 
     avg_p = (
         f"€ {total_stats['avg_price_sold']:.2f}"
@@ -690,6 +993,11 @@ async def verify_batch(
         avg_h,
         " | STOP per runtime" if total_stats.get("time_limit_hit") else "",
     )
+    if blocked_403_ratio > float(max_http403_ratio):
+        raise RuntimeError(
+            "HTTP 403 troppo alto: "
+            f"{blocked_403_ratio * 100:.2f}% > {float(max_http403_ratio) * 100:.2f}%"
+        )
     return total_stats
 
 
@@ -783,6 +1091,53 @@ def _build_arg_parser() -> argparse.ArgumentParser:
             "Disabilitato per default: Subito risponde 200 per tutto, nessun filtro utile."
         ),
     )
+    parser.add_argument(
+        "--nav-timeout-ms",
+        type=int,
+        default=DEFAULT_NAV_TIMEOUT_MS,
+        metavar="MS",
+        help=(
+            "Timeout goto(wait_until='domcontentloaded') in millisecondi "
+            f"(default {DEFAULT_NAV_TIMEOUT_MS})"
+        ),
+    )
+    parser.add_argument(
+        "--body-timeout-seconds",
+        type=float,
+        default=DEFAULT_BODY_TIMEOUT_SECONDS,
+        metavar="S",
+        help=(
+            "Timeout probe resp.text() in secondi "
+            f"(default {DEFAULT_BODY_TIMEOUT_SECONDS})"
+        ),
+    )
+    parser.add_argument(
+        "--dom-fallback-timeout-ms",
+        type=int,
+        default=DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
+        metavar="MS",
+        help=(
+            "Timeout fallback DOM (domcontentloaded + locator) in millisecondi "
+            f"(default {DEFAULT_DOM_FALLBACK_TIMEOUT_MS})"
+        ),
+    )
+    parser.add_argument(
+        "--selection-sample",
+        type=int,
+        default=0,
+        metavar="N",
+        help="Logga N annunci esclusi dal filtro xbox-only (default 0).",
+    )
+    parser.add_argument(
+        "--max-http403-ratio",
+        type=float,
+        default=DEFAULT_MAX_HTTP403_RATIO,
+        metavar="R",
+        help=(
+            "Soglia massima tollerata di 403 (0.02 = 2%). "
+            f"Default {DEFAULT_MAX_HTTP403_RATIO:.2f}"
+        ),
+    )
     return parser
 
 
@@ -801,5 +1156,10 @@ if __name__ == "__main__":
             max_runtime_minutes=max_runtime,
             browser_restart_every=args.browser_restart_every,
             http_precheck=args.http_precheck,
+            nav_timeout_ms=args.nav_timeout_ms,
+            body_timeout_seconds=args.body_timeout_seconds,
+            dom_fallback_timeout_ms=args.dom_fallback_timeout_ms,
+            max_http403_ratio=args.max_http403_ratio,
+            selection_sample=args.selection_sample,
         )
     )
