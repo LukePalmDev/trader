@@ -37,7 +37,7 @@ DEFAULT_RECHECK_DAYS = 7
 DEFAULT_CHUNK_SIZE = 350
 DEFAULT_MAX_RUNTIME_MINUTES = 45
 DEFAULT_BROWSER_RESTART_EVERY = 3
-DEFAULT_CONCURRENCY = 10
+DEFAULT_CONCURRENCY = 20
 _WARNED_NO_AIOHTTP = False
 
 _XBOX_SQL_FILTER = """
@@ -150,7 +150,7 @@ async def check_url(ctx, url: str) -> bool:
 
             return True
 
-        res = bool(await retry(_do, retries=2, delay=5.0, label=url))
+        res = bool(await retry(_do, retries=2, delay=2.0, label=url))
     except Exception as exc:
         log.warning("Errore navigazione %s: %s", url, exc)
         res = True  # In caso di errore strano assumiamo sia ancora vivo per prudenza
@@ -172,14 +172,17 @@ async def _process_rows(
     rows: list,
     *,
     deadline_utc: datetime | None = None,
+    http_precheck: bool = False,
     http_batch_size: int = 120,
 ) -> dict:
-    """Verifica concorrente con pre-check HTTP + fallback Playwright.
+    """Verifica concorrente con Playwright (+ pre-check HTTP opzionale).
 
-    Fase 1: HTTP HEAD/GET leggero per tutti gli URL (molto veloce, ~50 concorrenti).
-             Rileva subito i 404/410/redirect → "sold" senza aprire un browser.
-    Fase 2: Solo gli URL "unknown" vengono verificati con Playwright (lento ma accurato).
-             La concorrenza è controllata dal pool di context (ctx_pool.qsize()).
+    Subito restituisce sempre HTTP 200 per gli annunci, anche i venduti (che mostrano
+    "non più disponibile" nel DOM via JS). Il pre-check HTTP è disabilitato per default
+    perché aggiunge overhead senza filtrare nulla (~6 min su 7658 annunci, 0 catturati).
+    Riabilitare con http_precheck=True se Subito modificasse il comportamento.
+
+    La concorrenza Playwright è controllata dal pool di context (ctx_pool.qsize()).
 
     Returns:
         dict con chiavi: verified, active, sold, avg_price_sold, avg_hours_active
@@ -203,25 +206,29 @@ async def _process_rows(
             "time_limit_hit": True,
         }
 
-    # ---------- Fase 1: HTTP pre-check in micro-batch ----------
-    http_results: dict[int, str] = {}  # ad_id → "sold" | "unknown"
-    http_sem = asyncio.Semaphore(50)   # concorrenza HTTP più alta (leggero)
-    total_rows = len(rows)
-    processed_count = 0
-
-    async def _precheck_one(session, row):
-        nonlocal processed_count
-        async with http_sem:
-            status = await _http_precheck(session, row["url"])
-            http_results[row["id"]] = status
-            processed_count += 1
-            if processed_count % 500 == 0:
-                log.info("  Pre-check HTTP in corso: %d/%d annunci verificati…", processed_count, total_rows)
-
-    effective_http_batch = max(1, int(http_batch_size))
     time_limit_hit = False
+    skipped_rows = 0
 
-    if aiohttp is not None:
+    # ---------- Fase 1 (opzionale): HTTP pre-check ----------
+    # Disabilitato per default: Subito risponde 200 per tutto, 0 annunci filtrati.
+    http_sold_ids: set[int] = set()
+
+    if http_precheck and aiohttp is not None:
+        http_results: dict[int, str] = {}
+        http_sem = asyncio.Semaphore(50)
+        total_rows = len(rows)
+        processed_count = 0
+
+        async def _precheck_one(session, row):
+            nonlocal processed_count
+            async with http_sem:
+                status = await _http_precheck(session, row["url"])
+                http_results[row["id"]] = status
+                processed_count += 1
+                if processed_count % 500 == 0:
+                    log.info("  Pre-check HTTP: %d/%d…", processed_count, total_rows)
+
+        effective_http_batch = max(1, int(http_batch_size))
         headers = {"User-Agent": _COMMON["user_agent"]}
         async with aiohttp.ClientSession(headers=headers) as session:
             for idx in range(0, len(rows), effective_http_batch):
@@ -230,28 +237,16 @@ async def _process_rows(
                     break
                 batch = rows[idx : idx + effective_http_batch]
                 await asyncio.gather(*[_precheck_one(session, r) for r in batch])
-    else:
-        global _WARNED_NO_AIOHTTP
-        if not _WARNED_NO_AIOHTTP:
-            log.warning("aiohttp non disponibile: pre-check HTTP saltato, uso solo Playwright.")
-            _WARNED_NO_AIOHTTP = True
-        for row in rows:
-            if _deadline_reached(deadline_utc):
-                time_limit_hit = True
-                break
-            http_results[row["id"]] = "unknown"
 
-    processable_rows = [r for r in rows if r["id"] in http_results]
-    skipped_rows = len(rows) - len(processable_rows)
+        http_sold_ids = {r["id"] for r in rows if http_results.get(r["id"]) == "sold"}
+        log.info(
+            "Pre-check HTTP: %d venduti subito, %d a Playwright.",
+            len(http_sold_ids), len(rows) - len(http_sold_ids),
+        )
+    elif http_precheck:
+        log.warning("aiohttp non disponibile: pre-check HTTP saltato.")
 
-    # Separa i risultati certi dai dubbi
-    sold_fast = [r for r in processable_rows if http_results.get(r["id"]) == "sold"]
-    needs_playwright = [r for r in processable_rows if http_results.get(r["id"]) == "unknown"]
-
-    log.info(
-        "Pre-check HTTP: %d venduti subito, %d da verificare con browser.",
-        len(sold_fast), len(needs_playwright),
-    )
+    needs_playwright = [r for r in rows if r["id"] not in http_sold_ids]
 
     # ---------- Fase 2: Playwright solo per gli "unknown" ----------
     # La concorrenza è governata dal pool: solo ctx_pool.qsize() check girano in parallelo.
@@ -275,18 +270,18 @@ async def _process_rows(
 
     # ---------- Unifica risultati ----------
     results: list[tuple] = []
-    for row in processable_rows:
+    # Annunci venduti dal pre-check HTTP (is_active=False certi)
+    for row in rows:
+        if row["id"] in http_sold_ids:
+            results.append((row, False))
+    # Annunci verificati da Playwright
+    for row in needs_playwright:
         ad_id = row["id"]
         if ad_id in playwright_results:
-            is_active = playwright_results[ad_id]
-        elif http_results.get(ad_id) == "sold":
-            # pre-check HTTP ha detto "sold"
-            is_active = False
+            results.append((row, playwright_results[ad_id]))
         else:
-            # deadline raggiunta prima del check browser: riga non processata
+            # deadline raggiunta prima del check Playwright
             skipped_rows += 1
-            continue
-        results.append((row, is_active))
 
     conn = _connect(DB_PATH)
     conn.isolation_level = None
@@ -436,6 +431,7 @@ async def verify_batch(
     chunk_size: int = DEFAULT_CHUNK_SIZE,
     max_runtime_minutes: int | None = DEFAULT_MAX_RUNTIME_MINUTES,
     browser_restart_every: int = DEFAULT_BROWSER_RESTART_EVERY,
+    http_precheck: bool = False,
 ) -> dict:
     """Recupera un batch di annunci e li verifica online con concorrenza.
 
@@ -443,12 +439,14 @@ async def verify_batch(
         batch_size:    Numero massimo di annunci da verificare (ignorato se verify_all=True).
         verify_all:    Se True, verifica tutti gli annunci attivi non verificati.
         recheck_days:  Se impostato, ri-verifica anche i venduti degli ultimi N giorni.
-        concurrency:   Numero massimo di URL verificati in parallelo (default 10).
+        concurrency:   Numero massimo di URL verificati in parallelo (default 20).
         include_rejected: include anche annunci ai_status='rejected' (default False).
         xbox_only: verifica solo annunci rilevanti Xbox (default True).
         chunk_size: numero record per chunk operativo.
         max_runtime_minutes: stop soft oltre la durata indicata.
         browser_restart_every: riavvia browser ogni N chunk.
+        http_precheck: pre-check HTTP prima di Playwright (default False).
+                       Subito risponde 200 per tutto; non filtra nulla di utile.
 
     Returns:
         Statistiche della sessione di verifica.
@@ -606,6 +604,7 @@ async def verify_batch(
                     ctx_pool,
                     chunk,
                     deadline_utc=deadline_utc,
+                    http_precheck=http_precheck,
                 )
 
                 total_stats["verified"] += stats["verified"]
@@ -749,6 +748,16 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help="Disabilita filtro xbox-only.",
     )
     parser.set_defaults(xbox_only=True)
+    parser.add_argument(
+        "--http-precheck",
+        action="store_true",
+        dest="http_precheck",
+        default=False,
+        help=(
+            "Abilita pre-check HTTP prima di Playwright. "
+            "Disabilitato per default: Subito risponde 200 per tutto, nessun filtro utile."
+        ),
+    )
     return parser
 
 
@@ -766,5 +775,6 @@ if __name__ == "__main__":
             chunk_size=args.chunk_size,
             max_runtime_minutes=max_runtime,
             browser_restart_every=args.browser_restart_every,
+            http_precheck=args.http_precheck,
         )
     )
