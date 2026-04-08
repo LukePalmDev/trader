@@ -37,6 +37,7 @@ DEFAULT_RECHECK_DAYS = 7
 DEFAULT_CHUNK_SIZE = 350
 DEFAULT_MAX_RUNTIME_MINUTES = 45
 DEFAULT_BROWSER_RESTART_EVERY = 3
+DEFAULT_CONCURRENCY = 10
 _WARNED_NO_AIOHTTP = False
 
 _XBOX_SQL_FILTER = """
@@ -81,79 +82,83 @@ async def _new_context(browser):
 async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
     """Pre-check HTTP leggero (senza browser) per rilevare 404/410/redirect.
 
+    Segue i redirect per catturare catene 301→302→home che con allow_redirects=False
+    sarebbero visibili solo al primo hop.
+
     Returns:
-        "sold"     — sicuramente non disponibile (404, 410, redirect a home)
+        "sold"     — sicuramente non disponibile (404, 410, redirect a home/ricerca)
         "unknown"  — serve verifica Playwright (200 ma potrebbe avere testo "non disponibile")
     """
+    _timeout = aiohttp.ClientTimeout(total=8)
+
+    async def _check(method: str) -> str:
+        requester = session.head if method == "HEAD" else session.get
+        async with requester(url, allow_redirects=True, timeout=_timeout) as resp:
+            if resp.status in (404, 410):
+                return "sold"
+            if resp.status == 405:
+                return "retry_get"
+            final_url = str(resp.url)
+            if (
+                final_url.rstrip("/") == "https://www.subito.it"
+                or ("annunci-italia/vendita" in final_url and "q=" in final_url)
+            ):
+                return "sold"
+            return "unknown"
+
     try:
         if aiohttp is None:
             return "unknown"
-        async with session.get(
-            url, allow_redirects=False, timeout=aiohttp.ClientTimeout(total=8)
-        ) as resp:
-            # 404 / 410 → sicuramente rimosso
-            if resp.status in (404, 410):
-                return "sold"
-
-            # Redirect 301/302 → controlla se va verso la home (annuncio eliminato)
-            if resp.status in (301, 302, 303, 307, 308):
-                location = resp.headers.get("Location", "")
-                if (
-                    location.rstrip("/") == "https://www.subito.it"
-                    or "annunci-italia/vendita" in location
-                ):
-                    return "sold"
-
-            # 200 → potrebbe avere "non più disponibile" nel body, serve Playwright
-            return "unknown"
+        result = await _check("HEAD")
+        if result == "retry_get":
+            result = await _check("GET")
+        return result
     except (aiohttp.ClientError, asyncio.TimeoutError):
         # Errore di rete → serve Playwright per conferma
         return "unknown"
 
 
-async def check_url(browser, semaphore: asyncio.Semaphore, url: str) -> bool:
-    """Visita l'URL e controlla se è ancora in vendita.
+async def check_url(ctx, url: str) -> bool:
+    """Visita l'URL con un context dal pool.
+    Apre e chiude solo la page; il context rimane aperto per il riuso.
     Restituisce True se ancora attivo, False se venduto/eliminato.
     """
-    async with semaphore:
-        ctx = await _new_context(browser)
-        page = await ctx.new_page()
-        res = False
+    page = await ctx.new_page()
+    res = True
+    try:
+        async def _do() -> bool:
+            resp = await page.goto(url, wait_until="domcontentloaded", timeout=20000)
+            if not resp:
+                return False
+
+            # Verifica redirect (Subito a volte reindirizza alla home o ricerca se assente)
+            if page.url == "https://www.subito.it/" or (
+                "annunci-italia/vendita" in page.url and "q=" in page.url
+            ):
+                log.debug("  Redirect rilevato: %s -> %s", url, page.url)
+                return False
+
+            if resp.status == 404 or resp.status == 410:
+                return False
+
+            # Verifica testo in pagina per annunci "venduti" ma con URL mantenuto
+            sold_count = await page.locator(
+                "text=/non più disponibile/i"
+            ).count()
+            if sold_count > 0:
+                return False
+
+            return True
+
+        res = bool(await retry(_do, retries=2, delay=5.0, label=url))
+    except Exception as exc:
+        log.warning("Errore navigazione %s: %s", url, exc)
+        res = True  # In caso di errore strano assumiamo sia ancora vivo per prudenza
+    finally:
         try:
-            async def _do() -> bool:
-                resp = await page.goto(url, wait_until="load", timeout=30000)
-                if not resp:
-                    return False
-
-                # Verifica redirect (Subito a volte reindirizza alla home o ricerca se assente)
-                if page.url == "https://www.subito.it/" or (
-                    "annunci-italia/vendita" in page.url and "q=" in page.url
-                ):
-                    log.debug("  Redirect rilevato: %s -> %s", url, page.url)
-                    return False
-
-                if resp.status == 404 or resp.status == 410:
-                    return False
-
-                # Verifica testo in pagina per annunci "venduti" ma con URL mantenuto
-                content = await page.content()
-                if (
-                    "Annuncio non più disponibile" in content
-                    or "Questo annuncio non è più disponibile" in content
-                ):
-                    return False
-
-                return True
-
-            res = bool(await retry(_do, retries=2, delay=5.0, label=url))
-        except Exception as exc:
-            log.warning("Errore navigazione %s: %s", url, exc)
-            res = True  # In caso di errore strano assumiamo sia ancora vivo per prudenza
-        finally:
-            try:
-                await ctx.close()
-            except Exception:
-                pass
+            await page.close()
+        except Exception:
+            pass
 
     return res
 
@@ -163,19 +168,18 @@ def _deadline_reached(deadline_utc: datetime | None) -> bool:
 
 
 async def _process_rows(
-    browser,
+    ctx_pool: asyncio.Queue,
     rows: list,
-    semaphore: asyncio.Semaphore,
     *,
     deadline_utc: datetime | None = None,
     http_batch_size: int = 120,
-    pw_batch_size: int = 40,
 ) -> dict:
     """Verifica concorrente con pre-check HTTP + fallback Playwright.
 
-    Fase 1: HTTP GET leggero per tutti gli URL (molto veloce, ~50 concorrenti).
+    Fase 1: HTTP HEAD/GET leggero per tutti gli URL (molto veloce, ~50 concorrenti).
              Rileva subito i 404/410/redirect → "sold" senza aprire un browser.
     Fase 2: Solo gli URL "unknown" vengono verificati con Playwright (lento ma accurato).
+             La concorrenza è controllata dal pool di context (ctx_pool.qsize()).
 
     Returns:
         dict con chiavi: verified, active, sold, avg_price_sold, avg_hours_active
@@ -215,7 +219,6 @@ async def _process_rows(
                 log.info("  Pre-check HTTP in corso: %d/%d annunci verificati…", processed_count, total_rows)
 
     effective_http_batch = max(1, int(http_batch_size))
-    effective_pw_batch = max(1, int(pw_batch_size))
     time_limit_hit = False
 
     if aiohttp is not None:
@@ -251,18 +254,23 @@ async def _process_rows(
     )
 
     # ---------- Fase 2: Playwright solo per gli "unknown" ----------
+    # La concorrenza è governata dal pool: solo ctx_pool.qsize() check girano in parallelo.
     playwright_results: dict[int, bool] = {}  # ad_id → is_active
 
     async def _check_one_pw(row) -> None:
-        is_active = await check_url(browser, semaphore, row["url"])
+        ctx = await ctx_pool.get()
+        try:
+            is_active = await check_url(ctx, row["url"])
+        finally:
+            await ctx_pool.put(ctx)
         playwright_results[row["id"]] = is_active
 
     if needs_playwright:
-        for idx in range(0, len(needs_playwright), effective_pw_batch):
+        for idx in range(0, len(needs_playwright), 200):
             if _deadline_reached(deadline_utc):
                 time_limit_hit = True
                 break
-            batch = needs_playwright[idx : idx + effective_pw_batch]
+            batch = needs_playwright[idx : idx + 200]
             await asyncio.gather(*[_check_one_pw(r) for r in batch])
 
     # ---------- Unifica risultati ----------
@@ -281,6 +289,7 @@ async def _process_rows(
         results.append((row, is_active))
 
     conn = _connect(DB_PATH)
+    conn.isolation_level = None
     sold_count = 0
     already_sold_count = 0
     recovered_count = 0
@@ -288,108 +297,110 @@ async def _process_rows(
     sold_prices: list[float] = []
     sold_hours: list[float] = []
 
-    for row, is_active in results:
-        ad_id = row["id"]
-        url = row["url"]
-        price = row["last_price"]
-        first_seen = row["first_seen"]
-        last_seen = row["last_seen"]
-        last_active_seen = row["last_active_seen"]
-        first_inactive_seen = row["first_inactive_seen"]
-        sold_at = row["sold_at"]
-        sold_at_estimated = row["sold_at_estimated"]
-        sold_window_hours = row["sold_window_hours"]
-        was_available = int(row["last_available"] or 0) == 1
+    conn.execute("BEGIN IMMEDIATE")
+    try:
+        for row, is_active in results:
+            ad_id = row["id"]
+            url = row["url"]
+            price = row["last_price"]
+            first_seen = row["first_seen"]
+            last_seen = row["last_seen"]
+            last_active_seen = row["last_active_seen"]
+            first_inactive_seen = row["first_inactive_seen"]
+            sold_at = row["sold_at"]
+            sold_at_estimated = row["sold_at_estimated"]
+            sold_window_hours = row["sold_window_hours"]
+            was_available = int(row["last_available"] or 0) == 1
 
-        conn.isolation_level = None
-        conn.execute("BEGIN IMMEDIATE")
-        try:
-            if is_active:
-                if not was_available:
-                    recovered_count += 1
-                    log.info("  -> RIATTIVATO: %s", url)
-                conn.execute(
-                    """
-                    UPDATE ads
-                    SET last_seen = ?,
-                        last_available = 1,
-                        last_active_seen = ?,
-                        first_inactive_seen = NULL,
-                        sold_at = NULL,
-                        sold_at_estimated = NULL,
-                        sold_window_hours = NULL
-                    WHERE id = ?
-                    """,
-                    (now, now, ad_id),
-                )
-                active_count += 1
-            else:
-                if not first_inactive_seen:
-                    first_inactive_seen = now
-                if not sold_at:
-                    sold_at = now
-
-                if not sold_at_estimated:
-                    sold_at_estimated, sold_window_hours = _estimate_sold_window(
-                        last_active_seen=(last_active_seen or last_seen),
-                        first_inactive_seen=first_inactive_seen,
-                    )
-                    if sold_at_estimated is None:
-                        sold_at_estimated = sold_at
-
-                conn.execute(
-                    """
-                    UPDATE ads
-                    SET last_available = 0,
-                        sold_at = ?,
-                        last_seen = ?,
-                        first_inactive_seen = ?,
-                        sold_at_estimated = ?,
-                        sold_window_hours = ?
-                    WHERE id = ?
-                    """,
-                    (
-                        sold_at,
-                        now,
-                        first_inactive_seen,
-                        sold_at_estimated,
-                        sold_window_hours,
-                        ad_id,
-                    ),
-                )
-                if was_available:
+            try:
+                if is_active:
+                    if not was_available:
+                        recovered_count += 1
+                        log.info("  -> RIATTIVATO: %s", url)
                     conn.execute(
                         """
-                        INSERT INTO ad_changes
-                            (ad_id, changed_at, price_old, price_new, available_old, available_new, change_type)
-                        VALUES (?, ?, ?, ?, 1, 0, 'availability')
+                        UPDATE ads
+                        SET last_seen = ?,
+                            last_available = 1,
+                            last_active_seen = ?,
+                            first_inactive_seen = NULL,
+                            sold_at = NULL,
+                            sold_at_estimated = NULL,
+                            sold_window_hours = NULL
+                        WHERE id = ?
                         """,
-                        (ad_id, now, price, price),
+                        (now, now, ad_id),
                     )
-                    sold_count += 1
-                    log.info("  -> VENDUTO: %s", url)
-
-                    if price and price > 0:
-                        sold_prices.append(price)
-                    if first_seen:
-                        try:
-                            fs = datetime.fromisoformat(first_seen.replace("Z", "+00:00"))
-                            sold_dt = datetime.fromisoformat((sold_at_estimated or sold_at or now).replace("Z", "+00:00"))
-                            hours = (sold_dt - fs).total_seconds() / 3600.0
-                            if hours >= 0:
-                                sold_hours.append(hours)
-                        except (ValueError, TypeError):
-                            pass
+                    active_count += 1
                 else:
-                    already_sold_count += 1
+                    if not first_inactive_seen:
+                        first_inactive_seen = now
+                    if not sold_at:
+                        sold_at = now
 
-            conn.execute("COMMIT")
-        except Exception as e:
-            if conn.in_transaction:
-                conn.execute("ROLLBACK")
-            log.error("DB error for ad %s: %s", ad_id, e)
+                    if not sold_at_estimated:
+                        sold_at_estimated, sold_window_hours = _estimate_sold_window(
+                            last_active_seen=(last_active_seen or last_seen),
+                            first_inactive_seen=first_inactive_seen,
+                        )
+                        if sold_at_estimated is None:
+                            sold_at_estimated = sold_at
 
-    conn.close()
+                    conn.execute(
+                        """
+                        UPDATE ads
+                        SET last_available = 0,
+                            sold_at = ?,
+                            last_seen = ?,
+                            first_inactive_seen = ?,
+                            sold_at_estimated = ?,
+                            sold_window_hours = ?
+                        WHERE id = ?
+                        """,
+                        (
+                            sold_at,
+                            now,
+                            first_inactive_seen,
+                            sold_at_estimated,
+                            sold_window_hours,
+                            ad_id,
+                        ),
+                    )
+                    if was_available:
+                        conn.execute(
+                            """
+                            INSERT INTO ad_changes
+                                (ad_id, changed_at, price_old, price_new, available_old, available_new, change_type)
+                            VALUES (?, ?, ?, ?, 1, 0, 'availability')
+                            """,
+                            (ad_id, now, price, price),
+                        )
+                        sold_count += 1
+                        log.info("  -> VENDUTO: %s", url)
+
+                        if price and price > 0:
+                            sold_prices.append(price)
+                        if first_seen:
+                            try:
+                                fs = datetime.fromisoformat(first_seen.replace("Z", "+00:00"))
+                                sold_dt = datetime.fromisoformat((sold_at_estimated or sold_at or now).replace("Z", "+00:00"))
+                                hours = (sold_dt - fs).total_seconds() / 3600.0
+                                if hours >= 0:
+                                    sold_hours.append(hours)
+                            except (ValueError, TypeError):
+                                pass
+                    else:
+                        already_sold_count += 1
+            except Exception as e:
+                log.error("DB error for ad %s: %s", ad_id, e)
+
+        conn.execute("COMMIT")
+    except Exception as e:
+        log.error("Errore transazione batch DB: %s", e)
+        if conn.in_transaction:
+            conn.execute("ROLLBACK")
+    finally:
+        conn.close()
 
     sold_price_sum = sum(sold_prices)
     sold_price_count = len(sold_prices)
@@ -419,7 +430,7 @@ async def verify_batch(
     batch_size: int = DEFAULT_BATCH_SIZE,
     verify_all: bool = False,
     recheck_days=None,  # int or None
-    concurrency: int = 5,
+    concurrency: int = DEFAULT_CONCURRENCY,
     include_rejected: bool = False,
     xbox_only: bool = True,
     chunk_size: int = DEFAULT_CHUNK_SIZE,
@@ -432,7 +443,7 @@ async def verify_batch(
         batch_size:    Numero massimo di annunci da verificare (ignorato se verify_all=True).
         verify_all:    Se True, verifica tutti gli annunci attivi non verificati.
         recheck_days:  Se impostato, ri-verifica anche i venduti degli ultimi N giorni.
-        concurrency:   Numero massimo di URL verificati in parallelo (default 5).
+        concurrency:   Numero massimo di URL verificati in parallelo (default 10).
         include_rejected: include anche annunci ai_status='rejected' (default False).
         xbox_only: verifica solo annunci rilevanti Xbox (default True).
         chunk_size: numero record per chunk operativo.
@@ -511,7 +522,6 @@ async def verify_batch(
         ),
     )
 
-    semaphore = asyncio.Semaphore(concurrency)
     start_ts = datetime.now(timezone.utc)
     max_runtime = (
         timedelta(minutes=max(1, int(max_runtime_minutes)))
@@ -538,8 +548,18 @@ async def verify_batch(
     chunk_len = max(1, int(chunk_size))
     restart_every = max(1, int(browser_restart_every))
 
+    async def _close_pool(pool: asyncio.Queue) -> None:
+        """Chiude tutti i context nel pool."""
+        while not pool.empty():
+            ctx = pool.get_nowait()
+            try:
+                await ctx.close()
+            except Exception:
+                pass
+
     async with async_playwright() as p:
         browser = None
+        ctx_pool: asyncio.Queue | None = None
         try:
             for idx in range(0, len(all_rows), chunk_len):
                 if max_runtime is not None and datetime.now(timezone.utc) - start_ts >= max_runtime:
@@ -554,14 +574,26 @@ async def verify_batch(
                 chunk = all_rows[idx : idx + chunk_len]
                 chunk_no = idx // chunk_len
                 if browser is None or (chunk_no > 0 and chunk_no % restart_every == 0):
+                    # Chiudi pool e browser esistenti prima del restart
+                    if ctx_pool is not None:
+                        await _close_pool(ctx_pool)
+                        ctx_pool = None
                     if browser is not None:
                         await browser.close()
+                    # Avvia nuovo browser e pre-crea pool di context
                     browser = await launch_chromium(
                         p,
                         headless=True,
                         preferred_channel=_COMMON.get("playwright_channel", "chrome"),
                     )
-                    log.info("Browser session restart (chunk %d).", chunk_no + 1)
+                    ctx_pool = asyncio.Queue()
+                    for _ in range(concurrency):
+                        ctx_pool.put_nowait(await _new_context(browser))
+                    log.info(
+                        "Browser session restart (chunk %d), pool=%d context.",
+                        chunk_no + 1,
+                        concurrency,
+                    )
 
                 log.info(
                     "Chunk %d: verifica annunci %d-%d / %d",
@@ -571,9 +603,8 @@ async def verify_batch(
                     len(all_rows),
                 )
                 stats = await _process_rows(
-                    browser,
+                    ctx_pool,
                     chunk,
-                    semaphore,
                     deadline_utc=deadline_utc,
                 )
 
@@ -597,6 +628,8 @@ async def verify_batch(
                     )
                     break
         finally:
+            if ctx_pool is not None:
+                await _close_pool(ctx_pool)
             if browser is not None:
                 await browser.close()
 
@@ -667,9 +700,9 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=5,
+        default=DEFAULT_CONCURRENCY,
         metavar="N",
-        help="Numero di URL verificati in parallelo (default 5)",
+        help=f"Numero di URL verificati in parallelo (default {DEFAULT_CONCURRENCY})",
     )
     parser.add_argument(
         "--chunk-size",
