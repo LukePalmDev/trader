@@ -37,7 +37,7 @@ DEFAULT_RECHECK_DAYS = 7
 DEFAULT_CHUNK_SIZE = 350
 DEFAULT_MAX_RUNTIME_MINUTES = 45
 DEFAULT_BROWSER_RESTART_EVERY = 3
-DEFAULT_CONCURRENCY = 30
+DEFAULT_CONCURRENCY = 20
 _WARNED_NO_AIOHTTP = False
 
 _XBOX_SQL_FILTER = """
@@ -121,10 +121,10 @@ async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
 async def check_url(ctx, url: str) -> bool:
     """Visita l'URL con un context dal pool.
 
-    Usa wait_until="commit" (headers ricevuti, PRIMA del parsing DOM) per evitare
-    di attendere i bundle JS di Next.js (~2-2.5s per URL risparmiati).
-    Il body SSR viene letto con asyncio.wait_for per proteggere dai throttle Akamai:
-    se il body non arriva entro 7s si assume attivo (fallback conservativo).
+    Usa wait_until="domcontentloaded": Playwright gestisce internamente body+parsing
+    con un unico timeout da 10s. Più affidabile di commit+resp.text() perché il body
+    di Subito è lento (100-500KB) e con molte connessioni simultanee resp.text()
+    blocca più a lungo del parsing DOM completo.
 
     Apre e chiude solo la page; il context rimane aperto per il riuso.
     Restituisce True se ancora attivo, False se venduto/eliminato.
@@ -133,36 +133,21 @@ async def check_url(ctx, url: str) -> bool:
     res = True
     try:
         async def _do() -> bool:
-            # "commit" = appena ricevuti gli header della risposta finale (dopo redirect).
-            # Non aspetta il parsing HTML né i bundle JS: risparmia ~2-2.5s per URL.
-            resp = await page.goto(url, wait_until="commit", timeout=10000)
+            resp = await page.goto(url, wait_until="domcontentloaded", timeout=10000)
             if not resp:
                 return False
 
-            # Redirect check via URL finale della risposta (affidabile con "commit")
-            final_url = str(resp.url)
-            if final_url.rstrip("/") == "https://www.subito.it" or (
-                "annunci-italia/vendita" in final_url and "q=" in final_url
+            if page.url == "https://www.subito.it/" or (
+                "annunci-italia/vendita" in page.url and "q=" in page.url
             ):
-                log.debug("  Redirect rilevato: %s -> %s", url, final_url)
+                log.debug("  Redirect rilevato: %s -> %s", url, page.url)
                 return False
 
             if resp.status in (404, 410):
                 return False
 
-            # Legge il body HTTP con timeout esplicito.
-            # Subito usa Next.js SSR: "non più disponibile" è nell'HTML iniziale.
-            # asyncio.wait_for previene il blocco se Akamai throttles la consegna del body
-            # (problema osservato in run precedente: chunk 12 bloccato 358s senza timeout).
-            try:
-                body = await asyncio.wait_for(resp.text(), timeout=7.0)
-            except asyncio.TimeoutError:
-                # Body non arriva in tempo → fallback conservativo: assume attivo.
-                # Meglio saltare un venduto che marcare come venduto un annuncio vivo.
-                log.debug("  resp.text() timeout su %s → assume attivo", url)
-                return True
-
-            return "non più disponibile" not in body
+            sold_count = await page.locator("text=/non più disponibile/i").count()
+            return sold_count == 0
 
         res = bool(await retry(_do, retries=1, delay=2.0, label=url))
     except Exception as exc:
@@ -188,6 +173,7 @@ async def _process_rows(
     deadline_utc: datetime | None = None,
     http_precheck: bool = False,
     http_batch_size: int = 120,
+    stagger_secs: float = 0.0,
 ) -> dict:
     """Verifica concorrente con Playwright (+ pre-check HTTP opzionale).
 
@@ -195,6 +181,11 @@ async def _process_rows(
     "non più disponibile" nel DOM via JS). Il pre-check HTTP è disabilitato per default
     perché aggiunge overhead senza filtrare nulla (~6 min su 7658 annunci, 0 catturati).
     Riabilitare con http_precheck=True se Subito modificasse il comportamento.
+
+    stagger_secs > 0 scagliona le prime pool_size navigazioni di questo chunk nel tempo:
+    task 0 parte subito, task 1 dopo stagger_secs, task 2 dopo 2×stagger_secs, ecc.
+    Va usato solo sul primo chunk dopo un browser restart per evitare che 20 contesti
+    freschi aprano 20 TCP connection simultanee verso Subito (trigger ban Akamai).
 
     La concorrenza Playwright è controllata dal pool di context (ctx_pool.qsize()).
 
@@ -266,7 +257,12 @@ async def _process_rows(
     # La concorrenza è governata dal pool: solo ctx_pool.qsize() check girano in parallelo.
     playwright_results: dict[int, bool] = {}  # ad_id → is_active
 
-    async def _check_one_pw(row) -> None:
+    # Numero di contesti disponibili all'inizio del chunk (tutti in coda dopo un restart).
+    pool_size = ctx_pool.qsize()
+
+    async def _check_one_pw(row, stagger: float = 0.0) -> None:
+        if stagger > 0.0:
+            await asyncio.sleep(stagger)
         ctx = await ctx_pool.get()
         try:
             is_active = await check_url(ctx, row["url"])
@@ -275,12 +271,23 @@ async def _process_rows(
         playwright_results[row["id"]] = is_active
 
     if needs_playwright:
-        for idx in range(0, len(needs_playwright), 200):
+        for batch_idx, start in enumerate(range(0, len(needs_playwright), 200)):
             if _deadline_reached(deadline_utc):
                 time_limit_hit = True
                 break
-            batch = needs_playwright[idx : idx + 200]
-            await asyncio.gather(*[_check_one_pw(r) for r in batch])
+            batch = needs_playwright[start : start + 200]
+            # Stagger solo sul primo batch del chunk post-restart:
+            # task i attende i * stagger_secs prima di aprire la connessione.
+            # Questo distribuisce le N TCP connection su N*stagger_secs secondi
+            # invece di spikarle tutte nello stesso momento (→ ERR_CONNECTION_TIMED_OUT).
+            if batch_idx == 0 and stagger_secs > 0.0:
+                tasks = [
+                    _check_one_pw(r, i * stagger_secs if i < pool_size else 0.0)
+                    for i, r in enumerate(batch)
+                ]
+            else:
+                tasks = [_check_one_pw(r) for r in batch]
+            await asyncio.gather(*tasks)
 
     # ---------- Unifica risultati ----------
     results: list[tuple] = []
@@ -585,7 +592,8 @@ async def verify_batch(
 
                 chunk = all_rows[idx : idx + chunk_len]
                 chunk_no = idx // chunk_len
-                if browser is None or (chunk_no > 0 and chunk_no % restart_every == 0):
+                is_restart = browser is None or (chunk_no > 0 and chunk_no % restart_every == 0)
+                if is_restart:
                     # Chiudi pool e browser esistenti prima del restart
                     if ctx_pool is not None:
                         await _close_pool(ctx_pool)
@@ -614,11 +622,14 @@ async def verify_batch(
                     min(idx + len(chunk), len(all_rows)),
                     len(all_rows),
                 )
+                # Dopo ogni browser restart scagliona le prime N navigazioni di 0.15s l'una:
+                # 20 contesti × 0.15s = 3s di rampa invece di 20 TCP simultanée → meno Akamai ban.
                 stats = await _process_rows(
                     ctx_pool,
                     chunk,
                     deadline_utc=deadline_utc,
                     http_precheck=http_precheck,
+                    stagger_secs=0.15 if is_restart else 0.0,
                 )
 
                 total_stats["verified"] += stats["verified"]
