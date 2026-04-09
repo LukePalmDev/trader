@@ -41,9 +41,13 @@ jobs:
           --concurrency 18
           --chunk-size 350
           --browser-restart-every 3
+          --nav-timeout-ms 7000
           --body-timeout-seconds 2.5
           --dom-fallback-timeout-ms 1200
           --max-http403-ratio 0.02
+          --fail-fast-min-attempts 700
+          --fail-fast-blocked-ratio 0.85
+          --fail-fast-403-ratio 0.60
           --selection-sample 5
 
       - name: Commit e push DB aggiornato
