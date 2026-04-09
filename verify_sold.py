@@ -24,7 +24,7 @@ try:
 except ImportError:  # pragma: no cover - fallback runtime
     aiohttp = None
 
-from scrapers.base import launch_chromium, retry  # noqa: E402
+from scrapers.base import launch_chromium  # noqa: E402
 from settings import load_config  # noqa: E402
 from db_subito import DB_PATH, _connect, _estimate_sold_window  # noqa: E402
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError  # noqa: E402
@@ -43,6 +43,9 @@ DEFAULT_NAV_TIMEOUT_MS = 10_000
 DEFAULT_BODY_TIMEOUT_SECONDS = 2.5
 DEFAULT_DOM_FALLBACK_TIMEOUT_MS = 1_200
 DEFAULT_MAX_HTTP403_RATIO = 0.02
+DEFAULT_FAIL_FAST_MIN_ATTEMPTS = 700
+DEFAULT_FAIL_FAST_BLOCKED_RATIO = 0.85
+DEFAULT_FAIL_FAST_403_RATIO = 0.60
 _WARNED_NO_AIOHTTP = False
 
 _XBOX_MATCH_CONDITION = """
@@ -90,6 +93,15 @@ def _is_sold_redirect(url: str) -> bool:
 def _contains_sold_marker(text: str) -> bool:
     normalized = (text or "").lower()
     return any(marker in normalized for marker in _SOLD_MARKERS)
+
+
+def _classify_navigation_exception(exc: Exception) -> str:
+    msg = str(exc).lower()
+    if "err_connection_timed_out" in msg or "timeout" in msg or "timed out" in msg:
+        return "blocked:timeout"
+    if any(token in msg for token in ("err_name_not_resolved", "err_connection_reset", "err_network_changed")):
+        return "blocked:network"
+    return "blocked:error"
 
 
 def _build_selection_breakdown(
@@ -222,38 +234,37 @@ async def check_url(
         worker["page"] = page
 
     try:
-        async def _do() -> tuple[bool, str]:
-            resp = await page.goto(url, wait_until="domcontentloaded", timeout=int(nav_timeout_ms))
-            if not resp:
-                return True, "blocked:no-response"
-
-            if _is_sold_redirect(page.url):
-                log.debug("  Redirect rilevato: %s -> %s", url, page.url)
-                return False, "sold:redirect"
-
-            if resp.status in (404, 410):
-                return False, "sold:http-status"
-
-            if resp.status == 403:
-                return True, "blocked:http-403"
-            if resp.status == 429:
-                return True, "blocked:http-429"
-            if resp.status in (500, 502, 503, 504):
-                return True, f"blocked:http-{resp.status}"
-
-            sold_count = await page.locator("text=/non più disponibile/i").count()
-            if sold_count > 0:
-                return False, "sold:dom-marker"
-
-            return True, "active:dom-ok"
-
-        is_active, reason = await retry(_do, retries=1, delay=2.0, label=url)
-        return bool(is_active), str(reason)
+        resp = await page.goto(url, wait_until="domcontentloaded", timeout=int(nav_timeout_ms))
     except PlaywrightTimeoutError:
         return True, "blocked:timeout"
     except Exception as exc:
-        log.warning("Errore navigazione %s: %s", url, exc)
-        return True, "blocked:error"
+        reason = _classify_navigation_exception(exc)
+        if reason == "blocked:error":
+            log.warning("Errore navigazione %s: %s", url, exc)
+        return True, reason
+
+    if not resp:
+        return True, "blocked:no-response"
+
+    if _is_sold_redirect(page.url):
+        log.debug("  Redirect rilevato: %s -> %s", url, page.url)
+        return False, "sold:redirect"
+
+    if resp.status in (404, 410):
+        return False, "sold:http-status"
+
+    if resp.status == 403:
+        return True, "blocked:http-403"
+    if resp.status == 429:
+        return True, "blocked:http-429"
+    if resp.status in (500, 502, 503, 504):
+        return True, f"blocked:http-{resp.status}"
+
+    sold_count = await page.locator("text=/non più disponibile/i").count()
+    if sold_count > 0:
+        return False, "sold:dom-marker"
+
+    return True, "active:dom-ok"
 
 
 async def _reset_worker_session(worker: dict) -> None:
@@ -603,6 +614,9 @@ async def verify_batch(
     body_timeout_seconds: float = DEFAULT_BODY_TIMEOUT_SECONDS,
     dom_fallback_timeout_ms: int = DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
     max_http403_ratio: float = DEFAULT_MAX_HTTP403_RATIO,
+    fail_fast_min_attempts: int = DEFAULT_FAIL_FAST_MIN_ATTEMPTS,
+    fail_fast_blocked_ratio: float = DEFAULT_FAIL_FAST_BLOCKED_RATIO,
+    fail_fast_403_ratio: float = DEFAULT_FAIL_FAST_403_RATIO,
     selection_sample: int = 0,
 ) -> dict:
     """Recupera un batch di annunci e li verifica online con concorrenza.
@@ -622,7 +636,10 @@ async def verify_batch(
         nav_timeout_ms: timeout navigazione `goto(..., wait_until="domcontentloaded")`.
         body_timeout_seconds: parametro legacy (compatibilità CLI).
         dom_fallback_timeout_ms: parametro legacy (compatibilità CLI).
-        max_http403_ratio: soglia massima tollerata di 403 sul totale verificato.
+        max_http403_ratio: soglia massima tollerata di 403 sul totale tentativi.
+        fail_fast_min_attempts: minimo tentativi prima di abilitare stop anticipato.
+        fail_fast_blocked_ratio: soglia blocked totale per stop anticipato.
+        fail_fast_403_ratio: soglia 403 per stop anticipato.
         selection_sample: numero di annunci esclusi da xbox-only da mostrare a log.
 
     Returns:
@@ -751,6 +768,9 @@ async def verify_batch(
         "skipped": 0,
         "blocked_403": 0,
         "blocked_total": 0,
+        "blocked_timeout": 0,
+        "blocked_network": 0,
+        "blocked_error": 0,
         "time_limit_hit": False,
     }
     session_reason_counts: dict[str, int] = {}
@@ -761,7 +781,7 @@ async def verify_batch(
     chunk_len = max(1, int(chunk_size))
     restart_every = max(1, int(browser_restart_every))
     target_concurrency = max(1, int(concurrency))
-    min_concurrency = max(8, target_concurrency // 2)
+    min_concurrency = max(4, target_concurrency // 3)
     current_concurrency = target_concurrency
     force_restart_next = False
 
@@ -854,8 +874,11 @@ async def verify_batch(
                     dom_fallback_timeout_ms=dom_fallback_timeout_ms,
                 )
                 chunk_elapsed = max(0.001, time.perf_counter() - chunk_t0)
-                chunk_rate = stats["verified"] / chunk_elapsed
                 reason_counts = stats.get("reason_counts") or {}
+                attempted_in_chunk = sum(int(v) for v in reason_counts.values())
+                if attempted_in_chunk <= 0:
+                    attempted_in_chunk = int(stats.get("verified", 0) or 0) + int(stats.get("skipped", 0) or 0)
+                chunk_rate = attempted_in_chunk / chunk_elapsed
                 for reason, count in reason_counts.items():
                     session_reason_counts[reason] = session_reason_counts.get(reason, 0) + int(count)
                 top_reasons = ", ".join(
@@ -863,23 +886,24 @@ async def verify_batch(
                     for k, v in sorted(reason_counts.items(), key=lambda item: item[1], reverse=True)[:4]
                 ) if reason_counts else "n/a"
                 log.info(
-                    "Chunk %d completato in %.1fs (%.2f annunci/s) | reason: %s",
+                    "Chunk %d completato in %.1fs (%.2f tentativi/s, verificati=%d/%d) | reason: %s",
                     chunk_no + 1,
                     chunk_elapsed,
                     chunk_rate,
+                    int(stats.get("verified", 0) or 0),
+                    attempted_in_chunk,
                     top_reasons,
                 )
                 unstable_hits = sum(
                     count
                     for reason, count in reason_counts.items()
                     if (
-                        "active:error" in reason
+                        str(reason).startswith("blocked:")
                         or "http-403" in reason
                         or "http-429" in reason
-                        or "text-timeout" in reason
                     )
                 )
-                unstable_ratio = unstable_hits / max(1, int(stats["verified"]))
+                unstable_ratio = unstable_hits / max(1, attempted_in_chunk)
                 if unstable_ratio >= 0.25 and current_concurrency > min_concurrency:
                     new_concurrency = max(min_concurrency, current_concurrency - 4)
                     if new_concurrency != current_concurrency:
@@ -917,10 +941,33 @@ async def verify_batch(
                 total_stats["blocked_total"] += int(
                     sum(v for k, v in reason_counts.items() if str(k).startswith("blocked:"))
                 )
+                total_stats["blocked_timeout"] += int(
+                    sum(v for k, v in reason_counts.items() if "blocked:timeout" in str(k))
+                )
+                total_stats["blocked_network"] += int(
+                    sum(v for k, v in reason_counts.items() if "blocked:network" in str(k))
+                )
+                total_stats["blocked_error"] += int(
+                    sum(v for k, v in reason_counts.items() if "blocked:error" in str(k))
+                )
                 sold_price_sum += float(stats["sold_price_sum"] or 0.0)
                 sold_price_count += int(stats["sold_price_count"] or 0)
                 sold_hour_sum += float(stats["sold_hour_sum"] or 0.0)
                 sold_hour_count += int(stats["sold_hour_count"] or 0)
+                cumulative_attempted = int(total_stats["verified"]) + int(total_stats["skipped"])
+                if cumulative_attempted >= max(1, int(fail_fast_min_attempts)):
+                    cumulative_blocked_ratio = float(total_stats["blocked_total"]) / float(cumulative_attempted)
+                    cumulative_403_ratio = float(total_stats["blocked_403"]) / float(cumulative_attempted)
+                    if (
+                        cumulative_blocked_ratio >= float(fail_fast_blocked_ratio)
+                        and cumulative_403_ratio >= float(fail_fast_403_ratio)
+                    ):
+                        raise RuntimeError(
+                            "Fail-fast: runner probabilmente bloccato (Akamai/network). "
+                            f"blocked={cumulative_blocked_ratio * 100:.2f}% "
+                            f"403={cumulative_403_ratio * 100:.2f}% "
+                            f"su {cumulative_attempted} tentativi"
+                        )
                 if stats.get("time_limit_hit"):
                     total_stats["time_limit_hit"] = True
                     log.warning(
@@ -941,9 +988,11 @@ async def verify_batch(
     if sold_hour_count:
         total_stats["avg_hours_active"] = sold_hour_sum / sold_hour_count
 
-    verified_total = max(1, int(total_stats["verified"]))
-    blocked_403_ratio = float(total_stats["blocked_403"]) / float(verified_total)
-    blocked_total_ratio = float(total_stats["blocked_total"]) / float(verified_total)
+    attempted_total = int(total_stats["verified"]) + int(total_stats["skipped"])
+    if attempted_total <= 0:
+        attempted_total = 1
+    blocked_403_ratio = float(total_stats["blocked_403"]) / float(attempted_total)
+    blocked_total_ratio = float(total_stats["blocked_total"]) / float(attempted_total)
     total_stats["blocked_403_ratio"] = blocked_403_ratio
     total_stats["blocked_total_ratio"] = blocked_total_ratio
 
@@ -956,13 +1005,19 @@ async def verify_batch(
         top_session_reasons,
     )
     log.info(
-        "HTTP block summary: 403=%d/%d (%.2f%%) | blocked_totali=%d/%d (%.2f%%)",
+        (
+            "HTTP block summary: 403=%d/%d (%.2f%%) | blocked_totali=%d/%d (%.2f%%) "
+            "| timeout=%d | network=%d | error=%d"
+        ),
         total_stats["blocked_403"],
-        verified_total,
+        attempted_total,
         blocked_403_ratio * 100,
         total_stats["blocked_total"],
-        verified_total,
+        attempted_total,
         blocked_total_ratio * 100,
+        total_stats["blocked_timeout"],
+        total_stats["blocked_network"],
+        total_stats["blocked_error"],
     )
 
     avg_p = (
@@ -1138,6 +1193,36 @@ def _build_arg_parser() -> argparse.ArgumentParser:
             f"Default {DEFAULT_MAX_HTTP403_RATIO:.2f}"
         ),
     )
+    parser.add_argument(
+        "--fail-fast-min-attempts",
+        type=int,
+        default=DEFAULT_FAIL_FAST_MIN_ATTEMPTS,
+        metavar="N",
+        help=(
+            "Abilita stop anticipato dopo almeno N tentativi "
+            f"(default {DEFAULT_FAIL_FAST_MIN_ATTEMPTS})"
+        ),
+    )
+    parser.add_argument(
+        "--fail-fast-blocked-ratio",
+        type=float,
+        default=DEFAULT_FAIL_FAST_BLOCKED_RATIO,
+        metavar="R",
+        help=(
+            "Soglia blocked totale per fail-fast (0.85 = 85%). "
+            f"Default {DEFAULT_FAIL_FAST_BLOCKED_RATIO:.2f}"
+        ),
+    )
+    parser.add_argument(
+        "--fail-fast-403-ratio",
+        type=float,
+        default=DEFAULT_FAIL_FAST_403_RATIO,
+        metavar="R",
+        help=(
+            "Soglia 403 per fail-fast (0.60 = 60%). "
+            f"Default {DEFAULT_FAIL_FAST_403_RATIO:.2f}"
+        ),
+    )
     return parser
 
 
@@ -1160,6 +1245,9 @@ if __name__ == "__main__":
             body_timeout_seconds=args.body_timeout_seconds,
             dom_fallback_timeout_ms=args.dom_fallback_timeout_ms,
             max_http403_ratio=args.max_http403_ratio,
+            fail_fast_min_attempts=args.fail_fast_min_attempts,
+            fail_fast_blocked_ratio=args.fail_fast_blocked_ratio,
+            fail_fast_403_ratio=args.fail_fast_403_ratio,
             selection_sample=args.selection_sample,
         )
     )
