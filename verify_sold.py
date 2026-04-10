@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import logging
 import os
+import random
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -28,22 +29,30 @@ from scrapers.base import launch_chromium  # noqa: E402
 from settings import load_config  # noqa: E402
 from db_subito import DB_PATH, _connect, _estimate_sold_window  # noqa: E402
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError  # noqa: E402
+from playwright_stealth import Stealth  # noqa: E402
 
 _CONFIG_PATH = Path("config.toml")
 _CFG = load_config(_CONFIG_PATH)
 _COMMON = _CFG["common"]
+
+# Istanza stealth riusabile — si limita ad add_init_script, nessuno stato mutabile.
+_STEALTH = Stealth(
+    navigator_languages_override=("it-IT", "it"),
+    navigator_platform_override="MacIntel",
+    navigator_webdriver=True,
+)
 
 DEFAULT_BATCH_SIZE = 200
 DEFAULT_RECHECK_DAYS = 7
 DEFAULT_CHUNK_SIZE = 350
 DEFAULT_MAX_RUNTIME_MINUTES = 45
 DEFAULT_BROWSER_RESTART_EVERY = 3
-DEFAULT_CONCURRENCY = 30
+DEFAULT_CONCURRENCY = 3
 DEFAULT_NAV_TIMEOUT_MS = 10_000
 DEFAULT_BODY_TIMEOUT_SECONDS = 2.5
 DEFAULT_DOM_FALLBACK_TIMEOUT_MS = 1_200
-DEFAULT_MAX_HTTP403_RATIO = 0.02
-DEFAULT_FAIL_FAST_MIN_ATTEMPTS = 700
+DEFAULT_MAX_HTTP403_RATIO = 0.40
+DEFAULT_FAIL_FAST_MIN_ATTEMPTS = 150
 DEFAULT_FAIL_FAST_BLOCKED_RATIO = 0.85
 DEFAULT_FAIL_FAST_403_RATIO = 0.60
 _WARNED_NO_AIOHTTP = False
@@ -164,8 +173,8 @@ def _pick_excluded_by_xbox_sample(
 
 
 async def _new_context(browser):
-    """Context fresco per bypassare i controlli bot Akamai di Subito."""
-    return await browser.new_context(
+    """Context fresco con stealth completo per bypassare i controlli bot Akamai di Subito."""
+    ctx = await browser.new_context(
         user_agent=_COMMON["user_agent"],
         viewport={
             "width": _COMMON["viewport_width"],
@@ -173,6 +182,8 @@ async def _new_context(browser):
         },
         locale=_COMMON["locale"],
     )
+    await _STEALTH.apply_stealth_async(ctx)
+    return ctx
 
 
 async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
@@ -289,6 +300,20 @@ async def _reset_worker_session(worker: dict) -> None:
     worker["page"] = new_page
 
 
+_SUBITO_HOME = "https://www.subito.it"
+
+
+async def _warmup_worker(worker: dict, timeout_ms: int = 8_000) -> None:
+    """Carica la homepage di Subito per acquisire cookie Akamai prima di verificare annunci."""
+    page = worker.get("page")
+    if page is None or page.is_closed():
+        return
+    try:
+        await page.goto(_SUBITO_HOME, wait_until="domcontentloaded", timeout=timeout_ms)
+    except Exception:
+        pass  # warmup best-effort: un fallimento non blocca la verifica
+
+
 def _deadline_reached(deadline_utc: datetime | None) -> bool:
     return deadline_utc is not None and datetime.now(timezone.utc) >= deadline_utc
 
@@ -394,6 +419,7 @@ async def _process_rows(
     async def _check_one_pw(row, stagger: float = 0.0) -> None:
         if stagger > 0.0:
             await asyncio.sleep(stagger)
+        await asyncio.sleep(random.uniform(0.3, 0.9))
         worker = await worker_pool.get()
         try:
             is_active, reason = await check_url(
@@ -781,7 +807,7 @@ async def verify_batch(
     chunk_len = max(1, int(chunk_size))
     restart_every = max(1, int(browser_restart_every))
     target_concurrency = max(1, int(concurrency))
-    min_concurrency = max(4, target_concurrency // 3)
+    min_concurrency = max(1, target_concurrency // 3)
     current_concurrency = target_concurrency
     force_restart_next = False
 
@@ -839,12 +865,16 @@ async def verify_batch(
                         preferred_channel=_COMMON.get("playwright_channel", "chrome"),
                     )
                     worker_pool = asyncio.Queue()
+                    workers_created: list[dict] = []
                     for idx_worker in range(current_concurrency):
                         ctx = await _new_context(browser)
                         page = await ctx.new_page()
-                        worker_pool.put_nowait(
-                            {"id": idx_worker, "browser": browser, "ctx": ctx, "page": page}
-                        )
+                        w = {"id": idx_worker, "browser": browser, "ctx": ctx, "page": page}
+                        workers_created.append(w)
+                    # Warmup: carica homepage Subito in parallelo per acquisire cookie Akamai.
+                    await asyncio.gather(*[_warmup_worker(w) for w in workers_created])
+                    for w in workers_created:
+                        worker_pool.put_nowait(w)
                     log.info(
                         "Browser session restart (chunk %d), pool=%d worker.",
                         chunk_no + 1,
@@ -868,7 +898,7 @@ async def verify_batch(
                     chunk,
                     deadline_utc=deadline_utc,
                     http_precheck=http_precheck,
-                    stagger_secs=0.15 if is_restart else 0.0,
+                    stagger_secs=1.5 if is_restart else 0.0,
                     nav_timeout_ms=nav_timeout_ms,
                     body_timeout_seconds=body_timeout_seconds,
                     dom_fallback_timeout_ms=dom_fallback_timeout_ms,
@@ -1049,10 +1079,12 @@ async def verify_batch(
         " | STOP per runtime" if total_stats.get("time_limit_hit") else "",
     )
     if blocked_403_ratio > float(max_http403_ratio):
-        raise RuntimeError(
-            "HTTP 403 troppo alto: "
-            f"{blocked_403_ratio * 100:.2f}% > {float(max_http403_ratio) * 100:.2f}%"
+        log.warning(
+            "HTTP 403 alto: %.2f%% > %.2f%% (soglia) — dati parziali disponibili",
+            blocked_403_ratio * 100,
+            float(max_http403_ratio) * 100,
         )
+        total_stats["high_block_rate"] = True
     return total_stats
 
 
