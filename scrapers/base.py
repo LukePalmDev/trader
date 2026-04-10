@@ -199,11 +199,18 @@ async def launch_chromium(playwright, headless: bool = True, preferred_channel: 
         attempts.append({"channel": requested})
     attempts.append({})
 
+    _stealth_args = [
+        "--disable-blink-features=AutomationControlled",
+        "--disable-infobars",
+        "--no-sandbox",
+        "--disable-dev-shm-usage",
+    ]
+
     last_exc = None
     for opts in attempts:
         label = opts.get("channel", "bundled-chromium")
         try:
-            browser = await playwright.chromium.launch(headless=headless, **opts)
+            browser = await playwright.chromium.launch(headless=headless, args=_stealth_args, **opts)
             log.info("Playwright browser avviato: %s", label)
             return browser
         except Exception as exc:  # noqa: BLE001

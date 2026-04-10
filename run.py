@@ -611,8 +611,8 @@ def main() -> None:
     parser.add_argument(
         "--concurrency",
         type=int,
-        default=5,
-        help="Concorrenza per la verifica annunci (default 5)",
+        default=3,
+        help="Concorrenza per la verifica annunci (default 3)",
     )
     parser.add_argument(
         "--verify-chunk-size",
