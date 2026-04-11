@@ -426,7 +426,7 @@ async def _process_rows(
             async with cffi_sem:
                 cffi_results[row["id"]] = await _cffi_precheck(row["url"], session)
 
-        async with CffiAsyncSession(impersonate="chrome124") as cffi_session:
+        async with CffiAsyncSession(impersonate="chrome136") as cffi_session:
             await asyncio.gather(*[_cffi_one(cffi_session, r) for r in rows])
 
         cffi_sold_ids = {r["id"] for r in rows if cffi_results.get(r["id"]) == "sold"}
