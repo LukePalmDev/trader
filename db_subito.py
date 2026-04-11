@@ -185,6 +185,13 @@ def _migration_v6_text_hash_and_sold_window(conn: sqlite3.Connection) -> None:
     if payload:
         conn.executemany("UPDATE ads SET text_hash = ? WHERE id = ?", payload)
 
+def _migration_v7_verify_status(conn: sqlite3.Connection) -> None:
+    _add_column_if_missing(conn, "ads", "verify_status TEXT NOT NULL DEFAULT 'buyable'")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_verify_status ON ads(verify_status)")
+    # Backfill: annunci già venduti → sold, resto rimane buyable
+    conn.execute("UPDATE ads SET verify_status = 'sold' WHERE sold_at IS NOT NULL")
+
+
 _MIGRATIONS = (
     Migration(
         1,
@@ -257,6 +264,11 @@ _MIGRATIONS = (
         "add-text-hash-sold-window",
         callback=_migration_v6_text_hash_and_sold_window,
     ),
+    Migration(
+        7,
+        "add-verify-status",
+        callback=_migration_v7_verify_status,
+    ),
 )
 
 
@@ -311,6 +323,7 @@ def init_db(db_path: Path = DB_PATH) -> None:
             last_available INTEGER NOT NULL DEFAULT 1,
             ai_status      TEXT    NOT NULL DEFAULT 'pending',
             ai_confidence  REAL,
+            verify_status  TEXT    NOT NULL DEFAULT 'buyable',
             sold_at        TEXT,
             sold_at_estimated TEXT,
             sold_window_hours REAL
@@ -538,6 +551,7 @@ def get_all_ads(db_path: Path = DB_PATH) -> list[dict]:
                 seller_type, published_at,
                 last_price, last_available,
                 ai_status, ai_confidence,
+                verify_status,
                 sold_at_estimated, sold_window_hours
             FROM ads
             ORDER BY console_family, last_price ASC NULLS LAST
