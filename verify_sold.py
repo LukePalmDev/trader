@@ -561,17 +561,20 @@ async def _process_rows(
         if row["id"] in http_sold_ids:
             results.append((row, False))
     # Annunci verificati da Playwright
+    skipped_ids: list[int] = []
     for row in needs_playwright:
         ad_id = row["id"]
         if ad_id in playwright_results:
             is_active, _ = playwright_results[ad_id]
             if is_active is None:
                 skipped_rows += 1
+                skipped_ids.append(ad_id)
             else:
                 results.append((row, is_active))
         else:
             # deadline raggiunta prima del check Playwright
             skipped_rows += 1
+            skipped_ids.append(ad_id)
 
     conn = _connect(DB_PATH)
     conn.isolation_level = None
@@ -611,7 +614,8 @@ async def _process_rows(
                             first_inactive_seen = NULL,
                             sold_at = NULL,
                             sold_at_estimated = NULL,
-                            sold_window_hours = NULL
+                            sold_window_hours = NULL,
+                            verify_status = 'buyable'
                         WHERE id = ?
                         """,
                         (now, now, ad_id),
@@ -639,7 +643,8 @@ async def _process_rows(
                             last_seen = ?,
                             first_inactive_seen = ?,
                             sold_at_estimated = ?,
-                            sold_window_hours = ?
+                            sold_window_hours = ?,
+                            verify_status = 'sold'
                         WHERE id = ?
                         """,
                         (
@@ -684,8 +689,24 @@ async def _process_rows(
         log.error("Errore transazione batch DB: %s", e)
         if conn.in_transaction:
             conn.execute("ROLLBACK")
+        skipped_ids = []  # non aggiornare pending se il batch è fallito
     finally:
         conn.close()
+
+    # Aggiorna gli annunci bloccati/non verificati → verify_status = 'pending'
+    # Saranno prioritizzati nel prossimo run (ORDER BY pending first).
+    if skipped_ids:
+        try:
+            _pending_conn = _connect(DB_PATH)
+            with _pending_conn:
+                placeholders_p = ",".join("?" * len(skipped_ids))
+                _pending_conn.execute(
+                    f"UPDATE ads SET verify_status = 'pending' WHERE id IN ({placeholders_p})",
+                    skipped_ids,
+                )
+            _pending_conn.close()
+        except Exception as e:
+            log.error("Errore aggiornamento verify_status pending: %s", e)
 
     sold_price_sum = sum(sold_prices)
     sold_price_count = len(sold_prices)
@@ -767,14 +788,16 @@ async def verify_batch(
 
     select_cols = (
         "id, url, last_price, first_seen, last_seen, last_available, "
-        "last_active_seen, first_inactive_seen, sold_at, sold_at_estimated, sold_window_hours"
+        "last_active_seen, first_inactive_seen, sold_at, sold_at_estimated, sold_window_hours, "
+        "verify_status"
     )
     base_query = (
         f"SELECT {select_cols} FROM ads "
         f"WHERE ai_status IN ({placeholders}) "
         "AND last_available = 1 AND sold_at IS NULL "
         + (_XBOX_SQL_FILTER if xbox_only else "")
-        + " ORDER BY COALESCE(last_seen, first_seen) ASC"
+        + " ORDER BY CASE verify_status WHEN 'pending' THEN 0 ELSE 1 END,"
+        " COALESCE(last_seen, first_seen) ASC"
     )
 
     active_params: list = list(statuses)
