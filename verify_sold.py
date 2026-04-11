@@ -1096,10 +1096,17 @@ async def verify_batch(
                         current_concurrency = new_concurrency
                         force_restart_next = True
 
-                # Cooldown inter-chunk: se il blocco è massiccio, aspetta prima del prossimo
-                # chunk per permettere all'IP di uscire dalla blacklist Akamai a breve termine.
+                # Cooldown inter-chunk adattivo: scala proporzionale all'intensità del blocco.
+                # Ban totale (>95%) richiede più recovery del ban moderato (60-70%).
                 if unstable_ratio >= 0.60 and idx + chunk_len < len(all_rows):
-                    cooldown_secs = 45
+                    if unstable_ratio >= 0.95:
+                        cooldown_secs = 75
+                    elif unstable_ratio >= 0.85:
+                        cooldown_secs = 45
+                    elif unstable_ratio >= 0.70:
+                        cooldown_secs = 25
+                    else:
+                        cooldown_secs = 15
                     log.info(
                         "Cooldown inter-chunk %d: %.1f%% blocked → pausa %ds",
                         chunk_no + 1,
