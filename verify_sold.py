@@ -5,6 +5,7 @@ import asyncio
 import logging
 import os
 import random
+import sqlite3
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -107,6 +108,23 @@ def _is_sold_redirect(url: str) -> bool:
 def _contains_sold_marker(text: str) -> bool:
     normalized = (text or "").lower()
     return any(marker in normalized for marker in _SOLD_MARKERS)
+
+
+def _check_db_integrity(conn: sqlite3.Connection) -> bool:
+    """Verifica integrità del database SQLite tramite PRAGMA integrity_check.
+
+    Args:
+        conn: Connessione SQLite attiva.
+
+    Returns:
+        True se il DB è integro ("ok"), False altrimenti.
+    """
+    try:
+        result = conn.execute("PRAGMA integrity_check(1)").fetchone()
+        return result is not None and result[0] == "ok"
+    except Exception as e:
+        log.error(f"Errore durante check integrità DB: {e}")
+        return False
 
 
 def _classify_navigation_exception(exc: Exception) -> str:
@@ -808,6 +826,12 @@ async def verify_batch(
         Statistiche della sessione di verifica.
     """
     conn = _connect(DB_PATH)
+
+    # Pre-run DB integrity check
+    if not _check_db_integrity(conn):
+        conn.close()
+        log.error("Database corrotto (PRAGMA integrity_check failed). Aborting.")
+        sys.exit(1)
 
     statuses = ["approved", "pending"]
     if include_rejected:
