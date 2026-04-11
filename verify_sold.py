@@ -416,6 +416,7 @@ async def _process_rows(
     # I "unknown" (403/errore) vengono inviati a Playwright come fallback.
     cffi_sold_ids: set[int] = set()
     cffi_active_ids: set[int] = set()
+    _cffi_block = False  # True se cffi segnala blocco IP massivo (≥80% unknown)
 
     if CffiAsyncSession is not None and not _deadline_reached(deadline_utc):
         cffi_results: dict[int, str] = {}
@@ -437,6 +438,16 @@ async def _process_rows(
             len(cffi_active_ids),
             cffi_unknown_count,
         )
+        # Blocco IP rilevato: se ≥80% degli URL sono "unknown" (403/errori),
+        # Akamai ha bannato l'IP. Playwright otterrebbe gli stessi blocchi
+        # bruciando 100+ secondi per 0 verifiche. Salta e marca tutto pending.
+        _cffi_block_ratio = cffi_unknown_count / max(1, len(rows))
+        if _cffi_block_ratio >= 0.80:
+            _cffi_block = True
+            log.warning(
+                "cffi blocco massivo (%.0f%% unknown): skip Playwright, chunk → pending",
+                _cffi_block_ratio * 100,
+            )
     else:
         if CffiAsyncSession is None:
             log.warning("curl-cffi non disponibile: precheck saltato, tutto a Playwright.")
@@ -477,9 +488,15 @@ async def _process_rows(
     elif http_precheck:
         log.warning("aiohttp non disponibile: pre-check HTTP saltato.")
 
-    # Annunci già classificati da cffi → escludi da Playwright
+    # Annunci già classificati da cffi → escludi da Playwright.
+    # Se cffi ha segnalato blocco IP massivo, forza needs_playwright vuoto:
+    # tutti i non-sold vengono marcati pending (vedi skipped_ids più sotto).
     skip_playwright_ids = cffi_sold_ids | http_sold_ids | cffi_active_ids
-    needs_playwright = [r for r in rows if r["id"] not in skip_playwright_ids]
+    needs_playwright = (
+        []
+        if _cffi_block
+        else [r for r in rows if r["id"] not in skip_playwright_ids]
+    )
 
     # ---------- Fase 2: Playwright solo per gli "unknown" ----------
     # La concorrenza è governata dal pool: solo worker_pool.qsize() check girano in parallelo.
@@ -545,6 +562,9 @@ async def _process_rows(
         reason_counts["sold:cffi-410"] = reason_counts.get("sold:cffi-410", 0) + len(cffi_sold_ids)
     if cffi_active_ids:
         reason_counts["active:cffi-200"] = reason_counts.get("active:cffi-200", 0) + len(cffi_active_ids)
+    if _cffi_block:
+        _block_pending_count = len(rows) - len(cffi_sold_ids)
+        reason_counts["skipped:cffi-block"] = reason_counts.get("skipped:cffi-block", 0) + _block_pending_count
 
     # ---------- Unifica risultati ----------
     results: list[tuple] = []
@@ -560,8 +580,15 @@ async def _process_rows(
     for row in rows:
         if row["id"] in http_sold_ids:
             results.append((row, False))
+    # Se cffi ha segnalato blocco IP, pre-popola skipped_ids con tutti i non-sold.
+    # needs_playwright è già vuoto, quindi il loop sottostante non aggiunge altri ID.
+    skipped_ids: list[int] = (
+        [r["id"] for r in rows if r["id"] not in cffi_sold_ids]
+        if _cffi_block
+        else []
+    )
+    skipped_rows += len(skipped_ids)
     # Annunci verificati da Playwright
-    skipped_ids: list[int] = []
     for row in needs_playwright:
         ad_id = row["id"]
         if ad_id in playwright_results:
