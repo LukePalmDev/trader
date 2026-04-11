@@ -25,6 +25,11 @@ try:
 except ImportError:  # pragma: no cover - fallback runtime
     aiohttp = None
 
+try:
+    from curl_cffi.requests import AsyncSession as CffiAsyncSession
+except ImportError:  # pragma: no cover - fallback runtime
+    CffiAsyncSession = None
+
 from scrapers.base import launch_chromium  # noqa: E402
 from settings import load_config  # noqa: E402
 from db_subito import DB_PATH, _connect, _estimate_sold_window  # noqa: E402
@@ -231,6 +236,34 @@ async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
         return "unknown"
 
 
+async def _cffi_precheck(url: str, session: "CffiAsyncSession") -> str:
+    """Pre-check leggero con curl-cffi: impersona Chrome a livello TLS, nessun JS.
+
+    Subito.it risponde 410 per annunci venduti/scaduti e 200 per annunci attivi.
+    Questo consente di filtrare i venduti certi senza aprire Playwright.
+
+    Returns:
+        "sold"    — 404/410 HTTP o redirect a homepage/ricerca (definitivo)
+        "active"  — 200 con URL finale invariato (alta confidenza = attivo)
+        "unknown" — 403/errore/altro → demanda a Playwright
+    """
+    try:
+        resp = await session.get(url, timeout=10, allow_redirects=True)
+        if resp.status_code in (404, 410):
+            return "sold"
+        if resp.status_code == 200:
+            final = str(resp.url).rstrip("/")
+            if final == "https://www.subito.it" or (
+                "annunci-italia/vendita" in final and "q=" in final
+            ):
+                return "sold"
+            return "active"
+        # 403 = bloccato da Akamai, 5xx = errore server → Playwright
+        return "unknown"
+    except Exception:
+        return "unknown"
+
+
 async def check_url(
     worker: dict,
     url: str,
@@ -375,11 +408,43 @@ async def _process_rows(
     time_limit_hit = False
     skipped_rows = 0
 
-    # ---------- Fase 1 (opzionale): HTTP pre-check ----------
-    # Disabilitato per default: Subito risponde 200 per tutto, 0 annunci filtrati.
-    http_sold_ids: set[int] = set()
+    # ---------- Fase 1: curl-cffi precheck (sempre attivo se disponibile) ----------
+    # curl-cffi impersona Chrome a livello TLS (JA3/JA4), bypassando Akamai senza browser.
+    # Subito.it risponde 410 per venduti e 200 per attivi: segnale affidabile e verificato.
+    # I "sold" certi (410/404/redirect) saltano Playwright completamente.
+    # I "active" (200) vengono inviati a Playwright per conferma DOM.
+    # I "unknown" (403/errore) vengono inviati a Playwright come fallback.
+    cffi_sold_ids: set[int] = set()
+    cffi_active_ids: set[int] = set()
 
-    if http_precheck and aiohttp is not None:
+    if CffiAsyncSession is not None and not _deadline_reached(deadline_utc):
+        cffi_results: dict[int, str] = {}
+        cffi_sem = asyncio.Semaphore(40)
+
+        async def _cffi_one(session, row) -> None:
+            async with cffi_sem:
+                cffi_results[row["id"]] = await _cffi_precheck(row["url"], session)
+
+        async with CffiAsyncSession(impersonate="chrome124") as cffi_session:
+            await asyncio.gather(*[_cffi_one(cffi_session, r) for r in rows])
+
+        cffi_sold_ids = {r["id"] for r in rows if cffi_results.get(r["id"]) == "sold"}
+        cffi_active_ids = {r["id"] for r in rows if cffi_results.get(r["id"]) == "active"}
+        cffi_unknown_count = len(rows) - len(cffi_sold_ids) - len(cffi_active_ids)
+        log.info(
+            "cffi precheck: sold=%d | active=%d | unknown(→Playwright)=%d",
+            len(cffi_sold_ids),
+            len(cffi_active_ids),
+            cffi_unknown_count,
+        )
+    else:
+        if CffiAsyncSession is None:
+            log.warning("curl-cffi non disponibile: precheck saltato, tutto a Playwright.")
+
+    # Fase 1b: vecchio HTTP pre-check aiohttp (opzionale, disabilitato per default)
+    # Lasciato per compatibilità CLI --http-precheck; curl-cffi lo supera in efficacia.
+    http_sold_ids: set[int] = set()
+    if http_precheck and aiohttp is not None and not _deadline_reached(deadline_utc):
         http_results: dict[int, str] = {}
         http_sem = asyncio.Semaphore(50)
         total_rows = len(rows)
@@ -406,13 +471,15 @@ async def _process_rows(
 
         http_sold_ids = {r["id"] for r in rows if http_results.get(r["id"]) == "sold"}
         log.info(
-            "Pre-check HTTP: %d venduti subito, %d a Playwright.",
+            "Pre-check HTTP (aiohttp): %d venduti, %d a Playwright.",
             len(http_sold_ids), len(rows) - len(http_sold_ids),
         )
     elif http_precheck:
         log.warning("aiohttp non disponibile: pre-check HTTP saltato.")
 
-    needs_playwright = [r for r in rows if r["id"] not in http_sold_ids]
+    # Annunci già classificati da cffi → escludi da Playwright
+    skip_playwright_ids = cffi_sold_ids | http_sold_ids | cffi_active_ids
+    needs_playwright = [r for r in rows if r["id"] not in skip_playwright_ids]
 
     # ---------- Fase 2: Playwright solo per gli "unknown" ----------
     # La concorrenza è governata dal pool: solo worker_pool.qsize() check girano in parallelo.
@@ -473,9 +540,23 @@ async def _process_rows(
                 tasks = [_check_one_pw(r) for r in batch]
             await asyncio.gather(*tasks)
 
+    # Aggiungi conteggi cffi a reason_counts per il reporting chunk
+    if cffi_sold_ids:
+        reason_counts["sold:cffi-410"] = reason_counts.get("sold:cffi-410", 0) + len(cffi_sold_ids)
+    if cffi_active_ids:
+        reason_counts["active:cffi-200"] = reason_counts.get("active:cffi-200", 0) + len(cffi_active_ids)
+
     # ---------- Unifica risultati ----------
     results: list[tuple] = []
-    # Annunci venduti dal pre-check HTTP (is_active=False certi)
+    # Annunci venduti da cffi precheck (is_active=False certi: 410/404/redirect)
+    for row in rows:
+        if row["id"] in cffi_sold_ids:
+            results.append((row, False))
+    # Annunci attivi da cffi precheck (is_active=True ad alta confidenza: HTTP 200)
+    for row in rows:
+        if row["id"] in cffi_active_ids:
+            results.append((row, True))
+    # Annunci venduti dal pre-check HTTP aiohttp (fallback, disabilitato per default)
     for row in rows:
         if row["id"] in http_sold_ids:
             results.append((row, False))
