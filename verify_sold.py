@@ -353,6 +353,13 @@ async def _warmup_worker(worker: dict, timeout_ms: int = 8_000) -> None:
         pass  # warmup best-effort: un fallimento non blocca la verifica
 
 
+async def _create_worker(browser, idx: int) -> dict:
+    """Crea un singolo worker (context + page) per il pool Playwright."""
+    ctx = await _new_context(browser)
+    page = await ctx.new_page()
+    return {"id": idx, "browser": browser, "ctx": ctx, "page": page}
+
+
 def _deadline_reached(deadline_utc: datetime | None) -> bool:
     return deadline_utc is not None and datetime.now(timezone.utc) >= deadline_utc
 
@@ -996,12 +1003,12 @@ async def verify_batch(
                         preferred_channel=_COMMON.get("playwright_channel", "chrome"),
                     )
                     worker_pool = asyncio.Queue()
-                    workers_created: list[dict] = []
-                    for idx_worker in range(current_concurrency):
-                        ctx = await _new_context(browser)
-                        page = await ctx.new_page()
-                        w = {"id": idx_worker, "browser": browser, "ctx": ctx, "page": page}
-                        workers_created.append(w)
+                    # Crea context+page di tutti i worker in parallelo (era sequenziale).
+                    workers_created: list[dict] = list(
+                        await asyncio.gather(
+                            *[_create_worker(browser, i) for i in range(current_concurrency)]
+                        )
+                    )
                     # Warmup: carica homepage Subito in parallelo per acquisire cookie Akamai.
                     await asyncio.gather(*[_warmup_worker(w) for w in workers_created])
                     for w in workers_created:
