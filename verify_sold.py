@@ -1222,8 +1222,10 @@ async def verify_batch(
         attempted_total = 1
     blocked_403_ratio = float(total_stats["blocked_403"]) / float(attempted_total)
     blocked_total_ratio = float(total_stats["blocked_total"]) / float(attempted_total)
+    coverage_ratio = float(total_stats["verified"]) / float(max(1, attempted_total))
     total_stats["blocked_403_ratio"] = blocked_403_ratio
     total_stats["blocked_total_ratio"] = blocked_total_ratio
+    total_stats["coverage_ratio"] = coverage_ratio
 
     top_session_reasons = ", ".join(
         f"{k}={v}"
@@ -1265,10 +1267,11 @@ async def verify_batch(
         avg_h = "—"
 
     log.info(
-        "Verifica completata. %d verificati, %d skipped: %d attivi, %d venduti nuovi, "
+        "Verifica completata. %d verificati, %d skipped (coverage %.1f%%): %d attivi, %d venduti nuovi, "
         "%d venduti confermati, %d riattivati | prezzo medio venduto %s | tempo attivo medio %s%s",
         total_stats["verified"],
         total_stats["skipped"],
+        coverage_ratio * 100,
         total_stats["active"],
         total_stats["sold"],
         total_stats["already_sold"],
@@ -1277,6 +1280,13 @@ async def verify_batch(
         avg_h,
         " | STOP per runtime" if total_stats.get("time_limit_hit") else "",
     )
+
+    # Warning se coverage bassa
+    if coverage_ratio < 0.70:
+        log.warning(
+            "Coverage bassa (%.1f%% < 70%%): verifica interrotta da blocchi massivi o errori",
+            coverage_ratio * 100,
+        )
     if blocked_403_ratio > float(max_http403_ratio):
         log.warning(
             "HTTP 403 alto: %.2f%% > %.2f%% (soglia) — dati parziali disponibili",
