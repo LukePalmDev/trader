@@ -39,7 +39,7 @@ _COMMON = _CFG["common"]
 _STEALTH = Stealth(
     navigator_languages_override=("it-IT", "it"),
     navigator_platform_override="MacIntel",
-    navigator_webdriver=True,
+    navigator_webdriver=False,  # False = nasconde il flag webdriver (era True: bug)
 )
 
 DEFAULT_BATCH_SIZE = 200
@@ -109,6 +109,12 @@ def _classify_navigation_exception(exc: Exception) -> str:
     if "err_connection_timed_out" in msg or "timeout" in msg or "timed out" in msg:
         return "blocked:timeout"
     if any(token in msg for token in ("err_name_not_resolved", "err_connection_reset", "err_network_changed")):
+        return "blocked:network"
+    # Chrome reindirizza a chrome-error://chromewebdata/ quando Akamai chiude la TCP
+    # prima che la pagina si carichi; l'eccezione Playwright contiene "interrupted by
+    # another navigation" oppure "chrome-error". Non è un bug del codice: classificare
+    # silenziosamente come blocked:network (non loggare WARNING).
+    if "chrome-error" in msg or "interrupted by another navigation" in msg:
         return "blocked:network"
     return "blocked:error"
 
@@ -958,6 +964,18 @@ async def verify_batch(
                         )
                         current_concurrency = new_concurrency
                         force_restart_next = True
+
+                # Cooldown inter-chunk: se il blocco è massiccio, aspetta prima del prossimo
+                # chunk per permettere all'IP di uscire dalla blacklist Akamai a breve termine.
+                if unstable_ratio >= 0.60 and idx + chunk_len < len(all_rows):
+                    cooldown_secs = 45
+                    log.info(
+                        "Cooldown inter-chunk %d: %.1f%% blocked → pausa %ds",
+                        chunk_no + 1,
+                        unstable_ratio * 100,
+                        cooldown_secs,
+                    )
+                    await asyncio.sleep(cooldown_secs)
 
                 total_stats["verified"] += stats["verified"]
                 total_stats["active"] += stats["active"]
