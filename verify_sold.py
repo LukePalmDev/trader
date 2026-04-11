@@ -33,7 +33,7 @@ except ImportError:  # pragma: no cover - fallback runtime
 
 from scrapers.base import launch_chromium  # noqa: E402
 from settings import load_config  # noqa: E402
-from db_subito import DB_PATH, _connect, _estimate_sold_window  # noqa: E402
+from db_subito import DB_PATH, _connect, _estimate_sold_window, init_db  # noqa: E402
 from patchright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError  # noqa: E402
 from playwright_stealth import Stealth  # noqa: E402
 
@@ -1469,6 +1469,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     args = _build_arg_parser().parse_args()
+    init_db()
     max_runtime = args.max_runtime_minutes if args.max_runtime_minutes and args.max_runtime_minutes > 0 else None
     asyncio.run(
         verify_batch(
