@@ -2,9 +2,9 @@ name: Verify Sold Subito
 
 on:
   schedule:
-    # 04:30 UTC = 06:30 CEST (estate) — 1h30 dopo lo scrape notturno di Subito (03:00 UTC)
-    # Il gap lascia raffreddare l'IP nella blacklist Akamai prima di verify-sold.
-    - cron: '30 4 * * *'
+    # 1 ora dopo lo scraper Subito: 03:00 09:00 15:00 21:00 UTC → 05/11/17/23 CEST
+    # Il gap da 1h lascia raffreddare l'IP nella blacklist Akamai prima di verify-sold.
+    - cron: '0 3,9,15,21 * * *'
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
 concurrency:
