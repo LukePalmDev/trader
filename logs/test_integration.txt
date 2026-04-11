@@ -1,0 +1,33 @@
+Integration test — 2026-03-27
+
+TASK 1 - db_subito.py insert senza rules:
+  - Rimossa chiamata a classify_title() al momento dell'insert
+  - Nuovi annunci: console_family=NULL, canonical_model=NULL, classify_method=NULL
+  - ai_status='pending' di default (esplicito nell'INSERT)
+  - Test import: OK
+
+TASK 2 - Crontab aggiornato:
+  0 7,13,19,1 * * *  scrape subito >> logs/cron.log
+  0 8 * * *          verify_sold --all >> logs/cron_verify.log
+  30 2 * * *         ai_classifier.py --concurrency 1 >> logs/cron_classify.log
+
+TASK 3 - Flag run.py:
+  --classify: già presente (riga ~503), chiama classifier.run_classifier()
+  --ai-classify: già presente (riga ~516), chiama ai_classifier.run_ai_classifier()
+  --verify-sold: già presente (riga ~603), chiama verify_sold.verify_batch()
+
+TASK 4 - logs/:
+  mkdir -p logs/ + touch logs/.gitkeep: OK
+  .gitignore aggiornato con logs/*.log
+
+TASK 5 - _VALID_CANONICALS allineati con model_rules.py:
+  Tutti i canonicals di model_rules._canonical_model() sono in _VALID_CANONICALS
+  (eccetto "unknown" che è il fallback rules per family=other, sostituito da "other" in AI)
+
+TASK 8 - Commit git: ab7ab4e
+
+TASK 9 - Background classifier (PID 6366):
+  Avviato prima di questa sessione su tutti e 31501 annunci
+  Stato: batch 62/631 alle 08:29 (concurrency=1, rate limited 429 → retry)
+  Il processo NON è stato interrotto
+  Risultati visibili dopo il commit del classificatore (fine run stimata: 2-3 ore)
