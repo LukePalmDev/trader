@@ -323,6 +323,151 @@ trader/
 └── .github/workflows/       # CI/CD (Quality Gate + Daily Scrape)
 ```
 
+## Criticità note: verify\_sold
+
+Questa sezione documenta i problemi ricorrenti rilevati analizzando i run CI del 11 Aprile 2026 (v0→v3) e le sessioni di sviluppo precedenti.
+
+---
+
+### 1. Cloudflare cffi-block: degrado massiccio della coverage
+
+**Descrizione**
+Il fast-path di verifica (`cffi` — HTTP diretto senza Playwright) viene bloccato da Cloudflare con risposte HTTP non classificabili. Quando Cloudflare entra in "burst block mode", interi chunk da 350 annunci vengono skippati in meno di 1 secondo (`reason: skipped:cffi-block=350`).
+
+**Impatto osservato (4 run dello stesso giorno)**
+
+| Run | Ora | Pool | Verificati | Coverage | cffi-block chunks |
+|-----|-----|------|-----------|----------|-------------------|
+| v0 | 10:09 | 7.012 | 5.350 | **76%** | 0 |
+| v1 | 12:11 | 6.868 | 6.088 | **89%** | 2 |
+| v2 | 15:24 | 6.854 | 2.802 | **41%** | 13 |
+| v3 | 21:48 | 9.471 | 2.464 | **26%** | 20 consecutivi |
+
+La coverage crolla da 89% a 26% nello stesso giorno in base all'orario. I run mattutini sono sistematicamente migliori.
+
+**Causa radice**
+Subito.it usa Cloudflare con rate limiting adattivo. Alte concorrenze (`--concurrency 18`) e chunk rapidi saturano la finestra di tolleranza. I run pomeridiani/serali partono già con un budget IP esaurito da sessioni precedenti.
+
+**Stato:** aperto — nessuna soluzione stabile implementata.
+
+---
+
+### 2. Anti-burst pause fissa non scala contro blocchi sostenuti
+
+**Descrizione**
+Il meccanismo anti-burst (commit `8329759`) rileva N chunk consecutivi con cffi-block e applica una pausa di **30 secondi fissi** prima di riprovare. Quando Cloudflare rimane bloccato per molti chunk consecutivi, la pausa si ripete indefinitamente senza escalation.
+
+**Impatto osservato (v3)**
+- 20 burst rilevati consecutivi → 20 × 30s = **10 minuti sprecati in pause**
+- Cloudflare non si sblocca dopo 30s: la pausa non è abbastanza lunga
+- Il run termina in soli 13 minuti con 74% degli annunci skippati
+
+**Comportamento attuale**
+```
+WARNING: Cloudflare burst rilevato (N chunk consecutivi con cffi-block): pausa 30s
+# N cresce ma la pausa resta sempre 30s
+```
+
+**Comportamento desiderato**
+Backoff esponenziale: 30s → 60s → 120s → cap a 300s, oppure dopo soglia (es. 5 burst consecutivi) abbandonare il cffi per il resto del run e passare a Playwright puro.
+
+**Stato:** aperto — patch necessaria in `verify_sold.py`.
+
+---
+
+### 3. Nessun fallback Playwright per annunci cffi-blocked
+
+**Descrizione**
+Quando un chunk viene skippato per cffi-block, gli annunci rimangono con status `pending` nel DB e vengono esclusi dai successivi run solo dopo che il loro status cambia. Non c'è un fallback automatico a Playwright per verificare quegli stessi annunci nello stesso run.
+
+**Impatto**
+- In v3: 6.998 annunci lasciati `pending` su 9.471 — rientreranno nel pool del prossimo run gonfiandolo ulteriormente
+- Effetto cumulativo: più run con coverage bassa → il pool pending cresce → i run successivi peggiorano
+
+**Mitigazione parziale**
+La flag `--selection-sample N` randomizza quali annunci vengono prioritizzati, evitando che gli stessi annunci vengano sempre skippati, ma non risolve il problema strutturale.
+
+**Stato:** aperto — nessun fallback implementato.
+
+---
+
+### 4. Inflazione del pool pending dopo restore DB
+
+**Descrizione**
+Il restore del DB da backup (commit `0644f80`, 27 Mar) ha riportato in stato `pending` annunci che erano già stati verificati. Il pool da verificare in v3 è saltato a **9.471** (+35% rispetto ai run precedenti ~7.000).
+
+**Effetto combinato**
+Pool più grande × coverage bassa per cffi-block = impatto molto maggiore degli skip.
+
+**Stato:** conseguenza nota del restore — non evitabile retroattivamente. Per futuri restore: eseguire un run verify-sold dedicato subito dopo il restore, in orario mattutino.
+
+---
+
+### 5. Sensibilità oraria non gestita
+
+**Descrizione**
+I run mattutini (10:00–13:00) ottengono sistematicamente coverage >75%. I run pomeridiani/serali (15:00+) subiscono blocchi cffi massivi. Il workflow CI è schedulato ogni 2 ore indipendentemente dall'orario.
+
+**Dati osservati**
+- v0 (10:09): 76.3%, v1 (12:11): 88.6%
+- v2 (15:24): 40.8%, v3 (21:48): 26.0%
+
+**Stato:** aperto — considerare di concentrare i run verify-sold nelle fasce 06:00–12:00.
+
+---
+
+### 6. Timeout e 403 in pre-anti-burst (v0)
+
+**Descrizione**
+Prima dell'implementazione anti-burst, i blocchi Cloudflare si manifestavano come:
+- 841 HTTP 403 (12.0% del pool)
+- 698 timeout (wait completo prima del fallback)
+- 123 errori di rete
+
+Ogni timeout aspettava il timeout completo (`--nav-timeout-ms 7000`), sprecando ~81 minuti di runtime cumulativo solo in attese inutili.
+
+**Risoluzione parziale**
+Il cffi fast-path + anti-burst hanno eliminato quasi completamente i 403 e i timeout (v1: 0.5% e 179 timeout; v3: 0.18% e 0 timeout). Ma il problema si è spostato verso i cffi-block.
+
+**Stato:** parzialmente risolto — i timeout sono eliminati ma i cffi-block ora skippano silenziosamente senza Playwright fallback.
+
+---
+
+### 7. Coverage warning senza fail del run
+
+**Descrizione**
+Il warning `Coverage bassa (26.0% < 70%)` viene loggato ma il run termina con exit code 0 e fa il commit del DB. Un run con 26% di coverage potrebbe mancare centinaia di annunci venduti nel frattempo.
+
+**Rischio**
+- Annunci venduti non marcati rimangono visibili nel viewer
+- Il fair value di Subito viene calcolato su un campione non rappresentativo
+
+**Stato:** aperto — valutare se forzare exit code ≠ 0 sotto una soglia critica (es. < 20%), o almeno sopprimere il commit automatico.
+
+---
+
+### 8. Totale=31.501 vs ~33.600 — discrepanza post-restore
+
+**Descrizione**
+Dopo il restore del DB, il campo `totale` (tutti gli annunci in DB) è sceso da ~33.600 a 31.501. Questo indica che il backup usato (27 Mar) non conteneva ~2.100 annunci scrappati nelle settimane successive.
+
+**Stato:** dato acquisito — i 2.100 annunci mancanti verranno reintegrati man mano che Subito viene riscrappato nelle run successive.
+
+---
+
+### Riepilogo priorità interventi
+
+| # | Problema | Impatto | Priorità |
+|---|----------|---------|----------|
+| 2 | Anti-burst pause fissa | Alto — spreca 10 min per run | P0 |
+| 3 | Nessun Playwright fallback per cffi-block | Alto — 74% skip in v3 | P0 |
+| 7 | Coverage warning senza fail | Medio — commit DB incompleto | P1 |
+| 5 | Sensibilità oraria non gestita | Medio — scheduling subottimale | P1 |
+| 1 | Cloudflare cffi-block strutturale | Alto — causa root | P2 (esterno) |
+| 4 | Pool inflazione post-restore | Basso — una tantum | P3 |
+
+---
+
 ## Troubleshooting
 
 | Problema | Soluzione |
