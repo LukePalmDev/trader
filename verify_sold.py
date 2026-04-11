@@ -28,7 +28,7 @@ except ImportError:  # pragma: no cover - fallback runtime
 from scrapers.base import launch_chromium  # noqa: E402
 from settings import load_config  # noqa: E402
 from db_subito import DB_PATH, _connect, _estimate_sold_window  # noqa: E402
-from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError  # noqa: E402
+from patchright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError  # noqa: E402
 from playwright_stealth import Stealth  # noqa: E402
 
 _CONFIG_PATH = Path("config.toml")

@@ -2,8 +2,9 @@ name: Verify Sold Subito
 
 on:
   schedule:
-    # 03:00 UTC = 05:00 CEST (estate) — dopo lo scrape notturno di Subito
-    - cron: '0 3 * * *'
+    # 04:30 UTC = 06:30 CEST (estate) — 1h30 dopo lo scrape notturno di Subito (03:00 UTC)
+    # Il gap lascia raffreddare l'IP nella blacklist Akamai prima di verify-sold.
+    - cron: '30 4 * * *'
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
 concurrency:
@@ -33,6 +34,9 @@ jobs:
       - name: Install Python dependencies
         run: python3.11 -m pip install -r requirements.lock
 
+      - name: Install patchright browser (fallback chromium)
+        run: python3.11 -m patchright install chromium
+
       - name: Verifica annunci venduti
         run: >
           python3.11 verify_sold.py
@@ -45,7 +49,7 @@ jobs:
           --body-timeout-seconds 2.5
           --dom-fallback-timeout-ms 1200
           --max-http403-ratio 0.02
-          --fail-fast-min-attempts 700
+          --fail-fast-min-attempts 400
           --fail-fast-blocked-ratio 0.85
           --fail-fast-403-ratio 0.60
           --selection-sample 5
