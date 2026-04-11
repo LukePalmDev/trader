@@ -972,6 +972,7 @@ async def verify_batch(
     min_concurrency = max(1, target_concurrency // 3)
     current_concurrency = target_concurrency
     force_restart_next = False
+    consecutive_cffi_blocks = 0  # Track consecutive chunks with massive cffi blocking
 
     async def _close_pool(pool: asyncio.Queue) -> None:
         """Chiude worker pool (page + context)."""
@@ -1096,6 +1097,23 @@ async def verify_batch(
                     )
                 )
                 unstable_ratio = unstable_hits / max(1, attempted_in_chunk)
+
+                # Anti-burst throttling: delay quando si rilevano blocchi cffi massivi consecutivi
+                cffi_block_count = reason_counts.get("skipped:cffi-block", 0)
+                if cffi_block_count > 300:
+                    consecutive_cffi_blocks += 1
+                    if consecutive_cffi_blocks >= 2 and idx + chunk_len < len(all_rows):
+                        burst_delay = 30
+                        log.warning(
+                            "Cloudflare burst rilevato (%d chunk consecutivi con cffi-block): pausa %ds",
+                            consecutive_cffi_blocks,
+                            burst_delay,
+                        )
+                        await asyncio.sleep(burst_delay)
+                else:
+                    # Reset counter se chunk processato normalmente
+                    consecutive_cffi_blocks = 0
+
                 if unstable_ratio >= 0.25 and current_concurrency > min_concurrency:
                     new_concurrency = max(min_concurrency, current_concurrency - 4)
                     if new_concurrency != current_concurrency:
