@@ -520,16 +520,10 @@ async def _process_rows(
                 dom_fallback_timeout_ms=dom_fallback_timeout_ms,
             )
             if reason.startswith("blocked:http-403"):
-                # Retry hard su sessione fresca: alcuni blocchi Akamai sono session-bound.
+                # Nessun retry: l'IP è bannato a livello Akamai e un secondo tentativo
+                # sullo stesso IP dopo 0.35s non cambia nulla, bruciando 7s di timeout.
+                # Reset del context per lasciare il worker in stato pulito.
                 await _reset_worker_session(worker)
-                await asyncio.sleep(0.35)
-                is_active, reason = await check_url(
-                    worker,
-                    row["url"],
-                    nav_timeout_ms=nav_timeout_ms,
-                    body_timeout_seconds=body_timeout_seconds,
-                    dom_fallback_timeout_ms=dom_fallback_timeout_ms,
-                )
         finally:
             await worker_pool.put(worker)
         if reason.startswith("blocked:"):
