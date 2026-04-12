@@ -36,6 +36,7 @@ from settings import load_config  # noqa: E402
 from db_subito import DB_PATH, _connect, _estimate_sold_window, init_db  # noqa: E402
 from patchright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError  # noqa: E402
 from playwright_stealth import Stealth  # noqa: E402
+from verify_sold_controls import _compute_cffi_backoff_seconds, _count_unstable_hits  # noqa: E402
 
 _CONFIG_PATH = Path("config.toml")
 _CFG = load_config(_CONFIG_PATH)
@@ -54,6 +55,8 @@ DEFAULT_CHUNK_SIZE = 350
 DEFAULT_MAX_RUNTIME_MINUTES = 45
 DEFAULT_BROWSER_RESTART_EVERY = 3
 DEFAULT_CONCURRENCY = 3
+DEFAULT_CFFI_CONCURRENCY = 12
+DEFAULT_MIN_CFFI_CONCURRENCY = 4
 DEFAULT_NAV_TIMEOUT_MS = 10_000
 DEFAULT_BODY_TIMEOUT_SECONDS = 2.5
 DEFAULT_DOM_FALLBACK_TIMEOUT_MS = 1_200
@@ -61,6 +64,8 @@ DEFAULT_MAX_HTTP403_RATIO = 0.40
 DEFAULT_FAIL_FAST_MIN_ATTEMPTS = 150
 DEFAULT_FAIL_FAST_BLOCKED_RATIO = 0.85
 DEFAULT_FAIL_FAST_403_RATIO = 0.60
+DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO = 0.85
+DEFAULT_MIN_COVERAGE_RATIO = 0.0
 _WARNED_NO_AIOHTTP = False
 
 _XBOX_MATCH_CONDITION = """
@@ -108,8 +113,6 @@ def _is_sold_redirect(url: str) -> bool:
 def _contains_sold_marker(text: str) -> bool:
     normalized = (text or "").lower()
     return any(marker in normalized for marker in _SOLD_MARKERS)
-
-
 def _check_db_integrity(conn: sqlite3.Connection) -> bool:
     """Verifica integrità del database SQLite tramite PRAGMA integrity_check.
 
@@ -393,6 +396,8 @@ async def _process_rows(
     nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
     body_timeout_seconds: float = DEFAULT_BODY_TIMEOUT_SECONDS,
     dom_fallback_timeout_ms: int = DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
+    cffi_concurrency: int = DEFAULT_CFFI_CONCURRENCY,
+    cffi_block_unknown_ratio: float = DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO,
 ) -> dict:
     """Verifica concorrente con Playwright (+ pre-check HTTP opzionale).
 
@@ -445,10 +450,11 @@ async def _process_rows(
 
     if CffiAsyncSession is not None and not _deadline_reached(deadline_utc):
         cffi_results: dict[int, str] = {}
-        cffi_sem = asyncio.Semaphore(40)
+        cffi_sem = asyncio.Semaphore(max(1, int(cffi_concurrency)))
 
         async def _cffi_one(session, row) -> None:
             async with cffi_sem:
+                await asyncio.sleep(random.uniform(0.03, 0.12))
                 cffi_results[row["id"]] = await _cffi_precheck(row["url"], session)
 
         async with CffiAsyncSession(impersonate="chrome136") as cffi_session:
@@ -467,11 +473,12 @@ async def _process_rows(
         # Akamai ha bannato l'IP. Playwright otterrebbe gli stessi blocchi
         # bruciando 100+ secondi per 0 verifiche. Salta e marca tutto pending.
         _cffi_block_ratio = cffi_unknown_count / max(1, len(rows))
-        if _cffi_block_ratio >= 0.80:
+        if _cffi_block_ratio >= float(cffi_block_unknown_ratio):
             _cffi_block = True
             log.warning(
-                "cffi blocco massivo (%.0f%% unknown): skip Playwright, chunk → pending",
+                "cffi blocco massivo (%.0f%% unknown, sem=%d): skip Playwright, chunk → pending",
                 _cffi_block_ratio * 100,
+                max(1, int(cffi_concurrency)),
             )
     else:
         if CffiAsyncSession is None:
@@ -784,6 +791,7 @@ async def verify_batch(
     verify_all: bool = False,
     recheck_days=None,  # int or None
     concurrency: int = DEFAULT_CONCURRENCY,
+    cffi_concurrency: int = DEFAULT_CFFI_CONCURRENCY,
     include_rejected: bool = False,
     xbox_only: bool = True,
     chunk_size: int = DEFAULT_CHUNK_SIZE,
@@ -797,6 +805,8 @@ async def verify_batch(
     fail_fast_min_attempts: int = DEFAULT_FAIL_FAST_MIN_ATTEMPTS,
     fail_fast_blocked_ratio: float = DEFAULT_FAIL_FAST_BLOCKED_RATIO,
     fail_fast_403_ratio: float = DEFAULT_FAIL_FAST_403_RATIO,
+    cffi_block_unknown_ratio: float = DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO,
+    min_coverage_ratio: float = DEFAULT_MIN_COVERAGE_RATIO,
     selection_sample: int = 0,
 ) -> dict:
     """Recupera un batch di annunci e li verifica online con concorrenza.
@@ -806,6 +816,7 @@ async def verify_batch(
         verify_all:    Se True, verifica tutti gli annunci attivi non verificati.
         recheck_days:  Se impostato, ri-verifica anche i venduti degli ultimi N giorni.
         concurrency:   Numero massimo di URL verificati in parallelo (default 30).
+        cffi_concurrency: numero massimo di precheck curl-cffi in parallelo.
         include_rejected: include anche annunci ai_status='rejected' (default False).
         xbox_only: verifica solo annunci rilevanti Xbox (default True).
         chunk_size: numero record per chunk operativo.
@@ -820,6 +831,8 @@ async def verify_batch(
         fail_fast_min_attempts: minimo tentativi prima di abilitare stop anticipato.
         fail_fast_blocked_ratio: soglia blocked totale per stop anticipato.
         fail_fast_403_ratio: soglia 403 per stop anticipato.
+        cffi_block_unknown_ratio: soglia unknown oltre cui il chunk entra in cffi-block.
+        min_coverage_ratio: soglia opzionale minima di coverage finale.
         selection_sample: numero di annunci esclusi da xbox-only da mostrare a log.
 
     Returns:
@@ -926,9 +939,10 @@ async def verify_batch(
             )
 
     log.info(
-        "Inizio verifica di %d annunci (concorrenza=%d, chunk=%d, stati=%s)%s…",
+        "Inizio verifica di %d annunci (concorrenza=%d, cffi=%d, chunk=%d, stati=%s)%s…",
         len(all_rows),
         concurrency,
+        max(1, int(cffi_concurrency)),
         max(1, int(chunk_size)),
         ",".join(statuses),
         (
@@ -955,6 +969,7 @@ async def verify_batch(
         "avg_hours_active": None,
         "skipped": 0,
         "blocked_403": 0,
+        "blocked_cffi": 0,
         "blocked_total": 0,
         "blocked_timeout": 0,
         "blocked_network": 0,
@@ -971,6 +986,9 @@ async def verify_batch(
     target_concurrency = max(1, int(concurrency))
     min_concurrency = max(1, target_concurrency // 3)
     current_concurrency = target_concurrency
+    initial_cffi_concurrency = max(1, int(cffi_concurrency))
+    min_cffi_concurrency = max(1, min(DEFAULT_MIN_CFFI_CONCURRENCY, initial_cffi_concurrency))
+    current_cffi_concurrency = initial_cffi_concurrency
     force_restart_next = False
     consecutive_cffi_blocks = 0  # Track consecutive chunks with massive cffi blocking
 
@@ -1065,6 +1083,8 @@ async def verify_batch(
                     nav_timeout_ms=nav_timeout_ms,
                     body_timeout_seconds=body_timeout_seconds,
                     dom_fallback_timeout_ms=dom_fallback_timeout_ms,
+                    cffi_concurrency=current_cffi_concurrency,
+                    cffi_block_unknown_ratio=cffi_block_unknown_ratio,
                 )
                 chunk_elapsed = max(0.001, time.perf_counter() - chunk_t0)
                 reason_counts = stats.get("reason_counts") or {}
@@ -1087,23 +1107,31 @@ async def verify_batch(
                     attempted_in_chunk,
                     top_reasons,
                 )
-                unstable_hits = sum(
-                    count
-                    for reason, count in reason_counts.items()
-                    if (
-                        str(reason).startswith("blocked:")
-                        or "http-403" in reason
-                        or "http-429" in reason
-                    )
-                )
+                unstable_hits = _count_unstable_hits(reason_counts)
                 unstable_ratio = unstable_hits / max(1, attempted_in_chunk)
 
-                # Anti-burst throttling: delay quando si rilevano blocchi cffi massivi consecutivi
-                cffi_block_count = reason_counts.get("skipped:cffi-block", 0)
-                if cffi_block_count > 300:
+                # Anti-burst throttling: scala sia backoff sia concorrenza cffi
+                # quando il chunk finisce quasi interamente in cffi-block.
+                cffi_block_count = int(reason_counts.get("skipped:cffi-block", 0) or 0)
+                cffi_block_ratio = cffi_block_count / max(1, attempted_in_chunk)
+                if cffi_block_ratio >= 0.70:
                     consecutive_cffi_blocks += 1
-                    if consecutive_cffi_blocks >= 2 and idx + chunk_len < len(all_rows):
-                        burst_delay = 30
+                    new_cffi_concurrency = max(
+                        min_cffi_concurrency,
+                        current_cffi_concurrency - 4,
+                    )
+                    if new_cffi_concurrency != current_cffi_concurrency:
+                        log.warning(
+                            "Chunk %d in cffi-block (%.1f%%): cffi %d -> %d",
+                            chunk_no + 1,
+                            cffi_block_ratio * 100,
+                            current_cffi_concurrency,
+                            new_cffi_concurrency,
+                        )
+                        current_cffi_concurrency = new_cffi_concurrency
+                    force_restart_next = True
+                    if idx + chunk_len < len(all_rows):
+                        burst_delay = _compute_cffi_backoff_seconds(consecutive_cffi_blocks)
                         log.warning(
                             "Cloudflare burst rilevato (%d chunk consecutivi con cffi-block): pausa %ds",
                             consecutive_cffi_blocks,
@@ -1111,7 +1139,28 @@ async def verify_batch(
                         )
                         await asyncio.sleep(burst_delay)
                 else:
-                    # Reset counter se chunk processato normalmente
+                    if consecutive_cffi_blocks > 0 and cffi_block_count == 0:
+                        log.info(
+                            "cffi recovery dopo %d chunk bloccati consecutivi.",
+                            consecutive_cffi_blocks,
+                        )
+                    if (
+                        cffi_block_count == 0
+                        and unstable_ratio <= 0.05
+                        and current_cffi_concurrency < initial_cffi_concurrency
+                    ):
+                        new_cffi_concurrency = min(
+                            initial_cffi_concurrency,
+                            current_cffi_concurrency + 2,
+                        )
+                        if new_cffi_concurrency != current_cffi_concurrency:
+                            log.info(
+                                "Chunk %d stabile: cffi %d -> %d",
+                                chunk_no + 1,
+                                current_cffi_concurrency,
+                                new_cffi_concurrency,
+                            )
+                            current_cffi_concurrency = new_cffi_concurrency
                     consecutive_cffi_blocks = 0
 
                 if unstable_ratio >= 0.25 and current_concurrency > min_concurrency:
@@ -1141,7 +1190,7 @@ async def verify_batch(
 
                 # Cooldown inter-chunk adattivo: scala proporzionale all'intensità del blocco.
                 # Ban totale (>95%) richiede più recovery del ban moderato (60-70%).
-                if unstable_ratio >= 0.60 and idx + chunk_len < len(all_rows):
+                if cffi_block_count == 0 and unstable_ratio >= 0.60 and idx + chunk_len < len(all_rows):
                     if unstable_ratio >= 0.95:
                         cooldown_secs = 75
                     elif unstable_ratio >= 0.85:
@@ -1167,8 +1216,10 @@ async def verify_batch(
                 total_stats["blocked_403"] += int(
                     sum(v for k, v in reason_counts.items() if "http-403" in k)
                 )
+                total_stats["blocked_cffi"] += cffi_block_count
                 total_stats["blocked_total"] += int(
-                    sum(v for k, v in reason_counts.items() if str(k).startswith("blocked:"))
+                    cffi_block_count
+                    + sum(v for k, v in reason_counts.items() if str(k).startswith("blocked:"))
                 )
                 total_stats["blocked_timeout"] += int(
                     sum(v for k, v in reason_counts.items() if "blocked:timeout" in str(k))
@@ -1221,9 +1272,11 @@ async def verify_batch(
     if attempted_total <= 0:
         attempted_total = 1
     blocked_403_ratio = float(total_stats["blocked_403"]) / float(attempted_total)
+    blocked_cffi_ratio = float(total_stats["blocked_cffi"]) / float(attempted_total)
     blocked_total_ratio = float(total_stats["blocked_total"]) / float(attempted_total)
     coverage_ratio = float(total_stats["verified"]) / float(max(1, attempted_total))
     total_stats["blocked_403_ratio"] = blocked_403_ratio
+    total_stats["blocked_cffi_ratio"] = blocked_cffi_ratio
     total_stats["blocked_total_ratio"] = blocked_total_ratio
     total_stats["coverage_ratio"] = coverage_ratio
 
@@ -1237,12 +1290,15 @@ async def verify_batch(
     )
     log.info(
         (
-            "HTTP block summary: 403=%d/%d (%.2f%%) | blocked_totali=%d/%d (%.2f%%) "
-            "| timeout=%d | network=%d | error=%d"
+            "HTTP block summary: 403=%d/%d (%.2f%%) | cffi-block=%d/%d (%.2f%%) "
+            "| blocked_totali=%d/%d (%.2f%%) | timeout=%d | network=%d | error=%d"
         ),
         total_stats["blocked_403"],
         attempted_total,
         blocked_403_ratio * 100,
+        total_stats["blocked_cffi"],
+        attempted_total,
+        blocked_cffi_ratio * 100,
         total_stats["blocked_total"],
         attempted_total,
         blocked_total_ratio * 100,
@@ -1294,6 +1350,13 @@ async def verify_batch(
             float(max_http403_ratio) * 100,
         )
         total_stats["high_block_rate"] = True
+    if float(min_coverage_ratio) > 0 and coverage_ratio < float(min_coverage_ratio):
+        log.error(
+            "Coverage finale %.1f%% sotto soglia minima %.1f%%",
+            coverage_ratio * 100,
+            float(min_coverage_ratio) * 100,
+        )
+        total_stats["coverage_below_min"] = True
     return total_stats
 
 
@@ -1331,6 +1394,16 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         default=DEFAULT_CONCURRENCY,
         metavar="N",
         help=f"Numero di URL verificati in parallelo (default {DEFAULT_CONCURRENCY})",
+    )
+    parser.add_argument(
+        "--cffi-concurrency",
+        type=int,
+        default=DEFAULT_CFFI_CONCURRENCY,
+        metavar="N",
+        help=(
+            "Numero massimo di precheck curl-cffi in parallelo "
+            f"(default {DEFAULT_CFFI_CONCURRENCY})"
+        ),
     )
     parser.add_argument(
         "--chunk-size",
@@ -1464,6 +1537,26 @@ def _build_arg_parser() -> argparse.ArgumentParser:
             f"Default {DEFAULT_FAIL_FAST_403_RATIO:.2f}"
         ),
     )
+    parser.add_argument(
+        "--cffi-block-unknown-ratio",
+        type=float,
+        default=DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO,
+        metavar="R",
+        help=(
+            "Soglia unknown oltre cui il chunk entra in cffi-block "
+            f"(default {DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO:.2f})"
+        ),
+    )
+    parser.add_argument(
+        "--min-coverage-ratio",
+        type=float,
+        default=DEFAULT_MIN_COVERAGE_RATIO,
+        metavar="R",
+        help=(
+            "Soglia minima opzionale di coverage finale; exit code 2 se non rispettata "
+            f"(default {DEFAULT_MIN_COVERAGE_RATIO:.2f} = disabilitata)"
+        ),
+    )
     return parser
 
 
@@ -1471,12 +1564,13 @@ if __name__ == "__main__":
     args = _build_arg_parser().parse_args()
     init_db()
     max_runtime = args.max_runtime_minutes if args.max_runtime_minutes and args.max_runtime_minutes > 0 else None
-    asyncio.run(
+    stats = asyncio.run(
         verify_batch(
             batch_size=args.batch_size,
             verify_all=args.verify_all,
             recheck_days=args.recheck_days,
             concurrency=args.concurrency,
+            cffi_concurrency=args.cffi_concurrency,
             include_rejected=args.include_rejected,
             xbox_only=args.xbox_only,
             chunk_size=args.chunk_size,
@@ -1490,6 +1584,10 @@ if __name__ == "__main__":
             fail_fast_min_attempts=args.fail_fast_min_attempts,
             fail_fast_blocked_ratio=args.fail_fast_blocked_ratio,
             fail_fast_403_ratio=args.fail_fast_403_ratio,
+            cffi_block_unknown_ratio=args.cffi_block_unknown_ratio,
+            min_coverage_ratio=args.min_coverage_ratio,
             selection_sample=args.selection_sample,
         )
     )
+    if args.min_coverage_ratio and stats.get("coverage_below_min"):
+        raise SystemExit(2)
