@@ -2,9 +2,9 @@ name: Verify Sold Subito
 
 on:
   schedule:
-    # 1 ora dopo lo scraper Subito: 03:00 09:00 15:00 21:00 UTC → 05/11/17/23 CEST
-    # Il gap da 1h lascia raffreddare l'IP nella blacklist Akamai prima di verify-sold.
-    - cron: '0 3,9,15,21 * * *'
+    # Manteniamo verify-sold nelle finestre mattutine osservate come piu' stabili.
+    # 1 ora dopo lo scraper Subito: 03:00 09:00 UTC → 05/11 CEST
+    - cron: '0 3,9 * * *'
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
 concurrency:
@@ -43,13 +43,15 @@ jobs:
           python3.11 verify_sold.py
           --all
           --max-runtime-minutes 55
-          --concurrency 18
-          --chunk-size 350
-          --browser-restart-every 3
+          --concurrency 12
+          --cffi-concurrency 10
+          --chunk-size 200
+          --browser-restart-every 4
           --nav-timeout-ms 7000
           --body-timeout-seconds 2.5
           --dom-fallback-timeout-ms 1200
           --max-http403-ratio 0.02
+          --min-coverage-ratio 0.85
           --fail-fast-min-attempts 400
           --fail-fast-blocked-ratio 0.85
           --fail-fast-403-ratio 0.60
