@@ -1287,6 +1287,82 @@ header {
 }
 
 /* ============================================================
+   Market Views — layout unificato (subito-b, subito-p, subito-s, ebay)
+   ============================================================ */
+.mkt-stats {
+  display: flex;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+}
+.mkt-s2-subito span { color: #ff6600; }
+.mkt-s2-ebay   span { color: #e53935; }
+
+.mkt-inner {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+
+.mkt-filters {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 0 20px;
+}
+.mkt-filters input[type="text"] {
+  flex: 1;
+  min-width: 180px;
+  max-width: 300px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+}
+.mkt-filters input[type="text"]:focus { border-color: #ff6600; }
+.mkt-filters select {
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+.mkt-filters span {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.mkt-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+  gap: 20px;
+}
+
+.mkt-approve-btn,
+.mkt-reject-btn {
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  border-radius: 3px;
+  padding: 2px 7px;
+  color: white;
+  line-height: 1.6;
+}
+.mkt-approve-btn { background: #2e7d32; margin-right: 4px; }
+.mkt-reject-btn  { background: #b71c1c; }
+.mkt-approve-btn:hover { background: #1b5e20; }
+.mkt-reject-btn:hover  { background: #7f0000; }
+
+/* ============================================================
    Chart Button (Feature 4)
    ============================================================ */
 .chart-btn {
