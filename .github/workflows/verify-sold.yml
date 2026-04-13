@@ -54,8 +54,7 @@ jobs:
             --min-coverage-ratio 0.85 \
             --fail-fast-min-attempts 400 \
             --fail-fast-blocked-ratio 0.85 \
-            --fail-fast-403-ratio 0.60 \
-            --selection-sample 5
+            --fail-fast-403-ratio 0.60
           VERIFY_EXIT=$?
           echo "exit_code=${VERIFY_EXIT}" >> "$GITHUB_OUTPUT"
           # Exit code 3 = coverage sotto soglia: non fallire il job (il retry step gestisce)
