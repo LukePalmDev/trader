@@ -751,12 +751,14 @@ def main() -> None:
                     _vs.verify_batch(
                         batch_size=batch,
                         verify_all=args.verify_all,
-                        concurrency=args.concurrency,
                         include_rejected=args.verify_include_rejected,
                         xbox_only=args.verify_xbox_only,
-                        chunk_size=args.verify_chunk_size,
                         max_runtime_minutes=max_runtime,
-                        browser_restart_every=args.verify_browser_restart_every,
+                        cfg=_vs.VerifyConfig(
+                            concurrency=args.concurrency,
+                            chunk_size=args.verify_chunk_size,
+                            browser_restart_every=args.verify_browser_restart_every,
+                        ),
                     )
                 )
             ok = True
@@ -816,12 +818,14 @@ def main() -> None:
                     _vs.verify_batch(
                         batch_size=2000,
                         verify_all=False,
-                        concurrency=max(args.concurrency, 5),
                         include_rejected=False,
                         xbox_only=args.verify_xbox_only,
-                        chunk_size=max(120, min(int(args.verify_chunk_size), 240)),
                         max_runtime_minutes=50,
-                        browser_restart_every=max(args.verify_browser_restart_every, 3),
+                        cfg=_vs.VerifyConfig(
+                            concurrency=max(args.concurrency, 5),
+                            chunk_size=max(120, min(int(args.verify_chunk_size), 240)),
+                            browser_restart_every=max(args.verify_browser_restart_every, 3),
+                        ),
                     )
                 )
 
@@ -914,14 +918,16 @@ def main() -> None:
                     _vs.verify_batch(
                         include_rejected=args.verify_include_rejected,
                         xbox_only=args.verify_xbox_only,
-                        chunk_size=args.verify_chunk_size,
                         max_runtime_minutes=(
                             None
                             if int(args.verify_max_runtime_minutes) <= 0
                             else int(args.verify_max_runtime_minutes)
                         ),
-                        browser_restart_every=args.verify_browser_restart_every,
-                        concurrency=args.concurrency,
+                        cfg=_vs.VerifyConfig(
+                            concurrency=args.concurrency,
+                            chunk_size=args.verify_chunk_size,
+                            browser_restart_every=args.verify_browser_restart_every,
+                        ),
                     )
                 )
 
