@@ -17,6 +17,7 @@ jobs:
       TRADER_VIEWER_OPEN_BROWSER: "false"
       TRADER_TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TRADER_TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     permissions:
       contents: write
 
@@ -37,6 +38,9 @@ jobs:
 
       - name: Scrape eBay venduti
         run: python run.py --source ebay
+
+      - name: Classifica item eBay con AI (canonical model)
+        run: python ai_classifier.py --source ebay
 
       - name: Cleanup and archive old data
         run: python run.py --cleanup

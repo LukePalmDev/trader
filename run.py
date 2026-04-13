@@ -516,18 +516,29 @@ def main() -> None:
         action="store_true",
         help="Classifica ai_status/ai_confidence con Haiku 4.5 (titolo+descrizione).",
     )
-    parser.add_argument("--ai-limit", type=int, default=None, help="Limite annunci per ai_classifier")
+    parser.add_argument("--ai-limit", type=int, default=None, help="Limite annunci/item per ai_classifier")
     parser.add_argument("--ai-batch-size", type=int, default=50, help="Batch size ai_classifier")
     parser.add_argument("--ai-concurrency", type=int, default=5, help="Concorrenza ai_classifier")
     parser.add_argument(
+        "--ai-source",
+        choices=["subito", "ebay", "all"],
+        default="subito",
+        help="Sorgente per --ai-classify: subito (default), ebay, all",
+    )
+    parser.add_argument(
         "--ai-all",
         action="store_true",
-        help="Classifica tutti gli annunci in ai_classifier (non solo pending+NULL).",
+        help="(Subito) Classifica tutti gli annunci in ai_classifier (non solo pending+NULL).",
     )
     parser.add_argument(
         "--ai-reset-first",
         action="store_true",
-        help="Resetta ai_status/ai_confidence prima di ai_classifier.",
+        help="(Subito) Resetta ai_status/ai_confidence prima di ai_classifier.",
+    )
+    parser.add_argument(
+        "--ai-ebay-reclassify-all",
+        action="store_true",
+        help="(eBay) Riclassifica tutti gli item eBay, non solo quelli con canonical non risolto.",
     )
     parser.add_argument(
         "--subito-rebuild-all",
@@ -786,16 +797,27 @@ def main() -> None:
         if args.ai_classify:
             import ai_classifier as _aic
 
-            with report.step("ai_classify_subito"):
-                asyncio.run(
-                    _aic.run_ai_classifier(
-                        batch_size=args.ai_batch_size,
-                        concurrency=args.ai_concurrency,
-                        classify_all=args.ai_all,
-                        reset_first=args.ai_reset_first,
-                        limit=args.ai_limit,
+            if args.ai_source in ("subito", "all"):
+                with report.step("ai_classify_subito"):
+                    asyncio.run(
+                        _aic.run_ai_classifier(
+                            batch_size=args.ai_batch_size,
+                            concurrency=args.ai_concurrency,
+                            classify_all=args.ai_all,
+                            reset_first=args.ai_reset_first,
+                            limit=args.ai_limit,
+                        )
                     )
-                )
+            if args.ai_source in ("ebay", "all"):
+                with report.step("ai_classify_ebay"):
+                    asyncio.run(
+                        _aic.run_ebay_classifier(
+                            batch_size=args.ai_batch_size,
+                            concurrency=args.ai_concurrency,
+                            limit=args.ai_limit,
+                            reclassify_all=args.ai_ebay_reclassify_all,
+                        )
+                    )
             ok = True
             return
 
@@ -931,7 +953,7 @@ def main() -> None:
                     )
                 )
 
-            log.info("[ 4/6 ] Filtro AI su Subito (ai_classifier)…")
+            log.info("[ 4/6 ] Filtro AI su Subito + eBay (ai_classifier)…")
             if os.environ.get("ANTHROPIC_API_KEY"):
                 import ai_classifier as _aic
                 with report.step("ai_classify_subito"):
@@ -944,8 +966,16 @@ def main() -> None:
                             limit=args.ai_limit,
                         )
                     )
+                with report.step("ai_classify_ebay"):
+                    asyncio.run(
+                        _aic.run_ebay_classifier(
+                            batch_size=args.ai_batch_size,
+                            concurrency=args.ai_concurrency,
+                            limit=args.ai_limit,
+                        )
+                    )
             else:
-                log.warning("ANTHROPIC_API_KEY non trovata — filtro AI Subito saltato.")
+                log.warning("ANTHROPIC_API_KEY non trovata — filtro AI Subito/eBay saltato.")
 
             log.info("[ 5/6 ] Classificazione attributi Globale (classifier)…")
             if os.environ.get("ANTHROPIC_API_KEY"):
