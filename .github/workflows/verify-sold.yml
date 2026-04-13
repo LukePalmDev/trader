@@ -61,13 +61,31 @@ jobs:
           # Tutti gli altri errori (1, 2, …) falliscono il job normalmente
           [ "${VERIFY_EXIT}" -eq 0 ] || [ "${VERIFY_EXIT}" -eq 3 ] || exit "${VERIFY_EXIT}"
 
+      - name: Aggiorna coverage history CSV
+        run: |
+          CSV=logs/coverage_history.csv
+          mkdir -p logs
+          if [ ! -f "$CSV" ]; then
+            echo "date,coverage_pct,verified,skipped,sold_new" > "$CSV"
+          fi
+          if [ -f logs/verify_sold_last_run.json ]; then
+            python3.11 - <<'PY'
+import json, pathlib, sys
+p = pathlib.Path("logs/verify_sold_last_run.json")
+d = json.loads(p.read_text())
+row = f"{d['date']},{d['coverage_pct']},{d['verified']},{d['skipped']},{d['sold_new']}"
+with open("logs/coverage_history.csv", "a") as f:
+    f.write(row + "\n")
+PY
+          fi
+
       - name: Commit e push DB aggiornato
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           git fetch origin
           git reset --mixed origin/main
-          git add tracker.db
+          git add tracker.db logs/coverage_history.csv
           git diff --staged --quiet \
             || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"
           git push

@@ -1542,5 +1542,21 @@ if __name__ == "__main__":
             cfg=cfg,
         )
     )
+    # Scrivi statistiche finali per il workflow (coverage history CSV)
+    try:
+        _logs_dir = Path("logs")
+        _logs_dir.mkdir(exist_ok=True)
+        _last_run = {
+            "date": datetime.now(timezone.utc).date().isoformat(),
+            "coverage_pct": round(float(stats.get("coverage_ratio", 0) or 0) * 100, 1),
+            "verified": int(stats.get("verified", 0) or 0),
+            "skipped": int(stats.get("skipped", 0) or 0),
+            "sold_new": int(stats.get("sold", 0) or 0),
+        }
+        with open(_logs_dir / "verify_sold_last_run.json", "w") as _lrf:
+            json.dump(_last_run, _lrf)
+    except Exception as _lre:
+        log.debug("Last-run JSON write error: %s", _lre)
+
     if args.min_coverage_ratio and stats.get("coverage_below_min"):
         sys.exit(3)
