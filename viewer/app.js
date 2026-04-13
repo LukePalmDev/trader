@@ -356,13 +356,15 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('view-' + btn.dataset.tab).classList.add('active');
-    if (btn.dataset.tab === 'home')   renderHome();
+    if (btn.dataset.tab === 'home')      renderHome();
     if (btn.dataset.tab === 'standardi') renderStandardGroups();
-    if (btn.dataset.tab === 'subito') loadSubitoData();
-    if (btn.dataset.tab === 'ebay')   loadEbayData();
+    if (btn.dataset.tab === 'subito-b')  loadMarket('subito-b');
+    if (btn.dataset.tab === 'subito-p')  loadMarket('subito-p');
+    if (btn.dataset.tab === 'subito-s')  loadMarket('subito-s');
+    if (btn.dataset.tab === 'ebay')      loadMarket('ebay');
     if (btn.dataset.tab === 'statistiche') renderStatistiche();
-    if (btn.dataset.tab === 'trend') renderTrend();
-    if (btn.dataset.tab === 'ricerca') initRicerca();
+    if (btn.dataset.tab === 'trend')     renderTrend();
+    if (btn.dataset.tab === 'ricerca')   initRicerca();
   });
 });
 
@@ -2546,10 +2548,12 @@ async function updateAiStatus(adId, status) {
 // ============================================================
 document.getElementById('btn-refresh').addEventListener('click', () => {
   tryAutoLoad();
-  // Se il tab Subito è attivo, ricarica anche i suoi dati
+  // Se il tab market è attivo, ricarica anche i suoi dati
   const activeTab = document.querySelector('.tab.active');
-  if (activeTab && activeTab.dataset.tab === 'subito') loadSubitoData();
-  if (activeTab && activeTab.dataset.tab === 'ebay')   loadEbayData();
+  if (activeTab && activeTab.dataset.tab === 'subito-b') loadMarket('subito-b');
+  if (activeTab && activeTab.dataset.tab === 'subito-p') loadMarket('subito-p');
+  if (activeTab && activeTab.dataset.tab === 'subito-s') loadMarket('subito-s');
+  if (activeTab && activeTab.dataset.tab === 'ebay')     loadMarket('ebay');
 });
 
 async function tryAutoLoad() {
@@ -2821,6 +2825,347 @@ function renderEbay() {
     tableWrapper.appendChild(table);
     card.appendChild(tableWrapper);
     grid.appendChild(card);
+  }
+}
+
+// ============================================================
+// MARKET VIEWS — layout unificato (subito-b, subito-p, subito-s, ebay)
+// ============================================================
+
+function _updateMktStats(mode, rows) {
+  const priceField = mode === 'ebay' ? 'sold_price' : 'last_price';
+  const prices = rows.map(r => r[priceField]).filter(v => v != null && v > 0);
+  const total  = rows.length;
+  const minP   = prices.length ? Math.min(...prices) : null;
+  const avgP   = prices.length ? prices.reduce((s, v) => s + v, 0) / prices.length : null;
+  const s2val  = mode === 'subito-p'
+    ? rows.filter(r => r.last_price != null).length
+    : new Set(rows.map(r => r.console_family).filter(Boolean)).size;
+
+  const pfx = 'mkt-' + mode + '-';
+  const set  = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set(pfx + 's1', total  || '—');
+  set(pfx + 's2', s2val  || '—');
+  set(pfx + 's3', minP != null ? '€ ' + minP.toFixed(0) : '—');
+  set(pfx + 's4', avgP != null ? '€ ' + Math.round(avgP) : '—');
+}
+
+function _populateMktRegionFilter(mode, rows) {
+  const sel = document.getElementById('mkt-' + mode + '-region');
+  if (!sel || mode === 'ebay') return;
+  const current = sel.value;
+  while (sel.options.length > 1) sel.remove(1);
+  const regions = [...new Set(rows.map(r => r.region).filter(Boolean))].sort();
+  for (const r of regions) {
+    const opt = document.createElement('option');
+    opt.value = r; opt.textContent = r;
+    sel.appendChild(opt);
+  }
+  if (regions.includes(current)) sel.value = current;
+}
+
+async function loadMarket(mode) {
+  const _fb = { ok: false, body: null };
+  try {
+    if (mode === 'subito-b' || mode === 'subito-p') {
+      const [rAds, , rOpp] = _settled(
+        await Promise.allSettled([
+          API.fetchJson('/api/subito/ads'),
+          API.fetchJson('/api/subito/stats'),
+          API.fetchJson('/api/valuation/subito-opportunities?limit=500'),
+        ]),
+        [_fb, _fb, _fb],
+      );
+      if (rAds.ok) SUBITO_ADS = _sanitizeRows(rAds.body);
+      if (rOpp.ok) {
+        const payload = _sanitizeRow(rOpp.body);
+        SUBITO_OPPS = _sanitizeRows(payload.items || []);
+      }
+      // Update stats for both sibling modes since we loaded all ads
+      const bRows = SUBITO_ADS.filter(a => a.ai_status === 'approved' && !!a.last_available);
+      const pRows = SUBITO_ADS.filter(a => (a.ai_status || 'pending') === 'pending');
+      _updateMktStats('subito-b', bRows);
+      _updateMktStats('subito-p', pRows);
+      _populateMktRegionFilter('subito-b', bRows);
+      _populateMktRegionFilter('subito-p', pRows);
+      _syncState();
+    } else if (mode === 'subito-s') {
+      const [rSold] = _settled(
+        await Promise.allSettled([API.fetchJson('/api/subito/sold')]),
+        [_fb],
+      );
+      if (rSold.ok) SUBITO_SOLD = _sanitizeRows(rSold.body);
+      _updateMktStats('subito-s', SUBITO_SOLD);
+      _populateMktRegionFilter('subito-s', SUBITO_SOLD);
+      _syncState();
+    } else if (mode === 'ebay') {
+      const [rSold] = _settled(
+        await Promise.allSettled([API.fetchJson('/api/ebay/sold')]),
+        [_fb],
+      );
+      if (rSold.ok) {
+        const items = _sanitizeRows(rSold.body);
+        EBAY_SOLD = items.filter(i => !PARTS_RE.test(i.name || ''));
+      }
+      _updateMktStats('ebay', EBAY_SOLD);
+      _syncState();
+    }
+    renderMarket(mode);
+  } catch (e) {
+    console.warn('loadMarket', mode, ':', e.message);
+  }
+}
+
+function _renderMktRow(row, mode, famAvgs, oppByUrn) {
+  const priceField = mode === 'ebay' ? 'sold_price' : 'last_price';
+  const price  = row[priceField];
+  const isPro  = row.seller_type === 'professionale';
+  const accent = mode === 'ebay' ? '#e53935' : '#ff6600';
+
+  const tr = document.createElement('tr');
+  tr.className = 'product-row';
+
+  // 1. Annuncio
+  const tdName = document.createElement('td');
+  tdName.className = 'prod-name-cell';
+  let nameHtml = row.url
+    ? `<a href="${row.url}" target="_blank" rel="noopener noreferrer" class="prod-link" title="${row.name}">${row.name}</a>`
+    : `<span class="prod-link">${row.name}</span>`;
+  if (row.ai_confidence != null) {
+    const conf = row.ai_confidence;
+    const c = conf >= 75 ? '#2e7d32' : conf <= 25 ? '#b71c1c' : '#ef6c00';
+    nameHtml += `<span style="font-size:9px;font-weight:bold;color:${c};margin-left:5px;border:1px solid ${c};border-radius:3px;padding:0 3px;">AI:${conf}%</span>`;
+  }
+  if (mode === 'subito-p') {
+    nameHtml += `<div style="margin-top:4px;">
+      <button data-mkt-action="approved" data-ad-id="${row.id}" class="mkt-approve-btn">Approva</button>
+      <button data-mkt-action="rejected" data-ad-id="${row.id}" class="mkt-reject-btn">Scarta</button>
+    </div>`;
+  }
+  tdName.innerHTML = nameHtml;
+  tr.appendChild(tdName);
+
+  // 2. Zona
+  const tdZona = document.createElement('td');
+  tdZona.style.cssText = 'padding:6px 10px;font-size:12px;color:var(--text-muted);white-space:nowrap;';
+  tdZona.textContent = row.city || '—';
+  tr.appendChild(tdZona);
+
+  // 3. Tipo
+  const tdTipo = document.createElement('td');
+  tdTipo.style.cssText = 'padding:6px 10px;text-align:center;';
+  if (mode !== 'ebay' && row.seller_type) {
+    const b = document.createElement('span');
+    b.style.cssText = `font-size:9px;font-weight:700;text-transform:uppercase;padding:2px 5px;border-radius:3px;letter-spacing:0.5px;background:${isPro ? 'rgba(255,102,0,0.15)' : 'rgba(120,120,120,0.12)'};color:${isPro ? '#ff6600' : 'var(--text-muted)'};`;
+    b.textContent = isPro ? 'PRO' : 'PRV';
+    b.title = isPro ? 'Venditore professionale' : 'Privato';
+    tdTipo.appendChild(b);
+  } else {
+    tdTipo.style.cssText += 'font-size:12px;color:var(--text-muted);';
+    tdTipo.textContent = '—';
+  }
+  tr.appendChild(tdTipo);
+
+  // 4. Data
+  const tdData = document.createElement('td');
+  tdData.style.cssText = 'padding:6px 10px;font-size:11px;color:var(--text-muted);white-space:nowrap;';
+  if (mode === 'ebay') {
+    tdData.textContent = row.sold_date || '—';
+  } else if (mode === 'subito-s') {
+    const rawD = row.sold_at_estimated || row.sold_at;
+    tdData.textContent = rawD ? _fmtSubitoDate(rawD) : '—';
+  } else {
+    tdData.textContent = _fmtSubitoDate(row.published_at);
+  }
+  tr.appendChild(tdData);
+
+  // 5. Prezzo
+  const tdPrice = document.createElement('td');
+  tdPrice.className = 'prod-price-cell';
+  if (mode === 'ebay') tdPrice.style.color = '#e53935';
+  tdPrice.textContent = price != null ? '€ ' + price.toFixed(0) : '—';
+  tr.appendChild(tdPrice);
+
+  // 6. Info
+  const tdInfo = document.createElement('td');
+  tdInfo.style.cssText = 'padding:6px 10px;text-align:center;white-space:nowrap;font-size:11px;';
+  let infoHtml = '';
+  if (mode === 'subito-b') {
+    infoHtml = _renderOpportunityBadge(row, oppByUrn[row.urn_id], famAvgs);
+  }
+  if (row.canonical_model && row.canonical_model !== 'other') {
+    infoHtml += `<span style="font-size:10px;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:1px 4px;${infoHtml ? 'margin-left:3px;' : ''}">${row.canonical_model}</span>`;
+  }
+  tdInfo.innerHTML = infoHtml || '<span style="color:var(--text-muted);">—</span>';
+  tr.appendChild(tdInfo);
+
+  // 7. Stato
+  const tdStato = document.createElement('td');
+  tdStato.className = 'prod-avail-cell';
+  const dot = document.createElement('span');
+  if (mode === 'subito-b') {
+    dot.className = 'avail-dot ok'; dot.title = 'Disponibile';
+  } else if (mode === 'subito-p') {
+    dot.className = 'avail-dot'; dot.style.background = '#ef6c00'; dot.title = 'Pending AI';
+  } else {
+    dot.className = 'avail-dot ko'; dot.title = 'Venduto';
+  }
+  tdStato.appendChild(dot);
+  tr.appendChild(tdStato);
+
+  return tr;
+}
+
+function renderMarket(mode) {
+  const grid = document.getElementById('mkt-' + mode + '-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  // Base dataset per mode
+  let rows;
+  if (mode === 'subito-b') {
+    rows = SUBITO_ADS.filter(a => a.ai_status === 'approved' && !!a.last_available);
+  } else if (mode === 'subito-p') {
+    rows = SUBITO_ADS.filter(a => (a.ai_status || 'pending') === 'pending');
+  } else if (mode === 'subito-s') {
+    rows = SUBITO_SOLD.slice();
+  } else {
+    rows = EBAY_SOLD.filter(i => !PARTS_RE.test(i.name || ''));
+  }
+
+  // Filtri
+  const pfx    = 'mkt-' + mode + '-';
+  const q      = (document.getElementById(pfx + 'search')?.value    || '').toLowerCase().trim();
+  const famF   = document.getElementById(pfx + 'family')?.value     || '';
+  const selF   = document.getElementById(pfx + 'seller')?.value     || '';
+  const regF   = document.getElementById(pfx + 'region')?.value     || '';
+
+  if (q)    rows = rows.filter(r => (r.name || '').toLowerCase().includes(q));
+  if (famF) rows = rows.filter(r => r.console_family === famF);
+  if (selF && mode !== 'ebay') rows = rows.filter(r => r.seller_type === selF);
+  if (regF && mode !== 'ebay') rows = rows.filter(r => r.region === regF);
+
+  const countEl = document.getElementById(pfx + 'count');
+  if (countEl) countEl.textContent = rows.length + (mode === 'ebay' ? ' lotti' : ' annunci');
+
+  if (!rows.length) {
+    grid.innerHTML = '<div class="empty-shop">Nessun dato disponibile</div>';
+    return;
+  }
+
+  // Raggruppa per famiglia
+  const byFamily = {};
+  for (const r of rows) {
+    const fk = r.console_family || 'other';
+    if (!byFamily[fk]) byFamily[fk] = [];
+    byFamily[fk].push(r);
+  }
+
+  const accent    = mode === 'ebay' ? '#e53935' : '#ff6600';
+  const famOrder  = [...CONSOLE_FAMILIES.map(f => f.key), 'other'];
+  const _famAvgs  = mode === 'subito-b' ? _computeFamilyAvgs(SUBITO_ADS) : {};
+  const _oppByUrn = mode === 'subito-b' ? _buildOppMap(SUBITO_OPPS)      : {};
+  const priceField = mode === 'ebay' ? 'sold_price' : 'last_price';
+  const thSt = 'padding:6px 10px;font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--text-muted);';
+  const rowLabel = (mode === 'ebay' || mode === 'subito-s') ? 'venduti' : 'annunci';
+
+  for (const fk of famOrder) {
+    const items = byFamily[fk];
+    if (!items?.length) continue;
+
+    // Ordinamento
+    if (mode === 'subito-b' || mode === 'subito-p') {
+      items.sort((a, b) => (a.last_price ?? Infinity) - (b.last_price ?? Infinity));
+    } else if (mode === 'subito-s') {
+      items.sort((a, b) => {
+        const da = a.sold_at_estimated || a.sold_at || '', db = b.sold_at_estimated || b.sold_at || '';
+        return da < db ? 1 : -1;
+      });
+    } else {
+      items.sort((a, b) => {
+        const da = a.sold_date || '', db = b.sold_date || '';
+        return da < db ? 1 : -1;
+      });
+    }
+
+    const famLabel = FAMILY_LABELS[fk] || fk;
+    const prices   = items.map(r => r[priceField]).filter(v => v != null && v > 0);
+    const minPx    = prices.length ? Math.min(...prices) : null;
+
+    const card = document.createElement('div');
+    card.className = 'store-card';
+    card.style.setProperty('--store-accent', accent);
+
+    const header = document.createElement('div');
+    header.className = 'store-card-header';
+    header.innerHTML = `
+      <span class="store-name" style="color:${accent};">${famLabel}</span>
+      <span class="store-header-right">
+        <span class="store-count">${items.length} ${rowLabel}</span>
+        ${minPx != null ? `<span class="card-min-price" style="margin-left:10px;font-size:12px;color:var(--text-muted);">da € ${minPx.toFixed(0)}</span>` : ''}
+      </span>`;
+    card.appendChild(header);
+
+    const table = document.createElement('table');
+    table.className = 'console-table';
+
+    const thead = document.createElement('thead');
+    thead.innerHTML = `<tr style="background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      <th style="${thSt} padding-left:18px;">Annuncio</th>
+      <th style="${thSt}">Zona</th>
+      <th style="${thSt} text-align:center;">Tipo</th>
+      <th style="${thSt}">Data</th>
+      <th style="${thSt} text-align:right;">Prezzo</th>
+      <th style="${thSt} text-align:center;">Info</th>
+      <th style="${thSt} text-align:center;">Stato</th>
+    </tr>`;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    for (const row of items) {
+      tbody.appendChild(_renderMktRow(row, mode, _famAvgs, _oppByUrn));
+    }
+    table.appendChild(tbody);
+
+    const wrap = document.createElement('div');
+    wrap.className = 'console-table-wrapper';
+    wrap.appendChild(table);
+    card.appendChild(wrap);
+    grid.appendChild(card);
+  }
+}
+
+// Click handler delegato per approve/reject nel market P
+document.getElementById('mkt-subito-p-grid')?.addEventListener('click', e => {
+  const btn = e.target.closest('[data-mkt-action]');
+  if (!btn) return;
+  const adId   = parseInt(btn.dataset.adId, 10);
+  const action = btn.dataset.mktAction;
+  if (adId && action) _updateMktAiStatus(adId, action);
+});
+
+async function _updateMktAiStatus(adId, status) {
+  try {
+    const res = await API.fetchJson('/api/subito/update-ai', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ id: adId, status }),
+    });
+    if (!res.ok) {
+      alert('Errore aggiornamento stato: ' + (res.body?.error || res.status));
+      return;
+    }
+    const ad = SUBITO_ADS.find(a => a.id === adId);
+    if (ad) ad.ai_status = status;
+    // Aggiorna entrambe le viste
+    const bRows = SUBITO_ADS.filter(a => a.ai_status === 'approved' && !!a.last_available);
+    const pRows = SUBITO_ADS.filter(a => (a.ai_status || 'pending') === 'pending');
+    _updateMktStats('subito-b', bRows);
+    _updateMktStats('subito-p', pRows);
+    renderMarket('subito-p');
+    renderMarket('subito-b');
+  } catch (e) {
+    console.error('_updateMktAiStatus:', e);
   }
 }
 

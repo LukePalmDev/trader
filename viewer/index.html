@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Xbox Tracker</title>
-  <link rel="stylesheet" href="style.css?v=13" />
+  <link rel="stylesheet" href="style.css?v=14" />
 </head>
 <body>
 
@@ -15,7 +15,9 @@
     <button class="tab active" data-tab="home">Home</button>
     <button class="tab" data-tab="shop">Riepilogo</button>
     <button class="tab" data-tab="catalogo">Catalogo</button>
-    <button class="tab" data-tab="subito">Subito.it</button>
+    <button class="tab" data-tab="subito-b">Subito.it B</button>
+    <button class="tab" data-tab="subito-p">Subito.it P</button>
+    <button class="tab" data-tab="subito-s">Subito.it S</button>
     <button class="tab" data-tab="ebay">eBay</button>
     <button class="tab" data-tab="statistiche">📊 Statistiche</button>
     <button class="tab" data-tab="trend">📈 Trend</button>
@@ -194,27 +196,18 @@
 </div>
 
 
-<!-- ======== SUBITO VIEW ======== -->
-<div id="view-subito" class="view">
-
-  <div id="subito-stats">
-    <div class="gstat"><span id="ss-total">—</span><label>Annunci totali</label></div>
-    <div class="gstat gstat-accent"><span id="ss-avail">—</span><label>Disponibili</label></div>
-    <div class="gstat"><span id="ss-min">—</span><label>Prezzo minimo</label></div>
-    <div class="gstat"><span id="ss-avg">—</span><label>Prezzo medio</label></div>
+<!-- ======== SUBITO B VIEW (Acquistabili) ======== -->
+<div id="view-subito-b" class="view">
+  <div class="mkt-stats">
+    <div class="gstat"><span id="mkt-subito-b-s1">—</span><label>Acquistabili</label></div>
+    <div class="gstat mkt-s2-subito"><span id="mkt-subito-b-s2">—</span><label>Console</label></div>
+    <div class="gstat"><span id="mkt-subito-b-s3">—</span><label>Prezzo minimo</label></div>
+    <div class="gstat"><span id="mkt-subito-b-s4">—</span><label>Prezzo medio</label></div>
   </div>
-
-  <div class="subito-inner">
-
-    <div id="subito-filters">
-      <input type="text"  id="subito-search"    placeholder="🔍  Cerca annuncio…" oninput="renderSubito()" />
-      <select id="subito-filter-ai" onchange="renderSubito()" style="font-weight: 600; color: #ff6600;">
-        <option value="approved" selected>✅ Approvati AI</option>
-        <option value="pending">⏳ In Revisione</option>
-        <option value="rejected">❌ Scartati AI</option>
-        <option value="all">Tutti</option>
-      </select>
-      <select id="subito-filter-family"   onchange="renderSubito()">
+  <div class="mkt-inner">
+    <div class="mkt-filters">
+      <input type="text" id="mkt-subito-b-search" placeholder="🔍  Cerca annuncio…" oninput="renderMarket('subito-b')" />
+      <select id="mkt-subito-b-family" onchange="renderMarket('subito-b')">
         <option value="">Tutte le console</option>
         <option value="series-x">Series X</option>
         <option value="series-s">Series S</option>
@@ -222,94 +215,34 @@
         <option value="one-s">One S</option>
         <option value="one">One</option>
         <option value="360">360</option>
+        <option value="original">Original</option>
       </select>
-      <select id="subito-filter-seller" onchange="renderSubito()">
+      <select id="mkt-subito-b-seller" onchange="renderMarket('subito-b')">
         <option value="">Tutti i venditori</option>
         <option value="privato">Privato</option>
         <option value="professionale">Professionale</option>
       </select>
-      <select id="subito-filter-segment" onchange="renderSubito()">
-        <option value="">Tutti i segmenti</option>
-        <option value="base">Base</option>
-        <option value="premium">Premium</option>
-      </select>
-      <select id="subito-filter-edition" onchange="renderSubito()">
-        <option value="">Tutte le edizioni</option>
-        <option value="standard">Standard</option>
-        <option value="limited">Limited</option>
-        <option value="special">Special</option>
-        <option value="bundle">Bundle</option>
-      </select>
-      <select id="subito-filter-region" onchange="renderSubito()">
+      <select id="mkt-subito-b-region" onchange="renderMarket('subito-b')">
         <option value="">Tutte le regioni</option>
       </select>
-      <label class="filter-avail-label">
-        <input type="checkbox" id="subito-filter-avail" onchange="renderSubito()" />
-        Solo disponibili
-      </label>
-      <span id="subito-count"></span>
-      <button id="btn-scrape-subito" onclick="startSubitoScrape()" title="Avvia scraper Subito.it">▶ Scrapa</button>
+      <span id="mkt-subito-b-count"></span>
     </div>
-
-    <div id="subito-scrape-bar" style="display:none;">
-      <div id="subito-scrape-progress"></div>
-      <div id="subito-scrape-msg"></div>
-    </div>
-
-    <div id="subito-grid"></div>
-
-  <!-- Sezione Venduti Subito -->
-  <div id="subito-sold-section" style="margin-top:32px; border-top:2px solid var(--border); padding-top:24px;">
-    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding:0 4px;">
-      <h2 style="margin:0; font-size:18px; font-weight:700; color:var(--text);">
-        🏷️ Venduti su Subito.it
-        <span id="subito-sold-count" style="font-size:13px; font-weight:400; color:var(--text-muted); margin-left:8px;"></span>
-      </h2>
-      <button id="btn-load-sold" onclick="loadSubitoSoldData()" style="font-size:12px; padding:5px 14px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); cursor:pointer; color:var(--text);">Carica venduti</button>
-    </div>
-
-    <!-- Stats summary per famiglia -->
-    <div id="subito-sold-stats" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-bottom:20px;"></div>
-
-    <!-- Filtri -->
-    <div id="subito-sold-filters" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:14px;">
-      <input type="text" id="subito-sold-search" placeholder="🔍 Cerca…" oninput="renderSubitoSold()"
-             style="flex:1; min-width:180px; max-width:280px; padding:6px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); font-size:13px;" />
-      <select id="subito-sold-family" onchange="renderSubitoSold()"
-              style="padding:6px 10px; border-radius:6px; border:1px solid var(--border); background:var(--bg-card); color:var(--text); font-size:13px;">
-        <option value="">Tutte le console</option>
-        <option value="series-x">Series X</option>
-        <option value="series-s">Series S</option>
-        <option value="one-x">One X</option>
-        <option value="one-s">One S</option>
-        <option value="one">One</option>
-        <option value="360">360</option>
-        <option value="original">Original</option>
-      </select>
-    </div>
-
-    <!-- Tabella venduti -->
-    <div id="subito-sold-grid"></div>
-  </div>
-
+    <div id="mkt-subito-b-grid" class="mkt-grid"></div>
   </div>
 </div>
 
-<!-- ======== EBAY VIEW ======== -->
-<div id="view-ebay" class="view">
-
-  <div id="ebay-stats">
-    <div class="gstat"><span id="es-total">—</span><label>Lotti venduti</label></div>
-    <div class="gstat gstat-ebay"><span id="es-avg">—</span><label>Prezzo medio</label></div>
-    <div class="gstat"><span id="es-min">—</span><label>Prezzo minimo</label></div>
-    <div class="gstat"><span id="es-max">—</span><label>Prezzo massimo</label></div>
+<!-- ======== SUBITO P VIEW (In revisione AI) ======== -->
+<div id="view-subito-p" class="view">
+  <div class="mkt-stats">
+    <div class="gstat"><span id="mkt-subito-p-s1">—</span><label>In revisione</label></div>
+    <div class="gstat mkt-s2-subito"><span id="mkt-subito-p-s2">—</span><label>Con prezzo</label></div>
+    <div class="gstat"><span id="mkt-subito-p-s3">—</span><label>Prezzo minimo</label></div>
+    <div class="gstat"><span id="mkt-subito-p-s4">—</span><label>Prezzo medio</label></div>
   </div>
-
-  <div class="ebay-inner">
-
-    <div id="ebay-filters">
-      <input type="text" id="ebay-search" placeholder="🔍  Cerca lotto…" oninput="renderEbay()" />
-      <select id="ebay-filter-family" onchange="renderEbay()">
+  <div class="mkt-inner">
+    <div class="mkt-filters">
+      <input type="text" id="mkt-subito-p-search" placeholder="🔍  Cerca annuncio…" oninput="renderMarket('subito-p')" />
+      <select id="mkt-subito-p-family" onchange="renderMarket('subito-p')">
         <option value="">Tutte le console</option>
         <option value="series-x">Series X</option>
         <option value="series-s">Series S</option>
@@ -319,15 +252,87 @@
         <option value="360">360</option>
         <option value="original">Original</option>
       </select>
-      <span id="ebay-count"></span>
+      <select id="mkt-subito-p-seller" onchange="renderMarket('subito-p')">
+        <option value="">Tutti i venditori</option>
+        <option value="privato">Privato</option>
+        <option value="professionale">Professionale</option>
+      </select>
+      <select id="mkt-subito-p-region" onchange="renderMarket('subito-p')">
+        <option value="">Tutte le regioni</option>
+      </select>
+      <span id="mkt-subito-p-count"></span>
     </div>
+    <div id="mkt-subito-p-grid" class="mkt-grid"></div>
+  </div>
+</div>
 
-    <!-- Riepilogo prezzi per famiglia -->
-    <div id="ebay-summary"></div>
+<!-- ======== SUBITO S VIEW (Venduti Subito) ======== -->
+<div id="view-subito-s" class="view">
+  <div class="mkt-stats">
+    <div class="gstat"><span id="mkt-subito-s-s1">—</span><label>Venduti</label></div>
+    <div class="gstat mkt-s2-subito"><span id="mkt-subito-s-s2">—</span><label>Console</label></div>
+    <div class="gstat"><span id="mkt-subito-s-s3">—</span><label>Prezzo minimo</label></div>
+    <div class="gstat"><span id="mkt-subito-s-s4">—</span><label>Prezzo medio</label></div>
+  </div>
+  <div class="mkt-inner">
+    <div class="mkt-filters">
+      <input type="text" id="mkt-subito-s-search" placeholder="🔍  Cerca annuncio…" oninput="renderMarket('subito-s')" />
+      <select id="mkt-subito-s-family" onchange="renderMarket('subito-s')">
+        <option value="">Tutte le console</option>
+        <option value="series-x">Series X</option>
+        <option value="series-s">Series S</option>
+        <option value="one-x">One X</option>
+        <option value="one-s">One S</option>
+        <option value="one">One</option>
+        <option value="360">360</option>
+        <option value="original">Original</option>
+      </select>
+      <select id="mkt-subito-s-seller" onchange="renderMarket('subito-s')">
+        <option value="">Tutti i venditori</option>
+        <option value="privato">Privato</option>
+        <option value="professionale">Professionale</option>
+      </select>
+      <select id="mkt-subito-s-region" onchange="renderMarket('subito-s')">
+        <option value="">Tutte le regioni</option>
+      </select>
+      <span id="mkt-subito-s-count"></span>
+    </div>
+    <div id="mkt-subito-s-grid" class="mkt-grid"></div>
+  </div>
+</div>
 
-    <!-- Lista lotti venduti -->
-    <div id="ebay-grid"></div>
-
+<!-- ======== EBAY VIEW (Venduti eBay) ======== -->
+<div id="view-ebay" class="view">
+  <div class="mkt-stats">
+    <div class="gstat"><span id="mkt-ebay-s1">—</span><label>Lotti venduti</label></div>
+    <div class="gstat mkt-s2-ebay"><span id="mkt-ebay-s2">—</span><label>Console</label></div>
+    <div class="gstat"><span id="mkt-ebay-s3">—</span><label>Prezzo minimo</label></div>
+    <div class="gstat"><span id="mkt-ebay-s4">—</span><label>Prezzo medio</label></div>
+  </div>
+  <div class="mkt-inner">
+    <div class="mkt-filters">
+      <input type="text" id="mkt-ebay-search" placeholder="🔍  Cerca lotto…" oninput="renderMarket('ebay')" />
+      <select id="mkt-ebay-family" onchange="renderMarket('ebay')">
+        <option value="">Tutte le console</option>
+        <option value="series-x">Series X</option>
+        <option value="series-s">Series S</option>
+        <option value="one-x">One X</option>
+        <option value="one-s">One S</option>
+        <option value="one">One</option>
+        <option value="360">360</option>
+        <option value="original">Original</option>
+      </select>
+      <select id="mkt-ebay-seller" onchange="renderMarket('ebay')">
+        <option value="">Tutti i venditori</option>
+        <option value="privato">Privato</option>
+        <option value="professionale">Professionale</option>
+      </select>
+      <select id="mkt-ebay-region" onchange="renderMarket('ebay')">
+        <option value="">Tutte le regioni</option>
+      </select>
+      <span id="mkt-ebay-count"></span>
+    </div>
+    <div id="mkt-ebay-grid" class="mkt-grid"></div>
   </div>
 </div>
 
@@ -464,9 +469,9 @@
   </div>
 </div>
 
-<script src="modules/state.js?v=13"></script>
-<script src="modules/sanitize.js?v=13"></script>
-<script src="modules/api.js?v=13"></script>
-<script src="app.js?v=13"></script>
+<script src="modules/state.js?v=14"></script>
+<script src="modules/sanitize.js?v=14"></script>
+<script src="modules/api.js?v=14"></script>
+<script src="app.js?v=14"></script>
 </body>
 </html>
