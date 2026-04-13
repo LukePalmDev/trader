@@ -31,7 +31,6 @@ from settings import load_config  # noqa: E402
 from db_subito import DB_PATH, _connect, _estimate_sold_window, init_db  # noqa: E402
 from patchright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError  # noqa: E402
 from playwright_stealth import Stealth  # noqa: E402
-from verify_sold_controls import _compute_cffi_backoff_seconds, _count_unstable_hits  # noqa: E402
 
 _CONFIG_PATH = Path("config.toml")
 _CFG = load_config(_CONFIG_PATH)
@@ -59,6 +58,26 @@ DEFAULT_FAIL_FAST_BLOCKED_RATIO = 0.85
 DEFAULT_FAIL_FAST_403_RATIO = 0.60
 DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO = 0.85
 DEFAULT_MIN_COVERAGE_RATIO = 0.0
+
+
+def _compute_cffi_backoff_seconds(consecutive_blocks: int) -> int:
+    if consecutive_blocks <= 0:
+        return 0
+    return min(300, 30 * (2 ** max(0, consecutive_blocks - 1)))
+
+
+def _count_unstable_hits(reason_counts: dict[str, int]) -> int:
+    return sum(
+        int(count)
+        for reason, count in reason_counts.items()
+        if (
+            str(reason).startswith("blocked:")
+            or "http-403" in str(reason)
+            or "http-429" in str(reason)
+            or str(reason) == "skipped:cffi-block"
+        )
+    )
+
 
 _XBOX_MATCH_CONDITION = """
 (
