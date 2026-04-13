@@ -1506,7 +1506,7 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         default=DEFAULT_MIN_COVERAGE_RATIO,
         metavar="R",
         help=(
-            "Soglia minima opzionale di coverage finale; exit code 2 se non rispettata "
+            "Soglia minima opzionale di coverage finale; exit code 3 se non rispettata "
             f"(default {DEFAULT_MIN_COVERAGE_RATIO:.2f} = disabilitata)"
         ),
     )
@@ -1543,4 +1543,4 @@ if __name__ == "__main__":
         )
     )
     if args.min_coverage_ratio and stats.get("coverage_below_min"):
-        raise SystemExit(2)
+        sys.exit(3)
