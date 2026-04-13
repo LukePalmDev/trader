@@ -22,11 +22,6 @@ log = logging.getLogger("verify_sold")
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 try:
-    import aiohttp
-except ImportError:  # pragma: no cover - fallback runtime
-    aiohttp = None
-
-try:
     from curl_cffi.requests import AsyncSession as CffiAsyncSession
 except ImportError:  # pragma: no cover - fallback runtime
     CffiAsyncSession = None
@@ -58,15 +53,12 @@ DEFAULT_CONCURRENCY = 3
 DEFAULT_CFFI_CONCURRENCY = 12
 DEFAULT_MIN_CFFI_CONCURRENCY = 4
 DEFAULT_NAV_TIMEOUT_MS = 10_000
-DEFAULT_BODY_TIMEOUT_SECONDS = 2.5
-DEFAULT_DOM_FALLBACK_TIMEOUT_MS = 1_200
 DEFAULT_MAX_HTTP403_RATIO = 0.40
 DEFAULT_FAIL_FAST_MIN_ATTEMPTS = 150
 DEFAULT_FAIL_FAST_BLOCKED_RATIO = 0.85
 DEFAULT_FAIL_FAST_403_RATIO = 0.60
 DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO = 0.85
 DEFAULT_MIN_COVERAGE_RATIO = 0.0
-_WARNED_NO_AIOHTTP = False
 
 _XBOX_MATCH_CONDITION = """
 (
@@ -218,45 +210,6 @@ async def _new_context(browser):
     return ctx
 
 
-async def _http_precheck(session: aiohttp.ClientSession, url: str) -> str:
-    """Pre-check HTTP leggero (senza browser) per rilevare 404/410/redirect.
-
-    Segue i redirect per catturare catene 301→302→home che con allow_redirects=False
-    sarebbero visibili solo al primo hop.
-
-    Returns:
-        "sold"     — sicuramente non disponibile (404, 410, redirect a home/ricerca)
-        "unknown"  — serve verifica Playwright (200 ma potrebbe avere testo "non disponibile")
-    """
-    _timeout = aiohttp.ClientTimeout(total=8)
-
-    async def _check(method: str) -> str:
-        requester = session.head if method == "HEAD" else session.get
-        async with requester(url, allow_redirects=True, timeout=_timeout) as resp:
-            if resp.status in (404, 410):
-                return "sold"
-            if resp.status == 405:
-                return "retry_get"
-            final_url = str(resp.url)
-            if (
-                final_url.rstrip("/") == "https://www.subito.it"
-                or ("annunci-italia/vendita" in final_url and "q=" in final_url)
-            ):
-                return "sold"
-            return "unknown"
-
-    try:
-        if aiohttp is None:
-            return "unknown"
-        result = await _check("HEAD")
-        if result == "retry_get":
-            result = await _check("GET")
-        return result
-    except (aiohttp.ClientError, asyncio.TimeoutError):
-        # Errore di rete → serve Playwright per conferma
-        return "unknown"
-
-
 async def _cffi_precheck(url: str, session: "CffiAsyncSession") -> str:
     """Pre-check leggero con curl-cffi: impersona Chrome a livello TLS, nessun JS.
 
@@ -290,14 +243,8 @@ async def check_url(
     url: str,
     *,
     nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
-    body_timeout_seconds: float = DEFAULT_BODY_TIMEOUT_SECONDS,
-    dom_fallback_timeout_ms: int = DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
 ) -> tuple[bool, str]:
-    """Verifica URL con strategia strict (accuratezza > velocità).
-
-    Nota: gli argomenti body_timeout_seconds/dom_fallback_timeout_ms restano per
-    compatibilità CLI, ma la verifica usa una singola navigazione domcontentloaded.
-    """
+    """Verifica URL con strategia strict (accuratezza > velocità)."""
     ctx = worker["ctx"]
     page = worker.get("page")
     if page is None or page.is_closed():
@@ -390,21 +337,12 @@ async def _process_rows(
     rows: list,
     *,
     deadline_utc: datetime | None = None,
-    http_precheck: bool = False,
-    http_batch_size: int = 120,
     stagger_secs: float = 0.0,
     nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
-    body_timeout_seconds: float = DEFAULT_BODY_TIMEOUT_SECONDS,
-    dom_fallback_timeout_ms: int = DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
     cffi_concurrency: int = DEFAULT_CFFI_CONCURRENCY,
     cffi_block_unknown_ratio: float = DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO,
 ) -> dict:
-    """Verifica concorrente con Playwright (+ pre-check HTTP opzionale).
-
-    Subito restituisce sempre HTTP 200 per gli annunci, anche i venduti (che mostrano
-    "non più disponibile" nel DOM via JS). Il pre-check HTTP è disabilitato per default
-    perché aggiunge overhead senza filtrare nulla (~6 min su 7658 annunci, 0 catturati).
-    Riabilitare con http_precheck=True se Subito modificasse il comportamento.
+    """Verifica concorrente con Playwright (+ precheck curl-cffi).
 
     stagger_secs > 0 scagliona le prime pool_size navigazioni di questo chunk nel tempo:
     task 0 parte subito, task 1 dopo stagger_secs, task 2 dopo 2×stagger_secs, ecc.
@@ -484,46 +422,10 @@ async def _process_rows(
         if CffiAsyncSession is None:
             log.warning("curl-cffi non disponibile: precheck saltato, tutto a Playwright.")
 
-    # Fase 1b: vecchio HTTP pre-check aiohttp (opzionale, disabilitato per default)
-    # Lasciato per compatibilità CLI --http-precheck; curl-cffi lo supera in efficacia.
-    http_sold_ids: set[int] = set()
-    if http_precheck and aiohttp is not None and not _deadline_reached(deadline_utc):
-        http_results: dict[int, str] = {}
-        http_sem = asyncio.Semaphore(50)
-        total_rows = len(rows)
-        processed_count = 0
-
-        async def _precheck_one(session, row):
-            nonlocal processed_count
-            async with http_sem:
-                status = await _http_precheck(session, row["url"])
-                http_results[row["id"]] = status
-                processed_count += 1
-                if processed_count % 500 == 0:
-                    log.info("  Pre-check HTTP: %d/%d…", processed_count, total_rows)
-
-        effective_http_batch = max(1, int(http_batch_size))
-        headers = {"User-Agent": _COMMON["user_agent"]}
-        async with aiohttp.ClientSession(headers=headers) as session:
-            for idx in range(0, len(rows), effective_http_batch):
-                if _deadline_reached(deadline_utc):
-                    time_limit_hit = True
-                    break
-                batch = rows[idx : idx + effective_http_batch]
-                await asyncio.gather(*[_precheck_one(session, r) for r in batch])
-
-        http_sold_ids = {r["id"] for r in rows if http_results.get(r["id"]) == "sold"}
-        log.info(
-            "Pre-check HTTP (aiohttp): %d venduti, %d a Playwright.",
-            len(http_sold_ids), len(rows) - len(http_sold_ids),
-        )
-    elif http_precheck:
-        log.warning("aiohttp non disponibile: pre-check HTTP saltato.")
-
     # Annunci già classificati da cffi → escludi da Playwright.
     # Se cffi ha segnalato blocco IP massivo, forza needs_playwright vuoto:
     # tutti i non-sold vengono marcati pending (vedi skipped_ids più sotto).
-    skip_playwright_ids = cffi_sold_ids | http_sold_ids | cffi_active_ids
+    skip_playwright_ids = cffi_sold_ids | cffi_active_ids
     needs_playwright = (
         []
         if _cffi_block
@@ -548,8 +450,6 @@ async def _process_rows(
                 worker,
                 row["url"],
                 nav_timeout_ms=nav_timeout_ms,
-                body_timeout_seconds=body_timeout_seconds,
-                dom_fallback_timeout_ms=dom_fallback_timeout_ms,
             )
             if reason.startswith("blocked:http-403"):
                 # Nessun retry: l'IP è bannato a livello Akamai e un secondo tentativo
@@ -602,10 +502,6 @@ async def _process_rows(
     for row in rows:
         if row["id"] in cffi_active_ids:
             results.append((row, True))
-    # Annunci venduti dal pre-check HTTP aiohttp (fallback, disabilitato per default)
-    for row in rows:
-        if row["id"] in http_sold_ids:
-            results.append((row, False))
     # Se cffi ha segnalato blocco IP, pre-popola skipped_ids con tutti i non-sold.
     # needs_playwright è già vuoto, quindi il loop sottostante non aggiunge altri ID.
     skipped_ids: list[int] = (
@@ -797,10 +693,7 @@ async def verify_batch(
     chunk_size: int = DEFAULT_CHUNK_SIZE,
     max_runtime_minutes: int | None = DEFAULT_MAX_RUNTIME_MINUTES,
     browser_restart_every: int = DEFAULT_BROWSER_RESTART_EVERY,
-    http_precheck: bool = False,
     nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
-    body_timeout_seconds: float = DEFAULT_BODY_TIMEOUT_SECONDS,
-    dom_fallback_timeout_ms: int = DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
     max_http403_ratio: float = DEFAULT_MAX_HTTP403_RATIO,
     fail_fast_min_attempts: int = DEFAULT_FAIL_FAST_MIN_ATTEMPTS,
     fail_fast_blocked_ratio: float = DEFAULT_FAIL_FAST_BLOCKED_RATIO,
@@ -822,11 +715,7 @@ async def verify_batch(
         chunk_size: numero record per chunk operativo.
         max_runtime_minutes: stop soft oltre la durata indicata.
         browser_restart_every: riavvia browser ogni N chunk.
-        http_precheck: pre-check HTTP prima di Playwright (default False).
-                       Subito risponde 200 per tutto; non filtra nulla di utile.
         nav_timeout_ms: timeout navigazione `goto(..., wait_until="domcontentloaded")`.
-        body_timeout_seconds: parametro legacy (compatibilità CLI).
-        dom_fallback_timeout_ms: parametro legacy (compatibilità CLI).
         max_http403_ratio: soglia massima tollerata di 403 sul totale tentativi.
         fail_fast_min_attempts: minimo tentativi prima di abilitare stop anticipato.
         fail_fast_blocked_ratio: soglia blocked totale per stop anticipato.
@@ -1078,11 +967,8 @@ async def verify_batch(
                     worker_pool,
                     chunk,
                     deadline_utc=deadline_utc,
-                    http_precheck=http_precheck,
                     stagger_secs=1.5 if is_restart else 0.0,
                     nav_timeout_ms=nav_timeout_ms,
-                    body_timeout_seconds=body_timeout_seconds,
-                    dom_fallback_timeout_ms=dom_fallback_timeout_ms,
                     cffi_concurrency=current_cffi_concurrency,
                     cffi_block_unknown_ratio=cffi_block_unknown_ratio,
                 )
@@ -1451,16 +1337,6 @@ def _build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.set_defaults(xbox_only=True)
     parser.add_argument(
-        "--http-precheck",
-        action="store_true",
-        dest="http_precheck",
-        default=False,
-        help=(
-            "Abilita pre-check HTTP prima di Playwright. "
-            "Disabilitato per default: Subito risponde 200 per tutto, nessun filtro utile."
-        ),
-    )
-    parser.add_argument(
         "--nav-timeout-ms",
         type=int,
         default=DEFAULT_NAV_TIMEOUT_MS,
@@ -1468,26 +1344,6 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         help=(
             "Timeout goto(wait_until='domcontentloaded') in millisecondi "
             f"(default {DEFAULT_NAV_TIMEOUT_MS})"
-        ),
-    )
-    parser.add_argument(
-        "--body-timeout-seconds",
-        type=float,
-        default=DEFAULT_BODY_TIMEOUT_SECONDS,
-        metavar="S",
-        help=(
-            "Timeout probe resp.text() in secondi "
-            f"(default {DEFAULT_BODY_TIMEOUT_SECONDS})"
-        ),
-    )
-    parser.add_argument(
-        "--dom-fallback-timeout-ms",
-        type=int,
-        default=DEFAULT_DOM_FALLBACK_TIMEOUT_MS,
-        metavar="MS",
-        help=(
-            "Timeout fallback DOM (domcontentloaded + locator) in millisecondi "
-            f"(default {DEFAULT_DOM_FALLBACK_TIMEOUT_MS})"
         ),
     )
     parser.add_argument(
@@ -1576,10 +1432,7 @@ if __name__ == "__main__":
             chunk_size=args.chunk_size,
             max_runtime_minutes=max_runtime,
             browser_restart_every=args.browser_restart_every,
-            http_precheck=args.http_precheck,
             nav_timeout_ms=args.nav_timeout_ms,
-            body_timeout_seconds=args.body_timeout_seconds,
-            dom_fallback_timeout_ms=args.dom_fallback_timeout_ms,
             max_http403_ratio=args.max_http403_ratio,
             fail_fast_min_attempts=args.fail_fast_min_attempts,
             fail_fast_blocked_ratio=args.fail_fast_blocked_ratio,
