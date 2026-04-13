@@ -65,18 +65,9 @@ jobs:
         run: |
           CSV=logs/coverage_history.csv
           mkdir -p logs
-          if [ ! -f "$CSV" ]; then
-            echo "date,coverage_pct,verified,skipped,sold_new" > "$CSV"
-          fi
+          [ -f "$CSV" ] || echo "date,coverage_pct,verified,skipped,sold_new" > "$CSV"
           if [ -f logs/verify_sold_last_run.json ]; then
-            python3.11 - <<'PY'
-import json, pathlib, sys
-p = pathlib.Path("logs/verify_sold_last_run.json")
-d = json.loads(p.read_text())
-row = f"{d['date']},{d['coverage_pct']},{d['verified']},{d['skipped']},{d['sold_new']}"
-with open("logs/coverage_history.csv", "a") as f:
-    f.write(row + "\n")
-PY
+            python3.11 -c "import json,pathlib; d=json.loads(pathlib.Path('logs/verify_sold_last_run.json').read_text()); open('logs/coverage_history.csv','a').write('{},{},{},{},{}\n'.format(d['date'],d['coverage_pct'],d['verified'],d['skipped'],d['sold_new']))"
           fi
 
       - name: Commit e push DB aggiornato
