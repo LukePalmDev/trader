@@ -8,6 +8,7 @@ import random
 import sqlite3
 import sys
 import time
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -58,6 +59,24 @@ DEFAULT_FAIL_FAST_BLOCKED_RATIO = 0.85
 DEFAULT_FAIL_FAST_403_RATIO = 0.60
 DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO = 0.85
 DEFAULT_MIN_COVERAGE_RATIO = 0.0
+
+
+@dataclass
+class VerifyConfig:
+    """Parametri di tuning per verify_batch(). Separati dai parametri semantici."""
+
+    concurrency: int = DEFAULT_CONCURRENCY
+    cffi_concurrency: int = DEFAULT_CFFI_CONCURRENCY
+    chunk_size: int = DEFAULT_CHUNK_SIZE
+    nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS
+    fail_fast_min_attempts: int = DEFAULT_FAIL_FAST_MIN_ATTEMPTS
+    fail_fast_blocked_ratio: float = DEFAULT_FAIL_FAST_BLOCKED_RATIO
+    fail_fast_403_ratio: float = DEFAULT_FAIL_FAST_403_RATIO
+    max_http403_ratio: float = DEFAULT_MAX_HTTP403_RATIO
+    min_coverage_ratio: float = DEFAULT_MIN_COVERAGE_RATIO
+    cffi_block_unknown_ratio: float = DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO
+    browser_restart_every: int = DEFAULT_BROWSER_RESTART_EVERY
+    selection_sample: int = 0
 
 
 def _compute_cffi_backoff_seconds(consecutive_blocks: int) -> int:
@@ -705,47 +724,27 @@ async def verify_batch(
     batch_size: int = DEFAULT_BATCH_SIZE,
     verify_all: bool = False,
     recheck_days=None,  # int or None
-    concurrency: int = DEFAULT_CONCURRENCY,
-    cffi_concurrency: int = DEFAULT_CFFI_CONCURRENCY,
     include_rejected: bool = False,
     xbox_only: bool = True,
-    chunk_size: int = DEFAULT_CHUNK_SIZE,
     max_runtime_minutes: int | None = DEFAULT_MAX_RUNTIME_MINUTES,
-    browser_restart_every: int = DEFAULT_BROWSER_RESTART_EVERY,
-    nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
-    max_http403_ratio: float = DEFAULT_MAX_HTTP403_RATIO,
-    fail_fast_min_attempts: int = DEFAULT_FAIL_FAST_MIN_ATTEMPTS,
-    fail_fast_blocked_ratio: float = DEFAULT_FAIL_FAST_BLOCKED_RATIO,
-    fail_fast_403_ratio: float = DEFAULT_FAIL_FAST_403_RATIO,
-    cffi_block_unknown_ratio: float = DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO,
-    min_coverage_ratio: float = DEFAULT_MIN_COVERAGE_RATIO,
-    selection_sample: int = 0,
+    cfg: VerifyConfig = None,
 ) -> dict:
     """Recupera un batch di annunci e li verifica online con concorrenza.
 
     Args:
-        batch_size:    Numero massimo di annunci da verificare (ignorato se verify_all=True).
-        verify_all:    Se True, verifica tutti gli annunci attivi non verificati.
-        recheck_days:  Se impostato, ri-verifica anche i venduti degli ultimi N giorni.
-        concurrency:   Numero massimo di URL verificati in parallelo (default 30).
-        cffi_concurrency: numero massimo di precheck curl-cffi in parallelo.
-        include_rejected: include anche annunci ai_status='rejected' (default False).
-        xbox_only: verifica solo annunci rilevanti Xbox (default True).
-        chunk_size: numero record per chunk operativo.
-        max_runtime_minutes: stop soft oltre la durata indicata.
-        browser_restart_every: riavvia browser ogni N chunk.
-        nav_timeout_ms: timeout navigazione `goto(..., wait_until="domcontentloaded")`.
-        max_http403_ratio: soglia massima tollerata di 403 sul totale tentativi.
-        fail_fast_min_attempts: minimo tentativi prima di abilitare stop anticipato.
-        fail_fast_blocked_ratio: soglia blocked totale per stop anticipato.
-        fail_fast_403_ratio: soglia 403 per stop anticipato.
-        cffi_block_unknown_ratio: soglia unknown oltre cui il chunk entra in cffi-block.
-        min_coverage_ratio: soglia opzionale minima di coverage finale.
-        selection_sample: numero di annunci esclusi da xbox-only da mostrare a log.
+        batch_size:          Numero massimo di annunci da verificare (ignorato se verify_all=True).
+        verify_all:          Se True, verifica tutti gli annunci attivi non verificati.
+        recheck_days:        Se impostato, ri-verifica anche i venduti degli ultimi N giorni.
+        include_rejected:    Include anche annunci ai_status='rejected' (default False).
+        xbox_only:           Verifica solo annunci rilevanti Xbox (default True).
+        max_runtime_minutes: Stop soft oltre la durata indicata.
+        cfg:                 Parametri di tuning (VerifyConfig). Se None usa i default.
 
     Returns:
         Statistiche della sessione di verifica.
     """
+    if cfg is None:
+        cfg = VerifyConfig()
     conn = _connect(DB_PATH)
 
     # Pre-run DB integrity check
@@ -802,8 +801,8 @@ async def verify_batch(
     excluded_sample = _pick_excluded_by_xbox_sample(
         conn,
         statuses,
-        limit=max(0, int(selection_sample)),
-    ) if xbox_only and selection_sample else []
+        limit=max(0, int(cfg.selection_sample)),
+    ) if xbox_only and cfg.selection_sample else []
 
     conn.close()
 
@@ -849,9 +848,9 @@ async def verify_batch(
     log.info(
         "Inizio verifica di %d annunci (concorrenza=%d, cffi=%d, chunk=%d, stati=%s)%s…",
         len(all_rows),
-        concurrency,
-        max(1, int(cffi_concurrency)),
-        max(1, int(chunk_size)),
+        cfg.concurrency,
+        max(1, int(cfg.cffi_concurrency)),
+        max(1, int(cfg.chunk_size)),
         ",".join(statuses),
         (
             (f" + {len(recheck_rows)} ri-verifiche venduti" if recheck_rows else "")
@@ -889,12 +888,12 @@ async def verify_batch(
     sold_price_count = 0
     sold_hour_sum = 0.0
     sold_hour_count = 0
-    chunk_len = max(1, int(chunk_size))
-    restart_every = max(1, int(browser_restart_every))
-    target_concurrency = max(1, int(concurrency))
+    chunk_len = max(1, int(cfg.chunk_size))
+    restart_every = max(1, int(cfg.browser_restart_every))
+    target_concurrency = max(1, int(cfg.concurrency))
     min_concurrency = max(1, target_concurrency // 3)
     current_concurrency = target_concurrency
-    initial_cffi_concurrency = max(1, int(cffi_concurrency))
+    initial_cffi_concurrency = max(1, int(cfg.cffi_concurrency))
     min_cffi_concurrency = max(1, min(DEFAULT_MIN_CFFI_CONCURRENCY, initial_cffi_concurrency))
     current_cffi_concurrency = initial_cffi_concurrency
     force_restart_next = False
@@ -987,9 +986,9 @@ async def verify_batch(
                     chunk,
                     deadline_utc=deadline_utc,
                     stagger_secs=1.5 if is_restart else 0.0,
-                    nav_timeout_ms=nav_timeout_ms,
+                    nav_timeout_ms=cfg.nav_timeout_ms,
                     cffi_concurrency=current_cffi_concurrency,
-                    cffi_block_unknown_ratio=cffi_block_unknown_ratio,
+                    cffi_block_unknown_ratio=cfg.cffi_block_unknown_ratio,
                 )
                 chunk_elapsed = max(0.001, time.perf_counter() - chunk_t0)
                 reason_counts = stats.get("reason_counts") or {}
@@ -1140,12 +1139,12 @@ async def verify_batch(
                 sold_hour_sum += float(stats["sold_hour_sum"] or 0.0)
                 sold_hour_count += int(stats["sold_hour_count"] or 0)
                 cumulative_attempted = int(total_stats["verified"]) + int(total_stats["skipped"])
-                if cumulative_attempted >= max(1, int(fail_fast_min_attempts)):
+                if cumulative_attempted >= max(1, int(cfg.fail_fast_min_attempts)):
                     cumulative_blocked_ratio = float(total_stats["blocked_total"]) / float(cumulative_attempted)
                     cumulative_403_ratio = float(total_stats["blocked_403"]) / float(cumulative_attempted)
                     if (
-                        cumulative_blocked_ratio >= float(fail_fast_blocked_ratio)
-                        and cumulative_403_ratio >= float(fail_fast_403_ratio)
+                        cumulative_blocked_ratio >= float(cfg.fail_fast_blocked_ratio)
+                        and cumulative_403_ratio >= float(cfg.fail_fast_403_ratio)
                     ):
                         raise RuntimeError(
                             "Fail-fast: runner probabilmente bloccato (Akamai/network). "
@@ -1248,18 +1247,18 @@ async def verify_batch(
             "Coverage bassa (%.1f%% < 70%%): verifica interrotta da blocchi massivi o errori",
             coverage_ratio * 100,
         )
-    if blocked_403_ratio > float(max_http403_ratio):
+    if blocked_403_ratio > cfg.max_http403_ratio:
         log.warning(
             "HTTP 403 alto: %.2f%% > %.2f%% (soglia) — dati parziali disponibili",
             blocked_403_ratio * 100,
-            float(max_http403_ratio) * 100,
+            cfg.max_http403_ratio * 100,
         )
         total_stats["high_block_rate"] = True
-    if float(min_coverage_ratio) > 0 and coverage_ratio < float(min_coverage_ratio):
+    if cfg.min_coverage_ratio > 0 and coverage_ratio < cfg.min_coverage_ratio:
         log.error(
             "Coverage finale %.1f%% sotto soglia minima %.1f%%",
             coverage_ratio * 100,
-            float(min_coverage_ratio) * 100,
+            cfg.min_coverage_ratio * 100,
         )
         total_stats["coverage_below_min"] = True
     return total_stats
@@ -1439,26 +1438,29 @@ if __name__ == "__main__":
     args = _build_arg_parser().parse_args()
     init_db()
     max_runtime = args.max_runtime_minutes if args.max_runtime_minutes and args.max_runtime_minutes > 0 else None
+    cfg = VerifyConfig(
+        concurrency=args.concurrency,
+        cffi_concurrency=args.cffi_concurrency,
+        chunk_size=args.chunk_size,
+        nav_timeout_ms=args.nav_timeout_ms,
+        max_http403_ratio=args.max_http403_ratio,
+        fail_fast_min_attempts=args.fail_fast_min_attempts,
+        fail_fast_blocked_ratio=args.fail_fast_blocked_ratio,
+        fail_fast_403_ratio=args.fail_fast_403_ratio,
+        cffi_block_unknown_ratio=args.cffi_block_unknown_ratio,
+        min_coverage_ratio=args.min_coverage_ratio,
+        browser_restart_every=args.browser_restart_every,
+        selection_sample=args.selection_sample,
+    )
     stats = asyncio.run(
         verify_batch(
             batch_size=args.batch_size,
             verify_all=args.verify_all,
             recheck_days=args.recheck_days,
-            concurrency=args.concurrency,
-            cffi_concurrency=args.cffi_concurrency,
             include_rejected=args.include_rejected,
             xbox_only=args.xbox_only,
-            chunk_size=args.chunk_size,
             max_runtime_minutes=max_runtime,
-            browser_restart_every=args.browser_restart_every,
-            nav_timeout_ms=args.nav_timeout_ms,
-            max_http403_ratio=args.max_http403_ratio,
-            fail_fast_min_attempts=args.fail_fast_min_attempts,
-            fail_fast_blocked_ratio=args.fail_fast_blocked_ratio,
-            fail_fast_403_ratio=args.fail_fast_403_ratio,
-            cffi_block_unknown_ratio=args.cffi_block_unknown_ratio,
-            min_coverage_ratio=args.min_coverage_ratio,
-            selection_sample=args.selection_sample,
+            cfg=cfg,
         )
     )
     if args.min_coverage_ratio and stats.get("coverage_below_min"):
