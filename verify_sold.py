@@ -720,6 +720,57 @@ async def _process_rows(
     }
 
 
+async def _warmup_probe(conn: sqlite3.Connection, cfg: VerifyConfig) -> bool:
+    """Probe leggero pre-run: verifica 10 URL attivi casuali via cffi.
+
+    Se >80% ritornano "unknown" (403/errore) l'IP è probabilmente bannato da Akamai.
+    In quel caso logga WARNING e ritorna False → il caller uscirà con exit code 0
+    (nessun fallimento CI, nessuno spreco di runtime su un run destinato al blocco).
+
+    Returns:
+        True  — IP sano o cffi non disponibile (procedi normalmente).
+        False — IP probabilmente bannato (skip run).
+    """
+    if CffiAsyncSession is None:
+        return True  # cffi non disponibile: non possiamo fare la probe, procedi comunque
+
+    rows = conn.execute(
+        "SELECT url FROM ads "
+        "WHERE last_available = 1 AND sold_at IS NULL "
+        "AND ai_status IN ('approved', 'pending') "
+        "ORDER BY RANDOM() LIMIT 10"
+    ).fetchall()
+
+    if not rows:
+        return True  # nessun URL disponibile, non bloccare il run
+
+    urls = [r[0] for r in rows]
+
+    async with CffiAsyncSession(impersonate="chrome136") as session:
+        probe_results: list[str] = list(
+            await asyncio.gather(*[_cffi_precheck(url, session) for url in urls])
+        )
+
+    unknown_count = sum(1 for r in probe_results if r == "unknown")
+    unknown_ratio = unknown_count / max(1, len(probe_results))
+    log.info(
+        "Warmup probe: %d URL → sold=%d active=%d unknown=%d (%.0f%%)",
+        len(probe_results),
+        sum(1 for r in probe_results if r == "sold"),
+        sum(1 for r in probe_results if r == "active"),
+        unknown_count,
+        unknown_ratio * 100,
+    )
+
+    if unknown_ratio > 0.80:
+        log.warning(
+            "Warmup probe: %.0f%% unknown — IP probabilmente bannato, skip run",
+            unknown_ratio * 100,
+        )
+        return False
+    return True
+
+
 async def verify_batch(
     batch_size: int = DEFAULT_BATCH_SIZE,
     verify_all: bool = False,
@@ -752,6 +803,11 @@ async def verify_batch(
         conn.close()
         log.error("Database corrotto (PRAGMA integrity_check failed). Aborting.")
         sys.exit(1)
+
+    # Warmup probe: rileva ban IP prima di avviare il run completo
+    if not await _warmup_probe(conn, cfg):
+        conn.close()
+        sys.exit(0)
 
     statuses = ["approved", "pending"]
     if include_rejected:
