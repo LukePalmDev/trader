@@ -90,9 +90,11 @@ async def classify_batch(client: AsyncAnthropic, batch: list) -> list[dict]:
     for row in batch:
         title = _shorten(row["name"], max_len=240)
         body = _shorten(row["body_text"] or "", max_len=960)
+        _price = row["last_price"]
+        price_str = str(_price) if _price is not None else "null"
         ads_text.append(
             f'{{"id": {row["id"]}, "title": {json.dumps(title)}, '
-            f'"body": {json.dumps(body)}, "price": {row["last_price"]}}}'
+            f'"body": {json.dumps(body)}, "price": {price_str}}}'
         )
 
     user_message = "Classifica i seguenti annunci:\n" + "\n".join(ads_text)
@@ -357,19 +359,205 @@ async def run_ai_classifier(
     return {"total": len(rows), "updated": total_updated, "errors": errors}
 
 
+# ---------------------------------------------------------------------------
+# eBay classification
+# ---------------------------------------------------------------------------
+
+def _load_ebay_rows(
+    conn: sqlite3.Connection,
+    *,
+    limit: int | None,
+    reclassify_all: bool = False,
+) -> list[dict]:
+    """Carica eBay sold_items che necessitano classificazione AI.
+
+    Criteri di selezione (default):
+    - canonical_model IN ('other','unknown',NULL) oppure classify_confidence < 0.6
+    - E non ancora classificati con AI (classify_method NOT LIKE 'ai:%')
+
+    Restituisce dicts con chiavi compatibili con classify_batch:
+    {id, name, body_text, last_price}.
+    """
+    if reclassify_all:
+        sql = "SELECT id, name, sold_price FROM sold_items ORDER BY id"
+        params: tuple = ()
+    else:
+        sql = """
+            SELECT id, name, sold_price FROM sold_items
+            WHERE (
+                canonical_model IN ('other', 'unknown')
+                OR canonical_model IS NULL
+                OR classify_confidence IS NULL
+                OR classify_confidence < 0.6
+            )
+            AND (classify_method IS NULL OR classify_method NOT LIKE 'ai:%')
+            ORDER BY id
+        """
+        params = ()
+    if limit is not None and limit > 0:
+        sql += " LIMIT ?"
+        params = params + (int(limit),)
+
+    raw = conn.execute(sql, params).fetchall()
+    return [
+        {
+            "id": r["id"],
+            "name": r["name"],
+            "body_text": None,       # sold_items non ha body_text
+            "last_price": r["sold_price"],
+        }
+        for r in raw
+    ]
+
+
+async def run_ebay_classifier(
+    *,
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    concurrency: int = DEFAULT_MAX_CONCURRENT_BATCHES,
+    limit: int | None = None,
+    reclassify_all: bool = False,
+) -> dict[str, int]:
+    """Classifica eBay sold_items con canonical_model non risolto o confidence < 0.6.
+
+    A differenza di Subito, sold_items non ha ai_status: lo stato è tracciato
+    via classify_method ('ai:v1' = già classificato con AI).
+    Il SYSTEM_PROMPT è lo stesso di Subito: stessi canonical bucket, stesso modello.
+    """
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        log.error("La variabile d'ambiente ANTHROPIC_API_KEY non è impostata.")
+        return {"total": 0, "updated": 0, "errors": 0}
+
+    client = AsyncAnthropic(api_key=api_key)
+    global SELECTED_MODEL
+    SELECTED_MODEL = _validate_model(SELECTED_MODEL)
+
+    conn = _connect(DB_PATH)
+    rows = _load_ebay_rows(conn, limit=limit, reclassify_all=reclassify_all)
+
+    if not rows:
+        log.info("eBay: nessun item da classificare. DB aggiornato.")
+        conn.close()
+        return {"total": 0, "updated": 0, "errors": 0}
+
+    log.info(
+        "eBay: trovati %d item da classificare con %s.",
+        len(rows), SELECTED_MODEL,
+    )
+
+    total_updated = 0
+    errors = 0
+    sem = asyncio.Semaphore(max(1, int(concurrency)))
+    eff_batch = max(1, int(batch_size))
+    batches = [rows[i : i + eff_batch] for i in range(0, len(rows), eff_batch)]
+    tot_batches = len(batches)
+
+    async def _process_one_batch(batch_idx: int, batch: list) -> list[dict]:
+        async with sem:
+            log.info(
+                "eBay batch %d/%d (item %d-%d)...",
+                batch_idx + 1, tot_batches,
+                batch_idx * eff_batch + 1,
+                min((batch_idx + 1) * eff_batch, len(rows)),
+            )
+            return await classify_batch(client, batch) or []
+
+    all_results = await asyncio.gather(
+        *[_process_one_batch(idx, batch) for idx, batch in enumerate(batches)]
+    )
+
+    for batch_results in all_results:
+        for res in batch_results:
+            item_id = res.get("id")
+            conf = res.get("console_confidence")
+            if item_id is None or conf is None:
+                continue
+            try:
+                conf = int(conf)
+            except (ValueError, TypeError):
+                continue
+
+            family   = res.get("family")
+            canonical = res.get("canonical")
+            edition  = res.get("edition")
+
+            if family and family not in _VALID_FAMILIES:
+                family = None
+            if canonical and canonical not in _VALID_CANONICALS:
+                canonical = None
+            if edition and edition not in _VALID_EDITIONS:
+                edition = None
+
+            try:
+                if conf >= 75 and family and canonical:
+                    conn.execute(
+                        """UPDATE sold_items
+                           SET console_family      = ?,
+                               canonical_model     = ?,
+                               edition_class       = COALESCE(?, edition_class),
+                               classify_confidence = ?,
+                               classify_method     = 'ai:v1'
+                           WHERE id = ?""",
+                        (family, canonical, edition, round(conf / 100.0, 3), item_id),
+                    )
+                elif conf <= 25:
+                    conn.execute(
+                        """UPDATE sold_items
+                           SET console_family      = 'other',
+                               canonical_model     = 'other',
+                               classify_confidence = ?,
+                               classify_method     = 'ai:v1'
+                           WHERE id = ?""",
+                        (round(conf / 100.0, 3), item_id),
+                    )
+                else:
+                    # Ambiguo: aggiorna confidence e method, lascia canonical intatto
+                    conn.execute(
+                        """UPDATE sold_items
+                           SET classify_confidence = ?,
+                               classify_method     = 'ai:v1'
+                           WHERE id = ?""",
+                        (round(conf / 100.0, 3), item_id),
+                    )
+                total_updated += 1
+            except Exception as e:
+                log.error("Errore update eBay id %s: %s", item_id, e)
+                errors += 1
+
+    try:
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+    finally:
+        conn.close()
+
+    log.info(
+        "eBay classificazione completata. %d item aggiornati, %d errori "
+        "(concorrenza: %d batch paralleli).",
+        total_updated, errors, max(1, int(concurrency)),
+    )
+    return {"total": len(rows), "updated": total_updated, "errors": errors}
+
+
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Classifica annunci Subito con Claude Haiku: valida hardware console Xbox "
+            "Classifica annunci Subito e/o eBay con Claude Haiku: valida hardware console Xbox "
             "E assegna family/canonical/edition direttamente nel DB (classify_method=ai:v1)."
         )
+    )
+    parser.add_argument(
+        "--source",
+        choices=["subito", "ebay", "all"],
+        default="subito",
+        help="Sorgente da classificare: subito (default), ebay, all",
     )
     parser.add_argument(
         "--batch-size",
         type=int,
         default=DEFAULT_BATCH_SIZE,
         metavar="N",
-        help=f"Annunci per batch API (default {DEFAULT_BATCH_SIZE})",
+        help=f"Annunci/item per batch API (default {DEFAULT_BATCH_SIZE})",
     )
     parser.add_argument(
         "--concurrency",
@@ -382,31 +570,46 @@ def _build_arg_parser() -> argparse.ArgumentParser:
         "--all",
         action="store_true",
         dest="classify_all",
-        help="Classifica tutti gli annunci (ignora filtro pending+ai_confidence NULL).",
+        help="(Subito) Classifica tutti gli annunci, ignora filtro pending+ai_confidence NULL.",
     )
     parser.add_argument(
         "--reset-first",
         action="store_true",
-        help="Resetta ai_status/ai_confidence prima della classificazione.",
+        help="(Subito) Resetta ai_status/ai_confidence prima della classificazione.",
+    )
+    parser.add_argument(
+        "--ebay-reclassify-all",
+        action="store_true",
+        help="(eBay) Riclassifica tutti gli item, non solo quelli con canonical non risolto.",
     )
     parser.add_argument(
         "--limit",
         type=int,
         default=None,
-        help="Limite massimo annunci da processare.",
+        help="Limite massimo annunci/item da processare (applicato a ciascuna sorgente).",
     )
     return parser
 
 
 async def main():
     args = _build_arg_parser().parse_args()
-    await run_ai_classifier(
-        batch_size=args.batch_size,
-        concurrency=args.concurrency,
-        classify_all=args.classify_all,
-        reset_first=args.reset_first,
-        limit=args.limit,
-    )
+
+    if args.source in ("subito", "all"):
+        await run_ai_classifier(
+            batch_size=args.batch_size,
+            concurrency=args.concurrency,
+            classify_all=args.classify_all,
+            reset_first=args.reset_first,
+            limit=args.limit,
+        )
+
+    if args.source in ("ebay", "all"):
+        await run_ebay_classifier(
+            batch_size=args.batch_size,
+            concurrency=args.concurrency,
+            limit=args.limit,
+            reclassify_all=args.ebay_reclassify_all,
+        )
 
 
 if __name__ == "__main__":
