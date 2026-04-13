@@ -39,21 +39,28 @@ jobs:
           python3.11 -m patchright install chromium
 
       - name: Verifica annunci venduti
-        run: >
-          python3.11 verify_sold.py
-          --all
-          --max-runtime-minutes 55
-          --concurrency 12
-          --cffi-concurrency 10
-          --chunk-size 200
-          --browser-restart-every 4
-          --nav-timeout-ms 7000
-          --max-http403-ratio 0.02
-          --min-coverage-ratio 0.85
-          --fail-fast-min-attempts 400
-          --fail-fast-blocked-ratio 0.85
-          --fail-fast-403-ratio 0.60
-          --selection-sample 5
+        id: verify
+        run: |
+          set +e
+          python3.11 verify_sold.py \
+            --all \
+            --max-runtime-minutes 55 \
+            --concurrency 12 \
+            --cffi-concurrency 10 \
+            --chunk-size 200 \
+            --browser-restart-every 4 \
+            --nav-timeout-ms 7000 \
+            --max-http403-ratio 0.02 \
+            --min-coverage-ratio 0.85 \
+            --fail-fast-min-attempts 400 \
+            --fail-fast-blocked-ratio 0.85 \
+            --fail-fast-403-ratio 0.60 \
+            --selection-sample 5
+          VERIFY_EXIT=$?
+          echo "exit_code=${VERIFY_EXIT}" >> "$GITHUB_OUTPUT"
+          # Exit code 3 = coverage sotto soglia: non fallire il job (il retry step gestisce)
+          # Tutti gli altri errori (1, 2, …) falliscono il job normalmente
+          [ "${VERIFY_EXIT}" -eq 0 ] || [ "${VERIFY_EXIT}" -eq 3 ] || exit "${VERIFY_EXIT}"
 
       - name: Commit e push DB aggiornato
         run: |
@@ -65,3 +72,17 @@ jobs:
           git diff --staged --quiet \
             || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"
           git push
+
+      - name: Retry automatico se coverage sotto soglia (exit code 3)
+        if: steps.verify.outputs.exit_code == '3'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Coverage sotto soglia (exit 3): triggero nuovo run di verify-sold tra ~1 min"
+          gh workflow run verify-sold.yml --ref main
+
+      - name: Fallisci il job se coverage sotto soglia
+        if: steps.verify.outputs.exit_code == '3'
+        run: |
+          echo "::error::Coverage sotto soglia minima (exit code 3). Run automatico ri-schedulato."
+          exit 3
