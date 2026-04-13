@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import logging
 import os
 import random
@@ -1067,6 +1068,28 @@ async def verify_batch(
                     attempted_in_chunk,
                     top_reasons,
                 )
+                # Metrics JSONL — una riga per chunk, utile per analisi retrospettiva
+                try:
+                    _logs_dir = Path("logs")
+                    _logs_dir.mkdir(exist_ok=True)
+                    _chunk_verified = int(stats.get("verified", 0) or 0)
+                    _chunk_coverage = _chunk_verified / max(1, attempted_in_chunk) * 100
+                    _metrics_line = json.dumps({
+                        "ts": datetime.now(timezone.utc).isoformat(),
+                        "chunk": chunk_no + 1,
+                        "ads_total": attempted_in_chunk,
+                        "sold": int(stats.get("sold", 0) or 0),
+                        "blocked_403": int(
+                            sum(v for k, v in reason_counts.items() if "http-403" in k)
+                        ),
+                        "cffi_active": int(reason_counts.get("active:cffi-200", 0) or 0),
+                        "duration_s": round(chunk_elapsed, 2),
+                        "coverage_pct": round(_chunk_coverage, 1),
+                    })
+                    with open(_logs_dir / "verify_sold_metrics.jsonl", "a") as _mf:
+                        _mf.write(_metrics_line + "\n")
+                except Exception as _me:
+                    log.debug("Metrics JSONL write error: %s", _me)
                 unstable_hits = _count_unstable_hits(reason_counts)
                 unstable_ratio = unstable_hits / max(1, attempted_in_chunk)
 
