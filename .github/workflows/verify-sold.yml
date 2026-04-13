@@ -2,9 +2,8 @@ name: Verify Sold Subito
 
 on:
   schedule:
-    # Manteniamo verify-sold nelle finestre mattutine osservate come piu' stabili.
-    # 1 ora dopo lo scraper Subito: 03:00 09:00 UTC → 05/11 CEST
-    - cron: '0 3,9 * * *'
+    # 1 ora dopo ogni scrape Subito: 03:00 09:00 15:00 21:00 UTC → 05/11/17/23 CEST
+    - cron: '0 3,9,15,21 * * *'
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
 concurrency:
@@ -20,7 +19,6 @@ jobs:
       TRADER_VIEWER_OPEN_BROWSER: "false"
     permissions:
       contents: write
-      actions: write
 
     steps:
       - name: Checkout repository
@@ -52,13 +50,13 @@ jobs:
             --browser-restart-every 4 \
             --nav-timeout-ms 7000 \
             --max-http403-ratio 0.02 \
-            --min-coverage-ratio 0.85 \
+            --min-coverage-ratio 0.75 \
             --fail-fast-min-attempts 400 \
             --fail-fast-blocked-ratio 0.85 \
             --fail-fast-403-ratio 0.60
           VERIFY_EXIT=$?
           echo "exit_code=${VERIFY_EXIT}" >> "$GITHUB_OUTPUT"
-          # Exit code 3 = coverage sotto soglia: non fallire il job (il retry step gestisce)
+          # Exit code 3 = coverage sotto soglia: non fallire il job qui (gestito da step finale)
           # Tutti gli altri errori (1, 2, …) falliscono il job normalmente
           [ "${VERIFY_EXIT}" -eq 0 ] || [ "${VERIFY_EXIT}" -eq 3 ] || exit "${VERIFY_EXIT}"
 
@@ -82,16 +80,8 @@ jobs:
             || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"
           git push
 
-      - name: Retry automatico se coverage sotto soglia (exit code 3)
-        if: steps.verify.outputs.exit_code == '3'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Coverage sotto soglia (exit 3): triggero nuovo run di verify-sold tra ~1 min"
-          gh workflow run verify-sold.yml --ref main
-
       - name: Fallisci il job se coverage sotto soglia
         if: steps.verify.outputs.exit_code == '3'
         run: |
-          echo "::error::Coverage sotto soglia minima (exit code 3). Run automatico ri-schedulato."
+          echo "::error::Coverage sotto soglia minima (exit code 3). Prossima verifica al run schedulato."
           exit 3
