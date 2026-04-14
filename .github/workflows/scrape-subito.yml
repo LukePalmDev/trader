@@ -21,6 +21,9 @@ jobs:
       contents: write
 
     steps:
+      - name: Setup Homebrew PATH
+        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
+
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
@@ -48,32 +51,9 @@ jobs:
         if: steps.scrape.outputs.db_changed == 'true'
         run: python3.11 run.py --cleanup
 
-      - name: Ensure git
-        if: steps.scrape.outputs.db_changed == 'true'
-        env:
-          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-
-          # Se git fallisce, esci (non usare sudo su self-hosted runner)
-          if ! git --version 2>/dev/null; then
-            echo "git mancante. Verifica l'installazione su questa macchina."
-            exit 1
-          fi
-
-          # 2) actions/checkout senza git cade su REST API e non crea .git
-          #    → re-init del repo locale con credenziali per il push
-          if [ ! -d .git ]; then
-            echo "Nessun .git trovato (checkout REST API) — re-init repo..."
-            git init -b main
-            git remote add origin \
-              "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
-          fi
-
       - name: Commit and push DB/artifacts
         if: steps.scrape.outputs.db_changed == 'true'
         run: |
-          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           git fetch origin

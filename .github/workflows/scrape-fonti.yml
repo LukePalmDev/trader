@@ -22,6 +22,9 @@ jobs:
       contents: write
 
     steps:
+      - name: Setup Homebrew PATH
+        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
+
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
