@@ -50,9 +50,34 @@ jobs:
 
       - name: Ensure git
         if: steps.scrape.outputs.db_changed == 'true'
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-          git --version 2>/dev/null || brew install git
+
+          # 1) Se git non è disponibile, installa Xcode CLT via softwareupdate
+          #    (brew non funziona senza CLT — serve softwareupdate per installarlo headless)
+          if ! git --version 2>/dev/null; then
+            echo "Xcode CLT mancante — installazione headless via softwareupdate..."
+            sudo touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+            CLT=$(softwareupdate --list 2>&1 \
+              | grep "Label: Command Line Tools" \
+              | sed 's/.*Label: //' \
+              | tail -1)
+            echo "Pacchetto trovato: '$CLT'"
+            sudo softwareupdate --install "$CLT" --agree-to-license
+            sudo rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+            git --version   # fallisce qui se installazione non riuscita
+          fi
+
+          # 2) actions/checkout senza git cade su REST API e non crea .git
+          #    → re-init del repo locale con credenziali per il push
+          if [ ! -d .git ]; then
+            echo "Nessun .git trovato (checkout REST API) — re-init repo..."
+            git init -b main
+            git remote add origin \
+              "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
+          fi
 
       - name: Commit and push DB/artifacts
         if: steps.scrape.outputs.db_changed == 'true'
@@ -67,7 +92,7 @@ jobs:
           git add logs/run_report_latest.json || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)"
-          git push
+          git push origin main
 
       - name: Upload scrape log (debug)
         if: steps.scrape.outputs.db_changed == 'false'
