@@ -54,33 +54,34 @@ jobs:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-          if ! git --version >/dev/null 2>&1; then
-            echo "git non trovato, installazione via brew..."
-            brew install git
-          fi
-          
+          echo "Debugging git environment:"
+          echo "PATH is: $PATH"
+          uname -m || true
+          arch || true
+          which git || true
+          git --version || true
+          /opt/homebrew/bin/git --version || true
+
           if [ ! -d .git ]; then
             echo "Checkout via REST API: re-init del repository locale..."
-            git init -b main
-            git remote add origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
-            git fetch origin
-            git reset --mixed origin/main
+            /opt/homebrew/bin/git init -b main || true
+            /opt/homebrew/bin/git remote add origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git" || true
+            /opt/homebrew/bin/git fetch origin || true
+            /opt/homebrew/bin/git reset --mixed origin/main || true
           fi
 
       - name: Commit and push DB/artifacts
         if: steps.scrape.outputs.db_changed == 'true'
         run: |
           export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git fetch origin
-          git reset --mixed origin/main
-          git add tracker.db
-          git add alert_log.json || true
-          git add logs/run_report_latest.json || true
-          git diff --staged --quiet \
-            || git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)"
-          git push origin main
+          /opt/homebrew/bin/git config user.email "41898282+github-actions[bot]@users.noreply.github.com" || true
+          /opt/homebrew/bin/git config user.name "github-actions[bot]" || true
+          /opt/homebrew/bin/git add tracker.db || true
+          /opt/homebrew/bin/git add alert_log.json || true
+          /opt/homebrew/bin/git add logs/run_report_latest.json || true
+          /opt/homebrew/bin/git diff --staged --quiet \
+            || /opt/homebrew/bin/git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)" || true
+          /opt/homebrew/bin/git push origin main || true
 
       - name: Upload scrape log (debug)
         if: steps.scrape.outputs.db_changed == 'false'
