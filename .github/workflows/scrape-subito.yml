@@ -48,6 +48,12 @@ jobs:
         if: steps.scrape.outputs.db_changed == 'true'
         run: python3.11 run.py --cleanup
 
+      - name: Ensure git
+        if: steps.scrape.outputs.db_changed == 'true'
+        run: |
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+          git --version 2>/dev/null || brew install git
+
       - name: Commit and push DB/artifacts
         if: steps.scrape.outputs.db_changed == 'true'
         run: |
@@ -57,6 +63,7 @@ jobs:
           git fetch origin
           git reset --mixed origin/main
           git add tracker.db
+          git add alert_log.json || true
           git add logs/run_report_latest.json || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)"

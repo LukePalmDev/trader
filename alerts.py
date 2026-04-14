@@ -31,6 +31,7 @@ _ROOT      = Path(__file__).parent
 _LOG_PATH  = _ROOT / "alert_log.json"
 IVA_RATE   = 0.22   # sconto IVA applicato al prezzo CEX
 _ALERT_LOG_RETENTION_DAYS = 90  # purge entry più vecchie di N giorni
+_MAX_ALERTS_PER_RUN = 50        # cap notifiche per run (evita flood su reset log)
 
 
 # ---------------------------------------------------------------------------
@@ -300,10 +301,24 @@ def send_run_summary(stats_by_source: dict[str, dict]) -> None:
 # Entry point principale
 # ---------------------------------------------------------------------------
 
+_FAM_LABELS: dict[str, str] = {
+    "series-x": "Xbox Series X",
+    "series-s": "Xbox Series S",
+    "one-x":    "Xbox One X",
+    "one-s":    "Xbox One S",
+    "one":      "Xbox One",
+    "360":      "Xbox 360",
+    "original": "Xbox Original",
+}
+
+
 def check_alerts() -> int:
     """
     Controlla gli annunci Subito contro le soglie CEX.
-    Invia notifiche macOS per i nuovi match.
+    Invia notifiche macOS + Telegram per i nuovi match.
+
+    Tutti i match vengono marcati come notificati (evita re-flood alla run
+    successiva), ma le notifiche effettive sono cappate a _MAX_ALERTS_PER_RUN.
 
     Returns:
         numero di notifiche inviate
@@ -320,19 +335,17 @@ def check_alerts() -> int:
         {k: f"€{v:.0f}" for k, v in thresholds.items()},
     )
 
-    ads     = _db_subito.get_all_ads()
+    ads      = _db_subito.get_all_ads()
     log_data = _load_log()
     _purge_old_entries(log_data)
     already_notified: set[str] = set(log_data.get("notified", {}).keys())
+    now = datetime.now(timezone.utc).isoformat()
 
-    sent = 0
-    now  = datetime.now(timezone.utc).isoformat()
-
+    # 1) Raccoglie tutti i match non ancora notificati
+    matches: list[tuple[str, str, str]] = []  # (urn_id, title, message)
     for ad in ads:
         if not ad["last_available"]:
             continue
-            
-        # Saltiamo gli annunci non esplicitamente approvati dall'AI
         if ad.get("ai_status") != "approved":
             continue
 
@@ -340,41 +353,43 @@ def check_alerts() -> int:
         family = ad["console_family"] or "other"
         urn_id = ad["urn_id"]
 
-        if price is None or price <= 0:
+        if not price or price <= 0:
             continue
 
         threshold = thresholds.get(family)
-        if threshold is None:
-            continue
-
-        if price >= threshold:
+        if threshold is None or price >= threshold:
             continue
 
         if urn_id in already_notified:
             continue
 
-        # Nuovo match sotto soglia → notifica
-        fam_label = {
-            "series-x": "Xbox Series X",
-            "series-s": "Xbox Series S",
-            "one-x":    "Xbox One X",
-            "one-s":    "Xbox One S",
-            "one":      "Xbox One",
-            "360":      "Xbox 360",
-            "original": "Xbox Original",
-        }.get(family, family.upper())
-
+        fam_label = _FAM_LABELS.get(family, family.upper())
         city_part = f" · {ad['city']}" if ad.get("city") else ""
-        msg = f"€{price:.0f} (soglia €{threshold:.0f}){city_part} — {ad['name'][:60]}"
-        _notify(f"🎮 Deal {fam_label}!", msg)
+        msg   = f"€{price:.0f} (soglia €{threshold:.0f}){city_part} — {ad['name'][:60]}"
+        matches.append((urn_id, f"🎮 Deal {fam_label}!", msg))
 
+    if not matches:
+        log.info("Alert: nessun nuovo match sotto soglia.")
+        return 0
+
+    total = len(matches)
+    if total > _MAX_ALERTS_PER_RUN:
+        log.warning(
+            "Alert: %d match trovati, invio solo i primi %d (cap per run).",
+            total, _MAX_ALERTS_PER_RUN,
+        )
+
+    # 2) Marca TUTTI come notificati subito (evita re-flood alla run successiva
+    #    anche se la notifica non viene inviata per il cap)
+    for urn_id, _, _ in matches:
         log_data["notified"][urn_id] = now
+    _save_log(log_data)
+
+    # 3) Invia solo i primi _MAX_ALERTS_PER_RUN
+    sent = 0
+    for _urn_id, title, msg in matches[:_MAX_ALERTS_PER_RUN]:
+        _notify(title, msg)
         sent += 1
 
-    if sent:
-        _save_log(log_data)
-        log.info("Alert: %d nuove notifiche inviate.", sent)
-    else:
-        log.info("Alert: nessun nuovo match sotto soglia.")
-
+    log.info("Alert: %d/%d notifiche inviate.", sent, total)
     return sent
