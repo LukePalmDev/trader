@@ -51,6 +51,7 @@ jobs:
       - name: Commit and push DB/artifacts
         if: steps.scrape.outputs.db_changed == 'true'
         run: |
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           git fetch origin

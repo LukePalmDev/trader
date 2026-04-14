@@ -19,6 +19,7 @@ import json
 import logging
 import ssl
 import subprocess
+import time
 import urllib.request
 import urllib.parse
 from datetime import datetime, timedelta, timezone
@@ -128,6 +129,8 @@ def _purge_old_entries(log_data: dict) -> int:
 # ---------------------------------------------------------------------------
 
 _telegram_cfg: dict | None = None
+_last_telegram_send: float = 0.0
+_TELEGRAM_MIN_INTERVAL = 2.0  # secondi minimi tra invii (Telegram limita ~20 msg/min per chat)
 
 def _get_telegram_cfg() -> dict:
     """Carica la config Telegram da config.toml (lazy, una sola volta)."""
@@ -181,6 +184,8 @@ def _send_telegram(title: str, message: str) -> bool:
     Returns:
         True se il messaggio è stato inviato con successo, False altrimenti.
     """
+    global _last_telegram_send
+
     cfg = _get_telegram_cfg()
     if not cfg.get("enabled"):
         return False
@@ -189,6 +194,11 @@ def _send_telegram(title: str, message: str) -> bool:
     chat_id = cfg.get("chat_id", "")
     if not bot_token or not chat_id:
         return False
+
+    # Rate limiting: rispetta il limite ~20 msg/min per chat di Telegram
+    elapsed = time.monotonic() - _last_telegram_send
+    if elapsed < _TELEGRAM_MIN_INTERVAL:
+        time.sleep(_TELEGRAM_MIN_INTERVAL - elapsed)
 
     text = f"*{title}*\n{message}"
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -215,6 +225,8 @@ def _send_telegram(title: str, message: str) -> bool:
     except Exception as exc:
         log.warning("Telegram fallito: %s", exc)
         return False
+    finally:
+        _last_telegram_send = time.monotonic()
 
 
 # ---------------------------------------------------------------------------
