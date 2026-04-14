@@ -55,19 +55,10 @@ jobs:
         run: |
           export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-          # 1) Se git non è disponibile, installa Xcode CLT via softwareupdate
-          #    (brew non funziona senza CLT — serve softwareupdate per installarlo headless)
+          # Se git fallisce, esci (non usare sudo su self-hosted runner)
           if ! git --version 2>/dev/null; then
-            echo "Xcode CLT mancante — installazione headless via softwareupdate..."
-            sudo touch /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
-            CLT=$(softwareupdate --list 2>&1 \
-              | grep "Label: Command Line Tools" \
-              | sed 's/.*Label: //' \
-              | tail -1)
-            echo "Pacchetto trovato: '$CLT'"
-            sudo softwareupdate --install "$CLT" --agree-to-license
-            sudo rm -f /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
-            git --version   # fallisce qui se installazione non riuscita
+            echo "git mancante. Verifica l'installazione su questa macchina."
+            exit 1
           fi
 
           # 2) actions/checkout senza git cade su REST API e non crea .git
