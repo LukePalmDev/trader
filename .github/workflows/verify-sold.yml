@@ -21,17 +21,31 @@ jobs:
       contents: write
 
     steps:
-      - name: Setup Homebrew PATH
-        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
-
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
 
-      - name: Pull latest DB
-        run: git pull --rebase
+      - name: Ensure git, repo state and pull
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+          if ! git --version >/dev/null 2>&1; then
+            echo "git non trovato, installazione via brew..."
+            brew install git
+          fi
+          
+          if [ ! -d .git ]; then
+            echo "Checkout via REST API: re-init del repository locale..."
+            git init -b main
+            git remote add origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
+            git fetch origin
+            git reset --mixed origin/main
+          else
+            git pull --rebase
+          fi
 
       - name: Install Python dependencies
         run: python3.11 -m pip install -r requirements.lock
@@ -74,6 +88,7 @@ jobs:
 
       - name: Commit e push DB aggiornato
         run: |
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
           git fetch origin
@@ -81,7 +96,7 @@ jobs:
           git add tracker.db logs/coverage_history.csv
           git diff --staged --quiet \
             || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"
-          git push
+          git push origin main
 
       - name: Fallisci il job se coverage sotto soglia
         if: steps.verify.outputs.exit_code == '3'
