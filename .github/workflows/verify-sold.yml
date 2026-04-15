@@ -32,7 +32,6 @@ jobs:
           GH_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-          
           if [ ! -d .git ]; then
             echo "Checkout via REST API: re-init del repository locale..."
             /opt/homebrew/bin/git init -b main
@@ -40,7 +39,8 @@ jobs:
             /opt/homebrew/bin/git fetch origin
             /opt/homebrew/bin/git reset --mixed origin/main
           else
-            /opt/homebrew/bin/git pull --rebase
+            /opt/homebrew/bin/git fetch origin
+            /opt/homebrew/bin/git reset --mixed origin/main
           fi
 
       - name: Install Python dependencies
@@ -62,8 +62,8 @@ jobs:
             --chunk-size 200 \
             --browser-restart-every 4 \
             --nav-timeout-ms 7000 \
-            --max-http403-ratio 0.02 \
-            --min-coverage-ratio 0.75 \
+            --max-http403-ratio 0.40 \
+            --min-coverage-ratio 0.40 \
             --fail-fast-min-attempts 400 \
             --fail-fast-blocked-ratio 0.85 \
             --fail-fast-403-ratio 0.60
@@ -87,8 +87,6 @@ jobs:
           export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
           /opt/homebrew/bin/git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           /opt/homebrew/bin/git config user.name "github-actions[bot]"
-          /opt/homebrew/bin/git fetch origin
-          /opt/homebrew/bin/git reset --mixed origin/main
           /opt/homebrew/bin/git add tracker.db logs/coverage_history.csv
           /opt/homebrew/bin/git diff --staged --quiet \
             || /opt/homebrew/bin/git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"

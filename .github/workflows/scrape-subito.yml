@@ -26,6 +26,22 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Ensure git and repo state
+        env:
+          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+          if [ ! -d .git ]; then
+            echo "Checkout via REST API: re-init del repository locale..."
+            /opt/homebrew/bin/git init -b main
+            /opt/homebrew/bin/git remote add origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git"
+            /opt/homebrew/bin/git fetch origin
+            /opt/homebrew/bin/git reset --mixed origin/main
+          else
+            /opt/homebrew/bin/git fetch origin
+            /opt/homebrew/bin/git reset --mixed origin/main
+          fi
+
       - name: Install Python dependencies
         run: python3.11 -m pip install -r requirements.lock
 
@@ -48,40 +64,16 @@ jobs:
         if: steps.scrape.outputs.db_changed == 'true'
         run: python3.11 run.py --cleanup
 
-      - name: Ensure git and repo state
-        if: steps.scrape.outputs.db_changed == 'true'
-        env:
-          GH_PAT: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-          echo "Debugging git environment:"
-          echo "PATH is: $PATH"
-          uname -m || true
-          arch || true
-          which git || true
-          git --version || true
-          /opt/homebrew/bin/git --version || true
-
-          if [ ! -d .git ]; then
-            echo "Checkout via REST API: re-init del repository locale..."
-            /opt/homebrew/bin/git init -b main || true
-            /opt/homebrew/bin/git remote add origin "https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}.git" || true
-            /opt/homebrew/bin/git fetch origin || true
-            /opt/homebrew/bin/git reset --mixed origin/main || true
-          fi
-
       - name: Commit and push DB/artifacts
         if: steps.scrape.outputs.db_changed == 'true'
         run: |
           export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
-          /opt/homebrew/bin/git config user.email "41898282+github-actions[bot]@users.noreply.github.com" || true
-          /opt/homebrew/bin/git config user.name "github-actions[bot]" || true
-          /opt/homebrew/bin/git add tracker.db || true
-          /opt/homebrew/bin/git add alert_log.json || true
-          /opt/homebrew/bin/git add logs/run_report_latest.json || true
+          /opt/homebrew/bin/git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          /opt/homebrew/bin/git config user.name "github-actions[bot]"
+          /opt/homebrew/bin/git add tracker.db alert_log.json logs/run_report_latest.json || true
           /opt/homebrew/bin/git diff --staged --quiet \
-            || /opt/homebrew/bin/git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)" || true
-          /opt/homebrew/bin/git push origin main || true
+            || /opt/homebrew/bin/git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)"
+          /opt/homebrew/bin/git push origin main
 
       - name: Upload scrape log (debug)
         if: steps.scrape.outputs.db_changed == 'false'

@@ -693,8 +693,11 @@ async def _process_rows(
                     skipped_ids,
                 )
             _pending_conn.close()
-        except Exception as e:
-            log.error("Errore aggiornamento verify_status pending: %s", e)
+    # Assicura che ogni motivo di blocco/errore sia contato come skipped se non già presente.
+    # Questo corregge bug dove skipped_rows poteva essere 0 nonostante reason_counts > 0.
+    blocked_count = int(sum(v for k, v in reason_counts.items() if str(k).startswith("blocked:") or str(k).startswith("skipped:")))
+    if skipped_rows < blocked_count:
+        skipped_rows = blocked_count
 
     sold_price_sum = sum(sold_prices)
     sold_price_count = len(sold_prices)
@@ -1253,11 +1256,12 @@ async def verify_batch(
 
     attempted_total = int(total_stats["verified"]) + int(total_stats["skipped"])
     if attempted_total <= 0:
-        attempted_total = 1
+        attempted_total = max(1, int(total_stats["verified"]) + int(total_stats["blocked_total"]))
+    
     blocked_403_ratio = float(total_stats["blocked_403"]) / float(attempted_total)
     blocked_cffi_ratio = float(total_stats["blocked_cffi"]) / float(attempted_total)
     blocked_total_ratio = float(total_stats["blocked_total"]) / float(attempted_total)
-    coverage_ratio = float(total_stats["verified"]) / float(max(1, attempted_total))
+    coverage_ratio = float(total_stats["verified"]) / float(attempted_total)
     total_stats["blocked_403_ratio"] = blocked_403_ratio
     total_stats["blocked_cffi_ratio"] = blocked_cffi_ratio
     total_stats["blocked_total_ratio"] = blocked_total_ratio

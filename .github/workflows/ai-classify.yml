@@ -2,7 +2,7 @@ name: AI Classify
 
 on:
   workflow_run:
-    workflows: ["Scrape Subito.it (ogni 6 ore)"]
+    workflows: ["Subito.it"]
     types: [completed]
   workflow_dispatch:  # trigger manuale; disabilita il workflow da GitHub UI per sospenderlo
 
@@ -24,16 +24,13 @@ jobs:
       TRADER_VIEWER_OPEN_BROWSER: "false"
 
     steps:
-      - name: Setup Homebrew PATH
-        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
-
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           ref: main
 
-      - name: Pull latest DB (aggiornato dallo scrape precedente)
+      - name: Pull latest DB
         run: git pull --rebase
 
       - name: Set up Python 3.11
@@ -52,9 +49,7 @@ jobs:
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git fetch origin
-          git reset --mixed origin/main
           git add tracker.db
           git diff --staged --quiet \
             || git commit -m "chore: ai-classify $(date -u +%Y-%m-%dT%H:%M)"
-          git push
+          git push origin main
