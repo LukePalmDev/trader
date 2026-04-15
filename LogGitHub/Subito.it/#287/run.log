@@ -1,0 +1,177 @@
+scrape-subito	UNKNOWN STEP	﻿2026-04-07T16:46:03.7700530Z Current runner version: '2.333.1'
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7702960Z Runner name: 'mac-mini-luke'
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7703280Z Runner group name: 'Default'
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7703660Z Machine name: 'Mac-mini'
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7704720Z ##[group]GITHUB_TOKEN Permissions
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7705360Z Contents: write
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7705590Z Metadata: read
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7705800Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7706580Z Secret source: Actions
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.7706860Z Prepare workflow directory
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.8173940Z Prepare all required actions
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:03.8191310Z Getting action download info
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:04.5642050Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:05.2641980Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:05.9785760Z Complete job name: scrape-subito
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0093370Z ##[group]Run actions/checkout@v4
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0093850Z with:
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0094310Z   token: ***
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0094640Z   repository: LukePalmDev/trader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0095010Z   ssh-strict: true
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0095320Z   ssh-user: git
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0095640Z   persist-credentials: true
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0095960Z   clean: true
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0096260Z   sparse-checkout-cone-mode: true
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0096650Z   fetch-depth: 1
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0096950Z   fetch-tags: false
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0097250Z   show-progress: true
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0097580Z   lfs: false
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0097870Z   submodules: false
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0098180Z   set-safe-directory: true
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0098600Z env:
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0098900Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0099300Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0099880Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0100280Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0100650Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0809460Z Syncing repository: LukePalmDev/trader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0810520Z ##[group]Getting Git version info
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0811110Z Working directory is '/Users/luke/actions-runner/_work/trader/trader'
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0811950Z [command]/usr/bin/git version
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0856000Z git version 2.50.1 (Apple Git-155)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0865960Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0872190Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/fee509bf-bb51-4ef7-9e0c-9c3cdae9e343' before making global git config changes
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0873560Z Adding repository directory to the temporary git global config as a safe directory
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0875220Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.0957190Z [command]/usr/bin/git config --local --get remote.origin.url
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1014690Z https://github.com/LukePalmDev/trader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1022550Z ##[group]Removing previously created refs, to avoid conflicts
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1024160Z [command]/usr/bin/git rev-parse --symbolic-full-name --verify --quiet HEAD
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1089100Z refs/heads/main
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1093830Z [command]/usr/bin/git checkout --detach
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1195460Z HEAD is now at dc99a59 ci: fix self-hosted runner — usa python3.11 Homebrew, rimuove setup-python
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1197520Z M	logs/run_report_latest.json
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1271090Z [command]/usr/bin/git branch --delete --force main
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1340370Z Deleted branch main (was dc99a59).
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1414400Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1415450Z [command]/usr/bin/git submodule status
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1988880Z ##[group]Cleaning the repository
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.1990890Z [command]/usr/bin/git clean -ffdx
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2086290Z Removing __pycache__/
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2086720Z Removing data/
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2087170Z Removing logs/run_report_2026-04-07_17-02-36.json
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2087690Z Removing scrapers/__pycache__/
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2090800Z [command]/usr/bin/git reset --hard HEAD
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2194090Z HEAD is now at dc99a59 ci: fix self-hosted runner — usa python3.11 Homebrew, rimuove setup-python
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2196480Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2197280Z ##[group]Disabling automatic garbage collection
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2198590Z [command]/usr/bin/git config --local gc.auto 0
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2264050Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2264620Z ##[group]Setting up auth
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2269440Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2339330Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2828670Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.2897330Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.3358160Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.3425770Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.3910020Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.3998310Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.3998890Z ##[group]Fetching the repository
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.4000050Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +c68a0fd013c415d561a9a0f6be55b5a549d76a99:refs/remotes/origin/main
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8427730Z From https://github.com/LukePalmDev/trader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8428100Z  + dc99a59...c68a0fd c68a0fd013c415d561a9a0f6be55b5a549d76a99 -> origin/main  (forced update)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8466140Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8466380Z ##[group]Determining the checkout info
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8466620Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8468650Z [command]/usr/bin/git sparse-checkout disable
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8552660Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8619880Z ##[group]Checking out the ref
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8621670Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8708600Z Warning: you are leaving 1 commit behind, not connected to
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8708800Z any of your branches:
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8708870Z 
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8709120Z   dc99a59 ci: fix self-hosted runner — usa python3.11 Homebrew, rimuove setup-python
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8709300Z 
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8709410Z If you want to keep it by creating a new branch, this may be a good time
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8709590Z to do so with:
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8709650Z 
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8709730Z  git branch <new-branch-name> dc99a59
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8709820Z 
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8730210Z Switched to a new branch 'main'
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8733420Z branch 'main' set up to track 'origin/main'.
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8736570Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8819100Z [command]/usr/bin/git log -1 --format=%H
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8888080Z c68a0fd013c415d561a9a0f6be55b5a549d76a99
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8960410Z ##[group]Run python3.11 -m pip install -r requirements.lock
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8960650Z [36;1mpython3.11 -m pip install -r requirements.lock[0m
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8976640Z shell: /bin/bash -e {0}
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8976760Z env:
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8976870Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8977000Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8977260Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8977400Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:06.8977530Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1538690Z Ignoring tomli: markers 'python_version < "3.11"' don't match your environment
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1540320Z Requirement already satisfied: playwright==1.52.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 2)) (1.52.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1542050Z Requirement already satisfied: requests==2.31.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 3)) (2.31.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1543630Z Requirement already satisfied: beautifulsoup4==4.12.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 4)) (4.12.3)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1544910Z Requirement already satisfied: anthropic==0.86.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 6)) (0.86.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1546260Z Requirement already satisfied: aiohttp==3.11.14 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 7)) (3.11.14)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1552160Z Requirement already satisfied: pyee<14,>=13 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (13.0.1)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1553990Z Requirement already satisfied: greenlet<4.0.0,>=3.1.1 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (3.3.2)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1560010Z Requirement already satisfied: charset-normalizer<4,>=2 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (3.4.7)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1561790Z Requirement already satisfied: idna<4,>=2.5 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (3.11)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1563850Z Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (2.6.3)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1565480Z Requirement already satisfied: certifi>=2017.4.17 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (2026.2.25)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1572540Z Requirement already satisfied: soupsieve>1.2 in /opt/homebrew/lib/python3.11/site-packages (from beautifulsoup4==4.12.3->-r requirements.lock (line 4)) (2.8.3)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1579080Z Requirement already satisfied: anyio<5,>=3.5.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (4.13.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1580630Z Requirement already satisfied: distro<2,>=1.7.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (1.9.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1582210Z Requirement already satisfied: docstring-parser<1,>=0.15 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.17.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1583670Z Requirement already satisfied: httpx<1,>=0.25.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.28.1)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1585550Z Requirement already satisfied: jiter<1,>=0.4.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.13.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1587150Z Requirement already satisfied: pydantic<3,>=1.9.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (2.12.5)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1588580Z Requirement already satisfied: sniffio in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (1.3.1)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1589960Z Requirement already satisfied: typing-extensions<5,>=4.14 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (4.15.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1597320Z Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (2.6.1)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1598660Z Requirement already satisfied: aiosignal>=1.1.2 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.4.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1600490Z Requirement already satisfied: attrs>=17.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (26.1.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1601910Z Requirement already satisfied: frozenlist>=1.1.1 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.8.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1603710Z Requirement already satisfied: multidict<7.0,>=4.5 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (6.7.1)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1605150Z Requirement already satisfied: propcache>=0.2.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (0.4.1)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1606600Z Requirement already satisfied: yarl<2.0,>=1.17.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.23.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1651770Z Requirement already satisfied: httpcore==1.* in /opt/homebrew/lib/python3.11/site-packages (from httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6)) (1.0.9)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1664410Z Requirement already satisfied: h11>=0.16 in /opt/homebrew/lib/python3.11/site-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.16.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1688940Z Requirement already satisfied: annotated-types>=0.6.0 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.7.0)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1690350Z Requirement already satisfied: pydantic-core==2.41.5 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (2.41.5)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.1692190Z Requirement already satisfied: typing-inspection>=0.4.2 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.4.2)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2092610Z ##[group]Run python3.11 -m playwright install chrome
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2092820Z [36;1mpython3.11 -m playwright install chrome[0m
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2104390Z shell: /bin/bash -e {0}
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2104500Z env:
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2104600Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2104730Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2104950Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2105070Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.2105200Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.4914360Z Switching to root user to install dependencies...
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.5298820Z sudo: a terminal is required to read the password; either use the -S option to read from standard input or configure an askpass helper
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.5299190Z sudo: a password is required
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.5310050Z Failed to install browsers
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.5310260Z Error: Failed to install chrome
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.5382250Z ##[error]Process completed with exit code 1.
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.5453490Z Post job cleanup.
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6091810Z [command]/usr/bin/git version
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6168490Z git version 2.50.1 (Apple Git-155)
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6185390Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/0bf007db-e571-4bf1-9c79-7d2606e9416d' before making global git config changes
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6185830Z Adding repository directory to the temporary git global config as a safe directory
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6187770Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6257630Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6326210Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6795780Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6859310Z http.https://github.com/.extraheader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6865440Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.6939250Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.7409870Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.7479320Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.7998750Z Cleaning up orphan processes
+scrape-subito	UNKNOWN STEP	2026-04-07T16:46:07.9227450Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

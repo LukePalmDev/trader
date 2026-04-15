@@ -48,7 +48,7 @@ SELECTED_MODEL = os.environ.get("ANTHROPIC_MODEL") or HAIKU_MODEL
 
 
 def _connect() -> sqlite3.Connection:
-    conn = sqlite3.connect(str(DB_PATH))
+    conn = sqlite3.connect(str(DB_PATH), timeout=30.0)
     conn.row_factory = sqlite3.Row
     return conn
 

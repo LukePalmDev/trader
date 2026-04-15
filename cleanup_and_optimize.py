@@ -34,7 +34,7 @@ def vacuum_database(db_path: str) -> bool:
         size_before = os.path.getsize(db_path) / (1024 * 1024)
         logger.info(f"   Size before: {size_before:.2f} MB")
 
-        conn = sqlite3.connect(db_path)
+        conn = sqlite3.connect(db_path, timeout=30.0)
         conn.execute("VACUUM")
         conn.close()
 
@@ -159,7 +159,7 @@ def reset_wal_journals() -> Dict:
 
         try:
             # Try to open and close cleanly
-            conn = sqlite3.connect(db, timeout=5)
+            conn = sqlite3.connect(db, timeout=30.0)
             conn.close()
 
             # Check for WAL files

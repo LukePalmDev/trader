@@ -1,0 +1,822 @@
+verify-sold	UNKNOWN STEP	﻿2026-04-12T05:15:41.7181350Z Current runner version: '2.333.1'
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7183610Z Runner name: 'mac-mini-luke'
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7183910Z Runner group name: 'Default'
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7184280Z Machine name: 'Mac-mini'
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7185490Z ##[group]GITHUB_TOKEN Permissions
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7186130Z Contents: write
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7186430Z Metadata: read
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7186650Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7187420Z Secret source: Actions
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7187700Z Prepare workflow directory
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7579770Z Prepare all required actions
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:41.7597150Z Getting action download info
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:42.3611770Z Download action repository 'actions/checkout@v5' (SHA:93cb6efe18208431cddfb8368fd83d5badbf9bfd)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1376200Z Complete job name: verify-sold
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1652490Z ##[group]Run actions/checkout@v5
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1652810Z with:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1653110Z   token: ***
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1653310Z   ref: main
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1653510Z   repository: LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1653770Z   ssh-strict: true
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1653980Z   ssh-user: git
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1654180Z   persist-credentials: true
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1654410Z   clean: true
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1654620Z   sparse-checkout-cone-mode: true
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1654860Z   fetch-depth: 1
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1655060Z   fetch-tags: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1655260Z   show-progress: true
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1655470Z   lfs: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1655670Z   submodules: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1655880Z   set-safe-directory: true
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1656180Z env:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1656390Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1656650Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.1656900Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3360000Z Syncing repository: LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3360810Z ##[group]Getting Git version info
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3361170Z Working directory is '/Users/luke/actions-runner/_work/trader/trader'
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3361700Z [command]/usr/bin/git version
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3425780Z git version 2.50.1 (Apple Git-155)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3433720Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3438980Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/b96e0119-7a26-4f60-bb4f-c16814901000' before making global git config changes
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3439740Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3440570Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3506770Z [command]/usr/bin/git config --local --get remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3562220Z https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3568390Z ##[group]Removing previously created refs, to avoid conflicts
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3569700Z [command]/usr/bin/git rev-parse --symbolic-full-name --verify --quiet HEAD
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3628930Z refs/heads/main
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3632540Z [command]/usr/bin/git checkout --detach
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3716600Z HEAD is now at 9e2d449 chore: scrape subito 2026-04-12T04:47
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3719200Z M	alert_log.json
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3785510Z [command]/usr/bin/git branch --delete --force main
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3849880Z Deleted branch main (was 9e2d449).
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3917290Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.3917670Z [command]/usr/bin/git submodule status
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4374090Z ##[group]Cleaning the repository
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4374610Z [command]/usr/bin/git clean -ffdx
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4563960Z Removing __pycache__/
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4564270Z Removing data/
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4564570Z Removing logs/run_report_2026-04-12_06-47-19.json
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4564900Z Removing scrapers/__pycache__/
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4568000Z [command]/usr/bin/git reset --hard HEAD
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4681370Z HEAD is now at 9e2d449 chore: scrape subito 2026-04-12T04:47
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4684000Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4685070Z ##[group]Disabling automatic garbage collection
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4686620Z [command]/usr/bin/git config --local gc.auto 0
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4747970Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4748370Z ##[group]Setting up auth
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4750200Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.4812450Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.5264350Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.5326230Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.5778080Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.5841120Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.6284540Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.6350040Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.6350440Z ##[group]Fetching the repository
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:43.6353060Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6812460Z From https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6813030Z  + 9e2d449...ed982c0 main       -> origin/main  (forced update)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6848640Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6849210Z ##[group]Determining the checkout info
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6851060Z [command]/usr/bin/git branch --list --remote origin/main
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6919020Z   origin/main
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6921620Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6922900Z [command]/usr/bin/git sparse-checkout disable
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.6997720Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.7057000Z ##[group]Checking out the ref
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.7057680Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8055510Z Warning: you are leaving 2 commits behind, not connected to
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8056140Z any of your branches:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8056350Z 
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8056550Z   9e2d449 chore: scrape subito 2026-04-12T04:47
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8057080Z   8bccf95 chore: scrape ebay 2026-04-11
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8057410Z 
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8057810Z If you want to keep them by creating a new branch, this may be a good time
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8058460Z to do so with:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8058650Z 
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8058840Z  git branch <new-branch-name> 9e2d449
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8059190Z 
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8068600Z Switched to a new branch 'main'
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8071910Z branch 'main' set up to track 'origin/main'.
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8076060Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8154020Z [command]/usr/bin/git log -1 --format=%H
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8215410Z ed982c0d9fc3a9ba35d63d087c1828b3ff1f3b26
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8320200Z ##[group]Run git pull --rebase
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8320700Z [36;1mgit pull --rebase[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8335620Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8336020Z env:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8336360Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8336860Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:44.8337330Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.3054090Z Already up to date.
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.3076280Z ##[group]Run python3.11 -m pip install -r requirements.lock
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.3076510Z [36;1mpython3.11 -m pip install -r requirements.lock[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.3088900Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.3088990Z env:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.3089070Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.3089470Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.3089580Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5093140Z Ignoring tomli: markers 'python_version < "3.11"' don't match your environment
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5094950Z Requirement already satisfied: playwright==1.52.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 2)) (1.52.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5096500Z Requirement already satisfied: playwright-stealth==2.0.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 3)) (2.0.3)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5097990Z Requirement already satisfied: patchright==1.58.2 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 4)) (1.58.2)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5099430Z Requirement already satisfied: curl-cffi==0.15.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 5)) (0.15.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5100680Z Requirement already satisfied: requests==2.31.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 6)) (2.31.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5102050Z Requirement already satisfied: beautifulsoup4==4.12.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 7)) (4.12.3)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5103550Z Requirement already satisfied: anthropic==0.86.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 9)) (0.86.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5105240Z Requirement already satisfied: aiohttp==3.11.14 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 10)) (3.11.14)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5111580Z Requirement already satisfied: pyee<14,>=13 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (13.0.1)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5113100Z Requirement already satisfied: greenlet<4.0.0,>=3.1.1 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (3.3.2)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5131620Z Requirement already satisfied: cffi>=2.0.0 in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (2.0.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5133150Z Requirement already satisfied: certifi>=2024.2.2 in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (2026.2.25)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5134830Z Requirement already satisfied: rich in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (14.3.4)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5148230Z Requirement already satisfied: charset-normalizer<4,>=2 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (3.4.7)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5150020Z Requirement already satisfied: idna<4,>=2.5 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (3.11)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5151770Z Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (2.6.3)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5159110Z Requirement already satisfied: soupsieve>1.2 in /opt/homebrew/lib/python3.11/site-packages (from beautifulsoup4==4.12.3->-r requirements.lock (line 7)) (2.8.3)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5167060Z Requirement already satisfied: anyio<5,>=3.5.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (4.13.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5168570Z Requirement already satisfied: distro<2,>=1.7.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (1.9.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5170590Z Requirement already satisfied: docstring-parser<1,>=0.15 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.17.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5171610Z Requirement already satisfied: httpx<1,>=0.25.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.28.1)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5173060Z Requirement already satisfied: jiter<1,>=0.4.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.13.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5174550Z Requirement already satisfied: pydantic<3,>=1.9.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (2.12.5)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5175770Z Requirement already satisfied: sniffio in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (1.3.1)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5177250Z Requirement already satisfied: typing-extensions<5,>=4.14 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (4.15.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5188840Z Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (2.6.1)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5190170Z Requirement already satisfied: aiosignal>=1.1.2 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.4.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5192000Z Requirement already satisfied: attrs>=17.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (26.1.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5193450Z Requirement already satisfied: frozenlist>=1.1.1 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.8.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5194960Z Requirement already satisfied: multidict<7.0,>=4.5 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (6.7.1)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5196370Z Requirement already satisfied: propcache>=0.2.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (0.4.1)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5197850Z Requirement already satisfied: yarl<2.0,>=1.17.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.23.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5235430Z Requirement already satisfied: httpcore==1.* in /opt/homebrew/lib/python3.11/site-packages (from httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 9)) (1.0.9)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5245420Z Requirement already satisfied: h11>=0.16 in /opt/homebrew/lib/python3.11/site-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.16.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5271730Z Requirement already satisfied: annotated-types>=0.6.0 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.7.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5273190Z Requirement already satisfied: pydantic-core==2.41.5 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (2.41.5)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5275050Z Requirement already satisfied: typing-inspection>=0.4.2 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.4.2)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5344350Z Requirement already satisfied: pycparser in /opt/homebrew/lib/python3.11/site-packages (from cffi>=2.0.0->curl-cffi==0.15.0->-r requirements.lock (line 5)) (3.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5386360Z Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/homebrew/lib/python3.11/site-packages (from rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (4.0.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5388080Z Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/homebrew/lib/python3.11/site-packages (from rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (2.20.0)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5402080Z Requirement already satisfied: mdurl~=0.1 in /opt/homebrew/lib/python3.11/site-packages (from markdown-it-py>=2.2.0->rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (0.1.2)
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5726750Z ##[group]Run python3.11 -m patchright install chromium
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5726950Z [36;1mpython3.11 -m patchright install chromium[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5739660Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5740030Z env:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5740130Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5740270Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.5740400Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.9151760Z ##[group]Run python3.11 verify_sold.py --all --max-runtime-minutes 55 --concurrency 18 --chunk-size 350 --browser-restart-every 3 --nav-timeout-ms 7000 --body-timeout-seconds 2.5 --dom-fallback-timeout-ms 1200 --max-http403-ratio 0.02 --fail-fast-min-attempts 400 --fail-fast-blocked-ratio 0.85 --fail-fast-403-ratio 0.60 --selection-sample 5
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.9152890Z [36;1mpython3.11 verify_sold.py --all --max-runtime-minutes 55 --concurrency 18 --chunk-size 350 --browser-restart-every 3 --nav-timeout-ms 7000 --body-timeout-seconds 2.5 --dom-fallback-timeout-ms 1200 --max-http403-ratio 0.02 --fail-fast-min-attempts 400 --fail-fast-blocked-ratio 0.85 --fail-fast-403-ratio 0.60 --selection-sample 5[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.9166100Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.9166210Z env:
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.9166310Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.9166430Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:45.9166540Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:46.1057880Z 07:15:46 [INFO] db_subito: Subito DB pronto: /Users/luke/actions-runner/_work/trader/trader/tracker.db
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:46.2818320Z 07:15:46 [INFO] verify_sold: Selezione verify-sold: totale=33673 | status_ok=8473 | attivi_non_venduti=7739 | subset_finale=7464 | esclusi_da_xbox_only=275
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:46.2818980Z 07:15:46 [INFO] verify_sold: Inizio verifica di 7464 annunci (concorrenza=18, chunk=350, stati=approved,pending) | filtro xbox-only ON…
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:47.3361170Z 07:15:47 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:51.1535960Z 07:15:51 [INFO] verify_sold: Browser session restart (chunk 1), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:51.1536920Z 07:15:51 [INFO] verify_sold: Chunk 1: verifica annunci 1-350 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5298730Z 07:15:56 [INFO] verify_sold: cffi precheck: sold=340 | active=10 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5318620Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1tb-come-nuova-destiny-crotone-634017619.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5319900Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-livorno-633886928.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5320940Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-kinect-torino-633872496.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5321930Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-milano-633857368.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5322990Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-2-controller-catania-633835058.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5324040Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-fermo-633816630.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5324950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-roma-633752555.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5326030Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-scamb-per-switch-oled-siracusa-633700873.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5327310Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-512-gb-con-controller-e-scatola-lecce-633561686.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5328550Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-venezia-633539930.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5329490Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-catania-633481381.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5330480Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox360-giochi-controller-foggia-633263321.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5331520Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-asti-633188995.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5332590Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/box-360-24-giochi-4-joypad-e-accessori-vari-firenze-633111435.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5336360Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-controller-fc-26-messina-633109145.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5337660Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-l-aquila-633082928.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5338600Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-sassari-633024766.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5339620Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1-tb-ssd-messina-632846344.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5340760Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-2-controller-volante-f1-genova-632823050.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5341970Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-da-250gb-con-giochi-monza-632766578.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5343840Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-roma-632735185.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5345140Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-digital-latina-632575663.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5346310Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-chieti-632390661.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5347350Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-chieti-632390326.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5348280Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-torino-632375131.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5349430Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-come-nuova-2-controller-giochi-torino-632269372.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5350820Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-pronta-all-uso-joystick-scatola-catania-632141724.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5352070Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-da-testare-agrigento-632109688.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5353140Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1-tb-biella-631856972.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5354170Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-kinect-torino-631817657.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5355150Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512-gb-taranto-631651989.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5356210Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1-tb-napoli-631624197.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5357130Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-torino-631588986.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5358160Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-2-controller-potenza-631547151.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5359210Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-lecco-631494323.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5360410Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500-gb-2-joystick-caricatore-cavi-brescia-631471832.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5361540Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-trento-631206295.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5362480Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-viterbo-631168126.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5363590Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-2-controller-5-giochi-ascoli-piceno-631122461.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5364680Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-giochi-gorizia-631045030.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5365680Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-milano-630990742.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5367990Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-agrigento-630915323.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5369610Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-nuovissima-cagliari-630527206.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5370830Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-seris-x-1tb-account-savona-630497376.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5372040Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-kinect-2-controller-10-giochi-chieti-630441491.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5373120Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-napoli-630258072.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5374220Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-s-250-giga-2-joypad-giochi-vicenza-630227827.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5375440Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-7-giochi-accessori-caltanissetta-630018023.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5376520Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-1-napoli-630005244.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5377410Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-brindisi-629736913.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5378310Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/x-box-one-roma-629678530.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5379540Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-nintendo-switch-lite-per-steamdeck-padova-629444531.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5380800Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500gb-torino-629387711.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5381850Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-volante-3joypad-giochi-pescara-629302659.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5383060Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-1t-2-giochi-taranto-629274285.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5384200Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-nera-con-hd-interno-da-500gb-napoli-629238728.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5385240Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-roma-629113546.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5386160Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-milano-629100394.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5387140Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/console-xbox-360-sensore-kinect-4gb-12-giochi-lecce-628959795.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5388200Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-4gb-go-reggio-emilia-628949249.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5389100Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/one-s-kinect-19-giochi-2-jpad-salerno-628885685.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5389950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-bari-628573691.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5390700Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-bari-628521421.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5391420Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-udine-628064143.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5392230Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-torino-627502783.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5393100Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500-gb-6-giochi-monza-627371476.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5393960Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-250g-forli-cesena-627318177.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5394780Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-siracusa-627232030.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5395630Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-black-edition-milano-627108771.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5397330Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-matera-627065775.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5398150Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-matera-627065611.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5399040Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-1tb-edizione-2023-vicenza-627032407.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5399970Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-e-monitor-asus-treviso-626998225.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5400890Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-limited-edition-sassari-626899254.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5401800Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-limited-edition-sassari-626899109.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5402650Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500-gb-potenza-626818323.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5403490Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-cuneo-626550497.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5404240Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-cuneo-626550304.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5405050Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/microsoft-xbox-one-milano-626445982.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5423890Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-milano-626366460.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5424810Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-cosenza-626318049.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5425590Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-como-626228722.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5426480Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-completa-in-perfetto-stato-milano-640334027.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5427540Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-con-iphone-pro-roma-624254014.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5428410Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-fifa-26-messina-623655618.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5429260Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-series-x-1-tb-palermo-608564422.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5430120Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-lecce-602701112.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5430990Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-con-accessori-e-giochi-brescia-597941887.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5431780Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-bari-597731018.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5432480Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-milano-597328995.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5433150Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-trapani-597123899.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5433860Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-con-diablo-iv-pisa-544109061.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5434590Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-cronus-zen-roma-596270287.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5435350Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-lecce-596009475.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5436020Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-milano-595833852.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5436840Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-con-scatolo-e-imballaggio-originale-taranto-626108973.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5438170Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/informatica/xbox-series-s-512gb-pari-al-nuovo-napoli-624951106.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5439250Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-cosenza-623117873.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5439920Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-roma-620423005.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5440590Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-milano-614778179.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5441300Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-1tb-sud-sardegna-613644986.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5442100Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-frosinone-597312724.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5442810Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-caserta-597026226.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5443490Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-caserta-597026772.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5444220Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-512-gb-taranto-596999853.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5445130Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-2022-e-base-di-ricarica-roma-596920701.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5445850Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-salerno-596729082.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5446530Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-500gb-venezia-596728607.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5447220Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-roma-596224077.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5447840Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-milano-596117555.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5448600Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-pari-al-nuovo-l-aquila-596115499.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5449320Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbos-series-s-foggia-596100566.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5450000Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-512gb-ragusa-595725140.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5450760Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-caltanissetta-595708159.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5451420Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-lucca-626056978.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5452090Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-viterbo-625931563.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5452920Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-adattatore-e-kinect-19-giochi-2-jpad-salerno-625247657.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5453710Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-ones-modena-625212954.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5454410Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500-gb-10-giochi-torino-578739645.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5455120Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-sud-sardegna-624847929.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5455770Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-s-1tb-cosenza-623633329.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5456500Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-1-tb-giochi-milano-622920489.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5457200Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-bari-622905349.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5457830Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-taranto-622848022.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5458950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-modena-622325520.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5459930Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-prato-621813969.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5460660Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-seconda-mano-fifa-18-pesaro-urbino-620733890.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5461390Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-vicenza-620135053.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5461990Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-roma-619679390.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5462630Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-firenze-618683822.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5463260Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-potenza-617714625.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5463980Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-lunch-edition-catania-616328682.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5464700Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1-tb-benevento-615343934.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5465470Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-limited-edition-minecraft-treviso-615235352.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5466220Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-cosenza-612587586.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5466950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/magnifica-xbox-one-s-all-digital-latina-506892450.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5467740Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-con-3-giochi-livorno-612448158.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5468620Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-consolle-viedeogiochi-napoli-612149506.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5469340Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-roma-610497133.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5470130Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/lotto-ps4-xbox-one-x-giochi-elite-serie-2-vicenza-610272476.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5471030Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-monitor-koorui-barletta-andria-trani-608384261.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5471870Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500gb-agrigento-606680148.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5472540Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500gb-bari-606177223.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5473280Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-leggere-descrizione-bari-605068866.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5474000Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-catania-602830142.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5474690Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500-gb-giochi-cagliari-602685224.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5475390Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/x-box-one-cosenza-601611681.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5476860Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-1tb-padova-601510385.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5477560Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-all-digital-modena-600886602.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5478250Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-firenze-596381640.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5478910Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500gb-messina-600000340.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5479680Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-2-joypad-e-giochi-messina-599674902.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5480920Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-messina-599674788.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5482230Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-piu-giochi-bergamo-597970571.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5483100Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-pistoia-597899747.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5483760Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-roma-597740433.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5484430Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-sassari-597736705.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5485140Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-e-lettore-dvd-napoli-597684394.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5485830Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-napoli-597672365.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5486600Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-100-giochi-controller-1-tb-palermo-597656321.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5487400Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-agrigento-597588630.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5488070Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1t-vicenza-597543476.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5488740Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500gb-disk-roma-597539116.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5489430Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-udine-597490819.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5490060Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-pistoia-597478915.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5490770Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-catania-597418375.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5491420Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500-gb-monza-597389019.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5492090Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500-gb-frosinone-597387776.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5492800Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-controller-mantova-597342486.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5493540Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-controller-agrigento-597338491.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5494380Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500gb-limited-edition-minecraft-como-597335913.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5495280Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-con-controlli-e-giochi-messina-597334231.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5496000Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-modena-597333520.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5496760Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-e-12-giochi-ritiro-solo-su-provincia-modena-597233778.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5497480Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-giochi-milano-597218194.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5498070Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-verona-597184171.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5498630Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-napoli-597177152.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5499180Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-cuneo-597112034.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5499750Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-1tb-siracusa-597107662.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5500350Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/simulatore-di-giuda-biella-597102431.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5501520Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-project-scorpio-mai-usato-milano-597059726.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5502650Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-10-giochi-l-aquila-597051542.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5503280Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-catania-597047696.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5503920Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-controller-giochi-ancona-597044685.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5504560Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-palermo-597025800.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5505100Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-torino-596983674.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5505670Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-aosta-596955402.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5506310Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-controller-cuffie-giochi-milano-596936331.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5507060Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-minecraft-limited-edition-cuneo-596866009.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5507750Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-catania-596832449.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5508330Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-salerno-596728792.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5508880Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-avellino-596711124.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5509470Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-napoli-596649349.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5510020Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-varese-596626039.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5510600Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-salerno-596618552.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5511260Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-19-giochi-2-joystick-asti-485525124.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5511880Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-como-596488960.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5512460Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-napoli-596477529.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5513190Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-all-digital-edition-no-disco-512gb-alessandria-596427522.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5513950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-14-giochi-milano-596420864.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5514570Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-con-kinet-venezia-596418344.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5515170Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-firenze-596394747.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5515740Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-firenze-596383026.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5516290Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-firenze-596382761.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5516970Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-condizioni-molto-buone-2-joystick-verona-596364736.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5517670Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-giochi-torino-596352822.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5518280Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-one-s-512gb-brescia-596235279.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5518870Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-catania-596163171.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5519880Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-torino-596156478.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5521030Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-controller-giochi-milano-596132564.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5521670Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-cagliari-596076788.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5522230Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-brescia-596074218.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5522820Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-catania-596073437.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5523400Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1-tb-brindisi-596049584.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5524120Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-con-pad-perfettamente-funzionante-napoli-596013749.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5524830Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-2tb-firenze-595994950.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5525400Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-roma-595958056.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5525950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-pistoia-595936891.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5526510Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-palermo-595916138.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5527110Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500gb-forli-cesena-595864337.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5527790Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-nero-kinect-pistoia-595838251.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5528490Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-controller-6-giochi-catania-595773129.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5529140Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-nuovo-pescara-595767353.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5529750Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-4-giochi-taranto-595761738.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5530360Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-varese-595636583.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5530960Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-all-digital-varese-595636660.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5531600Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1-tera-sud-sardegna-595606007.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5532210Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-torino-595593459.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5532760Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-foggia-595544734.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5533320Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1t-bolzano-595535588.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5533880Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-taranto-595515363.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5534450Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-pavia-595502832.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5535000Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-bolzano-593318723.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5535570Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1-tb-prato-585314418.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5536220Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-2-joystick-17-giochi-verona-570311818.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5537070Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/hobby-collezionismo/videogiochi-nintendo-xbox-360-giochi-controller-napoli-626110367.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5544560Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-enna-626099425.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5545720Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-avellino-625647960.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5546340Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-fat-genova-625182584.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5546890Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-caserta-624661839.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5547530Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-slim-con-controller-e-kinect-milano-622066126.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5548320Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/console-xbox-360-e-diversi-giochi-massa-carrara-620669195.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5548980Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-potenza-618608584.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5549550Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-sud-sardegna-617731019.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5550250Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-kinect-dragon-ball-raging-blast-e-acc-lecce-617500977.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5550970Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-kinect-treviso-616515759.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5551630Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-halo-4-limited-edition-udine-614358773.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5552260Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-perugia-614163905.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5552830Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-salerno-613743684.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5553380Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-pesaro-urbino-611018085.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5553950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-palermo-610074423.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5554550Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-60gb-varese-609549660.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5555120Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-padova-607866582.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5555750Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-nera-con-due-controller-vicenza-605392088.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5556560Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-slim-2-joypad-originali-giochi-crotone-602791307.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5557290Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-e-joystick-7-giochi-viterbo-601844988.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5557900Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-napoli-600787458.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5558570Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-kinect-cod-ghost-collector-edition-siena-597916404.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5559300Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-pezzi-di-ricambio-torino-597795330.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5559940Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-controller-macerata-489281071.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5560520Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-pavia-597662980.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5561050Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-treviso-597495991.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5561610Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-napoli-597492341.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5562170Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-elite-caserta-597285999.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5563090Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-taranto-597137857.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5564120Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-taranto-597088200.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5564650Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-26-giochi-bari-597013524.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5565240Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-kinnect-torino-596992592.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5565740Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-verona-596869806.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5566250Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox360-reggio-calabria-596854861.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5566830Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-8-gb-funzionante-bergamo-596732628.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5567380Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-pavia-596702630.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5567920Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox360-funzionante-roma-596686431.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5568430Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-rimini-596645178.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5569080Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-giochi-a-parte-con-cavi-i-goistik-nn-funz-benevento-596577871.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5569870Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-controller-giochi-incorporati-e-gioco-taranto-596501039.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5570600Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-e-500-gb-stazione-di-ricarica-mantova-596470082.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5571250Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-2-joypad-2-giochi-asti-596434946.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5571870Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-joestik-kinect-360-roma-596376407.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5572530Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-joestik-kinect-360-roma-596376102.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5573080Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-palermo-596346746.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5573570Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-perugia-228352510.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5574090Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-bianca-120-gb-roma-596292291.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5574620Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-black-torino-596248944.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5575120Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-pavia-596217372.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5575600Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/x-box-napoli-596196893.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5576090Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-3-giochi-roma-596141241.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5576600Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-roma-596108293.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5577090Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-modena-596070363.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5577590Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-nero-alessandria-596043752.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5578100Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-matera-596018177.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5578670Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-4-gb-kinect-e-giochi-milano-595957840.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5579740Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox360-500g-kinect-giochi-brescia-595876264.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5580700Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-caserta-595865608.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5581270Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-console-e-giochi-napoli-595793007.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5581830Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox360-250-giga-brescia-369157572.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5582400Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-usata-siracusa-595715007.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5582950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-joystick-como-595700849.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5583470Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox360-napoli-595640399.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5584060Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-kinect-8-giochi-agrigento-595613672.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5584720Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-3gb-bianca-4-controller-accessori-roma-595606438.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5585310Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-roma-595531524.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5585800Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-salerno-587847665.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5586450Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-nera-con-4-giochi-no-alimentatore-roma-585645819.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5587080Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1-tera-napoli-625193090.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5587660Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-controller-torino-620082171.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5588230Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512gb-trapani-619295351.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5588780Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-500-gb-viterbo-617806223.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5589360Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-funzionate-con-giochi-milano-614946902.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5589950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512-gb-ssd-milano-614385019.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5590560Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/giochi-e-consolle-xbox-prima-serie-trento-546039611.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5591150Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/x-box-s-genova-597524831.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5591770Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-con-controller-wolverine-ultimate-perugia-596263952.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5592420Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-rieti-595816547.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5592970Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-classic-full-games-messina-595668239.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5593630Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-s-schermo-huawei-pad-pro-2-pesaro-urbino-595565721.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5594300Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-bianca-da-1tb-nuova-milano-583154642.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5594940Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-1tb-edizione-speciale-salerno-640342976.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5595570Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-usata-pochissimo-napoli-640483164.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5600920Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-500gb-chieti-640473981.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5601950Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512gb-catania-640472805.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5602510Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-varese-640467398.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5603040Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-giochi-bari-640466193.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5603570Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-frosinone-640465294.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5604080Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-torino-640464837.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5604570Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-milano-640456144.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5605120Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-completa-forli-cesena-640456092.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5605820Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-charger-station-pad-aggiunto-pescara-640454771.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5606570Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-512gb-controller-originale-blu-bologna-640452410.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5607180Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-ragusa-640448760.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5607660Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-lecco-640445732.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5608170Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-brescia-640445209.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5608670Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-firenze-640437839.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5609180Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-ancona-640436147.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5609800Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-classic-completa-e-con-3-giochi-inclusi-torino-640434501.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5610430Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500-gb-ragusa-640433245.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5610970Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-giochi-gorizia-640431208.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5611500Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-modena-640430105.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5612050Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-digital-1tb-salerno-640428869.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5612660Z 07:15:56 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/microsoft-xbox-classic-completa-novara-640426527.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5693190Z 07:15:56 [INFO] verify_sold: Chunk 1 completato in 5.4s (64.63 tentativi/s, verificati=350/350) | reason: sold:cffi-410=340, active:cffi-200=10
+verify-sold	UNKNOWN STEP	2026-04-12T05:15:56.5693640Z 07:15:56 [INFO] verify_sold: Chunk 2: verifica annunci 351-700 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:10.2985570Z 07:16:10 [INFO] verify_sold: cffi precheck: sold=144 | active=198 | unknown(→Playwright)=8
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5458620Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1000gb-modena-640420907.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5459700Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-20-giochi-pavia-640411759.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5469910Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-rieti-640402790.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5471580Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/console-xbox-360-nera-2-controller-udine-640394779.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5474660Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-milano-640366197.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5476410Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/console-xbox-360-fat-jasper-bari-640354566.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5477290Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-genova-640525049.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5478280Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-microsoft-nero-originale-console-2giochi-latina-640522430.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5479290Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-milano-640519951.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5480410Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-ci-due-pad-originali-brescia-640515775.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5481440Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-slim-256gbhdd-abadavatar-ricondizionata-palermo-640514472.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5481950Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-vicenza-640513124.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5482620Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512gb-2-controller-cuffie-roma-640510833.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5487340Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-treviso-640527413.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5487820Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-per-pezzi-di-ricambio-padova-640539608.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5488700Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-pesaro-urbino-640483482.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5489120Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-pesaro-urbino-640521021.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5489550Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-potenza-640551127.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5489900Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-trento-640542623.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5490470Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-x-pavia-640573912.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5491440Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-padova-640572790.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5492290Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-seriesx-1trb-belluno-640568304.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5493170Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512-gb-ssd-torino-640556486.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5494010Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-milano-640598348.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5494810Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-10-giochi-milano-640591504.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5495650Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-cagliari-640587212.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5496450Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-caserta-640581223.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5497460Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-fat-rgh3-custom-led-verde-ricondizionata-palermo-640533786.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5498530Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-firenze-640664976.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5499390Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-x-catania-640662131.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5500280Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-catania-640660012.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5500920Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-222-gb-giochi-latina-640655441.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5502230Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-come-nuovo-modena-640644560.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5502620Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-matera-640585447.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5502960Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-mantova-640714163.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5544150Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-come-nuova-destiny-crotone-640705399.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5545300Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-fat-mod-falcon-kinect-6-giochi-original-napoli-640681393.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5546450Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-hdd-seagate-1tb-29-videogiochi-napoli-640684120.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5547580Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-2-controller-base-ricarica-pavia-640688021.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5548630Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-console-xboxone-s-500gb-milano-640700352.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5549560Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-giochi-salerno-640698982.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5560990Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-perfetta-compresa-di-giochi-catania-640697849.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5563030Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-bianca-vicenza-640697696.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5566250Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-cosenza-640696067.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5567880Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-cosenza-640695783.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5570290Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-con-2-controller-caserta-640682254.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5571730Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-5-giochi-accessori-perfetta-vicenza-640749263.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5574820Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-classic-microsoft-prima-edizione-como-640748687.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5575230Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-brindisi-640747031.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5575630Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-giochi-accessori-venezia-640743094.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5576090Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-original-classic-funzionante-con-giochi-modena-640739252.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5576550Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/x-box-series-x-1-joistick-bergamo-640736227.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5577400Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-salerno-640732045.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5578350Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-trento-640730355.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5579370Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/x-box-one-s-con-controller-e-gta-5-trieste-640729913.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5580710Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-512-gb-lucca-640726260.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5581590Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-torino-640722667.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5582410Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-taranto-640780984.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5584590Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-palermo-640778793.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5586170Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-cagliari-640769249.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5587080Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-e-giochi-vari-vicenza-640763533.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5588380Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-controller-cuffie-wireless-torino-640758785.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5589040Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-con-joypad-verona-640753941.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5589440Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-monitor-torino-640752113.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5589900Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-milano-640882223.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5590590Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-come-nuova-cyberpunk-batteria-milano-640877721.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5591020Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-sondrio-640869371.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5591450Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-varese-640860093.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5591960Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/x-box-series-s-512gb-1-joistick-bergamo-640849310.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5593120Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-valuto-scambi-milano-640842280.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5594020Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-milano-640826051.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5594840Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-seriea-s-512g-milano-597102289.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5595690Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-napoli-640881979.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5596140Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-microsoft-console-500-gb-perfetta-con-acc-napoli-640854051.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5596850Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1-t-memoria-1-joistic-8-giochi-napoli-640806839.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5597610Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-1-tb-caserta-640799315.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5597990Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-onex1tcon-joy-e-cavo-salerno-568899480.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5598420Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-roma-640855099.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5598770Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360e-frosinone-597060510.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5599190Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-perfettamente-funzionante-venezia-623101289.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5599620Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-venduto-vicenza-604008185.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5599990Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-verona-596527050.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5600320Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-x-bari-640843078.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5600650Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-taranto-640835871.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5601070Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-barletta-andria-trani-609558646.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5601480Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-250-giga-palermo-640889290.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5602510Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-palermo-640829407.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5602920Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-ragusa-597479315.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5603280Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-ragusa-597479688.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5603660Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1-tb-torino-640858440.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5604020Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-novara-640821351.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5604450Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-1-asti-625353260.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5604800Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-1-tb-torino-597583984.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5605200Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-512-gb-alessandria-596386753.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5605600Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-512-gb-alessandria-596376916.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5605970Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-modena-597337657.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5606760Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-bianca-forli-cesena-597059855.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5607750Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-prima-generazione-forli-cesena-544820158.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5608780Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-all-digital-1tb-fifa-25-controller-bologna-595842013.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5613190Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-con-controller-perfettamente-funzionante-firenze-640873882.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5613790Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-512gb-console-bianco-leggete-arezzo-640818769.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5615820Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/console-xbox-one-s-disco-500gb-gioco-cavi-testata-prato-640811881.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5738880Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1tb-con-gioco-the-witcher-3-grosseto-640806379.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5739900Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-pisa-600511565.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5740730Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512gb-prato-596859259.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5741160Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-ascoli-piceno-640887544.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5741540Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-1tb-sassari-640837900.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5742010Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-s-cagliari-596008856.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5742380Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/bundlex-box-serie-cagliari-595741663.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5742800Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-genova-640794279.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5743190Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-digital-500gb-caserta-638878453.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5743550Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/console-roma-632192355.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5743870Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-cagliari-630429110.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5744930Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-con-un-gioco-taranto-639549189.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5745650Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-slim-giochi-palermo-639362120.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5746070Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-controller-giochi-como-639283457.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5746550Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/indiana-jones-premium-edition-xbox-roma-638347751.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5746960Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-origin-2-tera-bergamo-638284926.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5747450Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/batman-arkham-knight-special-edition-xbox-one-udine-638073666.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5747940Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-3-controller-3-giochi-milano-637930775.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5748330Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-x4g-4-tera-bergamo-637438683.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5748740Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-xs-cuneo-637425210.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5749100Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-usata-poco-como-634629845.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5749440Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/legion-go-catania-634376964.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5749780Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/controller-xbox-frosinone-633961358.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5750200Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-grosseto-632591650.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5750530Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/giochi-mantova-630909917.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5750930Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-wii-torino-630900963.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5751290Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/consolle-xbox-reggio-emilia-628340810.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5751710Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/consolle-xbox-e-nintendo-wii-reggio-emilia-628338060.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5752130Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/giochi-xbox-one-x-ps5-catania-597599364.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5752550Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/x-box-one-s-solo-ricambi-no-hard-disk-ravenna-596168111.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5752940Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-roma-604756420.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5753270Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-salerno-597070562.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5753690Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/joystics-per-xbox-e-per-ipad-consolle-reggio-emilia-640425974.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5754250Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-monza-610535275.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5754970Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/lotto-ricambi-nds-psp-1004-napoli-622589001.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5757700Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512gb-salerno-620014105.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5758080Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-salerno-620013876.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5758760Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-con-giochi-napoli-613011700.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5759360Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-3-controller-reggio-emilia-640858866.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5760440Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/duke-nukem-forever-per-xbox-360-nuovo-piacenza-640807641.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5767270Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/videogiochi-parma-621564745.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5768850Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/interessanti-giochi-economici-per-la-xbox-e-wii-bologna-620071213.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5860830Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-512-ssd-console-roma-640419471.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5861980Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-cuffie-avellino-640418655.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5862440Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-vicenza-640414353.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5862820Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-2tb-vicenza-640414190.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5863190Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1tb-treviso-640413515.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5863540Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-roma-640410067.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5864310Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-lecce-640409584.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5865310Z 07:16:11 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-come-nuova-con-scatola-originale-firenze-640406989.htm
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5979120Z 07:16:11 [INFO] verify_sold: Chunk 2 completato in 15.0s (23.29 tentativi/s, verificati=350/350) | reason: active:cffi-200=198, sold:cffi-410=144, sold:http-status=8
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:11.5979590Z 07:16:11 [INFO] verify_sold: Chunk 3: verifica annunci 701-1050 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:17.2175500Z 07:16:17 [INFO] verify_sold: cffi precheck: sold=0 | active=350 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:17.2387030Z 07:16:17 [INFO] verify_sold: Chunk 3 completato in 5.6s (62.05 tentativi/s, verificati=350/350) | reason: active:cffi-200=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:32.8775260Z 07:16:32 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:37.5722290Z 07:16:37 [INFO] verify_sold: Browser session restart (chunk 4), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-12T05:16:37.5722860Z 07:16:37 [INFO] verify_sold: Chunk 4: verifica annunci 1051-1400 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:17:03.8845290Z 07:17:03 [INFO] verify_sold: cffi precheck: sold=0 | active=330 | unknown(→Playwright)=20
+verify-sold	UNKNOWN STEP	2026-04-12T05:17:30.1873720Z 07:17:30 [INFO] verify_sold: Chunk 4 completato in 52.6s (6.65 tentativi/s, verificati=350/350) | reason: active:cffi-200=330, active:dom-ok=20
+verify-sold	UNKNOWN STEP	2026-04-12T05:17:30.1874080Z 07:17:30 [INFO] verify_sold: Chunk 5: verifica annunci 1401-1750 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:17:58.2795730Z 07:17:58 [INFO] verify_sold: cffi precheck: sold=0 | active=322 | unknown(→Playwright)=28
+verify-sold	UNKNOWN STEP	2026-04-12T05:18:08.2328500Z 07:18:08 [INFO] verify_sold: Chunk 5 completato in 38.0s (9.20 tentativi/s, verificati=323/350) | reason: active:cffi-200=322, blocked:timeout=27, active:dom-ok=1
+verify-sold	UNKNOWN STEP	2026-04-12T05:18:08.2328930Z 07:18:08 [INFO] verify_sold: Chunk 6: verifica annunci 1751-2100 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:18:22.5776600Z 07:18:22 [INFO] verify_sold: cffi precheck: sold=0 | active=341 | unknown(→Playwright)=9
+verify-sold	UNKNOWN STEP	2026-04-12T05:18:30.4263280Z 07:18:30 [INFO] verify_sold: Chunk 6 completato in 22.2s (15.77 tentativi/s, verificati=345/350) | reason: active:cffi-200=341, blocked:timeout=5, active:dom-ok=4
+verify-sold	UNKNOWN STEP	2026-04-12T05:18:31.4713180Z 07:18:31 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:18:42.1133470Z 07:18:42 [INFO] verify_sold: Browser session restart (chunk 7), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-12T05:18:42.1134120Z 07:18:42 [INFO] verify_sold: Chunk 7: verifica annunci 2101-2450 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:01.5461720Z 07:19:01 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:01.5474580Z 07:19:01 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:01.5540160Z 07:19:01 [INFO] verify_sold: Chunk 7 completato in 19.4s (18.00 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:01.5540820Z 07:19:01 [INFO] verify_sold: Chunk 8: verifica annunci 2451-2800 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:02.2823300Z 07:19:02 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:02.2824050Z 07:19:02 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:02.2888390Z 07:19:02 [INFO] verify_sold: Chunk 8 completato in 0.7s (475.87 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:02.2889110Z 07:19:02 [WARNING] verify_sold: Cloudflare burst rilevato (2 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:32.2898080Z 07:19:32 [INFO] verify_sold: Chunk 9: verifica annunci 2801-3150 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:40.1169940Z 07:19:40 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:40.1170830Z 07:19:40 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:40.1295250Z 07:19:40 [INFO] verify_sold: Chunk 9 completato in 7.8s (44.64 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:19:40.1296030Z 07:19:40 [WARNING] verify_sold: Cloudflare burst rilevato (3 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:20:10.8049410Z 07:20:10 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:20:21.5728980Z 07:20:21 [INFO] verify_sold: Browser session restart (chunk 10), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-12T05:20:21.5730590Z 07:20:21 [INFO] verify_sold: Chunk 10: verifica annunci 3151-3500 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:20:33.4696550Z 07:20:33 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:20:33.4698830Z 07:20:33 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:20:33.4794340Z 07:20:33 [INFO] verify_sold: Chunk 10 completato in 11.9s (29.40 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:20:33.4795590Z 07:20:33 [WARNING] verify_sold: Cloudflare burst rilevato (4 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:03.4822580Z 07:21:03 [INFO] verify_sold: Chunk 11: verifica annunci 3501-3850 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:04.3059470Z 07:21:04 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:04.3061280Z 07:21:04 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:04.3264720Z 07:21:04 [INFO] verify_sold: Chunk 11 completato in 0.8s (414.62 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:04.3265750Z 07:21:04 [WARNING] verify_sold: Cloudflare burst rilevato (5 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:34.3293800Z 07:21:34 [INFO] verify_sold: Chunk 12: verifica annunci 3851-4200 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:35.5018530Z 07:21:35 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:35.5192740Z 07:21:35 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:35.5193700Z 07:21:35 [INFO] verify_sold: Chunk 12 completato in 1.2s (294.15 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:21:35.5194590Z 07:21:35 [WARNING] verify_sold: Cloudflare burst rilevato (6 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:22:06.2780270Z 07:22:06 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:22:12.9139990Z 07:22:12 [INFO] verify_sold: Browser session restart (chunk 13), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-12T05:22:12.9140760Z 07:22:12 [INFO] verify_sold: Chunk 13: verifica annunci 4201-4550 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:22:29.5798000Z 07:22:29 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:22:29.5814990Z 07:22:29 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:22:29.6071790Z 07:22:29 [INFO] verify_sold: Chunk 13 completato in 16.7s (20.97 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:22:29.6072500Z 07:22:29 [WARNING] verify_sold: Cloudflare burst rilevato (7 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:22:59.6088780Z 07:22:59 [INFO] verify_sold: Chunk 14: verifica annunci 4551-4900 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:07.4779050Z 07:23:07 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:07.4780360Z 07:23:07 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:07.5015200Z 07:23:07 [INFO] verify_sold: Chunk 14 completato in 7.9s (44.35 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:37.5044940Z 07:23:07 [WARNING] verify_sold: Cloudflare burst rilevato (8 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:37.5046950Z 07:23:37 [INFO] verify_sold: Chunk 15: verifica annunci 4901-5250 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:38.5252740Z 07:23:38 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:38.5254500Z 07:23:38 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:38.5387200Z 07:23:38 [INFO] verify_sold: Chunk 15 completato in 1.0s (338.40 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:23:38.5388170Z 07:23:38 [WARNING] verify_sold: Cloudflare burst rilevato (9 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:24:09.3493600Z 07:24:09 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:24:19.2669720Z 07:24:19 [INFO] verify_sold: Browser session restart (chunk 16), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-12T05:24:19.2671830Z 07:24:19 [INFO] verify_sold: Chunk 16: verifica annunci 5251-5600 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:24:27.1123740Z 07:24:27 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:24:27.1125310Z 07:24:27 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:24:27.1270400Z 07:24:27 [INFO] verify_sold: Chunk 16 completato in 7.9s (44.53 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:24:27.1271380Z 07:24:27 [WARNING] verify_sold: Cloudflare burst rilevato (10 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:24:57.1299530Z 07:24:57 [INFO] verify_sold: Chunk 17: verifica annunci 5601-5950 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:12.8211080Z 07:25:12 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:12.8212350Z 07:25:12 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:12.8461700Z 07:25:12 [INFO] verify_sold: Chunk 17 completato in 15.7s (22.27 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:12.8462720Z 07:25:12 [WARNING] verify_sold: Cloudflare burst rilevato (11 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:42.8474600Z 07:25:42 [INFO] verify_sold: Chunk 18: verifica annunci 5951-6300 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:43.9084910Z 07:25:43 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:43.9086300Z 07:25:43 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:43.9313300Z 07:25:43 [INFO] verify_sold: Chunk 18 completato in 1.1s (322.93 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:25:43.9314130Z 07:25:43 [WARNING] verify_sold: Cloudflare burst rilevato (12 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:26:14.7357090Z 07:26:14 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:26:22.3901010Z 07:26:22 [INFO] verify_sold: Browser session restart (chunk 19), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-12T05:26:22.3903140Z 07:26:22 [INFO] verify_sold: Chunk 19: verifica annunci 6301-6650 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:26:36.4386200Z 07:26:36 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:26:36.4387560Z 07:26:36 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:26:36.4620390Z 07:26:36 [INFO] verify_sold: Chunk 19 completato in 14.1s (24.87 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:26:36.4621220Z 07:26:36 [WARNING] verify_sold: Cloudflare burst rilevato (13 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:06.4638280Z 07:27:06 [INFO] verify_sold: Chunk 20: verifica annunci 6651-7000 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:14.3174010Z 07:27:14 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:14.3174950Z 07:27:14 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:14.3353340Z 07:27:14 [INFO] verify_sold: Chunk 20 completato in 7.9s (44.46 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:14.3354120Z 07:27:14 [WARNING] verify_sold: Cloudflare burst rilevato (14 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:44.3382740Z 07:27:44 [INFO] verify_sold: Chunk 21: verifica annunci 7001-7350 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:45.1942300Z 07:27:45 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:45.1943930Z 07:27:45 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:45.2174130Z 07:27:45 [INFO] verify_sold: Chunk 21 completato in 0.9s (398.10 tentativi/s, verificati=0/350) | reason: skipped:cffi-block=350
+verify-sold	UNKNOWN STEP	2026-04-12T05:27:45.2175070Z 07:27:45 [WARNING] verify_sold: Cloudflare burst rilevato (15 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-12T05:28:16.0562480Z 07:28:16 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:28:20.8163590Z 07:28:20 [INFO] verify_sold: Browser session restart (chunk 22), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-12T05:28:20.8163960Z 07:28:20 [INFO] verify_sold: Chunk 22: verifica annunci 7351-7464 / 7464
+verify-sold	UNKNOWN STEP	2026-04-12T05:28:37.8597000Z 07:28:37 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=114
+verify-sold	UNKNOWN STEP	2026-04-12T05:28:37.8598430Z 07:28:37 [WARNING] verify_sold: cffi blocco massivo (100% unknown): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-12T05:28:37.8674770Z 07:28:37 [INFO] verify_sold: Chunk 22 completato in 17.1s (6.69 tentativi/s, verificati=0/114) | reason: skipped:cffi-block=114
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.2759410Z 07:29:02 [INFO] verify_sold: Reason summary sessione: skipped:cffi-block=5364, active:cffi-200=1551, sold:cffi-410=484, blocked:timeout=32, active:dom-ok=25, sold:http-status=8
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.2760290Z 07:29:02 [INFO] verify_sold: HTTP block summary: 403=0/7464 (0.00%) | blocked_totali=32/7464 (0.43%) | timeout=32 | network=0 | error=0
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.2761590Z 07:29:02 [INFO] verify_sold: Verifica completata. 2068 verificati, 5396 skipped (coverage 27.7%): 1576 attivi, 492 venduti nuovi, 0 venduti confermati, 0 riattivati | prezzo medio venduto € 172.43 | tempo attivo medio 12 giorni
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.2762790Z 07:29:02 [WARNING] verify_sold: Coverage bassa (27.7% < 70%): verifica interrotta da blocchi massivi o errori
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3422790Z ##[group]Run git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3423210Z [36;1mgit config user.email "41898282+github-actions[bot]@users.noreply.github.com"[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3423470Z [36;1mgit config user.name "github-actions[bot]"[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3423640Z [36;1mgit fetch origin[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3423760Z [36;1mgit reset --mixed origin/main[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3423900Z [36;1mgit add tracker.db[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3424080Z [36;1mgit diff --staged --quiet \[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3424250Z [36;1m  || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3426640Z [36;1mgit push[0m
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3528690Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3528790Z env:
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3528880Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3529020Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.3529140Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.8350800Z Unstaged changes after reset:
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:02.8351020Z M	tracker.db
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:03.4850190Z [main 7816085] chore: verify-sold 2026-04-12
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:03.4850460Z  1 file changed, 0 insertions(+), 0 deletions(-)
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.4595180Z To https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.4596200Z    ed982c0..7816085  main -> main
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.4853980Z Post job cleanup.
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.6718260Z [command]/usr/bin/git version
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.6796490Z git version 2.50.1 (Apple Git-155)
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.6810010Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/558a908e-65a2-4897-b113-3dcc4d2ceaa3' before making global git config changes
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.6810440Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.6811730Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.6882000Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.6947790Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.7496090Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.7554470Z http.https://github.com/.extraheader
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.7559320Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.7619330Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.8063620Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.8125360Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-12T05:29:06.8639170Z Cleaning up orphan processes

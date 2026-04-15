@@ -1,0 +1,417 @@
+verify-sold	UNKNOWN STEP	﻿2026-04-08T18:42:14.8113500Z Current runner version: '2.333.1'
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8115830Z Runner name: 'mac-mini-luke'
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8116130Z Runner group name: 'Default'
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8116480Z Machine name: 'Mac-mini'
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8117580Z ##[group]GITHUB_TOKEN Permissions
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8118330Z Contents: write
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8118550Z Metadata: read
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8118770Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8119530Z Secret source: Actions
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8119790Z Prepare workflow directory
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8568200Z Prepare all required actions
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:14.8586860Z Getting action download info
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:15.4598950Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1609260Z Complete job name: verify-sold
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1913340Z ##[group]Run actions/checkout@v4
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1913670Z with:
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1914010Z   token: ***
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1914210Z   ref: main
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1914400Z   repository: LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1914670Z   ssh-strict: true
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1914870Z   ssh-user: git
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1915080Z   persist-credentials: true
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1915300Z   clean: true
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1915510Z   sparse-checkout-cone-mode: true
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1915750Z   fetch-depth: 1
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1915940Z   fetch-tags: false
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1916150Z   show-progress: true
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1916360Z   lfs: false
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1916550Z   submodules: false
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1916760Z   set-safe-directory: true
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1917040Z env:
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1917240Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1917500Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.1917760Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2722700Z Syncing repository: LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2723690Z ##[group]Getting Git version info
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2724050Z Working directory is '/Users/luke/actions-runner/_work/trader/trader'
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2724650Z [command]/usr/bin/git version
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2782470Z git version 2.50.1 (Apple Git-155)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2836940Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2839960Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/25ac68b7-08a1-44e0-b901-8929a128890f' before making global git config changes
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2840710Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2841340Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2892630Z [command]/usr/bin/git config --local --get remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2993760Z https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2995270Z ##[group]Removing previously created refs, to avoid conflicts
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.2995830Z [command]/usr/bin/git rev-parse --symbolic-full-name --verify --quiet HEAD
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3051250Z refs/heads/main
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3055300Z [command]/usr/bin/git checkout --detach
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3150020Z HEAD is now at cea0ebf chore: scrape subito 2026-04-08T18:16
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3152180Z M	alert_log.json
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3233760Z [command]/usr/bin/git branch --delete --force main
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3308360Z Deleted branch main (was cea0ebf).
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3381110Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3382190Z [command]/usr/bin/git submodule status
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3945410Z ##[group]Cleaning the repository
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.3947410Z [command]/usr/bin/git clean -ffdx
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4375040Z Removing __pycache__/
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4375350Z Removing data/
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4375640Z Removing logs/run_report_2026-04-08_20-16-02.json
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4376000Z Removing logs/run_report_2026-04-08_20-16-03.json
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4376380Z Removing scrapers/__pycache__/
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4379560Z [command]/usr/bin/git reset --hard HEAD
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4499000Z HEAD is now at cea0ebf chore: scrape subito 2026-04-08T18:16
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4501380Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4502500Z ##[group]Disabling automatic garbage collection
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4503890Z [command]/usr/bin/git config --local gc.auto 0
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4570170Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4570580Z ##[group]Setting up auth
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4572550Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.4653520Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.5141250Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.5209640Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.5664040Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.5729770Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.6196580Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.6265730Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.6266310Z ##[group]Fetching the repository
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:16.6270070Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.8994190Z From https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.8994600Z  + cea0ebf...d399b56 main       -> origin/main  (forced update)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9032250Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9032510Z ##[group]Determining the checkout info
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9035300Z [command]/usr/bin/git branch --list --remote origin/main
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9106390Z   origin/main
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9109480Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9110630Z [command]/usr/bin/git sparse-checkout disable
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9191330Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9254220Z ##[group]Checking out the ref
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:17.9255660Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0774550Z Warning: you are leaving 3 commits behind, not connected to
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0774830Z any of your branches:
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0774920Z 
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0775010Z   cea0ebf chore: scrape subito 2026-04-08T18:16
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0775230Z   8fa5447 chore: verify-sold 2026-04-08
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0775430Z   3ebeb6f chore: ai-classify 2026-04-08T16:15
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0775560Z 
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0775660Z If you want to keep them by creating a new branch, this may be a good time
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0775890Z to do so with:
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0775960Z 
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0776050Z  git branch <new-branch-name> cea0ebf
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0776190Z 
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0787870Z Switched to a new branch 'main'
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0791100Z branch 'main' set up to track 'origin/main'.
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0794430Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0880770Z [command]/usr/bin/git log -1 --format=%H
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.0943940Z d399b5654954c7f0d95cc060bcf254ef50f2cfc9
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.1021510Z ##[group]Run git pull --rebase
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.1021690Z [36;1mgit pull --rebase[0m
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.1035920Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.1036040Z env:
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.1036140Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.1036310Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.1036450Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.6995420Z Already up to date.
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.7034160Z ##[group]Run python3.11 -m pip install -r requirements.lock
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.7034510Z [36;1mpython3.11 -m pip install -r requirements.lock[0m
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.7055040Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.7055240Z env:
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.7055390Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.7055630Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.7055800Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9532660Z Ignoring tomli: markers 'python_version < "3.11"' don't match your environment
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9534350Z Requirement already satisfied: playwright==1.52.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 2)) (1.52.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9535970Z Requirement already satisfied: requests==2.31.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 3)) (2.31.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9537430Z Requirement already satisfied: beautifulsoup4==4.12.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 4)) (4.12.3)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9538870Z Requirement already satisfied: anthropic==0.86.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 6)) (0.86.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9540140Z Requirement already satisfied: aiohttp==3.11.14 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 7)) (3.11.14)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9546860Z Requirement already satisfied: pyee<14,>=13 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (13.0.1)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9548890Z Requirement already satisfied: greenlet<4.0.0,>=3.1.1 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (3.3.2)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9554960Z Requirement already satisfied: charset-normalizer<4,>=2 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (3.4.7)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9556720Z Requirement already satisfied: idna<4,>=2.5 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (3.11)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9558780Z Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (2.6.3)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9560320Z Requirement already satisfied: certifi>=2017.4.17 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (2026.2.25)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9566910Z Requirement already satisfied: soupsieve>1.2 in /opt/homebrew/lib/python3.11/site-packages (from beautifulsoup4==4.12.3->-r requirements.lock (line 4)) (2.8.3)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9574780Z Requirement already satisfied: anyio<5,>=3.5.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (4.13.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9576370Z Requirement already satisfied: distro<2,>=1.7.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (1.9.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9577930Z Requirement already satisfied: docstring-parser<1,>=0.15 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.17.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9579460Z Requirement already satisfied: httpx<1,>=0.25.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.28.1)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9581180Z Requirement already satisfied: jiter<1,>=0.4.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.13.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9582680Z Requirement already satisfied: pydantic<3,>=1.9.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (2.12.5)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9583870Z Requirement already satisfied: sniffio in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (1.3.1)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9585820Z Requirement already satisfied: typing-extensions<5,>=4.14 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (4.15.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9594360Z Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (2.6.1)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9595850Z Requirement already satisfied: aiosignal>=1.1.2 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.4.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9597800Z Requirement already satisfied: attrs>=17.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (26.1.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9599250Z Requirement already satisfied: frozenlist>=1.1.1 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.8.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9601140Z Requirement already satisfied: multidict<7.0,>=4.5 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (6.7.1)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9602600Z Requirement already satisfied: propcache>=0.2.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (0.4.1)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9604190Z Requirement already satisfied: yarl<2.0,>=1.17.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.23.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9642320Z Requirement already satisfied: httpcore==1.* in /opt/homebrew/lib/python3.11/site-packages (from httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6)) (1.0.9)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9655820Z Requirement already satisfied: h11>=0.16 in /opt/homebrew/lib/python3.11/site-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.16.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9680450Z Requirement already satisfied: annotated-types>=0.6.0 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.7.0)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9681830Z Requirement already satisfied: pydantic-core==2.41.5 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (2.41.5)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:18.9683690Z Requirement already satisfied: typing-inspection>=0.4.2 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.4.2)
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:19.0083050Z ##[group]Run python3.11 verify_sold.py --all --max-runtime-minutes 45
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:19.0083330Z [36;1mpython3.11 verify_sold.py --all --max-runtime-minutes 45[0m
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:19.0095350Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:19.0095470Z env:
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:19.0095560Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:19.0095690Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:19.0095810Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:19.1906790Z 20:42:19 [INFO] verify_sold: Inizio verifica di 6867 annunci (concorrenza=20, chunk=350, stati=approved,pending) | filtro xbox-only ON…
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:20.0662710Z 20:42:20 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:20.1264270Z 20:42:20 [INFO] verify_sold: Browser session restart (chunk 1), pool=20 context.
+verify-sold	UNKNOWN STEP	2026-04-08T18:42:20.1264560Z 20:42:20 [INFO] verify_sold: Chunk 1: verifica annunci 1-350 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2934540Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-1tb-bianca-dic-24-fattura-amazon-treviso-642097040.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2939370Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-512gb-con-4-giochi-tv-panasonic-34-udine-639448948.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2941020Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-controller-mantova-597342486.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2941960Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-controller-agrigento-597338491.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2945130Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-come-nuova-torino-638586630.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2949060Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-modena-597337657.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2951780Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-512-gb-escluso-controller-roma-641882785.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2952290Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-digital-treviso-642339634.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2952810Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-digital-treviso-642338632.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2953200Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-treviso-642045465.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2955580Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/console-xbox-one-s-1tb-controller-perfetta-l-aquila-640207865.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2956690Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/lotto-giochi-xbox-genova-639590326.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2957390Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-black-edition-milano-627108771.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2958810Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-disco-salerno-636178643.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2959450Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-2024-monza-642035929.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2961100Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-roma-629113546.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.2962070Z 20:43:32 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-controller-cavi-scatola-bergamo-639830392.htm
+verify-sold	UNKNOWN STEP	2026-04-08T18:43:32.3128720Z 20:43:32 [INFO] verify_sold: Chunk 2: verifica annunci 351-700 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:44:36.1211220Z 20:44:36 [INFO] verify_sold: Chunk 3: verifica annunci 701-1050 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:45:49.9322820Z 20:45:49 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:45:49.9817520Z 20:45:49 [INFO] verify_sold: Browser session restart (chunk 4), pool=20 context.
+verify-sold	UNKNOWN STEP	2026-04-08T18:45:49.9817870Z 20:45:49 [INFO] verify_sold: Chunk 4: verifica annunci 1051-1400 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:46:49.2390690Z 20:46:49 [INFO] verify_sold: Chunk 5: verifica annunci 1401-1750 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:47:47.7979920Z 20:47:47 [INFO] verify_sold: Chunk 6: verifica annunci 1751-2100 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:48:45.6026070Z 20:48:45 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:48:45.6554030Z 20:48:45 [INFO] verify_sold: Browser session restart (chunk 7), pool=20 context.
+verify-sold	UNKNOWN STEP	2026-04-08T18:48:45.6554400Z 20:48:45 [INFO] verify_sold: Chunk 7: verifica annunci 2101-2450 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:49:45.4561690Z 20:49:45 [INFO] verify_sold: Chunk 8: verifica annunci 2451-2800 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:50:43.0701200Z 20:50:43 [INFO] verify_sold: Chunk 9: verifica annunci 2801-3150 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:51:37.0768600Z 20:51:37 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:51:37.1246210Z 20:51:37 [INFO] verify_sold: Browser session restart (chunk 10), pool=20 context.
+verify-sold	UNKNOWN STEP	2026-04-08T18:51:37.1246530Z 20:51:37 [INFO] verify_sold: Chunk 10: verifica annunci 3151-3500 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:52:44.0443190Z 20:52:44 [INFO] verify_sold: Chunk 11: verifica annunci 3501-3850 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:53:40.4106430Z 20:53:40 [INFO] verify_sold: Chunk 12: verifica annunci 3851-4200 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T18:59:38.1119090Z 20:59:38 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T18:59:38.1684210Z 20:59:38 [INFO] verify_sold: Browser session restart (chunk 13), pool=20 context.
+verify-sold	UNKNOWN STEP	2026-04-08T18:59:38.1684500Z 20:59:38 [INFO] verify_sold: Chunk 13: verifica annunci 4201-4550 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T19:00:33.9087730Z 21:00:33 [INFO] verify_sold: Chunk 14: verifica annunci 4551-4900 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T19:01:29.1148750Z 21:01:29 [INFO] verify_sold: Chunk 15: verifica annunci 4901-5250 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T19:02:32.3697890Z 21:02:32 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T19:02:32.4164520Z 21:02:32 [INFO] verify_sold: Browser session restart (chunk 16), pool=20 context.
+verify-sold	UNKNOWN STEP	2026-04-08T19:02:32.4164810Z 21:02:32 [INFO] verify_sold: Chunk 16: verifica annunci 5251-5600 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T19:03:56.3787800Z 21:03:56 [INFO] verify_sold: Chunk 17: verifica annunci 5601-5950 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T19:05:08.7807840Z 21:05:08 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-x-limited-venezia-641012670.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:05:08.7898260Z 21:05:08 [INFO] verify_sold: Chunk 18: verifica annunci 5951-6300 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:09.4894110Z 21:06:09 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:09.5283430Z 21:06:09 [INFO] verify_sold: Browser session restart (chunk 19), pool=20 context.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:09.5283780Z 21:06:09 [INFO] verify_sold: Chunk 19: verifica annunci 6301-6650 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8622480Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-one-giochi-vari-milano-642174443.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8622910Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8623160Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-giochi-vari-milano-642174443.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8623490Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8677320Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-one-s-brescia-642173384.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8677780Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8678860Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-brescia-642173384.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8679740Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8681030Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-series-x-1-tb-milano-642167386.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8681920Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8682580Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-1-tb-milano-642167386.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8682930Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8695040Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox360-cremona-642152731.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8695830Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8696060Z   - navigating to "https://www.subito.it/videogiochi/xbox360-cremona-642152731.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8696340Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8700980Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-360-milano-642148562.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8701330Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8701700Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-milano-642148562.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8702050Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8702730Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/console-xbox-one-x-milano-642146041.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8703170Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8703410Z   - navigating to "https://www.subito.it/videogiochi/console-xbox-one-x-milano-642146041.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8703710Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8713140Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-serie-s-monza-642120844.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8713910Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8714190Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-monza-642120844.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8714490Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8715120Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-360-pavia-642113271.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8715460Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8718360Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-pavia-642113271.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8718610Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8719040Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-serie-x-perfetta-varese-642099193.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8719440Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8719700Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-perfetta-varese-642099193.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8719970Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8727690Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-360s-monza-642085813.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8728050Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8728270Z   - navigating to "https://www.subito.it/videogiochi/xbox-360s-monza-642085813.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8728520Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8728960Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-series-x-lodi-642084360.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8729290Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8729530Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-lodi-642084360.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8729780Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8745810Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-serie-x-con-controller-e-7-giochi-varese-642022221.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8746980Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8747960Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-con-controller-e-7-giochi-varese-642022221.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8748760Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8749930Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-360-giochi-lecco-642016139.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8750790Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8751290Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-giochi-lecco-642016139.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8751910Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8753450Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-360-milano-642005203.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8754240Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8754850Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-milano-642005203.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8755480Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8756540Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-serie-s-1-t-brescia-641980154.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8757550Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8757850Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-1-t-brescia-641980154.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8758260Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8763660Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-series-x-1tb-milano-641964110.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8764510Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8765420Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-1tb-milano-641964110.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8766140Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8775630Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-serie-s-512-gb-bianca-con-scatola-e-pad-lodi-641930625.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8777180Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8777870Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-512-gb-bianca-con-scatola-e-pad-lodi-641930625.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8778980Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8780850Z 21:06:20 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-serie-x-milano-641894572.htm — tentativo 1/1 fallito: Page.goto: Timeout 10000ms exceeded.
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8781370Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8782090Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-milano-641894572.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:20.8782380Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8644200Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-giochi-vari-milano-642174443.htm: https://www.subito.it/videogiochi/xbox-one-giochi-vari-milano-642174443.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8685540Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-brescia-642173384.htm: https://www.subito.it/videogiochi/xbox-one-s-brescia-642173384.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8689300Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-1-tb-milano-642167386.htm: https://www.subito.it/videogiochi/xbox-series-x-1-tb-milano-642167386.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8692120Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox360-cremona-642152731.htm: https://www.subito.it/videogiochi/xbox360-cremona-642152731.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8702970Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-milano-642148562.htm: https://www.subito.it/videogiochi/xbox-360-milano-642148562.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8706570Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/console-xbox-one-x-milano-642146041.htm: https://www.subito.it/videogiochi/console-xbox-one-x-milano-642146041.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8713780Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-monza-642120844.htm: https://www.subito.it/videogiochi/xbox-serie-s-monza-642120844.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8719050Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-pavia-642113271.htm: https://www.subito.it/videogiochi/xbox-360-pavia-642113271.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8721530Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-perfetta-varese-642099193.htm: https://www.subito.it/videogiochi/xbox-serie-x-perfetta-varese-642099193.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8729030Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360s-monza-642085813.htm: https://www.subito.it/videogiochi/xbox-360s-monza-642085813.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8732370Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-lodi-642084360.htm: https://www.subito.it/videogiochi/xbox-series-x-lodi-642084360.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8749610Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-con-controller-e-7-giochi-varese-642022221.htm: https://www.subito.it/videogiochi/xbox-serie-x-con-controller-e-7-giochi-varese-642022221.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8757070Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-giochi-lecco-642016139.htm: https://www.subito.it/videogiochi/xbox-360-giochi-lecco-642016139.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8765000Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-milano-642005203.htm: https://www.subito.it/videogiochi/xbox-360-milano-642005203.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8771150Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-1-t-brescia-641980154.htm: https://www.subito.it/videogiochi/xbox-serie-s-1-t-brescia-641980154.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8777700Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-1tb-milano-641964110.htm: https://www.subito.it/videogiochi/xbox-series-x-1tb-milano-641964110.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8780370Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-512-gb-bianca-con-scatola-e-pad-lodi-641930625.htm: https://www.subito.it/videogiochi/xbox-serie-s-512-gb-bianca-con-scatola-e-pad-lodi-641930625.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:22.8783880Z 21:06:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-milano-641894572.htm: https://www.subito.it/videogiochi/xbox-serie-x-milano-641894572.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9382680Z 21:06:30 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-classic-160-gb-microsoft-napoli-641990986.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-classic-160-gb-microsoft-napoli-641990986.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9384160Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9384760Z   - navigating to "https://www.subito.it/videogiochi/xbox-classic-160-gb-microsoft-napoli-641990986.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9385430Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9442750Z 21:06:30 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-360-usata-napoli-641968436.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-360-usata-napoli-641968436.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9445590Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9446230Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-usata-napoli-641968436.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9450000Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9593260Z 21:06:30 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-one-napoli-642024612.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-one-napoli-642024612.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9593980Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9610850Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-napoli-642024612.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9612420Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9615880Z 21:06:30 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-serie-s-1-tb-napoli-641987934.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-serie-s-1-tb-napoli-641987934.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9617100Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9617600Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-1-tb-napoli-641987934.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9618210Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9744230Z 21:06:30 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-one-s-napoli-641908892.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-one-s-napoli-641908892.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9752700Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9753550Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-napoli-641908892.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:30.9754280Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1649720Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-series-s-cuffie-xbox-bluethoot-napoli-641918964.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-series-s-cuffie-xbox-bluethoot-napoli-641918964.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1651210Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1651820Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-cuffie-xbox-bluethoot-napoli-641918964.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1652520Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1810420Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-series-x-come-nuova-caserta-641744072.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-series-x-come-nuova-caserta-641744072.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1812730Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1813750Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-come-nuova-caserta-641744072.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1814140Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1822070Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-one-x-salerno-641752276.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-one-x-salerno-641752276.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1824480Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1824980Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-x-salerno-641752276.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1825550Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1837310Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-one-s-1-t-memoria-1-joistic-8-giochi-napoli-641712700.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-one-s-1-t-memoria-1-joistic-8-giochi-napoli-641712700.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1846100Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1846840Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-1-t-memoria-1-joistic-8-giochi-napoli-641712700.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1847570Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1893700Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-one-napoli-641710027.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-one-napoli-641710027.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1894940Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1895180Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-napoli-641710027.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.1895420Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2018260Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-641699353.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-641699353.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2120530Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2308810Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-641699353.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2378080Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2386020Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-series-x-halo-infinite-limited-edition-napoli-641708785.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-series-x-halo-infinite-limited-edition-napoli-641708785.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2388200Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2389440Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-halo-infinite-limited-edition-napoli-641708785.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2390300Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2391950Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-series-x-completa-semi-nuova-salerno-641580413.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-series-x-completa-semi-nuova-salerno-641580413.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2393300Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2393910Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-completa-semi-nuova-salerno-641580413.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2394780Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2396480Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/xbox-one-s-1t-di-memoria-1-joistic-8-giochi-napoli-641576634.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/xbox-one-s-1t-di-memoria-1-joistic-8-giochi-napoli-641576634.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2397920Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2398560Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-1t-di-memoria-1-joistic-8-giochi-napoli-641576634.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2400490Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2401810Z 21:06:31 [WARNING] scrapers.base: https://www.subito.it/videogiochi/lotto-xbox-one-napoli-641461366.htm — tentativo 1/1 fallito: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.subito.it/videogiochi/lotto-xbox-one-napoli-641461366.htm
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2402910Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2403380Z   - navigating to "https://www.subito.it/videogiochi/lotto-xbox-one-napoli-641461366.htm", waiting until "commit"
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:31.2407340Z . Attendo 2.0s...
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:32.9399360Z 21:06:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-classic-160-gb-microsoft-napoli-641990986.htm: https://www.subito.it/videogiochi/xbox-classic-160-gb-microsoft-napoli-641990986.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:32.9451500Z 21:06:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-usata-napoli-641968436.htm: https://www.subito.it/videogiochi/xbox-360-usata-napoli-641968436.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:32.9484360Z 21:06:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-napoli-642024612.htm: https://www.subito.it/videogiochi/xbox-one-napoli-642024612.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:32.9505540Z 21:06:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-1-tb-napoli-641987934.htm: https://www.subito.it/videogiochi/xbox-serie-s-1-tb-napoli-641987934.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:32.9762440Z 21:06:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-napoli-641908892.htm: https://www.subito.it/videogiochi/xbox-one-s-napoli-641908892.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.1669370Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-cuffie-xbox-bluethoot-napoli-641918964.htm: https://www.subito.it/videogiochi/xbox-series-s-cuffie-xbox-bluethoot-napoli-641918964.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.1833680Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-come-nuova-caserta-641744072.htm: https://www.subito.it/videogiochi/xbox-series-x-come-nuova-caserta-641744072.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.1840140Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-x-salerno-641752276.htm: https://www.subito.it/videogiochi/xbox-one-x-salerno-641752276.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.1844860Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-1-t-memoria-1-joistic-8-giochi-napoli-641712700.htm: https://www.subito.it/videogiochi/xbox-one-s-1-t-memoria-1-joistic-8-giochi-napoli-641712700.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.1851560Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-napoli-641710027.htm: https://www.subito.it/videogiochi/xbox-one-napoli-641710027.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.1985830Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-641699353.htm: https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-641699353.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.1990380Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-halo-infinite-limited-edition-napoli-641708785.htm: https://www.subito.it/videogiochi/xbox-series-x-halo-infinite-limited-edition-napoli-641708785.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.1994130Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-completa-semi-nuova-salerno-641580413.htm: https://www.subito.it/videogiochi/xbox-series-x-completa-semi-nuova-salerno-641580413.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.2056970Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-1t-di-memoria-1-joistic-8-giochi-napoli-641576634.htm: https://www.subito.it/videogiochi/xbox-one-s-1t-di-memoria-1-joistic-8-giochi-napoli-641576634.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:06:33.2065160Z 21:06:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/lotto-xbox-one-napoli-641461366.htm: https://www.subito.it/videogiochi/lotto-xbox-one-napoli-641461366.htm — tutti i 1 tentativi falliti
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:08.3403990Z 21:07:08 [INFO] verify_sold: Chunk 20: verifica annunci 6651-6867 / 6867
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2057170Z 21:07:44 [INFO] verify_sold: Verifica completata. 6867 verificati, 0 skipped: 6849 attivi, 18 venduti nuovi, 0 venduti confermati, 0 riattivati | prezzo medio venduto € 185.44 | tempo attivo medio 10 giorni
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2332700Z ##[group]Run git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2333020Z [36;1mgit config user.email "41898282+github-actions[bot]@users.noreply.github.com"[0m
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2333230Z [36;1mgit config user.name "github-actions[bot]"[0m
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2333370Z [36;1mgit fetch origin[0m
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2333470Z [36;1mgit reset --mixed origin/main[0m
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2333580Z [36;1mgit add tracker.db[0m
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2333690Z [36;1mgit diff --staged --quiet \[0m
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2333840Z [36;1m  || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"[0m
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2334050Z [36;1mgit push[0m
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2485780Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2485890Z env:
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2485980Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2486240Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.2486340Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.8388320Z Unstaged changes after reset:
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:44.8388660Z M	tracker.db
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:45.5991020Z [main 1923efc] chore: verify-sold 2026-04-08
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:45.5991350Z  1 file changed, 0 insertions(+), 0 deletions(-)
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:48.8746150Z To https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:48.8747140Z    d399b56..1923efc  main -> main
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:48.9005860Z Post job cleanup.
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0010520Z [command]/usr/bin/git version
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0087610Z git version 2.50.1 (Apple Git-155)
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0104100Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/1e05d570-38c3-494a-aef6-a1c37ea89d7b' before making global git config changes
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0104530Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0107310Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0175050Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0241420Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0820480Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0884810Z http.https://github.com/.extraheader
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0890500Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.0957550Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.1462460Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.1531220Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.2058530Z Cleaning up orphan processes
+verify-sold	UNKNOWN STEP	2026-04-08T19:07:49.7499060Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

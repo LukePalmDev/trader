@@ -1,0 +1,690 @@
+scrape-fonti	UNKNOWN STEP	﻿2026-04-03T06:06:02.4095106Z Current runner version: '2.333.1'
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4171015Z ##[group]Runner Image Provisioner
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4172442Z Hosted Compute Agent
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4173336Z Version: 20260213.493
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4174305Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4175544Z Build Date: 2026-02-13T00:28:41Z
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4197121Z Worker ID: {2937827e-4159-490f-bf3f-8016b9497968}
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4198398Z Azure Region: eastus
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4199306Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4201932Z ##[group]Operating System
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4202994Z Ubuntu
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4203887Z 24.04.4
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4204645Z LTS
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4205441Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4206305Z ##[group]Runner Image
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4207606Z Image: ubuntu-24.04
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4208578Z Version: 20260329.72.1
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4210720Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260329.72/images/ubuntu/Ubuntu2404-Readme.md
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4213399Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260329.72
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4215104Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4229904Z ##[group]GITHUB_TOKEN Permissions
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4232588Z Contents: write
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4233555Z Metadata: read
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4234598Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4237978Z Secret source: Actions
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.4239228Z Prepare workflow directory
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.5675132Z Prepare all required actions
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.5733840Z Getting action download info
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:02.9087989Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.0611208Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3080102Z Complete job name: scrape-fonti
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3724237Z ##[group]Run actions/checkout@v4
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3725123Z with:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3725715Z   token: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3726209Z   repository: LukePalmDev/trader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3726928Z   ssh-strict: true
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3727376Z   ssh-user: git
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3727787Z   persist-credentials: true
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3728231Z   clean: true
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3728668Z   sparse-checkout-cone-mode: true
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3729160Z   fetch-depth: 1
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3729569Z   fetch-tags: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3730030Z   show-progress: true
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3730439Z   lfs: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3730813Z   submodules: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3731225Z   set-safe-directory: true
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3731935Z env:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3732333Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3732883Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3733596Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3734117Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.3734578Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4898921Z Syncing repository: LukePalmDev/trader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4901171Z ##[group]Getting Git version info
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4902263Z Working directory is '/home/runner/work/trader/trader'
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4903958Z [command]/usr/bin/git version
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4938021Z git version 2.53.0
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4966180Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4983099Z Temporarily overriding HOME='/home/runner/work/_temp/2a5f70f6-849a-48fc-b3f1-84b84589b50b' before making global git config changes
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4986567Z Adding repository directory to the temporary git global config as a safe directory
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.4990357Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/trader/trader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5034608Z Deleting the contents of '/home/runner/work/trader/trader'
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5039438Z ##[group]Initializing the repository
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5044589Z [command]/usr/bin/git init /home/runner/work/trader/trader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5158388Z hint: Using 'master' as the name for the initial branch. This default branch name
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5165115Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5167056Z hint: to use in all of your new repositories, which will suppress this warning,
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5168913Z hint: call:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5169658Z hint:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5170485Z hint: 	git config --global init.defaultBranch <name>
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5171497Z hint:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5172425Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5174378Z hint: 'development'. The just-created branch can be renamed via this command:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5175708Z hint:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5176442Z hint: 	git branch -m <name>
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5177567Z hint:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5178656Z hint: Disable this message with "git config set advice.defaultBranchName false"
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5180276Z Initialized empty Git repository in /home/runner/work/trader/trader/.git/
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5183652Z [command]/usr/bin/git remote add origin https://github.com/LukePalmDev/trader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5213834Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5215063Z ##[group]Disabling automatic garbage collection
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5218355Z [command]/usr/bin/git config --local gc.auto 0
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5251064Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5252332Z ##[group]Setting up auth
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5258509Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5292190Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5587779Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5621089Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5848914Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.5880611Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.6124081Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.6162188Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.6164648Z ##[group]Fetching the repository
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:03.6172074Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +1bbb1340b833c3f2eb705fd724b998f60010bb0e:refs/remotes/origin/main
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4035916Z From https://github.com/LukePalmDev/trader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4040657Z  * [new ref]         1bbb1340b833c3f2eb705fd724b998f60010bb0e -> origin/main
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4067573Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4069212Z ##[group]Determining the checkout info
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4071068Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4075185Z [command]/usr/bin/git sparse-checkout disable
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4114892Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4145782Z ##[group]Checking out the ref
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.4152080Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5234438Z Switched to a new branch 'main'
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5239320Z branch 'main' set up to track 'origin/main'.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5248238Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5287044Z [command]/usr/bin/git log -1 --format=%H
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5311362Z 1bbb1340b833c3f2eb705fd724b998f60010bb0e
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5552880Z ##[group]Run actions/setup-python@v5
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5553415Z with:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5553781Z   python-version: 3.11
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5554182Z   cache: pip
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5554555Z   check-latest: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5555108Z   token: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5555491Z   update-environment: true
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5556133Z   allow-prereleases: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5556884Z   freethreaded: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5557405Z env:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5558009Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5558804Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5559841Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5560606Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.5561210Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.7431602Z ##[group]Installed versions
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.7904940Z Successfully set up CPython (3.11.15)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.7908186Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:05.8731343Z [command]/opt/hostedtoolcache/Python/3.11.15/x64/bin/pip cache dir
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:07.5892036Z /home/runner/.cache/pip
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:07.7172183Z Cache hit for: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.15-pip-5ee1fa4d3f6da3f69d704fb9039e2c88435ae57ad0910205bacbedd1498bb474
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.4729885Z Received 110394017 of 110394017 (100.0%), 150.8 MBs/sec
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.4732353Z Cache Size: ~105 MB (110394017 B)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.4828703Z [command]/usr/bin/tar -xf /home/runner/work/_temp/71defb58-85ec-4bd0-ad34-8f3978643c10/cache.tzst -P -C /home/runner/work/trader/trader --use-compress-program unzstd
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.6778157Z Cache restored successfully
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.6841651Z Cache restored from key: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.15-pip-5ee1fa4d3f6da3f69d704fb9039e2c88435ae57ad0910205bacbedd1498bb474
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7012411Z ##[group]Run pip install -r requirements.lock
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7012879Z [36;1mpip install -r requirements.lock[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7046595Z shell: /usr/bin/bash -e {0}
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7047239Z env:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7047468Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7047763Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7048270Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7048549Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7048888Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7049424Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7049855Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7050238Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7050642Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7051079Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:08.7051421Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.1097539Z Ignoring tomli: markers 'python_version < "3.11"' don't match your environment
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.2095310Z Collecting playwright==1.52.0 (from -r requirements.lock (line 2))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.2113267Z   Using cached playwright-1.52.0-py3-none-manylinux1_x86_64.whl.metadata (3.5 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.2415092Z Collecting requests==2.31.0 (from -r requirements.lock (line 3))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.2430583Z   Using cached requests-2.31.0-py3-none-any.whl.metadata (4.6 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.2559070Z Collecting beautifulsoup4==4.12.3 (from -r requirements.lock (line 4))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.2574137Z   Using cached beautifulsoup4-4.12.3-py3-none-any.whl.metadata (3.8 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.2927891Z Collecting anthropic==0.86.0 (from -r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.3629925Z   Downloading anthropic-0.86.0-py3-none-any.whl.metadata (3.0 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.8333685Z Collecting aiohttp==3.11.14 (from -r requirements.lock (line 7))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.8417269Z   Downloading aiohttp-3.11.14-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.8574083Z Collecting pyee<14,>=13 (from playwright==1.52.0->-r requirements.lock (line 2))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.8594375Z   Using cached pyee-13.0.1-py3-none-any.whl.metadata (3.0 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.9686296Z Collecting greenlet<4.0.0,>=3.1.1 (from playwright==1.52.0->-r requirements.lock (line 2))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:10.9702711Z   Using cached greenlet-3.3.2-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.7 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.0557534Z Collecting charset-normalizer<4,>=2 (from requests==2.31.0->-r requirements.lock (line 3))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.0603568Z   Downloading charset_normalizer-3.4.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.0858722Z Collecting idna<4,>=2.5 (from requests==2.31.0->-r requirements.lock (line 3))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.0873001Z   Using cached idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1068861Z Collecting urllib3<3,>=1.21.1 (from requests==2.31.0->-r requirements.lock (line 3))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1082929Z   Using cached urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1241606Z Collecting certifi>=2017.4.17 (from requests==2.31.0->-r requirements.lock (line 3))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1256060Z   Using cached certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1392118Z Collecting soupsieve>1.2 (from beautifulsoup4==4.12.3->-r requirements.lock (line 4))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1406034Z   Using cached soupsieve-2.8.3-py3-none-any.whl.metadata (4.6 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1578422Z Collecting anyio<5,>=3.5.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1615628Z   Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1791801Z Collecting distro<2,>=1.7.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1806365Z   Using cached distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1900417Z Collecting docstring-parser<1,>=0.15 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.1939852Z   Downloading docstring_parser-0.17.0-py3-none-any.whl.metadata (3.5 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.2107739Z Collecting httpx<1,>=0.25.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.2122081Z   Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.3092789Z Collecting jiter<1,>=0.4.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.3135992Z   Downloading jiter-0.13.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4252273Z Collecting pydantic<3,>=1.9.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4268678Z   Using cached pydantic-2.12.5-py3-none-any.whl.metadata (90 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4383063Z Collecting sniffio (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4398109Z   Using cached sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4530577Z Collecting typing-extensions<5,>=4.14 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4544645Z   Using cached typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4678235Z Collecting aiohappyeyeballs>=2.3.0 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4720408Z   Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl.metadata (5.9 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4835008Z Collecting aiosignal>=1.1.2 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.4874341Z   Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.5020312Z Collecting attrs>=17.3.0 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.5060063Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.5744759Z Collecting frozenlist>=1.1.1 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.5798026Z   Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.7886053Z Collecting multidict<7.0,>=4.5 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.7929025Z   Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.8863623Z Collecting propcache>=0.2.0 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:11.8907394Z   Downloading propcache-0.4.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (13 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.1181566Z Collecting yarl<2.0,>=1.17.0 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.1230091Z   Downloading yarl-1.23.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.1488554Z Collecting httpcore==1.* (from httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.1502480Z   Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.1605501Z Collecting h11>=0.16 (from httpcore==1.*->httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.1620038Z   Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.1718634Z Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.1735094Z   Using cached annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.8619307Z Collecting pydantic-core==2.41.5 (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.8635400Z   Using cached pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.8728230Z Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.8741910Z   Using cached typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.8908262Z WARNING: The candidate selected for download or install is a yanked version: 'aiohttp' candidate (version 3.11.14 at https://files.pythonhosted.org/packages/51/66/30b217d0de5584650340025a285f1d0abf2039e5a683342891e84f250da9/aiohttp-3.11.14-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from https://pypi.org/simple/aiohttp/) (requires-python:>=3.9))
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.8917936Z Reason for being yanked: Regression: https://github.com/aio-libs/aiohttp/issues/10617
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.8925938Z Using cached playwright-1.52.0-py3-none-manylinux1_x86_64.whl (45.1 MB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9098680Z Using cached requests-2.31.0-py3-none-any.whl (62 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9112691Z Using cached beautifulsoup4-4.12.3-py3-none-any.whl (147 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9166869Z Downloading anthropic-0.86.0-py3-none-any.whl (469 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9345752Z Downloading aiohttp-3.11.14-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.7 MB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9474941Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 145.2 MB/s  0:00:00
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9516278Z Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9587571Z Downloading charset_normalizer-3.4.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (214 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9631151Z Using cached distro-1.9.0-py3-none-any.whl (20 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9669251Z Downloading docstring_parser-0.17.0-py3-none-any.whl (36 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9713073Z Using cached greenlet-3.3.2-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (594 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9729358Z Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9743231Z Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9756822Z Using cached idna-3.11-py3-none-any.whl (71 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9800649Z Downloading jiter-0.13.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (362 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9881623Z Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (246 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9930875Z Using cached pydantic-2.12.5-py3-none-any.whl (463 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9947706Z Using cached pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9969036Z Using cached pyee-13.0.1-py3-none-any.whl (15 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9983191Z Using cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:12.9996643Z Using cached urllib3-2.6.3-py3-none-any.whl (131 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0038698Z Downloading yarl-1.23.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (102 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0107896Z Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl (15 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0172714Z Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0208749Z Using cached annotated_types-0.7.0-py3-none-any.whl (13 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0248979Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0290357Z Using cached certifi-2026.2.25-py3-none-any.whl (153 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0332306Z Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (231 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0391260Z Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0433661Z Downloading propcache-0.4.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (210 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0478586Z Using cached soupsieve-2.8.3-py3-none-any.whl (37 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0492150Z Using cached typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.0505761Z Using cached sniffio-1.3.1-py3-none-any.whl (10 kB)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:13.1948374Z Installing collected packages: urllib3, typing-extensions, soupsieve, sniffio, propcache, multidict, jiter, idna, h11, greenlet, frozenlist, docstring-parser, distro, charset-normalizer, certifi, attrs, annotated-types, aiohappyeyeballs, yarl, typing-inspection, requests, pyee, pydantic-core, httpcore, beautifulsoup4, anyio, aiosignal, pydantic, playwright, httpx, aiohttp, anthropic
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:15.4667264Z 
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:15.4694234Z Successfully installed aiohappyeyeballs-2.6.1 aiohttp-3.11.14 aiosignal-1.4.0 annotated-types-0.7.0 anthropic-0.86.0 anyio-4.13.0 attrs-26.1.0 beautifulsoup4-4.12.3 certifi-2026.2.25 charset-normalizer-3.4.7 distro-1.9.0 docstring-parser-0.17.0 frozenlist-1.8.0 greenlet-3.3.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.11 jiter-0.13.0 multidict-6.7.1 playwright-1.52.0 propcache-0.4.1 pydantic-2.12.5 pydantic-core-2.41.5 pyee-13.0.1 requests-2.31.0 sniffio-1.3.1 soupsieve-2.8.3 typing-extensions-4.15.0 typing-inspection-0.4.2 urllib3-2.6.3 yarl-1.23.0
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0508954Z ##[group]Run python -m playwright install chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0509398Z [36;1mpython -m playwright install chromium[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0509769Z [36;1mpython -m playwright install-deps chromium[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0537721Z shell: /usr/bin/bash -e {0}
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0537983Z env:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0538180Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0538460Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0538946Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0539220Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0539523Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0539977Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0540421Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0540803Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0541231Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0541623Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.0541941Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.4407324Z Downloading Chromium 136.0.7103.25 (playwright build v1169) from https://cdn.playwright.dev/dbazure/download/playwright/builds/chromium/1169/chromium-linux.zip
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.6260075Z |                                                                                |   0% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.8187527Z |■■■■■■■■                                                                        |  10% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:16.9434897Z |■■■■■■■■■■■■■■■■                                                                |  20% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:17.0551724Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:17.1617190Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:17.2676334Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:17.3563219Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:17.4563470Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:17.5630927Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:17.6402754Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:17.7106980Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 167.7 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.0018152Z Chromium 136.0.7103.25 (playwright build v1169) downloaded to /home/runner/.cache/ms-playwright/chromium-1169
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.0019911Z Downloading FFMPEG playwright build v1011 from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.1985626Z |                                                                                |   0% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2081398Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2123051Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2154070Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2194943Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2220385Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2248155Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2281634Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2310956Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2343395Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.2364405Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.3204077Z FFMPEG playwright build v1011 downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.3210923Z Downloading Chromium Headless Shell 136.0.7103.25 (playwright build v1169) from https://cdn.playwright.dev/dbazure/download/playwright/builds/chromium/1169/chromium-headless-shell-linux.zip
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.5212191Z |                                                                                |   0% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.6531836Z |■■■■■■■■                                                                        |  10% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.7778791Z |■■■■■■■■■■■■■■■■                                                                |  20% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.8716304Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:22.9487965Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:23.0315087Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:23.1025071Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:23.1722373Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:23.2465295Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:23.3150722Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:23.3870769Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 101.4 MiB
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:25.6980753Z Chromium Headless Shell 136.0.7103.25 (playwright build v1169) downloaded to /home/runner/.cache/ms-playwright/chromium_headless_shell-1169
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.5155175Z Installing dependencies...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.5255825Z Switching to root user to install dependencies...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.6598545Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.7518417Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.7560401Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.7696107Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.7777940Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.9708174Z Hit:6 https://packages.microsoft.com/repos/azure-cli noble InRelease
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.9741937Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1875 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.9743096Z Get:19 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:26.9989479Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [342 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.0031456Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [177 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.0045666Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 c-n-f Metadata [16.9 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.0068205Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1663 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.0215076Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [322 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.0278173Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [387 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.0353591Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 c-n-f Metadata [34.2 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.0371638Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [2894 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.0676288Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [671 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1251138Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Components [212 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1279309Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1328407Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [7380 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1349394Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [13.1 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1353732Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-backports/restricted amd64 Components [216 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1464447Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Components [212 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1514755Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1576 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1661782Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [252 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1690819Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [21.5 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1713998Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 c-n-f Metadata [10.7 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1760690Z Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1167 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1881442Z Get:29 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [225 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1897290Z Get:30 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [74.2 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.1932867Z Get:31 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 c-n-f Metadata [22.8 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.2373946Z Get:32 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [2757 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.2656482Z Get:33 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [642 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.2741238Z Get:34 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Components [212 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.2751655Z Get:35 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse amd64 Components [212 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.3078275Z Get:36 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.4 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.3122013Z Get:37 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [88.9 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:27.3173855Z Get:38 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [112 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:38.2922695Z Fetched 15.7 MB in 2s (7839 kB/s)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.0506391Z Reading package lists...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.0755060Z Reading package lists...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.2574669Z Building dependency tree...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.2582414Z Reading state information...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4160492Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.2).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4162618Z libasound2t64 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4163364Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4164247Z libatk-bridge2.0-0t64 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4164953Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4165544Z libatk1.0-0t64 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4167182Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4167789Z libatspi2.0-0t64 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4168254Z libcairo2 is already the newest version (1.18.0-3build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4168602Z libcairo2 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4168963Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.9).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4169334Z libcups2t64 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4169681Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4170031Z libdbus-1-3 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4170370Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4170739Z libdrm2 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4171069Z libgbm1 is already the newest version (25.2.8-0ubuntu0.24.04.1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4171412Z libgbm1 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4171738Z libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.8).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4172105Z libglib2.0-0t64 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4172434Z libnspr4 is already the newest version (2:4.35-1.1build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4172748Z libnspr4 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4173048Z libnss3 is already the newest version (2:3.98-1ubuntu0.1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4173359Z libnss3 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4173678Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4174023Z libpango-1.0-0 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4174335Z libx11-6 is already the newest version (2:1.8.7-1build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4174646Z libx11-6 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4174933Z libxcb1 is already the newest version (1.15-1ubuntu2).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4175235Z libxcb1 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4175554Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4175899Z libxcomposite1 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4176234Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4176564Z libxdamage1 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4177167Z libxext6 is already the newest version (2:1.3.4-1build2).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4177495Z libxext6 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4177987Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4178328Z libxfixes3 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4178653Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4178986Z libxkbcommon0 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4179302Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4179622Z libxrandr2 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4179933Z xvfb is already the newest version (2:21.1.12-1ubuntu1.5).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4180366Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4180849Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4181200Z libfontconfig1 set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4181542Z fonts-liberation is already the newest version (1:2.1.5-3).
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4181882Z fonts-liberation set to manually installed.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4182209Z The following additional packages will be installed:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4182535Z   xfonts-encodings xfonts-utils
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4183154Z Recommended packages:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4183540Z   fonts-ipafont-mincho fonts-tlwg-loma
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4819016Z The following NEW packages will be installed:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4821316Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4829445Z   fonts-wqy-zenhei xfonts-cyrillic xfonts-encodings xfonts-scalable
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4830682Z   xfonts-utils
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4835548Z The following packages will be upgraded:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.4841608Z   libfreetype6
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.5020727Z 1 upgraded, 9 newly installed, 0 to remove and 81 not upgraded.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.5022205Z Need to get 21.5 MB of archives.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.5023435Z After this operation, 79.5 MB of additional disk space will be used.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.5028569Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.5297374Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.6286492Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.7750556Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.7858413Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:39.8541801Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.0920927Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libfreetype6 amd64 2.13.2+dfsg-1ubuntu0.1 [402 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.1156615Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.1443279Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.1552229Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.1773795Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.4392325Z Fetched 21.5 MB in 1s (30.9 MB/s)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.4745955Z Selecting previously unselected package fonts-ipafont-gothic.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5895209Z (Reading database ... 
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5895851Z (Reading database ... 5%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5896326Z (Reading database ... 10%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5897545Z (Reading database ... 15%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5897931Z (Reading database ... 20%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5898304Z (Reading database ... 25%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5898681Z (Reading database ... 30%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5899072Z (Reading database ... 35%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5899454Z (Reading database ... 40%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5899811Z (Reading database ... 45%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.5900517Z (Reading database ... 50%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:40.6571068Z (Reading database ... 55%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:41.0875529Z (Reading database ... 60%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:41.4473493Z (Reading database ... 65%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:41.8352157Z (Reading database ... 70%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:42.1896818Z (Reading database ... 75%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:43.1419719Z (Reading database ... 80%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:43.9372952Z (Reading database ... 85%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:44.7414513Z (Reading database ... 90%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:45.6453965Z (Reading database ... 95%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:45.6455254Z (Reading database ... 100%
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:45.6455807Z (Reading database ... 220446 files and directories currently installed.)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:45.6501046Z Preparing to unpack .../0-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:45.6599920Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:45.9204781Z Selecting previously unselected package fonts-freefont-ttf.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:45.9342648Z Preparing to unpack .../1-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:45.9366256Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.0210832Z Selecting previously unselected package fonts-tlwg-loma-otf.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.0353360Z Preparing to unpack .../2-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.0367269Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.0611564Z Selecting previously unselected package fonts-unifont.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.0752713Z Preparing to unpack .../3-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.0768408Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.1902339Z Selecting previously unselected package fonts-wqy-zenhei.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.2035942Z Preparing to unpack .../4-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.2190372Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.7083172Z Preparing to unpack .../5-libfreetype6_2.13.2+dfsg-1ubuntu0.1_amd64.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.7132635Z Unpacking libfreetype6:amd64 (2.13.2+dfsg-1ubuntu0.1) over (2.13.2+dfsg-1build3) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.7537800Z Selecting previously unselected package xfonts-encodings.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.7663886Z Preparing to unpack .../6-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.7675888Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.7999024Z Selecting previously unselected package xfonts-utils.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.8135946Z Preparing to unpack .../7-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.8148104Z Unpacking xfonts-utils (1:7.7+6build3) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.9017877Z Selecting previously unselected package xfonts-cyrillic.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.9138335Z Preparing to unpack .../8-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.9152255Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.9537591Z Selecting previously unselected package xfonts-scalable.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.9672736Z Preparing to unpack .../9-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:46.9683206Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0122759Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0348753Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0378219Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0408323Z Setting up libfreetype6:amd64 (2.13.2+dfsg-1ubuntu0.1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0447159Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0475481Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0543923Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0563684Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0606910Z Setting up xfonts-utils (1:7.7+6build3) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.0675726Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.1149849Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.1544928Z Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.2962961Z Processing triggers for man-db (2.12.0-4build2) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.3069816Z Not building database; man-db/auto-update is not 'true'.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:47.3084775Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.6698460Z 
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.6699672Z Running kernel seems to be up-to-date.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.6701118Z 
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.6701704Z Restarting services...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.6775580Z  systemctl restart php8.3-fpm.service
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.7777334Z 
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.7778033Z No containers need to be restarted.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.7780006Z 
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.7780245Z No user sessions are running outdated binaries.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.7780607Z 
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:48.7780967Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9404696Z ##[group]Run python run.py --source gamelife,gamepeople,gameshock,rebuy,cex
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9405297Z [36;1mpython run.py --source gamelife,gamepeople,gameshock,rebuy,cex[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9432470Z shell: /usr/bin/bash -e {0}
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9432718Z env:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9432916Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9433206Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9433663Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9433920Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9434219Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9434827Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9435239Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9435637Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9436013Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9436419Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:49.9436995Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.0550043Z 06:06:50 [INFO] DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.0558293Z 06:06:50 [INFO] Subito DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.0566665Z 06:06:50 [INFO] eBay DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.0568285Z 06:06:50 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.0570119Z 06:06:50 [INFO] Avvio scraper: gamelife
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.2122410Z 06:06:50 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.2124860Z 06:06:50 [INFO] Gamelife Scraper — Console Xbox
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.2126199Z 06:06:50 [INFO] Categorie: Xbox Series, Xbox One, Xbox 360
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.2132415Z 06:06:50 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.6241569Z 06:06:50 [INFO] Playwright browser avviato: bundled-chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.6243046Z 06:06:50 [INFO] Categoria: Xbox Series — https://www.gamelife.it/shop/category/8-xbox-series
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:06:50.6937754Z 06:06:50 [INFO] Fetching: https://www.gamelife.it/shop/category/8-xbox-series
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:06.9992107Z 06:07:06 [WARNING] Nessun prodotto trovato su: https://www.gamelife.it/shop/category/8-xbox-series (pagina vuota o inesistente)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:06.9995990Z 06:07:06 [INFO]   Pagina 1: → 0 prodotti trovati
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:07.0243838Z 06:07:07 [INFO]   Totale categoria Xbox Series: 0 prodotti
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:07.0245672Z 06:07:07 [INFO] Categoria: Xbox One — https://www.gamelife.it/22-xbox-one
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:07.0698147Z 06:07:07 [INFO] Fetching: https://www.gamelife.it/22-xbox-one
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:23.2149089Z 06:07:23 [WARNING] Nessun prodotto trovato su: https://www.gamelife.it/22-xbox-one (pagina vuota o inesistente)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:23.2153122Z 06:07:23 [INFO]   Pagina 1: → 0 prodotti trovati
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:23.2375540Z 06:07:23 [INFO]   Totale categoria Xbox One: 0 prodotti
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:23.2397727Z 06:07:23 [INFO] Categoria: Xbox 360 — https://www.gamelife.it/shop/category/21-xbox-360
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:23.2831537Z 06:07:23 [INFO] Fetching: https://www.gamelife.it/shop/category/21-xbox-360
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.4578943Z 06:07:39 [WARNING] Nessun prodotto trovato su: https://www.gamelife.it/shop/category/21-xbox-360 (pagina vuota o inesistente)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.4581757Z 06:07:39 [INFO]   Pagina 1: → 0 prodotti trovati
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.4818905Z 06:07:39 [INFO]   Totale categoria Xbox 360: 0 prodotti
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.5258512Z 06:07:39 [INFO] Totale prodotti unici: 0
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.5261660Z 06:07:39 [INFO] Salvato: gamelife_2026-04-03_06-07-39.json  (0 prodotti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.5266173Z 06:07:39 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.5268643Z 06:07:39 [INFO] Avvio scraper: gamepeople
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.5292713Z 06:07:39 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.5294893Z 06:07:39 [INFO] GamePeople Scraper — Console Xbox
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.5295735Z 06:07:39 [INFO] Categorie: Xbox Series S/X — Console, Xbox One — Console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:39.5296465Z 06:07:39 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:40.0457789Z 06:07:39 [INFO] Playwright browser avviato: bundled-chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:07:40.0468272Z 06:07:39 [INFO] Categoria: Xbox Series S/X — Console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:08:40.1059298Z 06:08:40 [WARNING] https://www.gamepeople.it/index.php?id=prodotti&mf=VG&page=sfm&code=XBX&cat=GAAA&items=50 — tentativo 1/3 fallito: Page.goto: Timeout 60000ms exceeded.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:08:40.1060897Z Call log:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:08:40.1061813Z   - navigating to "https://www.gamepeople.it/index.php?id=prodotti&mf=VG&page=sfm&code=XBX&cat=GAAA&items=50", waiting until "domcontentloaded"
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:08:40.1062937Z . Attendo 3.0s...
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:09:42.3848704Z 06:09:42 [INFO]   → 4 prodotti trovati
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:09:42.3994763Z 06:09:42 [INFO] Categoria: Xbox One — Console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:00.5204470Z 06:10:00 [WARNING] Nessun prodotto trovato su: https://www.gamepeople.it/index.php?id=prodotti&mf=VG&page=sfm&code=XBO&cat=GAAA&items=50
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:00.5932706Z 06:10:00 [INFO] Totale prodotti unici: 4
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:00.5939731Z 06:10:00 [INFO] Salvato: gamepeople_2026-04-03_06-10-00.json  (4 prodotti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:00.6077384Z 06:10:00 [INFO] DB aggiornato — nuovi: 0 | prezzi cambiati: 0 | disponibilita' cambiata: 0 | invariati: 4
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:00.6078440Z 06:10:00 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:00.6079092Z 06:10:00 [INFO] Avvio scraper: gameshock
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:01.4395377Z 06:10:01 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:01.4398167Z 06:10:01 [INFO] Gameshock Scraper — Console Xbox
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:01.4399447Z 06:10:01 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:01.4406228Z 06:10:01 [INFO] Categoria: Xbox 360
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:01.4407333Z 06:10:01 [INFO]   Pagina 1: https://www.gameshock.it/46-console-xbox360?n=20&id_category=46
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:02.7536994Z 06:10:02 [INFO]   → 16 prodotti trovati
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:04.3180023Z 06:10:04 [INFO] Categoria: Xbox One
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:04.3182505Z 06:10:04 [INFO]   Pagina 1: https://www.gameshock.it/45-console-xbox-one?n=20&id_category=45
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:05.4704520Z 06:10:05 [INFO]   → 14 prodotti trovati
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:07.0309738Z 06:10:07 [INFO] Categoria: Xbox Series X/S
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:07.0312131Z 06:10:07 [INFO]   Pagina 1: https://www.gameshock.it/77-xbox-serie-x-e-s
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:08.1502130Z 06:10:08 [INFO]   → 2 prodotti trovati
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7007868Z 06:10:09 [INFO] Totale prodotti unici: 32
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7016341Z 06:10:09 [INFO] Salvato: gameshock_2026-04-03_06-10-09.json  (32 prodotti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7234983Z 06:10:09 [INFO] DB aggiornato — nuovi: 0 | prezzi cambiati: 0 | disponibilita' cambiata: 0 | invariati: 32
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7238630Z 06:10:09 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7239424Z 06:10:09 [INFO] Avvio scraper: rebuy
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7285718Z 06:10:09 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7287376Z 06:10:09 [INFO] rebuy.it Scraper — Console Xbox
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7288520Z 06:10:09 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7290287Z 06:10:09 [INFO] Categoria: Xbox Series X — https://www.rebuy.it/comprare/console-e-accessori/xbox/xbox-series-x/console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:09.7292257Z 06:10:09 [INFO]   Pagina 1: https://www.rebuy.it/comprare/console-e-accessori/xbox/xbox-series-x/console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:18.4220562Z 06:10:18 [INFO]   → 4 card console | 16 righe finali (con varianti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:20.0835322Z 06:10:20 [INFO] Categoria: Xbox Series S — https://www.rebuy.it/comprare/console-e-accessori/xbox/xbox-series-s/console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:20.0839545Z 06:10:20 [INFO]   Pagina 1: https://www.rebuy.it/comprare/console-e-accessori/xbox/xbox-series-s/console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:26.7170556Z 06:10:26 [INFO]   → 3 card console | 12 righe finali (con varianti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:28.3740761Z 06:10:28 [INFO] Categoria: Xbox One — https://www.rebuy.it/comprare/console-e-accessori/xbox/xbox-one/console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:10:28.3744511Z 06:10:28 [INFO]   Pagina 1: https://www.rebuy.it/comprare/console-e-accessori/xbox/xbox-one/console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:24.5074052Z 06:11:24 [INFO]   → 27 card console | 108 righe finali (con varianti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:26.2019254Z 06:11:26 [INFO] Categoria: Xbox 360 — https://www.rebuy.it/comprare/console-e-accessori/xbox/xbox-360/console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:26.2023415Z 06:11:26 [INFO]   Pagina 1: https://www.rebuy.it/comprare/console-e-accessori/xbox/xbox-360/console
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:29.0232631Z 06:11:29 [INFO]   → 1 card console | 4 righe finali (con varianti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.6773790Z 06:11:30 [INFO] Totale prodotti unici: 140
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.6796050Z 06:11:30 [INFO] Salvato: rebuy_2026-04-03_06-11-30.json  (140 prodotti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.7948470Z 06:11:30 [INFO] DB aggiornato — nuovi: 0 | prezzi cambiati: 20 | disponibilita' cambiata: 12 | invariati: 120
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.7949445Z 06:11:30 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.7950018Z 06:11:30 [INFO] Avvio scraper: cex
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.7976608Z 06:11:30 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.7979113Z 06:11:30 [INFO] CEX Scraper — Console Xbox (Algolia API)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.7979778Z 06:11:30 [INFO] ============================================================
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:30.7980489Z 06:11:30 [INFO] Categoria: Xbox Series Console (id=1090)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:31.3300150Z 06:11:31 [INFO]   → 21 prodotti totali (restituiti: 21)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:31.3301161Z 06:11:31 [INFO]   → 9 disponibili, 12 esauriti
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:32.8305011Z 06:11:32 [INFO] Categoria: Xbox One Console (id=1003)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:32.9209838Z 06:11:32 [INFO]   → 62 prodotti totali (restituiti: 62)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:32.9212494Z 06:11:32 [INFO]   → 22 disponibili, 40 esauriti
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:34.4216195Z 06:11:34 [INFO] Categoria: Xbox 360 Console (id=829)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:34.5131605Z 06:11:34 [INFO]   → 76 prodotti totali (restituiti: 76)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:34.5134361Z 06:11:34 [INFO]   → 13 disponibili, 63 esauriti
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:36.0138367Z 06:11:36 [INFO] Categoria: Xbox Console (id=1031)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:36.1024842Z 06:11:36 [INFO]   → 9 prodotti totali (restituiti: 9)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:36.1025557Z 06:11:36 [INFO]   → 0 disponibili, 9 esauriti
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:37.6039430Z 06:11:37 [INFO] Totale prodotti unici: 168
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:37.6061550Z 06:11:37 [INFO] Salvato: cex_2026-04-03_06-11-37.json  (168 prodotti)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:37.6428410Z 06:11:37 [INFO] DB aggiornato — nuovi: 0 | prezzi cambiati: 12 | disponibilita' cambiata: 5 | invariati: 154
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0136957Z 06:11:38 [INFO] Telegram inviato: 🎮 Xbox Tracker
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0139598Z 06:11:38 [INFO] Riepilogo run inviato via Telegram.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0143484Z 06:11:38 [INFO] Run report scritto in: /home/runner/work/trader/trader/logs/run_report_2026-04-03_06-11-38.json
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0551596Z ##[group]Run python run.py --cleanup
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0551944Z [36;1mpython run.py --cleanup[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0579046Z shell: /usr/bin/bash -e {0}
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0579301Z env:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0579498Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0579776Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0580231Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0580507Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0580817Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0581256Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0581674Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0582044Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0582408Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0582787Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.0583127Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.1249487Z 06:11:38 [INFO] DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.1259123Z 06:11:38 [INFO] Subito DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.1269355Z 06:11:38 [INFO] eBay DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3380234Z 06:11:38 [INFO] Cleanup completato: {'archived_snapshots': 0, 'db_clean': {'removed_separate_db_sources': 0, 'removed_invalid_rows': 0, 'conditions_normalized': 0, 'url_merged_rows': 0, 'orphan_changes_removed': 0}, 'vacuumed': {'tracker.db': 1}}
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3384683Z 06:11:38 [INFO] Run report scritto in: /home/runner/work/trader/trader/logs/run_report_2026-04-03_06-11-38.json
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3563605Z ##[group]Run git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3564253Z [36;1mgit config user.email "41898282+github-actions[bot]@users.noreply.github.com"[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3564709Z [36;1mgit config user.name "github-actions[bot]"[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3565006Z [36;1mgit add tracker.db[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3565276Z [36;1mgit add logs/run_report_latest.json || true[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3565581Z [36;1mgit diff --staged --quiet \[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3565908Z [36;1m  || git commit -m "chore: scrape fonti $(date -u +%Y-%m-%d)"[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3566247Z [36;1mgit push[0m
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3592777Z shell: /usr/bin/bash -e {0}
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3593026Z env:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3593226Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3593499Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3593991Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3594249Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3594592Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3595014Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3595424Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3595790Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3596164Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3596561Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:38.3597038Z ##[endgroup]
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.0813426Z [main 04fd845] chore: scrape fonti 2026-04-03
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.0814121Z  2 files changed, 7 insertions(+), 7 deletions(-)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2631072Z To https://github.com/LukePalmDev/trader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2632697Z  ! [rejected]        main -> main (fetch first)
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2634141Z error: failed to push some refs to 'https://github.com/LukePalmDev/trader'
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2646133Z hint: Updates were rejected because the remote contains work that you do not
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2648370Z hint: have locally. This is usually caused by another repository pushing to
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2649945Z hint: the same ref. If you want to integrate the remote changes, use
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2650593Z hint: 'git pull' before pushing again.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2653492Z hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2665438Z ##[error]Process completed with exit code 1.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.2775794Z Post job cleanup.
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.3738445Z [command]/usr/bin/git version
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.3780416Z git version 2.53.0
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.3830277Z Temporarily overriding HOME='/home/runner/work/_temp/c695f2d0-c128-4582-a2f4-4d291db04e41' before making global git config changes
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.3833633Z Adding repository directory to the temporary git global config as a safe directory
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.3843698Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/trader/trader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.3883762Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.3921070Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.4170678Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.4195423Z http.https://github.com/.extraheader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.4211222Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.4245939Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.4484228Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.4518109Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.4955314Z Cleaning up orphan processes
+scrape-fonti	UNKNOWN STEP	2026-04-03T06:11:39.5247542Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-python@v5. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,0 +1,468 @@
+verify-sold	Set up job	﻿2026-04-13T17:27:06.1515760Z Current runner version: '2.333.1'
+verify-sold	Set up job	2026-04-13T17:27:06.1518680Z Runner name: 'mac-mini-luke'
+verify-sold	Set up job	2026-04-13T17:27:06.1518990Z Runner group name: 'Default'
+verify-sold	Set up job	2026-04-13T17:27:06.1519340Z Machine name: 'Mac-mini'
+verify-sold	Set up job	2026-04-13T17:27:06.1520440Z ##[group]GITHUB_TOKEN Permissions
+verify-sold	Set up job	2026-04-13T17:27:06.1521110Z Actions: write
+verify-sold	Set up job	2026-04-13T17:27:06.1521330Z Contents: write
+verify-sold	Set up job	2026-04-13T17:27:06.1521550Z Metadata: read
+verify-sold	Set up job	2026-04-13T17:27:06.1521760Z ##[endgroup]
+verify-sold	Set up job	2026-04-13T17:27:06.1522570Z Secret source: Actions
+verify-sold	Set up job	2026-04-13T17:27:06.1522890Z Prepare workflow directory
+verify-sold	Set up job	2026-04-13T17:27:06.1827240Z Prepare all required actions
+verify-sold	Set up job	2026-04-13T17:27:06.1844130Z Getting action download info
+verify-sold	Set up job	2026-04-13T17:27:06.8564680Z Download action repository 'actions/checkout@v5' (SHA:93cb6efe18208431cddfb8368fd83d5badbf9bfd)
+verify-sold	Set up job	2026-04-13T17:27:07.5421990Z Complete job name: verify-sold
+verify-sold	Checkout repository	﻿2026-04-13T17:27:07.5715820Z ##[group]Run actions/checkout@v5
+verify-sold	Checkout repository	2026-04-13T17:27:07.5716160Z with:
+verify-sold	Checkout repository	2026-04-13T17:27:07.5716460Z   token: ***
+verify-sold	Checkout repository	2026-04-13T17:27:07.5716640Z   ref: main
+verify-sold	Checkout repository	2026-04-13T17:27:07.5716850Z   repository: LukePalmDev/trader
+verify-sold	Checkout repository	2026-04-13T17:27:07.5717110Z   ssh-strict: true
+verify-sold	Checkout repository	2026-04-13T17:27:07.5717310Z   ssh-user: git
+verify-sold	Checkout repository	2026-04-13T17:27:07.5717510Z   persist-credentials: true
+verify-sold	Checkout repository	2026-04-13T17:27:07.5717740Z   clean: true
+verify-sold	Checkout repository	2026-04-13T17:27:07.5717940Z   sparse-checkout-cone-mode: true
+verify-sold	Checkout repository	2026-04-13T17:27:07.5718200Z   fetch-depth: 1
+verify-sold	Checkout repository	2026-04-13T17:27:07.5718390Z   fetch-tags: false
+verify-sold	Checkout repository	2026-04-13T17:27:07.5718590Z   show-progress: true
+verify-sold	Checkout repository	2026-04-13T17:27:07.5718790Z   lfs: false
+verify-sold	Checkout repository	2026-04-13T17:27:07.5718980Z   submodules: false
+verify-sold	Checkout repository	2026-04-13T17:27:07.5719190Z   set-safe-directory: true
+verify-sold	Checkout repository	2026-04-13T17:27:07.5719470Z env:
+verify-sold	Checkout repository	2026-04-13T17:27:07.5719660Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Checkout repository	2026-04-13T17:27:07.5719940Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Checkout repository	2026-04-13T17:27:07.5720210Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:07.6296280Z Syncing repository: LukePalmDev/trader
+verify-sold	Checkout repository	2026-04-13T17:27:07.6297210Z ##[group]Getting Git version info
+verify-sold	Checkout repository	2026-04-13T17:27:07.6297650Z Working directory is '/Users/luke/actions-runner/_work/trader/trader'
+verify-sold	Checkout repository	2026-04-13T17:27:07.6298320Z [command]/usr/bin/git version
+verify-sold	Checkout repository	2026-04-13T17:27:07.6342810Z git version 2.50.1 (Apple Git-155)
+verify-sold	Checkout repository	2026-04-13T17:27:07.6350000Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:07.6355560Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/87ec5405-5c27-4fa1-987d-704a8977de55' before making global git config changes
+verify-sold	Checkout repository	2026-04-13T17:27:07.6356670Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	Checkout repository	2026-04-13T17:27:07.6357580Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	Checkout repository	2026-04-13T17:27:07.6420220Z [command]/usr/bin/git config --local --get remote.origin.url
+verify-sold	Checkout repository	2026-04-13T17:27:07.6475330Z https://github.com/LukePalmDev/trader
+verify-sold	Checkout repository	2026-04-13T17:27:07.6480640Z ##[group]Removing previously created refs, to avoid conflicts
+verify-sold	Checkout repository	2026-04-13T17:27:07.6482300Z [command]/usr/bin/git rev-parse --symbolic-full-name --verify --quiet HEAD
+verify-sold	Checkout repository	2026-04-13T17:27:07.6537660Z refs/heads/main
+verify-sold	Checkout repository	2026-04-13T17:27:07.6541420Z [command]/usr/bin/git checkout --detach
+verify-sold	Checkout repository	2026-04-13T17:27:07.6613260Z HEAD is now at 4389a7d chore: verify-sold 2026-04-13
+verify-sold	Checkout repository	2026-04-13T17:27:07.6679650Z [command]/usr/bin/git branch --delete --force main
+verify-sold	Checkout repository	2026-04-13T17:27:07.6745710Z Deleted branch main (was 4389a7d).
+verify-sold	Checkout repository	2026-04-13T17:27:07.6808160Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:07.6808450Z [command]/usr/bin/git submodule status
+verify-sold	Checkout repository	2026-04-13T17:27:07.7252910Z ##[group]Cleaning the repository
+verify-sold	Checkout repository	2026-04-13T17:27:07.7253370Z [command]/usr/bin/git clean -ffdx
+verify-sold	Checkout repository	2026-04-13T17:27:07.7341500Z Removing __pycache__/
+verify-sold	Checkout repository	2026-04-13T17:27:07.7341850Z Removing logs/verify_sold_last_run.json
+verify-sold	Checkout repository	2026-04-13T17:27:07.7342220Z Removing logs/verify_sold_metrics.jsonl
+verify-sold	Checkout repository	2026-04-13T17:27:07.7342580Z Removing scrapers/__pycache__/
+verify-sold	Checkout repository	2026-04-13T17:27:07.7345690Z [command]/usr/bin/git reset --hard HEAD
+verify-sold	Checkout repository	2026-04-13T17:27:07.7434030Z HEAD is now at 4389a7d chore: verify-sold 2026-04-13
+verify-sold	Checkout repository	2026-04-13T17:27:07.7436540Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:07.7437340Z ##[group]Disabling automatic garbage collection
+verify-sold	Checkout repository	2026-04-13T17:27:07.7438820Z [command]/usr/bin/git config --local gc.auto 0
+verify-sold	Checkout repository	2026-04-13T17:27:07.7496920Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:07.7497330Z ##[group]Setting up auth
+verify-sold	Checkout repository	2026-04-13T17:27:07.7499300Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	Checkout repository	2026-04-13T17:27:07.7555860Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	Checkout repository	2026-04-13T17:27:07.7998750Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	Checkout repository	2026-04-13T17:27:07.8061750Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	Checkout repository	2026-04-13T17:27:07.8503290Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	Checkout repository	2026-04-13T17:27:07.8564070Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	Checkout repository	2026-04-13T17:27:07.9008870Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+verify-sold	Checkout repository	2026-04-13T17:27:07.9075850Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:07.9076400Z ##[group]Fetching the repository
+verify-sold	Checkout repository	2026-04-13T17:27:07.9079440Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+verify-sold	Checkout repository	2026-04-13T17:27:08.7445580Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:08.7446680Z ##[group]Determining the checkout info
+verify-sold	Checkout repository	2026-04-13T17:27:08.7450160Z [command]/usr/bin/git branch --list --remote origin/main
+verify-sold	Checkout repository	2026-04-13T17:27:08.7574060Z   origin/main
+verify-sold	Checkout repository	2026-04-13T17:27:08.7577170Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:08.7579760Z [command]/usr/bin/git sparse-checkout disable
+verify-sold	Checkout repository	2026-04-13T17:27:08.7689890Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+verify-sold	Checkout repository	2026-04-13T17:27:08.7766750Z ##[group]Checking out the ref
+verify-sold	Checkout repository	2026-04-13T17:27:08.7768140Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+verify-sold	Checkout repository	2026-04-13T17:27:08.7859580Z Switched to a new branch 'main'
+verify-sold	Checkout repository	2026-04-13T17:27:08.7862250Z branch 'main' set up to track 'origin/main'.
+verify-sold	Checkout repository	2026-04-13T17:27:08.7865600Z ##[endgroup]
+verify-sold	Checkout repository	2026-04-13T17:27:08.7944670Z [command]/usr/bin/git log -1 --format=%H
+verify-sold	Checkout repository	2026-04-13T17:27:08.8008030Z 4389a7d43a7095a3ad8b625841867354484bec65
+verify-sold	Pull latest DB	﻿2026-04-13T17:27:08.8089970Z ##[group]Run git pull --rebase
+verify-sold	Pull latest DB	2026-04-13T17:27:08.8090400Z [36;1mgit pull --rebase[0m
+verify-sold	Pull latest DB	2026-04-13T17:27:08.8104830Z shell: /bin/bash -e {0}
+verify-sold	Pull latest DB	2026-04-13T17:27:08.8105160Z env:
+verify-sold	Pull latest DB	2026-04-13T17:27:08.8105450Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Pull latest DB	2026-04-13T17:27:08.8105860Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Pull latest DB	2026-04-13T17:27:08.8106230Z ##[endgroup]
+verify-sold	Pull latest DB	2026-04-13T17:27:09.2949240Z Already up to date.
+verify-sold	Install Python dependencies	﻿2026-04-13T17:27:09.3016790Z ##[group]Run python3.11 -m pip install -r requirements.lock
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.3017590Z [36;1mpython3.11 -m pip install -r requirements.lock[0m
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.3034870Z shell: /bin/bash -e {0}
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.3035290Z env:
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.3035650Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.3036180Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.3036680Z ##[endgroup]
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5153630Z Ignoring tomli: markers 'python_version < "3.11"' don't match your environment
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5155600Z Requirement already satisfied: playwright==1.52.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 2)) (1.52.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5157240Z Requirement already satisfied: playwright-stealth==2.0.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 3)) (2.0.3)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5158740Z Requirement already satisfied: patchright==1.58.2 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 4)) (1.58.2)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5160230Z Requirement already satisfied: curl-cffi==0.15.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 5)) (0.15.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5162030Z Requirement already satisfied: requests==2.31.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 6)) (2.31.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5163450Z Requirement already satisfied: beautifulsoup4==4.12.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 7)) (4.12.3)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5164860Z Requirement already satisfied: anthropic==0.86.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 9)) (0.86.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5166210Z Requirement already satisfied: aiohttp==3.11.14 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 10)) (3.11.14)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5172680Z Requirement already satisfied: pyee<14,>=13 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (13.0.1)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5174490Z Requirement already satisfied: greenlet<4.0.0,>=3.1.1 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (3.3.2)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5193400Z Requirement already satisfied: cffi>=2.0.0 in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (2.0.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5194920Z Requirement already satisfied: certifi>=2024.2.2 in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (2026.2.25)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5196530Z Requirement already satisfied: rich in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (14.3.4)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5209870Z Requirement already satisfied: charset-normalizer<4,>=2 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (3.4.7)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5211550Z Requirement already satisfied: idna<4,>=2.5 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (3.11)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5213310Z Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (2.6.3)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5220530Z Requirement already satisfied: soupsieve>1.2 in /opt/homebrew/lib/python3.11/site-packages (from beautifulsoup4==4.12.3->-r requirements.lock (line 7)) (2.8.3)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5228380Z Requirement already satisfied: anyio<5,>=3.5.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (4.13.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5229930Z Requirement already satisfied: distro<2,>=1.7.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (1.9.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5231610Z Requirement already satisfied: docstring-parser<1,>=0.15 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.17.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5233490Z Requirement already satisfied: httpx<1,>=0.25.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.28.1)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5234920Z Requirement already satisfied: jiter<1,>=0.4.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.13.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5236340Z Requirement already satisfied: pydantic<3,>=1.9.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (2.12.5)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5237720Z Requirement already satisfied: sniffio in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (1.3.1)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5239120Z Requirement already satisfied: typing-extensions<5,>=4.14 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (4.15.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5250170Z Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (2.6.1)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5251910Z Requirement already satisfied: aiosignal>=1.1.2 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.4.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5253390Z Requirement already satisfied: attrs>=17.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (26.1.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5254860Z Requirement already satisfied: frozenlist>=1.1.1 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.8.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5256370Z Requirement already satisfied: multidict<7.0,>=4.5 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (6.7.1)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5257880Z Requirement already satisfied: propcache>=0.2.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (0.4.1)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5259370Z Requirement already satisfied: yarl<2.0,>=1.17.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.23.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5297040Z Requirement already satisfied: httpcore==1.* in /opt/homebrew/lib/python3.11/site-packages (from httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 9)) (1.0.9)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5307470Z Requirement already satisfied: h11>=0.16 in /opt/homebrew/lib/python3.11/site-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.16.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5335130Z Requirement already satisfied: annotated-types>=0.6.0 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.7.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5336860Z Requirement already satisfied: pydantic-core==2.41.5 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (2.41.5)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5338760Z Requirement already satisfied: typing-inspection>=0.4.2 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.4.2)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5409530Z Requirement already satisfied: pycparser in /opt/homebrew/lib/python3.11/site-packages (from cffi>=2.0.0->curl-cffi==0.15.0->-r requirements.lock (line 5)) (3.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5451770Z Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/homebrew/lib/python3.11/site-packages (from rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (4.0.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5453400Z Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/homebrew/lib/python3.11/site-packages (from rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (2.20.0)
+verify-sold	Install Python dependencies	2026-04-13T17:27:09.5466470Z Requirement already satisfied: mdurl~=0.1 in /opt/homebrew/lib/python3.11/site-packages (from markdown-it-py>=2.2.0->rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (0.1.2)
+verify-sold	Install patchright browser (fallback chromium)	﻿2026-04-13T17:27:09.5800830Z ##[group]Run python3.11 -m patchright install chromium
+verify-sold	Install patchright browser (fallback chromium)	2026-04-13T17:27:09.5801320Z [36;1mpython3.11 -m patchright install chromium[0m
+verify-sold	Install patchright browser (fallback chromium)	2026-04-13T17:27:09.5814800Z shell: /bin/bash -e {0}
+verify-sold	Install patchright browser (fallback chromium)	2026-04-13T17:27:09.5815070Z env:
+verify-sold	Install patchright browser (fallback chromium)	2026-04-13T17:27:09.5815330Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Install patchright browser (fallback chromium)	2026-04-13T17:27:09.5815680Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Install patchright browser (fallback chromium)	2026-04-13T17:27:09.5816010Z ##[endgroup]
+verify-sold	Verifica annunci venduti	﻿2026-04-13T17:27:09.8140070Z ##[group]Run set +e
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8140230Z [36;1mset +e[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8140330Z [36;1mpython3.11 verify_sold.py \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8140460Z [36;1m  --all \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8140560Z [36;1m  --max-runtime-minutes 55 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8140680Z [36;1m  --concurrency 12 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8140800Z [36;1m  --cffi-concurrency 10 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8140900Z [36;1m  --chunk-size 200 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8141010Z [36;1m  --browser-restart-every 4 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8141130Z [36;1m  --nav-timeout-ms 7000 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8141460Z [36;1m  --max-http403-ratio 0.02 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8141570Z [36;1m  --min-coverage-ratio 0.85 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8141690Z [36;1m  --fail-fast-min-attempts 400 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8141840Z [36;1m  --fail-fast-blocked-ratio 0.85 \[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8141960Z [36;1m  --fail-fast-403-ratio 0.60[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8142080Z [36;1mVERIFY_EXIT=$?[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8142200Z [36;1mecho "exit_code=${VERIFY_EXIT}" >> "$GITHUB_OUTPUT"[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8142450Z [36;1m# Exit code 3 = coverage sotto soglia: non fallire il job (il retry step gestisce)[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8142670Z [36;1m# Tutti gli altri errori (1, 2, …) falliscono il job normalmente[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8142880Z [36;1m[ "${VERIFY_EXIT}" -eq 0 ] || [ "${VERIFY_EXIT}" -eq 3 ] || exit "${VERIFY_EXIT}"[0m
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8155930Z shell: /bin/bash -e {0}
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8156030Z env:
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8156120Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8156240Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.8156350Z ##[endgroup]
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:09.9471340Z 19:27:09 [INFO] db_subito: Subito DB pronto: /Users/luke/actions-runner/_work/trader/trader/tracker.db
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:10.4610710Z 19:27:10 [INFO] verify_sold: Warmup probe: 10 URL → sold=0 active=10 unknown=0 (0%)
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:10.5141400Z 19:27:10 [INFO] verify_sold: Selezione verify-sold: totale=33979 | status_ok=8458 | attivi_non_venduti=7117 | subset_finale=6842 | esclusi_da_xbox_only=275
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:10.5142270Z 19:27:10 [INFO] verify_sold: Inizio verifica di 6842 annunci (concorrenza=12, cffi=10, chunk=200, stati=approved,pending) | filtro xbox-only ON…
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:11.5843720Z 19:27:11 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:20.2372240Z 19:27:20 [INFO] verify_sold: Browser session restart (chunk 1), pool=12 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:20.2373790Z 19:27:20 [INFO] verify_sold: Chunk 1: verifica annunci 1-200 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:35.1825610Z 19:27:35 [INFO] verify_sold: cffi precheck: sold=0 | active=191 | unknown(→Playwright)=9
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:48.0837230Z 19:27:48 [INFO] verify_sold: Chunk 1 completato in 27.8s (7.18 tentativi/s, verificati=200/200) | reason: active:cffi-200=191, active:dom-ok=9
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:48.0839060Z 19:27:48 [INFO] verify_sold: Chunk 2: verifica annunci 201-400 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:54.4933870Z 19:27:54 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:54.5156630Z 19:27:54 [INFO] verify_sold: Chunk 2 completato in 6.4s (31.10 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:27:54.5158420Z 19:27:54 [INFO] verify_sold: Chunk 3: verifica annunci 401-600 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:10.0659210Z 19:28:10 [INFO] verify_sold: cffi precheck: sold=0 | active=191 | unknown(→Playwright)=9
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:12.1875700Z 19:28:12 [INFO] verify_sold: Chunk 3 completato in 17.7s (11.32 tentativi/s, verificati=200/200) | reason: active:cffi-200=191, active:dom-ok=9
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:12.1878230Z 19:28:12 [INFO] verify_sold: Chunk 4: verifica annunci 601-800 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:27.6921350Z 19:28:27 [INFO] verify_sold: cffi precheck: sold=0 | active=193 | unknown(→Playwright)=7
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:35.5791420Z 19:28:35 [INFO] verify_sold: Chunk 4 completato in 23.4s (8.55 tentativi/s, verificati=193/200) | reason: active:cffi-200=193, blocked:timeout=6, blocked:http-403=1
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:36.6967700Z 19:28:36 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:45.8824670Z 19:28:45 [INFO] verify_sold: Browser session restart (chunk 5), pool=12 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:45.8825780Z 19:28:45 [INFO] verify_sold: Chunk 5: verifica annunci 801-1000 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:56.7722850Z 19:28:56 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:56.7724270Z 19:28:56 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=10): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:56.7805730Z 19:28:56 [INFO] verify_sold: Chunk 5 completato in 10.9s (18.35 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:56.7809530Z 19:28:56 [WARNING] verify_sold: Chunk 5 in cffi-block (100.0%): cffi 10 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:28:56.7810340Z 19:28:56 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:26.7841310Z 19:29:26 [WARNING] verify_sold: Chunk 5 instabile (100.0% error/ban): concorrenza 12 -> 8
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:27.3065430Z 19:29:27 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:31.8653360Z 19:29:31 [INFO] verify_sold: Browser session restart (chunk 6), pool=8 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:31.8654420Z 19:29:31 [INFO] verify_sold: Chunk 6: verifica annunci 1001-1200 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:40.0941900Z 19:29:40 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:40.0943500Z 19:29:40 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=6): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:40.1139360Z 19:29:40 [INFO] verify_sold: Chunk 6 completato in 8.2s (24.25 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:40.1141700Z 19:29:40 [WARNING] verify_sold: Chunk 6 in cffi-block (100.0%): cffi 6 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:29:40.1142410Z 19:29:40 [WARNING] verify_sold: Cloudflare burst rilevato (2 chunk consecutivi con cffi-block): pausa 60s
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:40.1171100Z 19:30:40 [WARNING] verify_sold: Chunk 6 instabile (100.0% error/ban): concorrenza 8 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:40.7099720Z 19:30:40 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:41.6229330Z 19:30:41 [INFO] verify_sold: Browser session restart (chunk 7), pool=4 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:41.6229710Z 19:30:41 [INFO] verify_sold: Chunk 7: verifica annunci 1201-1400 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:56.5586440Z 19:30:56 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:56.5820860Z 19:30:56 [INFO] verify_sold: Chunk 7 completato in 15.0s (13.37 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:56.5823350Z 19:30:56 [INFO] verify_sold: cffi recovery dopo 2 chunk bloccati consecutivi.
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:56.5824000Z 19:30:56 [INFO] verify_sold: Chunk 7 stabile: cffi 4 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:56.5824600Z 19:30:56 [INFO] verify_sold: Chunk 7 stabile (0.0% error/ban): concorrenza 4 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:57.0169650Z 19:30:57 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:57.7298560Z 19:30:57 [INFO] verify_sold: Browser session restart (chunk 8), pool=6 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:30:57.7299240Z 19:30:57 [INFO] verify_sold: Chunk 8: verifica annunci 1401-1600 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:01.1406380Z 19:31:01 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:01.1409860Z 19:31:01 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=6): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:01.1631220Z 19:31:01 [INFO] verify_sold: Chunk 8 completato in 3.4s (58.26 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:01.1632910Z 19:31:01 [WARNING] verify_sold: Chunk 8 in cffi-block (100.0%): cffi 6 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:01.1633650Z 19:31:01 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:31.1661640Z 19:31:31 [WARNING] verify_sold: Chunk 8 instabile (100.0% error/ban): concorrenza 6 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:44.3101370Z 19:31:44 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:44.8417610Z 19:31:44 [INFO] verify_sold: Browser session restart (chunk 9), pool=4 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:44.8419310Z 19:31:44 [INFO] verify_sold: Chunk 9: verifica annunci 1601-1800 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:50.0241920Z 19:31:50 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:50.0244420Z 19:31:50 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=4): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:50.0488200Z 19:31:50 [INFO] verify_sold: Chunk 9 completato in 5.2s (38.41 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:31:50.0490120Z 19:31:50 [WARNING] verify_sold: Cloudflare burst rilevato (2 chunk consecutivi con cffi-block): pausa 60s
+verify-sold	Verifica annunci venduti	2026-04-13T17:32:50.6091090Z 19:32:50 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:32:51.3576930Z 19:32:51 [INFO] verify_sold: Browser session restart (chunk 10), pool=4 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:32:51.3577710Z 19:32:51 [INFO] verify_sold: Chunk 10: verifica annunci 1801-2000 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:05.6141310Z 19:33:05 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:05.6268230Z 19:33:05 [INFO] verify_sold: Chunk 10 completato in 14.3s (14.02 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:05.6272820Z 19:33:05 [INFO] verify_sold: cffi recovery dopo 2 chunk bloccati consecutivi.
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:05.6273590Z 19:33:05 [INFO] verify_sold: Chunk 10 stabile: cffi 4 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:05.6274170Z 19:33:05 [INFO] verify_sold: Chunk 10 stabile (0.0% error/ban): concorrenza 4 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:06.0659850Z 19:33:06 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:07.4355610Z 19:33:07 [INFO] verify_sold: Browser session restart (chunk 11), pool=6 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:07.4356830Z 19:33:07 [INFO] verify_sold: Chunk 11: verifica annunci 2001-2200 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:18.3052320Z 19:33:18 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:18.3300130Z 19:33:18 [INFO] verify_sold: Chunk 11 completato in 10.9s (18.36 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:18.3302060Z 19:33:18 [INFO] verify_sold: Chunk 11 stabile: cffi 6 -> 8
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:18.3302550Z 19:33:18 [INFO] verify_sold: Chunk 11 stabile (0.0% error/ban): concorrenza 6 -> 8
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:18.7937140Z 19:33:18 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:19.8610780Z 19:33:19 [INFO] verify_sold: Browser session restart (chunk 12), pool=8 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:19.8611550Z 19:33:19 [INFO] verify_sold: Chunk 12: verifica annunci 2201-2400 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:22.5433350Z 19:33:22 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:22.5434730Z 19:33:22 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=8): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:22.5638720Z 19:33:22 [INFO] verify_sold: Chunk 12 completato in 2.7s (74.00 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:22.5640720Z 19:33:22 [WARNING] verify_sold: Chunk 12 in cffi-block (100.0%): cffi 8 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:22.5641370Z 19:33:22 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	Verifica annunci venduti	2026-04-13T17:33:52.5669270Z 19:33:52 [WARNING] verify_sold: Chunk 12 instabile (100.0% error/ban): concorrenza 8 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:34:04.6583250Z 19:34:04 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:34:05.2991240Z 19:34:05 [INFO] verify_sold: Browser session restart (chunk 13), pool=4 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:34:05.2992090Z 19:34:05 [INFO] verify_sold: Chunk 13: verifica annunci 2401-2600 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:34:10.6014930Z 19:34:10 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:34:10.6239990Z 19:34:10 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=4): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:34:10.6242020Z 19:34:10 [INFO] verify_sold: Chunk 13 completato in 5.3s (37.56 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:34:10.6242950Z 19:34:10 [WARNING] verify_sold: Cloudflare burst rilevato (2 chunk consecutivi con cffi-block): pausa 60s
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:11.1330130Z 19:35:11 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:11.9342350Z 19:35:11 [INFO] verify_sold: Browser session restart (chunk 14), pool=4 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:11.9342710Z 19:35:11 [INFO] verify_sold: Chunk 14: verifica annunci 2601-2800 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:28.0060210Z 19:35:28 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:28.0263120Z 19:35:28 [INFO] verify_sold: Chunk 14 completato in 16.1s (12.43 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:28.0266810Z 19:35:28 [INFO] verify_sold: cffi recovery dopo 2 chunk bloccati consecutivi.
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:28.0267440Z 19:35:28 [INFO] verify_sold: Chunk 14 stabile: cffi 4 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:28.0267870Z 19:35:28 [INFO] verify_sold: Chunk 14 stabile (0.0% error/ban): concorrenza 4 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:28.4888470Z 19:35:28 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:29.2266990Z 19:35:29 [INFO] verify_sold: Browser session restart (chunk 15), pool=6 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:29.2267600Z 19:35:29 [INFO] verify_sold: Chunk 15: verifica annunci 2801-3000 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:33.0875090Z 19:35:33 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:33.0877720Z 19:35:33 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=6): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:33.1101050Z 19:35:33 [INFO] verify_sold: Chunk 15 completato in 3.9s (51.50 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:33.1102970Z 19:35:33 [WARNING] verify_sold: Chunk 15 in cffi-block (100.0%): cffi 6 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:35:33.1103670Z 19:35:33 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	Verifica annunci venduti	2026-04-13T17:36:03.1122200Z 19:36:03 [WARNING] verify_sold: Chunk 15 instabile (100.0% error/ban): concorrenza 6 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:36:14.1133060Z 19:36:14 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:36:14.6384200Z 19:36:14 [INFO] verify_sold: Browser session restart (chunk 16), pool=4 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:36:14.6385010Z 19:36:14 [INFO] verify_sold: Chunk 16: verifica annunci 3001-3200 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:36:19.6617590Z 19:36:19 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:36:19.6619000Z 19:36:19 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=4): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:36:19.6810880Z 19:36:19 [INFO] verify_sold: Chunk 16 completato in 5.0s (39.66 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:36:19.6813130Z 19:36:19 [WARNING] verify_sold: Cloudflare burst rilevato (2 chunk consecutivi con cffi-block): pausa 60s
+verify-sold	Verifica annunci venduti	2026-04-13T17:37:20.2666200Z 19:37:20 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:37:20.9507870Z 19:37:20 [INFO] verify_sold: Browser session restart (chunk 17), pool=4 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:37:20.9508580Z 19:37:20 [INFO] verify_sold: Chunk 17: verifica annunci 3201-3400 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:37:26.1080240Z 19:37:26 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:37:26.1081450Z 19:37:26 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=4): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:37:26.1391860Z 19:37:26 [INFO] verify_sold: Chunk 17 completato in 5.2s (38.55 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:37:26.1395890Z 19:37:26 [WARNING] verify_sold: Cloudflare burst rilevato (3 chunk consecutivi con cffi-block): pausa 120s
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:26.6967650Z 19:39:26 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:27.7935940Z 19:39:27 [INFO] verify_sold: Browser session restart (chunk 18), pool=4 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:27.7936540Z 19:39:27 [INFO] verify_sold: Chunk 18: verifica annunci 3401-3600 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:42.0281710Z 19:39:42 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:42.0507140Z 19:39:42 [INFO] verify_sold: Chunk 18 completato in 14.3s (14.03 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:42.0512330Z 19:39:42 [INFO] verify_sold: cffi recovery dopo 3 chunk bloccati consecutivi.
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:42.0515920Z 19:39:42 [INFO] verify_sold: Chunk 18 stabile: cffi 4 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:42.0516360Z 19:39:42 [INFO] verify_sold: Chunk 18 stabile (0.0% error/ban): concorrenza 4 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:42.4912440Z 19:39:42 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:44.0434890Z 19:39:44 [INFO] verify_sold: Browser session restart (chunk 19), pool=6 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:44.0435950Z 19:39:44 [INFO] verify_sold: Chunk 19: verifica annunci 3601-3800 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:53.0069720Z 19:39:53 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:53.0298510Z 19:39:53 [INFO] verify_sold: Chunk 19 completato in 9.0s (22.26 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:53.0300360Z 19:39:53 [INFO] verify_sold: Chunk 19 stabile: cffi 6 -> 8
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:53.0300870Z 19:39:53 [INFO] verify_sold: Chunk 19 stabile (0.0% error/ban): concorrenza 6 -> 8
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:53.5054280Z 19:39:53 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:55.0918410Z 19:39:55 [INFO] verify_sold: Browser session restart (chunk 20), pool=8 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:39:55.0919150Z 19:39:55 [INFO] verify_sold: Chunk 20: verifica annunci 3801-4000 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:40:11.6019360Z 19:40:11 [INFO] verify_sold: cffi precheck: sold=0 | active=196 | unknown(→Playwright)=4
+verify-sold	Verifica annunci venduti	2026-04-13T17:40:17.2050600Z 19:40:17 [INFO] verify_sold: Chunk 20 completato in 22.1s (9.04 tentativi/s, verificati=200/200) | reason: active:cffi-200=196, active:dom-ok=4
+verify-sold	Verifica annunci venduti	2026-04-13T17:40:17.2057610Z 19:40:17 [INFO] verify_sold: Chunk 20 stabile: cffi 8 -> 10
+verify-sold	Verifica annunci venduti	2026-04-13T17:40:17.2058140Z 19:40:17 [INFO] verify_sold: Chunk 20 stabile (0.0% error/ban): concorrenza 8 -> 10
+verify-sold	Verifica annunci venduti	2026-04-13T17:40:39.4172310Z 19:40:39 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:40:48.9143500Z 19:40:48 [INFO] verify_sold: Browser session restart (chunk 21), pool=10 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:40:48.9145390Z 19:40:48 [INFO] verify_sold: Chunk 21: verifica annunci 4001-4200 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:41:04.4800480Z 19:41:04 [INFO] verify_sold: cffi precheck: sold=0 | active=191 | unknown(→Playwright)=9
+verify-sold	Verifica annunci venduti	2026-04-13T17:41:21.3322490Z 19:41:21 [INFO] verify_sold: Chunk 21 completato in 32.4s (6.17 tentativi/s, verificati=194/200) | reason: active:cffi-200=191, blocked:timeout=6, active:dom-ok=3
+verify-sold	Verifica annunci venduti	2026-04-13T17:41:21.3323680Z 19:41:21 [INFO] verify_sold: Chunk 21 stabile (3.0% error/ban): concorrenza 10 -> 12
+verify-sold	Verifica annunci venduti	2026-04-13T17:41:26.1228560Z 19:41:26 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:41:35.8777560Z 19:41:35 [INFO] verify_sold: Browser session restart (chunk 22), pool=12 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:41:35.8779180Z 19:41:35 [INFO] verify_sold: Chunk 22: verifica annunci 4201-4400 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:41:50.5523900Z 19:41:50 [INFO] verify_sold: cffi precheck: sold=0 | active=191 | unknown(→Playwright)=9
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:07.0285900Z 19:42:07 [INFO] verify_sold: Chunk 22 completato in 31.2s (6.42 tentativi/s, verificati=199/200) | reason: active:cffi-200=191, active:dom-ok=8, blocked:timeout=1
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:07.0288900Z 19:42:07 [INFO] verify_sold: Chunk 23: verifica annunci 4401-4600 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:17.1588040Z 19:42:17 [INFO] verify_sold: cffi precheck: sold=0 | active=198 | unknown(→Playwright)=2
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:18.5962240Z 19:42:18 [INFO] verify_sold: Chunk 23 completato in 11.6s (17.29 tentativi/s, verificati=200/200) | reason: active:cffi-200=198, active:dom-ok=2
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:18.5965670Z 19:42:18 [INFO] verify_sold: Chunk 24: verifica annunci 4601-4800 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:24.8986730Z 19:42:24 [INFO] verify_sold: cffi precheck: sold=1 | active=199 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:24.9027600Z 19:42:24 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-non-si-accende-viterbo-633832796.htm
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:24.9131820Z 19:42:24 [INFO] verify_sold: Chunk 24 completato in 6.3s (31.66 tentativi/s, verificati=200/200) | reason: active:cffi-200=199, sold:cffi-410=1
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:27.5550350Z 19:42:27 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:37.4682670Z 19:42:37 [INFO] verify_sold: Browser session restart (chunk 25), pool=12 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:37.4683470Z 19:42:37 [INFO] verify_sold: Chunk 25: verifica annunci 4801-5000 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:42:51.7039910Z 19:42:51 [INFO] verify_sold: cffi precheck: sold=0 | active=191 | unknown(→Playwright)=9
+verify-sold	Verifica annunci venduti	2026-04-13T17:43:06.3290920Z 19:43:06 [INFO] verify_sold: Chunk 25 completato in 28.9s (6.93 tentativi/s, verificati=197/200) | reason: active:cffi-200=191, active:dom-ok=6, blocked:timeout=3
+verify-sold	Verifica annunci venduti	2026-04-13T17:43:06.3295040Z 19:43:06 [INFO] verify_sold: Chunk 26: verifica annunci 5001-5200 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:43:27.2829360Z 19:43:27 [INFO] verify_sold: cffi precheck: sold=0 | active=190 | unknown(→Playwright)=10
+verify-sold	Verifica annunci venduti	2026-04-13T17:43:29.5812540Z 19:43:29 [INFO] verify_sold: Chunk 26 completato in 23.3s (8.60 tentativi/s, verificati=200/200) | reason: active:cffi-200=190, active:dom-ok=10
+verify-sold	Verifica annunci venduti	2026-04-13T17:43:29.5833250Z 19:43:29 [INFO] verify_sold: Chunk 27: verifica annunci 5201-5400 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:43:44.0989680Z 19:43:44 [INFO] verify_sold: cffi precheck: sold=0 | active=192 | unknown(→Playwright)=8
+verify-sold	Verifica annunci venduti	2026-04-13T17:43:51.4605010Z 19:43:51 [INFO] verify_sold: Chunk 27 completato in 21.9s (9.14 tentativi/s, verificati=199/200) | reason: active:cffi-200=192, active:dom-ok=7, blocked:timeout=1
+verify-sold	Verifica annunci venduti	2026-04-13T17:43:51.4607510Z 19:43:51 [INFO] verify_sold: Chunk 28: verifica annunci 5401-5600 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:02.4678900Z 19:44:02 [INFO] verify_sold: cffi precheck: sold=0 | active=195 | unknown(→Playwright)=5
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:04.2070280Z 19:44:04 [INFO] verify_sold: Chunk 28 completato in 12.7s (15.69 tentativi/s, verificati=200/200) | reason: active:cffi-200=195, active:dom-ok=5
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:05.0377860Z 19:44:05 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:14.1081660Z 19:44:14 [INFO] verify_sold: Browser session restart (chunk 29), pool=12 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:14.1083110Z 19:44:14 [INFO] verify_sold: Chunk 29: verifica annunci 5601-5800 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:27.4229290Z 19:44:27 [INFO] verify_sold: cffi precheck: sold=0 | active=192 | unknown(→Playwright)=8
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:44.0616070Z 19:44:44 [INFO] verify_sold: Chunk 29 completato in 30.0s (6.68 tentativi/s, verificati=195/200) | reason: active:cffi-200=192, blocked:timeout=5, active:dom-ok=3
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:44.0616840Z 19:44:44 [INFO] verify_sold: Chunk 30: verifica annunci 5801-6000 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:44:54.9791740Z 19:44:54 [INFO] verify_sold: cffi precheck: sold=0 | active=197 | unknown(→Playwright)=3
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:02.8999090Z 19:45:02 [INFO] verify_sold: Chunk 30 completato in 18.8s (10.62 tentativi/s, verificati=197/200) | reason: active:cffi-200=197, blocked:timeout=3
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:02.9002290Z 19:45:02 [INFO] verify_sold: Chunk 31: verifica annunci 6001-6200 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:26.9952930Z 19:45:26 [INFO] verify_sold: cffi precheck: sold=0 | active=181 | unknown(→Playwright)=19
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:34.6985560Z 19:45:34 [INFO] verify_sold: Chunk 31 completato in 31.8s (6.29 tentativi/s, verificati=198/200) | reason: active:cffi-200=181, active:dom-ok=17, blocked:timeout=2
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:34.6988600Z 19:45:34 [INFO] verify_sold: Chunk 32: verifica annunci 6201-6400 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:45.9675340Z 19:45:45 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:45.9676800Z 19:45:45 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=10): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:46.0041380Z 19:45:46 [INFO] verify_sold: Chunk 32 completato in 11.3s (17.69 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:46.0045590Z 19:45:46 [WARNING] verify_sold: Chunk 32 in cffi-block (100.0%): cffi 10 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:45:46.0046120Z 19:45:46 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:16.0070030Z 19:46:16 [WARNING] verify_sold: Chunk 32 instabile (100.0% error/ban): concorrenza 12 -> 8
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:17.0303170Z 19:46:17 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:26.0707760Z 19:46:26 [INFO] verify_sold: Browser session restart (chunk 33), pool=8 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:26.0708440Z 19:46:26 [INFO] verify_sold: Chunk 33: verifica annunci 6401-6600 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:35.5201970Z 19:46:35 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:35.5466140Z 19:46:35 [INFO] verify_sold: Chunk 33 completato in 9.5s (21.11 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:35.5471640Z 19:46:35 [INFO] verify_sold: cffi recovery dopo 1 chunk bloccati consecutivi.
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:35.5472100Z 19:46:35 [INFO] verify_sold: Chunk 33 stabile: cffi 6 -> 8
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:35.5472530Z 19:46:35 [INFO] verify_sold: Chunk 33 stabile (0.0% error/ban): concorrenza 8 -> 10
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:36.0664480Z 19:46:36 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:44.8938480Z 19:46:44 [INFO] verify_sold: Browser session restart (chunk 34), pool=10 worker.
+verify-sold	Verifica annunci venduti	2026-04-13T17:46:44.8940500Z 19:46:44 [INFO] verify_sold: Chunk 34: verifica annunci 6601-6800 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:19.6761970Z 19:47:19 [INFO] verify_sold: cffi precheck: sold=0 | active=172 | unknown(→Playwright)=28
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:40.5976940Z 19:47:40 [INFO] verify_sold: Chunk 34 completato in 55.7s (3.59 tentativi/s, verificati=187/200) | reason: active:cffi-200=172, active:dom-ok=15, blocked:timeout=7, blocked:http-403=6
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:40.5980400Z 19:47:40 [INFO] verify_sold: Chunk 35: verifica annunci 6801-6842 / 6842
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.6824030Z 19:47:50 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=42
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.6825560Z 19:47:50 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=8): skip Playwright, chunk → pending
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.6999850Z 19:47:50 [INFO] verify_sold: Chunk 35 completato in 10.1s (4.16 tentativi/s, verificati=0/42) | reason: skipped:cffi-block=42
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.7002870Z 19:47:50 [WARNING] verify_sold: Chunk 35 in cffi-block (100.0%): cffi 8 -> 4
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.7003430Z 19:47:50 [WARNING] verify_sold: Chunk 35 instabile (100.0% error/ban): concorrenza 10 -> 6
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.9954850Z 19:47:50 [INFO] verify_sold: Reason summary sessione: active:cffi-200=4660, skipped:cffi-block=2042, active:dom-ok=98, blocked:timeout=34, blocked:http-403=7, sold:cffi-410=1
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.9955450Z 19:47:50 [INFO] verify_sold: HTTP block summary: 403=7/6842 (0.10%) | cffi-block=2042/6842 (29.85%) | blocked_totali=2083/6842 (30.44%) | timeout=34 | network=0 | error=0
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.9956340Z 19:47:50 [INFO] verify_sold: Verifica completata. 4759 verificati, 2083 skipped (coverage 69.6%): 4758 attivi, 1 venduti nuovi, 0 venduti confermati, 0 riattivati | prezzo medio venduto € 20.00 | tempo attivo medio 26 giorni
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.9956870Z 19:47:50 [WARNING] verify_sold: Coverage bassa (69.6% < 70%): verifica interrotta da blocchi massivi o errori
+verify-sold	Verifica annunci venduti	2026-04-13T17:47:50.9957170Z 19:47:50 [ERROR] verify_sold: Coverage finale 69.6% sotto soglia minima 85.0%
+verify-sold	Aggiorna coverage history CSV	﻿2026-04-13T17:47:51.0606220Z ##[group]Run CSV=logs/coverage_history.csv
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0606400Z [36;1mCSV=logs/coverage_history.csv[0m
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0606550Z [36;1mmkdir -p logs[0m
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0606710Z [36;1m[ -f "$CSV" ] || echo "date,coverage_pct,verified,skipped,sold_new" > "$CSV"[0m
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0606910Z [36;1mif [ -f logs/verify_sold_last_run.json ]; then[0m
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0607360Z [36;1m  python3.11 -c "import json,pathlib; d=json.loads(pathlib.Path('logs/verify_sold_last_run.json').read_text()); open('logs/coverage_history.csv','a').write('{},{},{},{},{}\n'.format(d['date'],d['coverage_pct'],d['verified'],d['skipped'],d['sold_new']))"[0m
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0607810Z [36;1mfi[0m
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0731110Z shell: /bin/bash -e {0}
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0731250Z env:
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0731340Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0735130Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Aggiorna coverage history CSV	2026-04-13T17:47:51.0735270Z ##[endgroup]
+verify-sold	Commit e push DB aggiornato	﻿2026-04-13T17:47:51.1265410Z ##[group]Run git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1265750Z [36;1mgit config user.email "41898282+github-actions[bot]@users.noreply.github.com"[0m
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1265970Z [36;1mgit config user.name "github-actions[bot]"[0m
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1266120Z [36;1mgit fetch origin[0m
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1266240Z [36;1mgit reset --mixed origin/main[0m
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1266390Z [36;1mgit add tracker.db logs/coverage_history.csv[0m
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1266550Z [36;1mgit diff --staged --quiet \[0m
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1266710Z [36;1m  || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"[0m
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1266860Z [36;1mgit push[0m
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1278660Z shell: /bin/bash -e {0}
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1278780Z env:
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1278890Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1279050Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:47:51.1279170Z ##[endgroup]
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:48:02.6436410Z Unstaged changes after reset:
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:48:02.6437380Z M	logs/coverage_history.csv
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:48:02.6437630Z M	tracker.db
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:48:03.4475180Z [main 2266be2] chore: verify-sold 2026-04-13
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:48:03.4475390Z  2 files changed, 1 insertion(+)
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:48:06.9366980Z To https://github.com/LukePalmDev/trader
+verify-sold	Commit e push DB aggiornato	2026-04-13T17:48:06.9367940Z    4389a7d..2266be2  main -> main
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	﻿2026-04-13T17:48:06.9608350Z ##[group]Run echo "Coverage sotto soglia (exit 3): triggero nuovo run di verify-sold tra ~1 min"
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:06.9609110Z [36;1mecho "Coverage sotto soglia (exit 3): triggero nuovo run di verify-sold tra ~1 min"[0m
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:06.9609620Z [36;1mgh workflow run verify-sold.yml --ref main[0m
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:06.9638980Z shell: /bin/bash -e {0}
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:06.9639170Z env:
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:06.9639340Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:06.9639570Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:06.9640210Z   GH_TOKEN: ***
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:06.9640380Z ##[endgroup]
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:07.0019200Z Coverage sotto soglia (exit 3): triggero nuovo run di verify-sold tra ~1 min
+verify-sold	Retry automatico se coverage sotto soglia (exit code 3)	2026-04-13T17:48:08.6782700Z https://github.com/LukePalmDev/trader/actions/runs/24358182094
+verify-sold	Fallisci il job se coverage sotto soglia	﻿2026-04-13T17:48:08.6919470Z ##[group]Run echo "::error::Coverage sotto soglia minima (exit code 3). Run automatico ri-schedulato."
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.6921080Z [36;1mecho "::error::Coverage sotto soglia minima (exit code 3). Run automatico ri-schedulato."[0m
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.6922050Z [36;1mexit 3[0m
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.6974840Z shell: /bin/bash -e {0}
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.6975350Z env:
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.6975690Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.6976170Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.6976580Z ##[endgroup]
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.7469290Z ##[error]Coverage sotto soglia minima (exit code 3). Run automatico ri-schedulato.
+verify-sold	Fallisci il job se coverage sotto soglia	2026-04-13T17:48:08.7473920Z ##[error]Process completed with exit code 3.
+verify-sold	Post Checkout repository	﻿2026-04-13T17:48:08.7533370Z Post job cleanup.
+verify-sold	Post Checkout repository	2026-04-13T17:48:08.9275120Z [command]/usr/bin/git version
+verify-sold	Post Checkout repository	2026-04-13T17:48:08.9352570Z git version 2.50.1 (Apple Git-155)
+verify-sold	Post Checkout repository	2026-04-13T17:48:08.9366590Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/18cdf862-12ca-4612-816b-3ac9be530067' before making global git config changes
+verify-sold	Post Checkout repository	2026-04-13T17:48:08.9366990Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	Post Checkout repository	2026-04-13T17:48:08.9368890Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	Post Checkout repository	2026-04-13T17:48:08.9442740Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	Post Checkout repository	2026-04-13T17:48:08.9512430Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	Post Checkout repository	2026-04-13T17:48:09.0045880Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	Post Checkout repository	2026-04-13T17:48:09.0107540Z http.https://github.com/.extraheader
+verify-sold	Post Checkout repository	2026-04-13T17:48:09.0112470Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+verify-sold	Post Checkout repository	2026-04-13T17:48:09.0177170Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	Post Checkout repository	2026-04-13T17:48:09.0630340Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	Post Checkout repository	2026-04-13T17:48:09.0694450Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	Complete job	﻿2026-04-13T17:48:09.1236020Z Cleaning up orphan processes

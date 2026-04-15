@@ -1,0 +1,970 @@
+verify-sold	UNKNOWN STEP	﻿2026-04-09T10:18:46.7543130Z Current runner version: '2.333.1'
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7545630Z Runner name: 'mac-mini-luke'
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7545930Z Runner group name: 'Default'
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7546340Z Machine name: 'Mac-mini'
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7547460Z ##[group]GITHUB_TOKEN Permissions
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7548210Z Contents: write
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7548440Z Metadata: read
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7548670Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7549480Z Secret source: Actions
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7549760Z Prepare workflow directory
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.7987120Z Prepare all required actions
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:46.8004740Z Getting action download info
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:47.4194690Z Download action repository 'actions/checkout@v5' (SHA:93cb6efe18208431cddfb8368fd83d5badbf9bfd)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1475240Z Complete job name: verify-sold
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1814570Z ##[group]Run actions/checkout@v5
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1815060Z with:
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1815550Z   token: ***
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1815860Z   ref: main
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1816190Z   repository: LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1816650Z   ssh-strict: true
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1817000Z   ssh-user: git
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1817360Z   persist-credentials: true
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1817760Z   clean: true
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1818100Z   sparse-checkout-cone-mode: true
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1818520Z   fetch-depth: 1
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1818850Z   fetch-tags: false
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1819190Z   show-progress: true
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1819550Z   lfs: false
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1819890Z   submodules: false
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1820260Z   set-safe-directory: true
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1820710Z env:
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1821060Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1821520Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.1821970Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.3984720Z Syncing repository: LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.3985830Z ##[group]Getting Git version info
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.3986460Z Working directory is '/Users/luke/actions-runner/_work/trader/trader'
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.3987370Z [command]/usr/bin/git version
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4045340Z git version 2.50.1 (Apple Git-155)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4054140Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4059210Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/89df16a9-2282-4c95-bbb5-2b451bc463cb' before making global git config changes
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4060640Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4061790Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4137470Z [command]/usr/bin/git config --local --get remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4195980Z https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4202690Z ##[group]Removing previously created refs, to avoid conflicts
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4203980Z [command]/usr/bin/git rev-parse --symbolic-full-name --verify --quiet HEAD
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4270980Z refs/heads/main
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4274960Z [command]/usr/bin/git checkout --detach
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4360660Z HEAD is now at dbd5715 chore: scrape subito 2026-04-09T10:09
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4363070Z M	alert_log.json
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4436750Z [command]/usr/bin/git branch --delete --force main
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4505000Z Deleted branch main (was dbd5715).
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4577500Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.4577920Z [command]/usr/bin/git submodule status
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5115360Z ##[group]Cleaning the repository
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5116470Z [command]/usr/bin/git clean -ffdx
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5315350Z Removing __pycache__/
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5315850Z Removing data/
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5316300Z Removing logs/run_report_2026-04-09_12-09-22.json
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5316910Z Removing logs/run_report_2026-04-09_12-09-23.json
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5317490Z Removing scrapers/__pycache__/
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5319160Z [command]/usr/bin/git reset --hard HEAD
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5456500Z HEAD is now at dbd5715 chore: scrape subito 2026-04-09T10:09
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5459770Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5460680Z ##[group]Disabling automatic garbage collection
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5462000Z [command]/usr/bin/git config --local gc.auto 0
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5529830Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5530490Z ##[group]Setting up auth
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5532090Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.5596780Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.6075220Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.6144160Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.6593130Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.6658740Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.7117410Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.7189810Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.7190460Z ##[group]Fetching the repository
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:48.7193890Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1305450Z From https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1305850Z  + dbd5715...e174459 main       -> origin/main  (forced update)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1346320Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1346560Z ##[group]Determining the checkout info
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1348750Z [command]/usr/bin/git branch --list --remote origin/main
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1421350Z   origin/main
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1423850Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1425850Z [command]/usr/bin/git sparse-checkout disable
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1511630Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1579290Z ##[group]Checking out the ref
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.1580070Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3072800Z Warning: you are leaving 2 commits behind, not connected to
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3073030Z any of your branches:
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3073130Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3073220Z   dbd5715 chore: scrape subito 2026-04-09T10:09
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3073460Z   e83ee49 fix(verify-sold): add fail-fast for blocked runner and fix ratios
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3073630Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3073730Z If you want to keep them by creating a new branch, this may be a good time
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3073920Z to do so with:
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3073980Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3074040Z  git branch <new-branch-name> dbd5715
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3074150Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3085090Z Switched to a new branch 'main'
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3088500Z branch 'main' set up to track 'origin/main'.
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3092070Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3173200Z [command]/usr/bin/git log -1 --format=%H
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3239620Z e174459b1ac01485c4510c98e2d5ac0d64f9a171
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3326040Z ##[group]Run git pull --rebase
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3326190Z [36;1mgit pull --rebase[0m
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3341670Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3341770Z env:
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3341880Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3342000Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.3342110Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.8290310Z Already up to date.
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.8316580Z ##[group]Run python3.11 -m pip install -r requirements.lock
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.8316810Z [36;1mpython3.11 -m pip install -r requirements.lock[0m
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.8330980Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.8331390Z env:
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.8331500Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.8331650Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:50.8331780Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0720400Z Ignoring tomli: markers 'python_version < "3.11"' don't match your environment
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0722240Z Requirement already satisfied: playwright==1.52.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 2)) (1.52.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0723950Z Requirement already satisfied: requests==2.31.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 3)) (2.31.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0725490Z Requirement already satisfied: beautifulsoup4==4.12.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 4)) (4.12.3)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0726980Z Requirement already satisfied: anthropic==0.86.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 6)) (0.86.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0728260Z Requirement already satisfied: aiohttp==3.11.14 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 7)) (3.11.14)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0734220Z Requirement already satisfied: pyee<14,>=13 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (13.0.1)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0736080Z Requirement already satisfied: greenlet<4.0.0,>=3.1.1 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (3.3.2)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0741950Z Requirement already satisfied: charset-normalizer<4,>=2 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (3.4.7)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0743640Z Requirement already satisfied: idna<4,>=2.5 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (3.11)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0745760Z Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (2.6.3)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0747360Z Requirement already satisfied: certifi>=2017.4.17 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 3)) (2026.2.25)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0753850Z Requirement already satisfied: soupsieve>1.2 in /opt/homebrew/lib/python3.11/site-packages (from beautifulsoup4==4.12.3->-r requirements.lock (line 4)) (2.8.3)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0761710Z Requirement already satisfied: anyio<5,>=3.5.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (4.13.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0763190Z Requirement already satisfied: distro<2,>=1.7.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (1.9.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0764790Z Requirement already satisfied: docstring-parser<1,>=0.15 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.17.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0766220Z Requirement already satisfied: httpx<1,>=0.25.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.28.1)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0768030Z Requirement already satisfied: jiter<1,>=0.4.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (0.13.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0769590Z Requirement already satisfied: pydantic<3,>=1.9.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (2.12.5)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0770770Z Requirement already satisfied: sniffio in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (1.3.1)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0772780Z Requirement already satisfied: typing-extensions<5,>=4.14 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 6)) (4.15.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0780010Z Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (2.6.1)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0781300Z Requirement already satisfied: aiosignal>=1.1.2 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.4.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0783130Z Requirement already satisfied: attrs>=17.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (26.1.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0784510Z Requirement already satisfied: frozenlist>=1.1.1 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.8.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0786270Z Requirement already satisfied: multidict<7.0,>=4.5 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (6.7.1)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0787730Z Requirement already satisfied: propcache>=0.2.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (0.4.1)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0789190Z Requirement already satisfied: yarl<2.0,>=1.17.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 7)) (1.23.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0823160Z Requirement already satisfied: httpcore==1.* in /opt/homebrew/lib/python3.11/site-packages (from httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6)) (1.0.9)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0836080Z Requirement already satisfied: h11>=0.16 in /opt/homebrew/lib/python3.11/site-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.16.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0863040Z Requirement already satisfied: annotated-types>=0.6.0 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.7.0)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0864560Z Requirement already satisfied: pydantic-core==2.41.5 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (2.41.5)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.0866540Z Requirement already satisfied: typing-inspection>=0.4.2 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6)) (0.4.2)
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.1257160Z ##[group]Run python3.11 verify_sold.py --all --max-runtime-minutes 45 --concurrency 18 --chunk-size 350 --browser-restart-every 3 --nav-timeout-ms 7000 --body-timeout-seconds 2.5 --dom-fallback-timeout-ms 1200 --max-http403-ratio 0.02 --fail-fast-min-attempts 700 --fail-fast-blocked-ratio 0.85 --fail-fast-403-ratio 0.60 --selection-sample 5
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.1258230Z [36;1mpython3.11 verify_sold.py --all --max-runtime-minutes 45 --concurrency 18 --chunk-size 350 --browser-restart-every 3 --nav-timeout-ms 7000 --body-timeout-seconds 2.5 --dom-fallback-timeout-ms 1200 --max-http403-ratio 0.02 --fail-fast-min-attempts 700 --fail-fast-blocked-ratio 0.85 --fail-fast-403-ratio 0.60 --selection-sample 5[0m
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.1271580Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.1271690Z env:
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.1271780Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.1271900Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.1272010Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.3112140Z 12:18:51 [INFO] verify_sold: Selezione verify-sold: totale=33225 | status_ok=8173 | attivi_non_venduti=7118 | subset_finale=6849 | esclusi_da_xbox_only=269
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:51.3112800Z 12:18:51 [INFO] verify_sold: Inizio verifica di 6849 annunci (concorrenza=18, chunk=350, stati=approved,pending) | filtro xbox-only ON…
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:52.2721150Z 12:18:52 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:56.0145640Z 12:18:56 [INFO] verify_sold: Browser session restart (chunk 1), pool=18 worker.
+verify-sold	UNKNOWN STEP	2026-04-09T10:18:56.0147420Z 12:18:56 [INFO] verify_sold: Chunk 1: verifica annunci 1-350 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0365040Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-genova-639957879.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0375860Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-bari-639403824.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0461190Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-prima-serie-agrigento-641795835.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0472790Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-brescia-641658588.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0475920Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-torino-642499457.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0483020Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/consolle-xbox-e-nintendo-wii-reggio-emilia-628338060.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0488580Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-1s-come-nuova-varese-640966030.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0490480Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-brescia-640445209.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0493960Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500-gb-2-joystick-caricatore-cavi-brescia-631471832.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0497280Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-catania-639431677.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0500880Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-pisa-600511565.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0504390Z 12:20:02 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500-gb-pesaro-urbino-641368438.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0631690Z 12:20:02 [INFO] verify_sold: Chunk 1 completato in 66.0s (5.30 tentativi/s, verificati=248/350) | reason: active:dom-ok=236, blocked:timeout=101, sold:http-status=12, blocked:http-403=1
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:02.0632420Z 12:20:02 [WARNING] verify_sold: Chunk 1 instabile (29.1% error/ban): concorrenza 18 -> 14
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:03.9883260Z 12:20:03 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:06.8492890Z 12:20:06 [INFO] verify_sold: Browser session restart (chunk 2), pool=14 worker.
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:06.8493470Z 12:20:06 [INFO] verify_sold: Chunk 2: verifica annunci 351-700 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:20.2761570Z 12:20:20 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-x-varese-617036893.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-x-varese-617036893.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:20.2763780Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:20.2764370Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-x-varese-617036893.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:20.2765050Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:20.3134540Z 12:20:20 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-monza-617009952.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-monza-617009952.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-x-varese-617036893.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:20.3136350Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:20.3137240Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-monza-617009952.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:20.3137960Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.4206000Z 12:20:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-varese-617628678.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-varese-617628678.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.4207560Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.4208220Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-varese-617628678.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.4209500Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.5395870Z 12:20:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-500gb-danneggiata-monza-614443603.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-danneggiata-monza-614443603.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-varese-617628678.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.5399230Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.5399570Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-500gb-danneggiata-monza-614443603.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.5399890Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.7363070Z 12:20:22 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-milano-587530022.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-milano-587530022.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-danneggiata-monza-614443603.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.7365090Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.7365760Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-milano-587530022.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:22.7366950Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:26.6416390Z 12:20:26 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-bologna-633649145.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-bologna-633649145.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:26.6418260Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:26.6418970Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-bologna-633649145.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:26.6419900Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:27.5756040Z 12:20:27 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-napoli-632513176.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-napoli-632513176.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:27.5757460Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:27.5758340Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-napoli-632513176.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:27.5758940Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.8626370Z 12:20:36 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-volante-e-pedaliera-ferrari-458-roma-620893163.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-volante-e-pedaliera-ferrari-458-roma-620893163.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.8628230Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.8629750Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-volante-e-pedaliera-ferrari-458-roma-620893163.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.8630560Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.8994220Z 12:20:36 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-arcade-roma-619856333.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-arcade-roma-619856333.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-volante-e-pedaliera-ferrari-458-roma-620893163.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.8995620Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.8995950Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-arcade-roma-619856333.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.8996220Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.9249530Z 12:20:36 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/console-xbox-360-napoli-619772702.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/console-xbox-360-napoli-619772702.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-arcade-roma-619856333.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.9251510Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.9252040Z   - navigating to "https://www.subito.it/videogiochi/console-xbox-360-napoli-619772702.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:36.9252400Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5147790Z 12:20:38 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/console-xbox-360-bologna-458700019.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/console-xbox-360-bologna-458700019.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5153860Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5154510Z   - navigating to "https://www.subito.it/videogiochi/console-xbox-360-bologna-458700019.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5155180Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5616830Z 12:20:38 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-bergamo-616066327.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-bergamo-616066327.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/console-xbox-360-bologna-458700019.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5618400Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5618940Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-bergamo-616066327.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5619540Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5870470Z 12:20:38 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-s-monza-615620679.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-s-monza-615620679.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-bergamo-616066327.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5871170Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5871440Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-s-monza-615620679.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:38.5871820Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.3242180Z 12:20:46 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-bergamo-556305705.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-bergamo-556305705.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.3244630Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.3245280Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-bergamo-556305705.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.3246230Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.4681260Z 12:20:46 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-napoli-604604617.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-napoli-604604617.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-bergamo-556305705.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.4683780Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.4684130Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-napoli-604604617.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.4684410Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.6033100Z 12:20:46 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-lodi-604545970.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-lodi-604545970.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-napoli-604604617.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.6035200Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.6036160Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-lodi-604545970.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:46.6037130Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.2243220Z 12:20:49 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-chieti-626946163.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-chieti-626946163.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.2244750Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.2245320Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-chieti-626946163.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.2245940Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.2642170Z 12:20:49 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-lucca-626738931.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-lucca-626738931.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.2643390Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.2643850Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-lucca-626738931.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.2645010Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.3327490Z 12:20:49 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-full-wireless-cagliari-626228909.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-full-wireless-cagliari-626228909.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-chieti-626946163.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.3329300Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.3330110Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-full-wireless-cagliari-626228909.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.3330820Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.4552150Z 12:20:49 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-e-videgiochi-treviso-626109691.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-e-videgiochi-treviso-626109691.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-lucca-626738931.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.4553620Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.4554650Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-e-videgiochi-treviso-626109691.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.4555210Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.4808710Z 12:20:49 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-digital-edition-salerno-625821776.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-digital-edition-salerno-625821776.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-full-wireless-cagliari-626228909.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.4811010Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.4812790Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-digital-edition-salerno-625821776.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:49.4814290Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:58.1481840Z 12:20:58 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-x-bari-597533372.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-x-bari-597533372.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:58.1483880Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:58.1484890Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-x-bari-597533372.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:20:58.1485290Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:14.9425240Z 12:21:14 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-macerata-639989682.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-macerata-639989682.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:14.9426730Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:14.9427380Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-macerata-639989682.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:14.9427950Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:14.9432430Z 12:21:14 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serire-x-con-due-controller-brescia-639997683.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serire-x-con-due-controller-brescia-639997683.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:14.9433250Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:14.9433570Z   - navigating to "https://www.subito.it/videogiochi/xbox-serire-x-con-due-controller-brescia-639997683.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:14.9433900Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.0461860Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-639981882.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-639981882.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serire-x-con-due-controller-brescia-639997683.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.0463930Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.0464530Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-639981882.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.0466440Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.2012580Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-senza-hard-disk-e-cavi-bolzano-639989072.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-senza-hard-disk-e-cavi-bolzano-639989072.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.2019160Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.2032680Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-senza-hard-disk-e-cavi-bolzano-639989072.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.2042990Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.2571870Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-torino-639980664.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-torino-639980664.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-x-1-tb-salerno-639981882.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.2578110Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.2578800Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-torino-639980664.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.2579350Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.3626300Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-1tb-ssd-como-639979879.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-x-1tb-ssd-como-639979879.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-senza-hard-disk-e-cavi-bolzano-639989072.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.3627160Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.3629970Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-1tb-ssd-como-639979879.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.3630600Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.3640830Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-verona-639964627.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-verona-639964627.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-torino-639980664.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.3642580Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.3644720Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-verona-639964627.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.3645380Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.5895400Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-1-tera-nera-lodi-639921339.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-1-tera-nera-lodi-639921339.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-x-1tb-ssd-como-639979879.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.5923280Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.5923980Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-1-tera-nera-lodi-639921339.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.5924610Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.6133520Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-chieti-639960461.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-chieti-639960461.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-verona-639964627.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.6135050Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.6135700Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-chieti-639960461.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.6136780Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.7230520Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-500gb-con-giochi-e-hdd-1tb-ferrara-639940393.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-con-giochi-e-hdd-1tb-ferrara-639940393.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-1-tera-nera-lodi-639921339.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.7232460Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.7233170Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-500gb-con-giochi-e-hdd-1tb-ferrara-639940393.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.7235020Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.7381350Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-treviso-639923228.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-treviso-639923228.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-chieti-639960461.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.7383130Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.7383750Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-treviso-639923228.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.7384440Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9058810Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-treviso-639922972.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-treviso-639922972.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-con-giochi-e-hdd-1tb-ferrara-639940393.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9060660Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9061260Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-treviso-639922972.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9061800Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9351480Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-1tb-como-639915312.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-1tb-como-639915312.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-treviso-639923228.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9354200Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9354590Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-1tb-como-639915312.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9354900Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9746240Z 12:21:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/console-xbox-360-fifa-13-padova-639893073.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/console-xbox-360-fifa-13-padova-639893073.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-treviso-639922972.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9748250Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9749960Z   - navigating to "https://www.subito.it/videogiochi/console-xbox-360-fifa-13-padova-639893073.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:15.9750740Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0168550Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/console-xbox-milano-639878904.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/console-xbox-milano-639878904.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-x-1tb-como-639915312.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0184110Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0185310Z   - navigating to "https://www.subito.it/videogiochi/console-xbox-milano-639878904.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0187000Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0204060Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/consolle-xbox-360-slim-accessori-catania-639863151.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/consolle-xbox-360-slim-accessori-catania-639863151.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/console-xbox-360-fifa-13-padova-639893073.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0206350Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0207080Z   - navigating to "https://www.subito.it/videogiochi/consolle-xbox-360-slim-accessori-catania-639863151.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0207760Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0603010Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-nera-napoli-639859421.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-nera-napoli-639859421.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/console-xbox-milano-639878904.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0604780Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0606940Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-nera-napoli-639859421.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0607610Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0988500Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-palermo-639856365.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-x-palermo-639856365.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/consolle-xbox-360-slim-accessori-catania-639863151.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0990760Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0991480Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-palermo-639856365.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.0992080Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.1069560Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-rovigo-639853315.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-rovigo-639853315.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-nera-napoli-639859421.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.1071890Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.1073180Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-rovigo-639853315.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.1073860Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.2064300Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-savona-639840987.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-savona-639840987.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-rovigo-639853315.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.2065150Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.2065430Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-savona-639840987.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.2065860Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.4164790Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-brindisi-639838897.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-brindisi-639838897.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-savona-639840987.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.4166480Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.4168540Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-brindisi-639838897.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.4169190Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.4665290Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-1-tb-ssd-monza-639821003.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-1-tb-ssd-monza-639821003.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-brindisi-639838897.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.4666410Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.4666750Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-1-tb-ssd-monza-639821003.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.4667020Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.7227870Z 12:21:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-x-1-tera-parma-639817117.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-x-1-tera-parma-639817117.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-x-1-tb-ssd-monza-639821003.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.7229620Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.7230230Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-x-1-tera-parma-639817117.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:16.7230840Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:19.5537840Z 12:21:19 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-non-funzionante-reggio-emilia-639942279.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-non-funzionante-reggio-emilia-639942279.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:19.5538800Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:19.5540760Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-non-funzionante-reggio-emilia-639942279.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:19.5541130Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:20.1219770Z 12:21:20 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-napoli-639694339.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-napoli-639694339.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-non-funzionante-reggio-emilia-639942279.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:20.1222400Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:20.1224730Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-napoli-639694339.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:20.1225330Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:24.4714310Z 12:21:24 [INFO] verify_sold: Chunk 2 completato in 77.6s (4.51 tentativi/s, verificati=38/350) | reason: blocked:timeout=212, blocked:http-403=53, blocked:error=47, active:dom-ok=38
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:24.4715040Z 12:21:24 [WARNING] verify_sold: Chunk 2 instabile (89.1% error/ban): concorrenza 14 -> 10
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:25.2659400Z 12:21:25 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:27.3338020Z 12:21:27 [INFO] verify_sold: Browser session restart (chunk 3), pool=10 worker.
+verify-sold	UNKNOWN STEP	2026-04-09T10:21:27.3338780Z 12:21:27 [INFO] verify_sold: Chunk 3: verifica annunci 701-1050 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:22:59.1545040Z 12:22:59 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-x-completa-bologna-639602121.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-x-completa-bologna-639602121.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:22:59.1600390Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:22:59.1601460Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-x-completa-bologna-639602121.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:22:59.1602110Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.6870090Z 12:23:13 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-catanzaro-637627495.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-catanzaro-637627495.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-s-lecce-637800785.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.6881840Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.6883750Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-catanzaro-637627495.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.6885040Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.8083670Z 12:23:13 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-2-joystick-giochi-original-box-padova-637625339.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-2-joystick-giochi-original-box-padova-637625339.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-catanzaro-637627495.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.8085620Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.8086460Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-2-joystick-giochi-original-box-padova-637625339.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.8087260Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.8898090Z 12:23:13 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-x-roma-637617602.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-x-roma-637617602.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-x-2-joystick-giochi-original-box-padova-637625339.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.8899780Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.8904150Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-x-roma-637617602.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:13.8904820Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.0322810Z 12:23:14 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-agrigento-637603577.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-agrigento-637603577.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-x-roma-637617602.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.0326670Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.0327250Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-agrigento-637603577.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.0327910Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.1766190Z 12:23:14 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-x-milano-637598825.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-x-milano-637598825.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-agrigento-637603577.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.1774750Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.1778230Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-x-milano-637598825.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.1781520Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.6681100Z 12:23:14 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-roma-637593858.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-roma-637593858.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-x-milano-637598825.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.6700150Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.6703210Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-roma-637593858.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:14.6703940Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.1273100Z 12:23:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-ose-s-varese-637567759.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-ose-s-varese-637567759.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-roma-637593858.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.1277370Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.1278090Z   - navigating to "https://www.subito.it/videogiochi/xbox-ose-s-varese-637567759.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.1278640Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.3242090Z 12:23:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-con-2-joystick-e-scatolo-originale-barletta-andria-trani-637564320.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-con-2-joystick-e-scatolo-originale-barletta-andria-trani-637564320.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-ose-s-varese-637567759.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.3244500Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.3245730Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-con-2-joystick-e-scatolo-originale-barletta-andria-trani-637564320.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.3246750Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.4916690Z 12:23:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-bari-637554874.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-x-bari-637554874.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-con-2-joystick-e-scatolo-originale-barletta-andria-trani-637564320.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.4935870Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.4936470Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-bari-637554874.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.4937150Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.7862380Z 12:23:15 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/console-xbox-classic-controller-s-cavi-bari-637548562.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/console-xbox-classic-controller-s-cavi-bari-637548562.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-x-bari-637554874.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.7864330Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.7865050Z   - navigating to "https://www.subito.it/videogiochi/console-xbox-classic-controller-s-cavi-bari-637548562.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:15.7865430Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.1852760Z 12:23:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-con-controller-7-giochi-viterbo-637532383.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-con-controller-7-giochi-viterbo-637532383.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/console-xbox-classic-controller-s-cavi-bari-637548562.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.1857770Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.1858460Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-con-controller-7-giochi-viterbo-637532383.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.1859190Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.3319000Z 12:23:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-verona-637529540.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-verona-637529540.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-con-controller-7-giochi-viterbo-637532383.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.3342520Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.3347210Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-verona-637529540.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.3349930Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.5627150Z 12:23:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-nera-opaca-250-gb-milano-637526639.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-nera-opaca-250-gb-milano-637526639.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-verona-637529540.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.5630480Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.5634150Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-nera-opaca-250-gb-milano-637526639.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.5634450Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.6608740Z 12:23:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-mouse-tastiera-cuffie-e-tappetino-siracusa-637514530.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-mouse-tastiera-cuffie-e-tappetino-siracusa-637514530.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-nera-opaca-250-gb-milano-637526639.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.6610930Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.6615070Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-mouse-tastiera-cuffie-e-tappetino-siracusa-637514530.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.6616150Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.8595380Z 12:23:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-con-1-joystick-cavo-lan-cavo-joystik-napoli-637466710.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-con-1-joystick-cavo-lan-cavo-joystik-napoli-637466710.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-mouse-tastiera-cuffie-e-tappetino-siracusa-637514530.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.8598270Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.8599070Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-con-1-joystick-cavo-lan-cavo-joystik-napoli-637466710.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.8600020Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.9331120Z 12:23:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-1tb-roma-637488383.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-x-1tb-roma-637488383.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-s-con-1-joystick-cavo-lan-cavo-joystik-napoli-637466710.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.9333000Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.9333560Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-1tb-roma-637488383.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:16.9334140Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.2261400Z 12:23:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-taranto-637457919.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-taranto-637457919.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-x-1tb-roma-637488383.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.2264640Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.2265490Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-taranto-637457919.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.2266140Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.2957400Z 12:23:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-cosenza-637434594.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-cosenza-637434594.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-taranto-637457919.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.2961060Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.2961640Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-cosenza-637434594.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.2962210Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.4813520Z 12:23:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-con-un-pad-come-nuova-palermo-637433177.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-con-un-pad-come-nuova-palermo-637433177.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-s-cosenza-637434594.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.4815840Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.4817150Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-con-un-pad-come-nuova-palermo-637433177.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.4817960Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.5333360Z 12:23:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-digital-1tb-catanzaro-637389467.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-x-digital-1tb-catanzaro-637389467.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-con-un-pad-come-nuova-palermo-637433177.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.5334740Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.5335040Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-digital-1tb-catanzaro-637389467.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.5335330Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.6453540Z 12:23:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-taranto-637366678.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-taranto-637366678.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-x-digital-1tb-catanzaro-637389467.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.6459240Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.6460090Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-taranto-637366678.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.6460750Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.7921280Z 12:23:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-512-gb-con-pad-originale-xbox-pordenone-637333808.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-512-gb-con-pad-originale-xbox-pordenone-637333808.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-taranto-637366678.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.7924910Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.7925950Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-512-gb-con-pad-originale-xbox-pordenone-637333808.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:17.7926780Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.1368500Z 12:23:18 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-1tb-piu-controller-sondrio-637332665.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-1tb-piu-controller-sondrio-637332665.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-s-512-gb-con-pad-originale-xbox-pordenone-637333808.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.1370490Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.1371210Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-1tb-piu-controller-sondrio-637332665.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.1372190Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.4064700Z 12:23:18 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-lecce-637282407.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-lecce-637282407.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-x-1tb-piu-controller-sondrio-637332665.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.4067860Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.4068480Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-lecce-637282407.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.4069030Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.6562500Z 12:23:18 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-s-ragusa-637272936.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-s-ragusa-637272936.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-lecce-637282407.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.6564470Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.6565130Z   - navigating to "https://www.subito.it/videogiochi/xbox-s-ragusa-637272936.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.6565690Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.7105810Z 12:23:18 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-gorizia-637216911.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-gorizia-637216911.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-s-ragusa-637272936.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.7108830Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.7110020Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-gorizia-637216911.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.7110610Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.7955240Z 12:23:18 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-x-genova-637245543.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-x-genova-637245543.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-s-gorizia-637216911.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.7957250Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.7958280Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-x-genova-637245543.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:18.7958730Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.2609060Z 12:23:19 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-salerno-637171665.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-salerno-637171665.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-x-genova-637245543.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.2629170Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.2629780Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-salerno-637171665.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.2633770Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.3405820Z 12:23:19 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-posata-poco-senza-joystick-sud-sardegna-637218728.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-posata-poco-senza-joystick-sud-sardegna-637218728.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-s-salerno-637171665.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.3407840Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.3408970Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-posata-poco-senza-joystick-sud-sardegna-637218728.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.3410010Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.4779330Z 12:23:19 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-console-blu-500gb-limited-giochi-milano-637165005.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-console-blu-500gb-limited-giochi-milano-637165005.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-posata-poco-senza-joystick-sud-sardegna-637218728.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.4787340Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.4788740Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-console-blu-500gb-limited-giochi-milano-637165005.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.4793740Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.7344440Z 12:23:19 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-napoli-637156061.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-napoli-637156061.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-console-blu-500gb-limited-giochi-milano-637165005.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.7347430Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.7350370Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-napoli-637156061.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.7350980Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.9605000Z 12:23:19 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-con-kinect-e-memoria-aggiuntiva-vicenza-637153443.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-con-kinect-e-memoria-aggiuntiva-vicenza-637153443.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-napoli-637156061.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.9608090Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.9609160Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-con-kinect-e-memoria-aggiuntiva-vicenza-637153443.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:19.9610230Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.1766370Z 12:23:20 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-ravenna-637118058.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-ravenna-637118058.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-con-kinect-e-memoria-aggiuntiva-vicenza-637153443.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.1769320Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.1770160Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-ravenna-637118058.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.1771060Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.2376700Z 12:23:20 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-con-6-giochi-originale-caserta-637100936.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-con-6-giochi-originale-caserta-637100936.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-x-ravenna-637118058.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.2377720Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.2378080Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-con-6-giochi-originale-caserta-637100936.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.2378360Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.3122420Z 12:23:20 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-serie-s-come-nuova-crotone-637067371.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-serie-s-come-nuova-crotone-637067371.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-con-6-giochi-originale-caserta-637100936.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.3124620Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.3127900Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-serie-s-come-nuova-crotone-637067371.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.3128310Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.4294620Z 12:23:20 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-vicenza-637054963.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-vicenza-637054963.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-serie-s-come-nuova-crotone-637067371.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.4295350Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.4295580Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-vicenza-637054963.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.4295810Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.7009230Z 12:23:20 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-con-controller-originale-catania-637041278.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-con-controller-originale-catania-637041278.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-vicenza-637054963.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.7012200Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.7012910Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-con-controller-originale-catania-637041278.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:20.7013620Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:21.1178990Z 12:23:21 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-napoli-637023869.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-napoli-637023869.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-s-con-controller-originale-catania-637041278.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:21.1181380Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:21.1181990Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-napoli-637023869.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:21.1182550Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:21.2533410Z 12:23:21 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-s-512-giga-bergamo-637022192.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-s-512-giga-bergamo-637022192.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-napoli-637023869.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:21.2587220Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:21.2587970Z   - navigating to "https://www.subito.it/videogiochi/xbox-s-512-giga-bergamo-637022192.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:21.2588560Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:37.6614820Z 12:23:37 [INFO] verify_sold: Chunk 3 completato in 130.3s (2.69 tentativi/s, verificati=0/350) | reason: blocked:http-403=214, blocked:timeout=96, blocked:error=40
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:37.6615910Z 12:23:37 [WARNING] verify_sold: Chunk 3 instabile (100.0% error/ban): concorrenza 10 -> 6
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:38.4234600Z 12:23:38 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:39.5343240Z 12:23:39 [INFO] verify_sold: Browser session restart (chunk 4), pool=6 worker.
+verify-sold	UNKNOWN STEP	2026-04-09T10:23:39.5344060Z 12:23:39 [INFO] verify_sold: Chunk 4: verifica annunci 1051-1400 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.4396750Z 12:24:08 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-512gb-brescia-635579120.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-512gb-brescia-635579120.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.4398540Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.4399380Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-512gb-brescia-635579120.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.4400370Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.4749410Z 12:24:08 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-nera-da-verificare-il-funzionamento-caserta-635559469.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-nera-da-verificare-il-funzionamento-caserta-635559469.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-512gb-brescia-635579120.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.4752220Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.4752980Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-nera-da-verificare-il-funzionamento-caserta-635559469.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.4753880Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.7625580Z 12:24:08 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-monitor-sedia-da-gaming-padova-635475009.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-monitor-sedia-da-gaming-padova-635475009.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.7627800Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.7628550Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-monitor-sedia-da-gaming-padova-635475009.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.7629260Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.7893230Z 12:24:08 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-matera-635444909.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-matera-635444909.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-monitor-sedia-da-gaming-padova-635475009.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.7896970Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.7897540Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-matera-635444909.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:08.7898140Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.4727240Z 12:24:27 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-primo-modello-como-635182294.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-primo-modello-como-635182294.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.4729190Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.4729790Z   - navigating to "https://www.subito.it/videogiochi/xbox-primo-modello-como-635182294.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.4730380Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.5119720Z 12:24:27 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-con-joystick-e-giochi-firenze-635145221.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-con-joystick-e-giochi-firenze-635145221.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-primo-modello-como-635182294.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.5121250Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.5121570Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-con-joystick-e-giochi-firenze-635145221.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.5121860Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.5631790Z 12:24:27 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-60gb-verbano-cusio-ossola-635140031.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-60gb-verbano-cusio-ossola-635140031.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-con-joystick-e-giochi-firenze-635145221.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.5633140Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.5633900Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-60gb-verbano-cusio-ossola-635140031.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:27.5634500Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:30.8369260Z 12:24:30 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-1tb-base-con-ventola-3-giochi-verona-635171918.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-1tb-base-con-ventola-3-giochi-verona-635171918.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:30.8371220Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:30.8376080Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-1tb-base-con-ventola-3-giochi-verona-635171918.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:30.8376820Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:30.8905910Z 12:24:30 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/console-xbox-serie-s-roma-635118696.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/console-xbox-serie-s-roma-635118696.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-1tb-base-con-ventola-3-giochi-verona-635171918.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:30.8909240Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:30.8909950Z   - navigating to "https://www.subito.it/videogiochi/console-xbox-serie-s-roma-635118696.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:30.8910820Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:47.9443720Z 12:24:47 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-kinect-2-controller-simulatore-ferrari-aosta-634688889.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-kinect-2-controller-simulatore-ferrari-aosta-634688889.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:47.9470120Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:47.9471340Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-kinect-2-controller-simulatore-ferrari-aosta-634688889.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:47.9474210Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:51.5651250Z 12:24:51 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-2-giochi-2-controller-reggio-emilia-634638354.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-2-giochi-2-controller-reggio-emilia-634638354.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:51.5656490Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:51.5657330Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-2-giochi-2-controller-reggio-emilia-634638354.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:51.5658260Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:59.4647460Z 12:24:59 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-500-gb-go-cosenza-634496661.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-500-gb-go-cosenza-634496661.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:59.4649560Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:59.4650170Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-500-gb-go-cosenza-634496661.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:24:59.4650800Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:00.6780120Z 12:25:00 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-con-giochi-varese-634455257.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-con-giochi-varese-634455257.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:00.6781710Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:00.6782320Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-con-giochi-varese-634455257.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:00.6782910Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:00.7426120Z 12:25:00 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-controller-elite-series-2-ancona-634453210.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-controller-elite-series-2-ancona-634453210.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-con-giochi-varese-634455257.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:00.7431150Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:00.7432890Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-controller-elite-series-2-ancona-634453210.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:00.7433670Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:01.6281870Z 12:25:01 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-novara-634373906.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-novara-634373906.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:01.6283340Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:01.6283960Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-novara-634373906.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:01.6284530Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:50.3811760Z 12:25:50 [INFO] verify_sold: Chunk 4 completato in 130.8s (2.67 tentativi/s, verificati=0/350) | reason: blocked:http-403=289, blocked:timeout=46, blocked:error=15
+verify-sold	UNKNOWN STEP	2026-04-09T10:25:50.3812660Z 12:25:50 [INFO] verify_sold: Chunk 5: verifica annunci 1401-1750 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.0958310Z 12:26:29 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-ancona-631294859.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-ancona-631294859.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.0959770Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.0960790Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-ancona-631294859.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.0961360Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.1367600Z 12:26:29 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-palermo-631248286.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-palermo-631248286.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-ancona-631294859.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.1370670Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.1370960Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-palermo-631248286.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.1371200Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.1627500Z 12:26:29 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-320gb-limited-edition-gears-of-war-3-napoli-631242204.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-320gb-limited-edition-gears-of-war-3-napoli-631242204.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-palermo-631248286.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.1628580Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.1629370Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-320gb-limited-edition-gears-of-war-3-napoli-631242204.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.1630020Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4141080Z 12:26:29 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-2-joystick-e-giochi-modena-631265152.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-2-joystick-e-giochi-modena-631265152.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4143110Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4144210Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-2-joystick-e-giochi-modena-631265152.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4144910Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4552820Z 12:26:29 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-nuova-nuova-manco-vecchissima-cagliari-631193184.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-nuova-nuova-manco-vecchissima-cagliari-631193184.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-2-joystick-e-giochi-modena-631265152.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4554760Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4555460Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-nuova-nuova-manco-vecchissima-cagliari-631193184.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4555830Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4800330Z 12:26:29 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-cagliari-631192942.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-cagliari-631192942.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-nuova-nuova-manco-vecchissima-cagliari-631193184.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4801890Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4802180Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-cagliari-631192942.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:29.4802510Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:31.9484570Z 12:26:31 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-all-digital-rimini-631104399.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-all-digital-rimini-631104399.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:31.9486330Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:31.9486980Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-all-digital-rimini-631104399.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:31.9490480Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.5863290Z 12:26:52 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-salerno-630659781.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-salerno-630659781.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.5938670Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.5940060Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-salerno-630659781.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.5940690Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.6418610Z 12:26:52 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-monitor-campobasso-630595448.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-monitor-campobasso-630595448.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-salerno-630659781.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.6422360Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.6423170Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-monitor-campobasso-630595448.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.6423850Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.6664830Z 12:26:52 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-500gb-senza-hdmi-2-controller-firenze-630579109.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-senza-hdmi-2-controller-firenze-630579109.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-x-monitor-campobasso-630595448.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.6667270Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.6667880Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-500gb-senza-hdmi-2-controller-firenze-630579109.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:26:52.6668330Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:27:53.4431390Z 12:27:53 [INFO] verify_sold: Chunk 5 completato in 123.1s (2.84 tentativi/s, verificati=0/350) | reason: blocked:http-403=301, blocked:timeout=39, blocked:error=10
+verify-sold	UNKNOWN STEP	2026-04-09T10:27:53.4432280Z 12:27:53 [INFO] verify_sold: Chunk 6: verifica annunci 1751-2100 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.4335690Z 12:28:31 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360e-tantissimi-accessori-5-giochi-napoli-627544338.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360e-tantissimi-accessori-5-giochi-napoli-627544338.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.4337710Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.4344240Z   - navigating to "https://www.subito.it/videogiochi/xbox-360e-tantissimi-accessori-5-giochi-napoli-627544338.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.4345120Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.4637880Z 12:28:31 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-1-con-cavi-originali-e-hd-120-gb-bari-627540035.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-1-con-cavi-originali-e-hd-120-gb-bari-627540035.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360e-tantissimi-accessori-5-giochi-napoli-627544338.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.4638860Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.4639150Z   - navigating to "https://www.subito.it/videogiochi/xbox-1-con-cavi-originali-e-hd-120-gb-bari-627540035.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.4639520Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.5941670Z 12:28:31 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-1tb-trattabile-modena-627535011.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-1tb-trattabile-modena-627535011.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.5943250Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.5943850Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-1tb-trattabile-modena-627535011.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.5944480Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.7804840Z 12:28:31 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-serie-s-512-gb-ssd-venezia-627463629.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-serie-s-512-gb-ssd-venezia-627463629.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-1tb-trattabile-modena-627535011.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.7821240Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.7822130Z   - navigating to "https://www.subito.it/videogiochi/xbox-serie-s-512-gb-ssd-venezia-627463629.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.7828590Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.8283190Z 12:28:31 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-s-512gb-ssd-pordenone-627449857.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-s-512gb-ssd-pordenone-627449857.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.8298820Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.8300040Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-s-512gb-ssd-pordenone-627449857.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.8300590Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.8883890Z 12:28:31 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-1-tera-con-due-controller-napoli-627430675.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-1-tera-con-due-controller-napoli-627430675.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-s-512gb-ssd-pordenone-627449857.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.8886200Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.8886920Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-1-tera-con-due-controller-napoli-627430675.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:31.8887660Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.0127790Z 12:28:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-con-giochi-torino-627422590.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-con-giochi-torino-627422590.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-series-x-1-tera-con-due-controller-napoli-627430675.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.0129920Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.0130210Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-con-giochi-torino-627422590.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.0130470Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.1925350Z 12:28:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-roma-627415785.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-roma-627415785.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-con-giochi-torino-627422590.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.1927260Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.1928040Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-roma-627415785.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.9248040Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.9252480Z 12:28:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-con-mod-napoli-627330571.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-con-mod-napoli-627330571.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.9254520Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.9263600Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-con-mod-napoli-627330571.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:32.9264490Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:51.6074350Z 12:28:51 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-1tb-all-digital-sport-red-controller-salerno-626923974.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-1tb-all-digital-sport-red-controller-salerno-626923974.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:51.6077310Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:51.6078160Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-1tb-all-digital-sport-red-controller-salerno-626923974.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:51.6078960Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:51.6440810Z 12:28:51 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-milano-626861924.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-milano-626861924.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-1tb-all-digital-sport-red-controller-salerno-626923974.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:51.6442900Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:51.6443540Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-milano-626861924.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:51.6444110Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:53.1467310Z 12:28:53 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbxox-series-s-roma-626929525.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbxox-series-s-roma-626929525.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:53.1511800Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:53.1512490Z   - navigating to "https://www.subito.it/videogiochi/xbxox-series-s-roma-626929525.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:28:53.1513060Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:03.7197480Z 12:29:03 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-varese-626718830.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-varese-626718830.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-serie-s-chieti-626858184.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:03.7201850Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:03.7204130Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-varese-626718830.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:03.7204520Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:04.0177050Z 12:29:04 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-series-x-imperia-626718303.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-series-x-imperia-626718303.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:04.0180210Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:04.0180820Z   - navigating to "https://www.subito.it/videogiochi/xbox-series-x-imperia-626718303.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:04.0181330Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:57.7801600Z 12:29:57 [INFO] verify_sold: Chunk 6 completato in 124.3s (2.81 tentativi/s, verificati=23/350) | reason: blocked:http-403=274, blocked:timeout=39, active:dom-ok=23, blocked:error=14
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:58.3451170Z 12:29:58 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:59.4552060Z 12:29:59 [INFO] verify_sold: Browser session restart (chunk 7), pool=6 worker.
+verify-sold	UNKNOWN STEP	2026-04-09T10:29:59.4552470Z 12:29:59 [INFO] verify_sold: Chunk 7: verifica annunci 2101-2450 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.8279010Z 12:30:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-500gb-lecco-522524290.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-lecco-522524290.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.8279810Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.8280110Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-500gb-lecco-522524290.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.8280410Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.8780530Z 12:30:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-da-provare-la-spezia-624770592.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-da-provare-la-spezia-624770592.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-lecco-522524290.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.8782090Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.8782460Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-da-provare-la-spezia-624770592.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.8782970Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.9203710Z 12:30:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-bari-624766212.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-bari-624766212.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-da-provare-la-spezia-624770592.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.9205250Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.9205970Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-bari-624766212.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.9206610Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.9848730Z 12:30:16 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-nera-reggio-calabria-624605698.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-nera-reggio-calabria-624605698.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-bari-624766212.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.9850300Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.9850590Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-nera-reggio-calabria-624605698.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:16.9850850Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.3663430Z 12:30:28 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-catania-623672234.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-catania-623672234.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.3664040Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.3664260Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-catania-623672234.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.3664480Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.3923540Z 12:30:28 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-matera-623610353.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-matera-623610353.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-catania-623672234.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.3925090Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.3925790Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-matera-623610353.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.3926370Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.4164010Z 12:30:28 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-500-gb-matera-623610205.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-500-gb-matera-623610205.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-matera-623610353.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.4165790Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.4166380Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-500-gb-matera-623610205.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.4166970Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.8583420Z 12:30:28 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-1-tb-giochi-roma-623561583.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-1-tb-giochi-roma-623561583.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.8585180Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.8585740Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-1-tb-giochi-roma-623561583.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:28.8586340Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:30.1524770Z 12:30:30 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-giochi-roma-623472207.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-giochi-roma-623472207.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:30.1525460Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:30.1525740Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-giochi-roma-623472207.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:30.1526030Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:30.1785440Z 12:30:30 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-padova-623471978.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-padova-623471978.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-giochi-roma-623472207.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:30.1787040Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:30.1787560Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-padova-623471978.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:30.1788100Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:35.9573740Z 12:30:35 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-nera-500gb-barletta-andria-trani-623068943.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-nera-500gb-barletta-andria-trani-623068943.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:35.9575680Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:35.9579620Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-nera-500gb-barletta-andria-trani-623068943.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:35.9580320Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.7788270Z 12:30:46 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-ones-controller-elite-base-con-ventola-giochi-cuneo-622320416.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-ones-controller-elite-base-con-ventola-giochi-cuneo-622320416.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.7791240Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.7792450Z   - navigating to "https://www.subito.it/videogiochi/xbox-ones-controller-elite-base-con-ventola-giochi-cuneo-622320416.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.7793300Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.8345000Z 12:30:46 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-frosinone-622078755.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-frosinone-622078755.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-ones-controller-elite-base-con-ventola-giochi-cuneo-622320416.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.8346850Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.8347390Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-frosinone-622078755.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.8348560Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.8600630Z 12:30:46 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-palermo-622076511.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-palermo-622076511.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-frosinone-622078755.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.8601680Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.8602380Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-palermo-622076511.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:46.8603080Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:53.7523940Z 12:30:53 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-bologna-621823886.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-bologna-621823886.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:53.7524800Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:53.7525070Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-bologna-621823886.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:53.7525340Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:53.8081250Z 12:30:53 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-16-giochi-milano-575376102.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-16-giochi-milano-575376102.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-bologna-621823886.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:53.8083560Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:53.8083900Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-16-giochi-milano-575376102.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:53.8084630Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:54.2806610Z 12:30:54 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-massa-carrara-621688156.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-massa-carrara-621688156.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:54.2808490Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:54.2809240Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-massa-carrara-621688156.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:54.2809840Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:54.3166190Z 12:30:54 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-torino-621631653.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-torino-621631653.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-massa-carrara-621688156.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:54.3167750Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:54.3168280Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-torino-621631653.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:54.3170300Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.6521890Z 12:30:56 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-ed-call-of-duty-2-controller-e-22-giochi-venezia-621253597.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-ed-call-of-duty-2-controller-e-22-giochi-venezia-621253597.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.6523290Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.6523740Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-ed-call-of-duty-2-controller-e-22-giochi-venezia-621253597.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.6524170Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.6983010Z 12:30:56 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/x-box-one-500gb-roma-621207409.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/x-box-one-500gb-roma-621207409.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-ed-call-of-duty-2-controller-e-22-giochi-venezia-621253597.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.6984790Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.6985340Z   - navigating to "https://www.subito.it/videogiochi/x-box-one-500gb-roma-621207409.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.6985910Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.7575620Z 12:30:56 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-treviso-621202485.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-treviso-621202485.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/x-box-one-500gb-roma-621207409.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.7578190Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.7578980Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-treviso-621202485.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:30:56.7579630Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.3611160Z 12:31:49 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-con-6-giochi-venezia-625305122.htm
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.3665420Z 12:31:49 [INFO] verify_sold: Chunk 7 completato in 109.9s (3.18 tentativi/s, verificati=124/350) | reason: blocked:http-403=139, active:dom-ok=123, blocked:timeout=66, blocked:error=21
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.3665980Z 12:31:49 [INFO] verify_sold: Chunk 8: verifica annunci 2451-2800 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.5625670Z 12:31:49 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-milano-510157260.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-milano-510157260.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.5627030Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.5627540Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-milano-510157260.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.5628060Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.7996650Z 12:31:49 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-500gb-catania-615516942.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-catania-615516942.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-milano-510157260.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.7998580Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.7999550Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-500gb-catania-615516942.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.8000220Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.9668950Z 12:31:49 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-padova-615320114.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-padova-615320114.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-500gb-catania-615516942.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.9670340Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.9670980Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-padova-615320114.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:49.9691680Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.1050170Z 12:31:50 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-con-cavi-e-giochi-firenze-615285691.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-con-cavi-e-giochi-firenze-615285691.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-padova-615320114.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.1052790Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.1054050Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-con-cavi-e-giochi-firenze-615285691.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.1054930Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.1828720Z 12:31:50 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-day-one-edition-kinect-2-controller-milano-611397428.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-day-one-edition-kinect-2-controller-milano-611397428.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-con-cavi-e-giochi-firenze-615285691.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.1830930Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.1831460Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-day-one-edition-kinect-2-controller-milano-611397428.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.1831770Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.4563830Z 12:31:50 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-console-piu-sei-giochi-caserta-614862548.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-console-piu-sei-giochi-caserta-614862548.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-day-one-edition-kinect-2-controller-milano-611397428.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.4565820Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.4566440Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-console-piu-sei-giochi-caserta-614862548.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.4567080Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.6141040Z 12:31:50 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-512mb-call-of-duty-brescia-614813453.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-512mb-call-of-duty-brescia-614813453.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-console-piu-sei-giochi-caserta-614862548.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.6141860Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.6142120Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-512mb-call-of-duty-brescia-614813453.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:31:50.6142380Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.6714110Z 12:32:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-1tb-bari-611436597.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-1tb-bari-611436597.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.6716080Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.6716650Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-1tb-bari-611436597.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.6717240Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.7071290Z 12:32:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-2-joystik-giochi-verona-611423902.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-2-joystik-giochi-verona-611423902.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-1tb-bari-611436597.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.7073050Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.7073660Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-2-joystik-giochi-verona-611423902.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.7074270Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.7395810Z 12:32:32 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-1tb-colore-nero-ragusa-611389334.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-1tb-colore-nero-ragusa-611389334.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-2-joystik-giochi-verona-611423902.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.7398580Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.7398880Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-1tb-colore-nero-ragusa-611389334.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:32.7399540Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3261490Z 12:32:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-grosseto-611284068.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-grosseto-611284068.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3262840Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3263380Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-grosseto-611284068.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3263910Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3605720Z 12:32:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-caserta-611281952.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-caserta-611281952.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-grosseto-611284068.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3606410Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3606650Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-caserta-611281952.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3606880Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3853780Z 12:32:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-kinect-cagliari-611273228.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-kinect-cagliari-611273228.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-caserta-611281952.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3854580Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3855130Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-kinect-cagliari-611273228.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:33.3855380Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.4729250Z 12:32:55 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-salerno-560967574.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-salerno-560967574.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.4734830Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.4813410Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-salerno-560967574.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.4814840Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.5299780Z 12:32:55 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-napoli-609319810.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-napoli-609319810.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-salerno-560967574.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.5301270Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.5301800Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-napoli-609319810.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.5302390Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.5568250Z 12:32:55 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-caserta-609314093.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-caserta-609314093.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-napoli-609319810.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.5570360Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.5571040Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-caserta-609314093.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.5571880Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.7420300Z 12:32:55 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-roma-609432914.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-roma-609432914.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.7421700Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.7422210Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-roma-609432914.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:55.7424650Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:58.6566010Z 12:32:58 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-1-tb-caserta-609437298.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-1-tb-caserta-609437298.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:58.6599300Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:58.6601060Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-1-tb-caserta-609437298.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:32:58.6602050Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.5966650Z 12:33:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-nera-500gb-bergamo-607862789.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-nera-500gb-bergamo-607862789.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.5968650Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.5969290Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-nera-500gb-bergamo-607862789.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.5969890Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.6668670Z 12:33:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-destiny-limited-edition-bergamo-558882938.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-destiny-limited-edition-bergamo-558882938.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-nera-500gb-bergamo-607862789.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.6671370Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.6672520Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-destiny-limited-edition-bergamo-558882938.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.6673350Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.7211290Z 12:33:17 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-bari-607637166.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-bari-607637166.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-destiny-limited-edition-bergamo-558882938.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.7213450Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.7215480Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-bari-607637166.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:17.7216220Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:49.1088090Z 12:33:49 [INFO] verify_sold: Chunk 8 completato in 119.7s (2.92 tentativi/s, verificati=17/350) | reason: blocked:http-403=281, blocked:timeout=31, blocked:error=21, active:dom-ok=17
+verify-sold	UNKNOWN STEP	2026-04-09T10:33:49.1089400Z 12:33:49 [INFO] verify_sold: Chunk 9: verifica annunci 2801-3150 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:33.7953320Z 12:34:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-s-roma-588327854.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-s-roma-588327854.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:33.7954340Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:33.7954750Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-s-roma-588327854.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:33.7955130Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:33.8302920Z 12:34:33 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-one-per-pezzi-di-ricambio-torino-587166708.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-one-per-pezzi-di-ricambio-torino-587166708.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-one-s-roma-588327854.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:33.8305170Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:33.8305820Z   - navigating to "https://www.subito.it/videogiochi/xbox-one-per-pezzi-di-ricambio-torino-587166708.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:33.8306470Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.5124520Z 12:34:53 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-con-giochi-roma-625426527.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-con-giochi-roma-625426527.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.5127120Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.5127450Z   - navigating to "https://www.subito.it/videogiochi/xbox-con-giochi-roma-625426527.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.5127720Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.5706650Z 12:34:53 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-hdmi-2-pad-telecomando-20-giochi-bologna-523164105.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-hdmi-2-pad-telecomando-20-giochi-bologna-523164105.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-con-giochi-roma-625426527.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.5708880Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.5709600Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-hdmi-2-pad-telecomando-20-giochi-bologna-523164105.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.5710360Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.8622320Z 12:34:53 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox360-reggio-emilia-625340669.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox360-reggio-emilia-625340669.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.8623800Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.8624090Z   - navigating to "https://www.subito.it/videogiochi/xbox360-reggio-emilia-625340669.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:34:53.8624350Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:35:08.8538110Z 12:35:08 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-kinect-salerno-560828938.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-kinect-salerno-560828938.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:35:08.8538730Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:35:08.8538970Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-kinect-salerno-560828938.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:35:08.8539230Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:35:41.4738520Z 12:35:41 [INFO] verify_sold: Chunk 9 completato in 112.4s (3.11 tentativi/s, verificati=0/350) | reason: blocked:http-403=315, blocked:timeout=29, blocked:error=6
+verify-sold	UNKNOWN STEP	2026-04-09T10:35:42.0685650Z 12:35:42 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-09T10:35:43.1747100Z 12:35:43 [INFO] verify_sold: Browser session restart (chunk 10), pool=6 worker.
+verify-sold	UNKNOWN STEP	2026-04-09T10:35:43.1747770Z 12:35:43 [INFO] verify_sold: Chunk 10: verifica annunci 3151-3500 / 6849
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:34.9057270Z 12:36:34 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-monza-609217349.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-monza-609217349.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:34.9058690Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:34.9059190Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-monza-609217349.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:34.9059750Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:34.9559250Z 12:36:34 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-roma-609038824.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-roma-609038824.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-monza-609217349.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:34.9561570Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:34.9562090Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-roma-609038824.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:34.9562620Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9276420Z 12:36:35 [WARNING] verify_sold: Errore navigazione https://www.subito.it/hobby-collezionismo/x-box-360-accessori-game-player-console-joystick-cagliari-608820555.htm: Page.goto: Navigation to "https://www.subito.it/hobby-collezionismo/x-box-360-accessori-game-player-console-joystick-cagliari-608820555.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9279460Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9281790Z   - navigating to "https://www.subito.it/hobby-collezionismo/x-box-360-accessori-game-player-console-joystick-cagliari-608820555.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9283330Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9661510Z 12:36:35 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-lecce-608743112.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-lecce-608743112.htm" is interrupted by another navigation to "https://www.subito.it/hobby-collezionismo/x-box-360-accessori-game-player-console-joystick-cagliari-608820555.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9663280Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9663840Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-lecce-608743112.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9664420Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9925950Z 12:36:35 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-nuovissima-cosenza-608691984.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-nuovissima-cosenza-608691984.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-lecce-608743112.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9926890Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9927160Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-nuovissima-cosenza-608691984.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:35.9927410Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:58.0724540Z 12:36:58 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-e-tanti-giochi-prezzo-trattabile-viterbo-616889090.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-e-tanti-giochi-prezzo-trattabile-viterbo-616889090.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:58.0742560Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:58.0744040Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-e-tanti-giochi-prezzo-trattabile-viterbo-616889090.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:36:58.0745980Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:13.8809700Z 12:37:13 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-con-scatola-originale-e-manuale-milano-603366321.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-con-scatola-originale-e-manuale-milano-603366321.htm" is interrupted by another navigation to "chrome-error://chromewebdata/"
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:13.8813720Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:13.8814680Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-con-scatola-originale-e-manuale-milano-603366321.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:13.8816060Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:13.9331740Z 12:37:13 [WARNING] verify_sold: Errore navigazione https://www.subito.it/videogiochi/xbox-360-cagliari-603048687.htm: Page.goto: Navigation to "https://www.subito.it/videogiochi/xbox-360-cagliari-603048687.htm" is interrupted by another navigation to "https://www.subito.it/videogiochi/xbox-360-con-scatola-originale-e-manuale-milano-603366321.htm"
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:13.9333530Z Call log:
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:13.9334200Z   - navigating to "https://www.subito.it/videogiochi/xbox-360-cagliari-603048687.htm", waiting until "domcontentloaded"
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:13.9334790Z 
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.5636790Z 12:37:44 [INFO] verify_sold: Chunk 10 completato in 121.4s (2.88 tentativi/s, verificati=1/350) | reason: blocked:http-403=306, blocked:timeout=35, blocked:error=8, active:dom-ok=1
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7589900Z Traceback (most recent call last):
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7590160Z   File "/Users/luke/actions-runner/_work/trader/trader/verify_sold.py", line 1232, in <module>
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7595900Z     asyncio.run(
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7596210Z   File "/opt/homebrew/Cellar/python@3.11/3.11.15/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/runners.py", line 190, in run
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7599060Z     return runner.run(main)
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7599330Z            ^^^^^^^^^^^^^^^^
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7599640Z   File "/opt/homebrew/Cellar/python@3.11/3.11.15/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/runners.py", line 118, in run
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7600490Z     return self._loop.run_until_complete(task)
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7600620Z            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7600930Z   File "/opt/homebrew/Cellar/python@3.11/3.11.15/Frameworks/Python.framework/Versions/3.11/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7603880Z     return future.result()
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7604000Z            ^^^^^^^^^^^^^^^
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7604200Z   File "/Users/luke/actions-runner/_work/trader/trader/verify_sold.py", line 965, in verify_batch
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7605290Z     raise RuntimeError(
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7605520Z RuntimeError: Fail-fast: runner probabilmente bloccato (Akamai/network). blocked=87.11% 403=62.09% su 3500 tentativi
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7821790Z ##[error]Process completed with exit code 1.
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.7877470Z Post job cleanup.
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.9813950Z [command]/usr/bin/git version
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.9894860Z git version 2.50.1 (Apple Git-155)
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.9909240Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/7b13aff8-afec-4926-ae94-4e838ebf6853' before making global git config changes
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.9909640Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.9910990Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:44.9979940Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:45.0042250Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:45.0594200Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:45.0654790Z http.https://github.com/.extraheader
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:45.0659030Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:45.0717190Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:45.1163370Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:45.1228940Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-09T10:37:45.1762090Z Cleaning up orphan processes
