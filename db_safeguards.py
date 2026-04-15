@@ -103,7 +103,7 @@ class DatabaseHealthCheck:
             return {"status": "error", "message": "File not found"}
 
         try:
-            conn = sqlite3.connect(self.db_path, timeout=10)
+            conn = sqlite3.connect(self.db_path, timeout=30)
             cursor = conn.cursor()
 
             # Integrity check
@@ -126,7 +126,7 @@ class DatabaseHealthCheck:
             return {"status": "error", "message": "File not found"}
 
         try:
-            conn = sqlite3.connect(self.db_path, timeout=10)
+            conn = sqlite3.connect(self.db_path, timeout=30)
             cursor = conn.cursor()
 
             cursor.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table'")
@@ -150,7 +150,7 @@ class DatabaseHealthCheck:
             return {"status": "error", "message": "File not found"}
 
         try:
-            conn = sqlite3.connect(self.db_path, timeout=5)
+            conn = sqlite3.connect(self.db_path, timeout=30)
             conn.execute("SELECT 1")
             conn.close()
 
@@ -189,7 +189,7 @@ class DatabaseHealthCheck:
             return {"status": "error", "message": "File not found"}
 
         try:
-            conn = sqlite3.connect(self.db_path, timeout=10)
+            conn = sqlite3.connect(self.db_path, timeout=30)
             cursor = conn.cursor()
 
             # Get all tables
@@ -240,7 +240,7 @@ class DatabaseBackupManager:
 
         try:
             # Verify source integrity before backup
-            conn = sqlite3.connect(self.db_path, timeout=5)
+            conn = sqlite3.connect(self.db_path, timeout=30)
             conn.execute("PRAGMA integrity_check")
             conn.close()
 
@@ -287,7 +287,7 @@ class DatabaseBackupManager:
 
         try:
             # Verify backup integrity
-            conn = sqlite3.connect(backup_path, timeout=5)
+            conn = sqlite3.connect(backup_path, timeout=30)
             conn.execute("PRAGMA integrity_check")
             conn.close()
 

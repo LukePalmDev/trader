@@ -1,0 +1,732 @@
+scrape-subito	UNKNOWN STEP	﻿2026-04-06T17:37:19.0050799Z Current runner version: '2.333.1'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0084960Z ##[group]Runner Image Provisioner
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0086204Z Hosted Compute Agent
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0087243Z Version: 20260213.493
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0088370Z Commit: 5c115507f6dd24b8de37d8bbe0bb4509d0cc0fa3
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0089921Z Build Date: 2026-02-13T00:28:41Z
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0091177Z Worker ID: {b643c7f1-91c6-4b5b-bcda-64044bb61199}
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0092466Z Azure Region: eastus2
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0093394Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0096274Z ##[group]Operating System
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0097201Z Ubuntu
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0098082Z 24.04.4
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0099308Z LTS
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0100198Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0101226Z ##[group]Runner Image
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0102213Z Image: ubuntu-24.04
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0103132Z Version: 20260329.72.1
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0105419Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260329.72/images/ubuntu/Ubuntu2404-Readme.md
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0108232Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260329.72
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0110111Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0111867Z ##[group]GITHUB_TOKEN Permissions
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0114769Z Contents: write
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0116250Z Metadata: read
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0117107Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0120373Z Secret source: Actions
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0121901Z Prepare workflow directory
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0919866Z Prepare all required actions
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.0976973Z Getting action download info
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.4204223Z Download action repository 'actions/checkout@v4' (SHA:34e114876b0b11c390a56381ad16ebd13914f8d5)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.5512486Z Download action repository 'actions/setup-python@v5' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.6675843Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.8759796Z Complete job name: scrape-subito
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9436378Z ##[group]Run actions/checkout@v4
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9437335Z with:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9437985Z   token: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9438466Z   repository: LukePalmDev/trader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9439240Z   ssh-strict: true
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9439689Z   ssh-user: git
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9440142Z   persist-credentials: true
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9440643Z   clean: true
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9441101Z   sparse-checkout-cone-mode: true
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9441633Z   fetch-depth: 1
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9442065Z   fetch-tags: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9442529Z   show-progress: true
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9442999Z   lfs: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9443426Z   submodules: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9443881Z   set-safe-directory: true
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9444634Z env:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9445099Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9445681Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9446464Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9447052Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:19.9447561Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0655115Z Syncing repository: LukePalmDev/trader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0656984Z ##[group]Getting Git version info
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0657739Z Working directory is '/home/runner/work/trader/trader'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0659101Z [command]/usr/bin/git version
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0682229Z git version 2.53.0
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0709788Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0724739Z Temporarily overriding HOME='/home/runner/work/_temp/6bb1707d-8413-470d-a7d9-07e19245de12' before making global git config changes
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0727604Z Adding repository directory to the temporary git global config as a safe directory
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0742022Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/trader/trader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0775516Z Deleting the contents of '/home/runner/work/trader/trader'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0779888Z ##[group]Initializing the repository
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0783865Z [command]/usr/bin/git init /home/runner/work/trader/trader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0867525Z hint: Using 'master' as the name for the initial branch. This default branch name
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0869618Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0870955Z hint: to use in all of your new repositories, which will suppress this warning,
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0871784Z hint: call:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0872200Z hint:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0872731Z hint: 	git config --global init.defaultBranch <name>
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0873376Z hint:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0874104Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0875587Z hint: 'development'. The just-created branch can be renamed via this command:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0876389Z hint:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0876809Z hint: 	git branch -m <name>
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0877314Z hint:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0877953Z hint: Disable this message with "git config set advice.defaultBranchName false"
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0879602Z Initialized empty Git repository in /home/runner/work/trader/trader/.git/
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0881874Z [command]/usr/bin/git remote add origin https://github.com/LukePalmDev/trader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0910092Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0910911Z ##[group]Disabling automatic garbage collection
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0914173Z [command]/usr/bin/git config --local gc.auto 0
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0942096Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0943618Z ##[group]Setting up auth
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0950306Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.0982023Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.1384463Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.1413104Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.1628081Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.1661197Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.1879174Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.1914366Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.1915875Z ##[group]Fetching the repository
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:20.1924765Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +d2f8080b151aed9a67fc221ab384014cf5c71c8c:refs/remotes/origin/main
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9584809Z From https://github.com/LukePalmDev/trader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9586760Z  * [new ref]         d2f8080b151aed9a67fc221ab384014cf5c71c8c -> origin/main
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9615176Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9617273Z ##[group]Determining the checkout info
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9619695Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9623337Z [command]/usr/bin/git sparse-checkout disable
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9662054Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9689611Z ##[group]Checking out the ref
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:22.9693870Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1574804Z Switched to a new branch 'main'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1576742Z branch 'main' set up to track 'origin/main'.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1586426Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1627857Z [command]/usr/bin/git log -1 --format=%H
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1651818Z d2f8080b151aed9a67fc221ab384014cf5c71c8c
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1959658Z ##[group]Run actions/setup-python@v5
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1960745Z with:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1961464Z   python-version: 3.11
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1962306Z   cache: pip
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1963306Z   check-latest: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1964425Z   token: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1965200Z   update-environment: true
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1966113Z   allow-prereleases: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1967020Z   freethreaded: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1967819Z env:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1968565Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1969813Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1971208Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1972154Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.1973045Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.3643010Z ##[group]Installed versions
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.4252978Z Successfully set up CPython (3.11.15)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.4253963Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:23.5146181Z [command]/opt/hostedtoolcache/Python/3.11.15/x64/bin/pip cache dir
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:24.9006587Z /home/runner/.cache/pip
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.0353859Z Cache hit for: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.15-pip-5ee1fa4d3f6da3f69d704fb9039e2c88435ae57ad0910205bacbedd1498bb474
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.5560972Z Received 110394017 of 110394017 (100.0%), 216.6 MBs/sec
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.5589893Z Cache Size: ~105 MB (110394017 B)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.5653750Z [command]/usr/bin/tar -xf /home/runner/work/_temp/9958ead3-a1ad-491c-b7d0-f1a471fdd434/cache.tzst -P -C /home/runner/work/trader/trader --use-compress-program unzstd
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7411396Z Cache restored successfully
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7545433Z Cache restored from key: setup-python-Linux-x64-24.04-Ubuntu-python-3.11.15-pip-5ee1fa4d3f6da3f69d704fb9039e2c88435ae57ad0910205bacbedd1498bb474
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7708236Z ##[group]Run pip install -r requirements.lock
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7708678Z [36;1mpip install -r requirements.lock[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7742435Z shell: /usr/bin/bash -e {0}
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7742702Z env:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7742917Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7743208Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7743691Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7743970Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7744281Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7744722Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7745148Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7745526Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7745902Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7746316Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:25.7746643Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.6272173Z Ignoring tomli: markers 'python_version < "3.11"' don't match your environment
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.7405418Z Collecting playwright==1.52.0 (from -r requirements.lock (line 2))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.7423745Z   Using cached playwright-1.52.0-py3-none-manylinux1_x86_64.whl.metadata (3.5 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.7759493Z Collecting requests==2.31.0 (from -r requirements.lock (line 3))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.7775284Z   Using cached requests-2.31.0-py3-none-any.whl.metadata (4.6 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.7943669Z Collecting beautifulsoup4==4.12.3 (from -r requirements.lock (line 4))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.7959203Z   Using cached beautifulsoup4-4.12.3-py3-none-any.whl.metadata (3.8 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.8385849Z Collecting anthropic==0.86.0 (from -r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:26.9159197Z   Downloading anthropic-0.86.0-py3-none-any.whl.metadata (3.0 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.4197280Z Collecting aiohttp==3.11.14 (from -r requirements.lock (line 7))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.4352632Z   Downloading aiohttp-3.11.14-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.7 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.4556126Z Collecting pyee<14,>=13 (from playwright==1.52.0->-r requirements.lock (line 2))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.4571301Z   Using cached pyee-13.0.1-py3-none-any.whl.metadata (3.0 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.5719419Z Collecting greenlet<4.0.0,>=3.1.1 (from playwright==1.52.0->-r requirements.lock (line 2))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.5736313Z   Using cached greenlet-3.3.2-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (3.7 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.6660717Z Collecting charset-normalizer<4,>=2 (from requests==2.31.0->-r requirements.lock (line 3))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.6744133Z   Downloading charset_normalizer-3.4.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (40 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7038461Z Collecting idna<4,>=2.5 (from requests==2.31.0->-r requirements.lock (line 3))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7054195Z   Using cached idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7294786Z Collecting urllib3<3,>=1.21.1 (from requests==2.31.0->-r requirements.lock (line 3))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7311915Z   Using cached urllib3-2.6.3-py3-none-any.whl.metadata (6.9 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7514898Z Collecting certifi>=2017.4.17 (from requests==2.31.0->-r requirements.lock (line 3))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7529478Z   Using cached certifi-2026.2.25-py3-none-any.whl.metadata (2.5 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7709944Z Collecting soupsieve>1.2 (from beautifulsoup4==4.12.3->-r requirements.lock (line 4))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7724241Z   Using cached soupsieve-2.8.3-py3-none-any.whl.metadata (4.6 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.7945101Z Collecting anyio<5,>=3.5.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.8016100Z   Downloading anyio-4.13.0-py3-none-any.whl.metadata (4.5 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.8168414Z Collecting distro<2,>=1.7.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.8182829Z   Using cached distro-1.9.0-py3-none-any.whl.metadata (6.8 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.8320786Z Collecting docstring-parser<1,>=0.15 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.8399311Z   Downloading docstring_parser-0.17.0-py3-none-any.whl.metadata (3.5 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.8594719Z Collecting httpx<1,>=0.25.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.8608306Z   Using cached httpx-0.28.1-py3-none-any.whl.metadata (7.1 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.9646396Z Collecting jiter<1,>=0.4.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:27.9726456Z   Downloading jiter-0.13.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (5.2 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.0811969Z Collecting pydantic<3,>=1.9.0 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.0827751Z   Using cached pydantic-2.12.5-py3-none-any.whl.metadata (90 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.0986746Z Collecting sniffio (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.1001495Z   Using cached sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.1166518Z Collecting typing-extensions<5,>=4.14 (from anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.1181878Z   Using cached typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.1371286Z Collecting aiohappyeyeballs>=2.3.0 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.1447181Z   Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl.metadata (5.9 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.1613044Z Collecting aiosignal>=1.1.2 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.1704519Z   Downloading aiosignal-1.4.0-py3-none-any.whl.metadata (3.7 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.1960873Z Collecting attrs>=17.3.0 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.2037141Z   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.2719962Z Collecting frozenlist>=1.1.1 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.2806096Z   Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (20 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.5014027Z Collecting multidict<7.0,>=4.5 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.5092330Z   Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.6067401Z Collecting propcache>=0.2.0 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.6145396Z   Downloading propcache-0.4.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (13 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.8502188Z Collecting yarl<2.0,>=1.17.0 (from aiohttp==3.11.14->-r requirements.lock (line 7))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.8596636Z   Downloading yarl-1.23.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.8949852Z Collecting httpcore==1.* (from httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.8964095Z   Using cached httpcore-1.0.9-py3-none-any.whl.metadata (21 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.9104519Z Collecting h11>=0.16 (from httpcore==1.*->httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.9118551Z   Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.9277641Z Collecting annotated-types>=0.6.0 (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:28.9300201Z   Using cached annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7206277Z Collecting pydantic-core==2.41.5 (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7221754Z   Using cached pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (7.3 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7354091Z Collecting typing-inspection>=0.4.2 (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 6))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7367689Z   Using cached typing_inspection-0.4.2-py3-none-any.whl.metadata (2.6 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7530292Z WARNING: The candidate selected for download or install is a yanked version: 'aiohttp' candidate (version 3.11.14 at https://files.pythonhosted.org/packages/51/66/30b217d0de5584650340025a285f1d0abf2039e5a683342891e84f250da9/aiohttp-3.11.14-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from https://pypi.org/simple/aiohttp/) (requires-python:>=3.9))
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7532067Z Reason for being yanked: Regression: https://github.com/aio-libs/aiohttp/issues/10617
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7543637Z Using cached playwright-1.52.0-py3-none-manylinux1_x86_64.whl (45.1 MB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7716598Z Using cached requests-2.31.0-py3-none-any.whl (62 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7730853Z Using cached beautifulsoup4-4.12.3-py3-none-any.whl (147 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.7806259Z Downloading anthropic-0.86.0-py3-none-any.whl (469 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:29.8239532Z Downloading aiohttp-3.11.14-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (1.7 MB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0532685Z    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.7/1.7 MB 6.6 MB/s  0:00:00
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0607691Z Downloading anyio-4.13.0-py3-none-any.whl (114 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0721305Z Downloading charset_normalizer-3.4.7-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (214 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0818667Z Using cached distro-1.9.0-py3-none-any.whl (20 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0901048Z Downloading docstring_parser-0.17.0-py3-none-any.whl (36 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0937976Z Using cached greenlet-3.3.2-cp311-cp311-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (594 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0954357Z Using cached httpx-0.28.1-py3-none-any.whl (73 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0968251Z Using cached httpcore-1.0.9-py3-none-any.whl (78 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.0982263Z Using cached idna-3.11-py3-none-any.whl (71 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1063235Z Downloading jiter-0.13.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (362 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1239903Z Downloading multidict-6.7.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (246 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1330338Z Using cached pydantic-2.12.5-py3-none-any.whl (463 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1346570Z Using cached pydantic_core-2.41.5-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.1 MB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1368000Z Using cached pyee-13.0.1-py3-none-any.whl (15 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1382235Z Using cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1395869Z Using cached urllib3-2.6.3-py3-none-any.whl (131 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1470306Z Downloading yarl-1.23.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (102 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1570067Z Downloading aiohappyeyeballs-2.6.1-py3-none-any.whl (15 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1664665Z Downloading aiosignal-1.4.0-py3-none-any.whl (7.5 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1696322Z Using cached annotated_types-0.7.0-py3-none-any.whl (13 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1777286Z Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1816725Z Using cached certifi-2026.2.25-py3-none-any.whl (153 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1891039Z Downloading frozenlist-1.8.0-cp311-cp311-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (231 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.1977450Z Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.2051492Z Downloading propcache-0.4.1-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (210 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.2132361Z Using cached soupsieve-2.8.3-py3-none-any.whl (37 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.2146312Z Using cached typing_inspection-0.4.2-py3-none-any.whl (14 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.2159754Z Using cached sniffio-1.3.1-py3-none-any.whl (10 kB)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:30.3507283Z Installing collected packages: urllib3, typing-extensions, soupsieve, sniffio, propcache, multidict, jiter, idna, h11, greenlet, frozenlist, docstring-parser, distro, charset-normalizer, certifi, attrs, annotated-types, aiohappyeyeballs, yarl, typing-inspection, requests, pyee, pydantic-core, httpcore, beautifulsoup4, anyio, aiosignal, pydantic, playwright, httpx, aiohttp, anthropic
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:32.6579550Z 
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:32.6600142Z Successfully installed aiohappyeyeballs-2.6.1 aiohttp-3.11.14 aiosignal-1.4.0 annotated-types-0.7.0 anthropic-0.86.0 anyio-4.13.0 attrs-26.1.0 beautifulsoup4-4.12.3 certifi-2026.2.25 charset-normalizer-3.4.7 distro-1.9.0 docstring-parser-0.17.0 frozenlist-1.8.0 greenlet-3.3.2 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.11 jiter-0.13.0 multidict-6.7.1 playwright-1.52.0 propcache-0.4.1 pydantic-2.12.5 pydantic-core-2.41.5 pyee-13.0.1 requests-2.31.0 sniffio-1.3.1 soupsieve-2.8.3 typing-extensions-4.15.0 typing-inspection-0.4.2 urllib3-2.6.3 yarl-1.23.0
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2964687Z ##[group]Run python -m playwright install chromium
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2965124Z [36;1mpython -m playwright install chromium[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2965490Z [36;1mpython -m playwright install-deps chromium[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2993833Z shell: /usr/bin/bash -e {0}
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2994079Z env:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2994288Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2994581Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2995190Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2995487Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2995799Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2996276Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2996692Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2997071Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2997486Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2997877Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.2998200Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.6465557Z Downloading Chromium 136.0.7103.25 (playwright build v1169) from https://cdn.playwright.dev/dbazure/download/playwright/builds/chromium/1169/chromium-linux.zip
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:33.8421063Z |                                                                                |   0% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:34.1294291Z |■■■■■■■■                                                                        |  10% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:34.3221190Z |■■■■■■■■■■■■■■■■                                                                |  20% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:34.6135500Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:34.8977984Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:35.1915487Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:35.5276750Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:36.0061145Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:36.3533283Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:36.5805991Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:36.7509253Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 167.7 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:39.9398230Z Chromium 136.0.7103.25 (playwright build v1169) downloaded to /home/runner/.cache/ms-playwright/chromium-1169
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:39.9400627Z Downloading FFMPEG playwright build v1011 from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.1396831Z |                                                                                |   0% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.1645121Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.1779479Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.1895165Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.1994510Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.2055390Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.2144715Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.2168362Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.2254575Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.2272424Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.2346831Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.2887113Z FFMPEG playwright build v1011 downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.2889902Z Downloading Chromium Headless Shell 136.0.7103.25 (playwright build v1169) from https://cdn.playwright.dev/dbazure/download/playwright/builds/chromium/1169/chromium-headless-shell-linux.zip
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.4977575Z |                                                                                |   0% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.7196722Z |■■■■■■■■                                                                        |  10% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:40.9269421Z |■■■■■■■■■■■■■■■■                                                                |  20% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:41.0609794Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:41.2257159Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:41.4151008Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:41.5807459Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:41.7341212Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:41.8500975Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:42.1310189Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:42.3212293Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 101.4 MiB
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.1577998Z Chromium Headless Shell 136.0.7103.25 (playwright build v1169) downloaded to /home/runner/.cache/ms-playwright/chromium_headless_shell-1169
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.7363664Z Installing dependencies...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.7447812Z Switching to root user to install dependencies...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.8160969Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.8538525Z Hit:6 https://packages.microsoft.com/repos/azure-cli noble InRelease
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.8539836Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.9215926Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.9219732Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.9261701Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.9293041Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.9698531Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main armhf Packages [11.4 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.9795404Z Get:9 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [89.7 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:44.9838423Z Get:10 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [113 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0644164Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1875 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0733015Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [342 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0760050Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [177 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0774162Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 c-n-f Metadata [16.9 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0783587Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1663 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0873439Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [322 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0895825Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [386 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0923184Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 c-n-f Metadata [34.2 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.0947153Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [2894 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1096153Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [671 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1553961Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Components [212 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1563161Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1567923Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [7380 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1573877Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [13.1 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1581039Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-backports/restricted amd64 Components [216 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1587227Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-backports/multiverse amd64 Components [212 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1734835Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1576 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1812371Z Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [252 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1830336Z Get:29 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [21.5 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1839397Z Get:30 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 c-n-f Metadata [10.7 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1850883Z Get:31 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1167 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1904015Z Get:32 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [225 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1919994Z Get:33 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [74.2 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.1928605Z Get:34 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 c-n-f Metadata [22.8 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.2356359Z Get:35 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [2757 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.2552536Z Get:36 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [642 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.2606080Z Get:37 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Components [212 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:45.2612152Z Get:38 http://azure.archive.ubuntu.com/ubuntu noble-security/multiverse amd64 Components [212 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:54.0635677Z Fetched 15.7 MB in 2s (8797 kB/s)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:54.8121153Z Reading package lists...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:54.8356637Z Reading package lists...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.0015931Z Building dependency tree...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.0023413Z Reading state information...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1577687Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.2).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1582368Z libasound2t64 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1583005Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1583762Z libatk-bridge2.0-0t64 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1584595Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1585056Z libatk1.0-0t64 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1585621Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1586004Z libatspi2.0-0t64 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1586351Z libcairo2 is already the newest version (1.18.0-3build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1586688Z libcairo2 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1587052Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.9).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1587424Z libcups2t64 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1587772Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1588239Z libdbus-1-3 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1588699Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1589344Z libdrm2 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1589674Z libgbm1 is already the newest version (25.2.8-0ubuntu0.24.04.1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1590027Z libgbm1 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1590507Z libglib2.0-0t64 is already the newest version (2.80.0-6ubuntu3.8).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1591136Z libglib2.0-0t64 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1591714Z libnspr4 is already the newest version (2:4.35-1.1build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1592301Z libnspr4 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1592849Z libnss3 is already the newest version (2:3.98-1ubuntu0.1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1593363Z libnss3 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1593704Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1594063Z libpango-1.0-0 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1594398Z libx11-6 is already the newest version (2:1.8.7-1build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1594720Z libx11-6 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1595018Z libxcb1 is already the newest version (1.15-1ubuntu2).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1595332Z libxcb1 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1595986Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1596649Z libxcomposite1 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1597253Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1597724Z libxdamage1 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1598062Z libxext6 is already the newest version (2:1.3.4-1build2).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1598397Z libxext6 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1599205Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1599610Z libxfixes3 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1599963Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1600520Z libxkbcommon0 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1601139Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1601785Z libxrandr2 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1602378Z xvfb is already the newest version (2:21.1.12-1ubuntu1.5).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1603197Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1604079Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1604750Z libfontconfig1 set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1605370Z fonts-liberation is already the newest version (1:2.1.5-3).
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1606005Z fonts-liberation set to manually installed.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1606600Z The following additional packages will be installed:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1607182Z   xfonts-encodings xfonts-utils
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1607631Z Recommended packages:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1608061Z   fonts-ipafont-mincho fonts-tlwg-loma
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1795123Z The following NEW packages will be installed:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1795982Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1801806Z   fonts-wqy-zenhei xfonts-cyrillic xfonts-encodings xfonts-scalable
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1802520Z   xfonts-utils
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1806899Z The following packages will be upgraded:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1812068Z   libfreetype6
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1973878Z 1 upgraded, 9 newly installed, 0 to remove and 81 not upgraded.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1974572Z Need to get 21.5 MB of archives.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1975204Z After this operation, 79.5 MB of additional disk space will be used.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.1975948Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.2140884Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.2366413Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.2736939Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.2765880Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.2989977Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.3482150Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libfreetype6 amd64 2.13.2+dfsg-1ubuntu0.1 [402 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.3524497Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.3576925Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.3599201Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.3639668Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6191896Z Fetched 21.5 MB in 0s (120 MB/s)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6447520Z Selecting previously unselected package fonts-ipafont-gothic.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6750068Z (Reading database ... 
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6750862Z (Reading database ... 5%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6751180Z (Reading database ... 10%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6751469Z (Reading database ... 15%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6751744Z (Reading database ... 20%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6752014Z (Reading database ... 25%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6752289Z (Reading database ... 30%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6752674Z (Reading database ... 35%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6752948Z (Reading database ... 40%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6753214Z (Reading database ... 45%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6753928Z (Reading database ... 50%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.6828379Z (Reading database ... 55%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:55.8037433Z (Reading database ... 60%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:56.0008726Z (Reading database ... 65%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:56.1922404Z (Reading database ... 70%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:56.3468096Z (Reading database ... 75%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:56.5558755Z (Reading database ... 80%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:56.7411301Z (Reading database ... 85%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:56.9462880Z (Reading database ... 90%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.0908204Z (Reading database ... 95%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.0908611Z (Reading database ... 100%
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.0909371Z (Reading database ... 220446 files and directories currently installed.)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.0954689Z Preparing to unpack .../0-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.1048482Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.3319116Z Selecting previously unselected package fonts-freefont-ttf.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.3453242Z Preparing to unpack .../1-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.3464814Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.4227898Z Selecting previously unselected package fonts-tlwg-loma-otf.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.4361992Z Preparing to unpack .../2-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.4371656Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.4590735Z Selecting previously unselected package fonts-unifont.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.4723016Z Preparing to unpack .../3-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.4734817Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.9157589Z Selecting previously unselected package fonts-wqy-zenhei.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.9290421Z Preparing to unpack .../4-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:57.9432015Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.7797549Z Preparing to unpack .../5-libfreetype6_2.13.2+dfsg-1ubuntu0.1_amd64.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.7833566Z Unpacking libfreetype6:amd64 (2.13.2+dfsg-1ubuntu0.1) over (2.13.2+dfsg-1build3) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.8088297Z Selecting previously unselected package xfonts-encodings.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.8223672Z Preparing to unpack .../6-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.8234193Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.8527708Z Selecting previously unselected package xfonts-utils.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.8660565Z Preparing to unpack .../7-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.8668257Z Unpacking xfonts-utils (1:7.7+6build3) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.9028270Z Selecting previously unselected package xfonts-cyrillic.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.9161215Z Preparing to unpack .../8-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.9168786Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.9510637Z Selecting previously unselected package xfonts-scalable.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.9644489Z Preparing to unpack .../9-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:58.9652836Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0060416Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0178454Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0201128Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0221099Z Setting up libfreetype6:amd64 (2.13.2+dfsg-1ubuntu0.1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0241202Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0261367Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0325152Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0342018Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0362992Z Setting up xfonts-utils (1:7.7+6build3) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0404611Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.0800783Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.1164932Z Processing triggers for libc-bin (2.39-0ubuntu8.7) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.1659507Z Processing triggers for man-db (2.12.0-4build2) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.1683361Z Not building database; man-db/auto-update is not 'true'.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.1697836Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.8557154Z 
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.8557552Z Running kernel seems to be up-to-date.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.8557872Z 
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.8557985Z Restarting services...
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.8632289Z  systemctl restart php8.3-fpm.service
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.9699409Z 
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.9700308Z No containers need to be restarted.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.9700652Z 
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.9707456Z No user sessions are running outdated binaries.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.9707835Z 
+scrape-subito	UNKNOWN STEP	2026-04-06T17:37:59.9708173Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8087497Z ##[group]Run # Salva hash DB pre-scrape per confronto
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8087967Z [36;1m# Salva hash DB pre-scrape per confronto[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8088356Z [36;1msha_before=$(sha256sum tracker.db | cut -d' ' -f1)[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8088773Z [36;1mpython run.py --source subito 2>&1 | tee /tmp/scrape.log[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8089771Z [36;1msha_after=$(sha256sum tracker.db | cut -d' ' -f1)[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8090134Z [36;1mif [ "$sha_before" = "$sha_after" ]; then[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8090768Z [36;1m  echo "⚠️  DB invariato dopo scrape — possibile fallimento silenzioso"[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8091224Z [36;1m  echo "db_changed=false" >> "$GITHUB_OUTPUT"[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8091523Z [36;1melse[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8091762Z [36;1m  echo "✅ DB aggiornato con nuovi dati"[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8092094Z [36;1m  echo "db_changed=true" >> "$GITHUB_OUTPUT"[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8092381Z [36;1mfi[0m
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8118390Z shell: /usr/bin/bash -e {0}
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8118643Z env:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8119145Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8119452Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8119899Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8120167Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8120481Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8120914Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8121337Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8121733Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8122117Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8122502Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:00.8122827Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:01.0682060Z 17:38:01 [INFO] DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:01.0688942Z 17:38:01 [INFO] Subito DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:01.0696314Z 17:38:01 [INFO] eBay DB pronto: /home/runner/work/trader/trader/tracker.db
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:01.0697144Z 17:38:01 [INFO] ============================================================
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:01.0697828Z 17:38:01 [INFO] Avvio scraper: subito
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:01.8150186Z 17:38:01 [INFO] ============================================================
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:01.8151203Z 17:38:01 [INFO] Subito.it Scraper — Console Xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:01.8151885Z 17:38:01 [INFO] ============================================================
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:02.1616819Z 17:38:02 [INFO] Playwright browser avviato: bundled-chromium
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:02.1620669Z 17:38:02 [INFO] Regione: Lombardia — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:02.1621602Z 17:38:02 [INFO]   Pagina 1: https://www.subito.it/annunci-lombardia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:02.5004730Z 17:38:02 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:04.5027611Z 17:38:04 [INFO]   Pagina 1: https://www.subito.it/annunci-lombardia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:04.6690078Z 17:38:04 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:08.6712596Z 17:38:08 [INFO]   Pagina 1: https://www.subito.it/annunci-lombardia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:08.8238250Z 17:38:08 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:08.8240984Z 17:38:08 [INFO] Regione: Campania — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:08.8241486Z 17:38:08 [INFO]   Pagina 1: https://www.subito.it/annunci-campania/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:08.9949204Z 17:38:08 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:10.9972232Z 17:38:10 [INFO]   Pagina 1: https://www.subito.it/annunci-campania/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:11.1838400Z 17:38:11 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:15.1872370Z 17:38:15 [INFO]   Pagina 1: https://www.subito.it/annunci-campania/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:15.3487597Z 17:38:15 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:15.3491959Z 17:38:15 [INFO] Regione: Lazio — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:15.3492780Z 17:38:15 [INFO]   Pagina 1: https://www.subito.it/annunci-lazio/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:15.5199625Z 17:38:15 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:17.5223450Z 17:38:17 [INFO]   Pagina 1: https://www.subito.it/annunci-lazio/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:17.6979411Z 17:38:17 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:21.7022539Z 17:38:21 [INFO]   Pagina 1: https://www.subito.it/annunci-lazio/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:21.8873445Z 17:38:21 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:21.8874416Z 17:38:21 [INFO] Regione: Veneto — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:21.8875352Z 17:38:21 [INFO]   Pagina 1: https://www.subito.it/annunci-veneto/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:22.0689986Z 17:38:22 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:24.0712951Z 17:38:24 [INFO]   Pagina 1: https://www.subito.it/annunci-veneto/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:24.3708242Z 17:38:24 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:28.3752009Z 17:38:28 [INFO]   Pagina 1: https://www.subito.it/annunci-veneto/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:28.6365171Z 17:38:28 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:28.6366378Z 17:38:28 [INFO] Regione: Puglia — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:28.6367240Z 17:38:28 [INFO]   Pagina 1: https://www.subito.it/annunci-puglia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:28.8034254Z 17:38:28 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:30.8057881Z 17:38:30 [INFO]   Pagina 1: https://www.subito.it/annunci-puglia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:30.9669126Z 17:38:30 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:34.9709520Z 17:38:34 [INFO]   Pagina 1: https://www.subito.it/annunci-puglia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:35.1348321Z 17:38:35 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:35.1349597Z 17:38:35 [INFO] Regione: Sicilia — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:35.1350569Z 17:38:35 [INFO]   Pagina 1: https://www.subito.it/annunci-sicilia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:35.3311618Z 17:38:35 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:37.3335284Z 17:38:37 [INFO]   Pagina 1: https://www.subito.it/annunci-sicilia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:37.5011723Z 17:38:37 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:41.5055010Z 17:38:41 [INFO]   Pagina 1: https://www.subito.it/annunci-sicilia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:41.6789061Z 17:38:41 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:41.6790127Z 17:38:41 [INFO] Regione: Piemonte — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:41.6790978Z 17:38:41 [INFO]   Pagina 1: https://www.subito.it/annunci-piemonte/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:41.9205165Z 17:38:41 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:43.9228696Z 17:38:43 [INFO]   Pagina 1: https://www.subito.it/annunci-piemonte/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:44.0836202Z 17:38:44 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:48.0879197Z 17:38:48 [INFO]   Pagina 1: https://www.subito.it/annunci-piemonte/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:48.3830184Z 17:38:48 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:48.3831216Z 17:38:48 [INFO] Regione: Emilia-Romagna — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:48.3832103Z 17:38:48 [INFO]   Pagina 1: https://www.subito.it/annunci-emilia-romagna/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:48.5256613Z 17:38:48 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:50.5263978Z 17:38:50 [INFO]   Pagina 1: https://www.subito.it/annunci-emilia-romagna/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:50.6774531Z 17:38:50 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:54.6818093Z 17:38:54 [INFO]   Pagina 1: https://www.subito.it/annunci-emilia-romagna/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:54.8207078Z 17:38:54 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:54.8208023Z 17:38:54 [INFO] Regione: Toscana — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:54.8208780Z 17:38:54 [INFO]   Pagina 1: https://www.subito.it/annunci-toscana/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:54.9841126Z 17:38:54 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:56.9861658Z 17:38:56 [INFO]   Pagina 1: https://www.subito.it/annunci-toscana/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:38:57.1508362Z 17:38:57 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:01.1552064Z 17:39:01 [INFO]   Pagina 1: https://www.subito.it/annunci-toscana/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:01.3937700Z 17:39:01 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:01.3939125Z 17:39:01 [INFO] Regione: Marche — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:01.3939931Z 17:39:01 [INFO]   Pagina 1: https://www.subito.it/annunci-marche/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:01.5897653Z 17:39:01 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:03.5919625Z 17:39:03 [INFO]   Pagina 1: https://www.subito.it/annunci-marche/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:03.7684973Z 17:39:03 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:07.7727900Z 17:39:07 [INFO]   Pagina 1: https://www.subito.it/annunci-marche/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:07.9327688Z 17:39:07 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:07.9328784Z 17:39:07 [INFO] Regione: Sardegna — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:07.9329873Z 17:39:07 [INFO]   Pagina 1: https://www.subito.it/annunci-sardegna/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:08.0943978Z 17:39:08 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:10.0967187Z 17:39:10 [INFO]   Pagina 1: https://www.subito.it/annunci-sardegna/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:10.4783850Z 17:39:10 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:14.4827029Z 17:39:14 [INFO]   Pagina 1: https://www.subito.it/annunci-sardegna/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:14.6646141Z 17:39:14 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:14.6647030Z 17:39:14 [INFO] Regione: Liguria — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:14.6647950Z 17:39:14 [INFO]   Pagina 1: https://www.subito.it/annunci-liguria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:14.8259739Z 17:39:14 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:16.8279952Z 17:39:16 [INFO]   Pagina 1: https://www.subito.it/annunci-liguria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:17.0169484Z 17:39:17 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:21.0212383Z 17:39:21 [INFO]   Pagina 1: https://www.subito.it/annunci-liguria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:21.1761281Z 17:39:21 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:21.1761923Z 17:39:21 [INFO] Regione: Friuli-Venezia Giulia — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:21.1762475Z 17:39:21 [INFO]   Pagina 1: https://www.subito.it/annunci-friuli-venezia-giulia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:21.3192269Z 17:39:21 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:23.3216074Z 17:39:23 [INFO]   Pagina 1: https://www.subito.it/annunci-friuli-venezia-giulia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:23.4723577Z 17:39:23 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:27.4764863Z 17:39:27 [INFO]   Pagina 1: https://www.subito.it/annunci-friuli-venezia-giulia/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:27.6420230Z 17:39:27 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:27.6422035Z 17:39:27 [INFO] Regione: Calabria — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:27.6422702Z 17:39:27 [INFO]   Pagina 1: https://www.subito.it/annunci-calabria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:27.7908488Z 17:39:27 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:29.7932593Z 17:39:29 [INFO]   Pagina 1: https://www.subito.it/annunci-calabria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:29.9610746Z 17:39:29 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:33.9653586Z 17:39:33 [INFO]   Pagina 1: https://www.subito.it/annunci-calabria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:34.2130419Z 17:39:34 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:34.2131511Z 17:39:34 [INFO] Regione: Abruzzo — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:34.2132229Z 17:39:34 [INFO]   Pagina 1: https://www.subito.it/annunci-abruzzo/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:34.3597241Z 17:39:34 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:36.3620048Z 17:39:36 [INFO]   Pagina 1: https://www.subito.it/annunci-abruzzo/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:36.5110139Z 17:39:36 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:40.5153027Z 17:39:40 [INFO]   Pagina 1: https://www.subito.it/annunci-abruzzo/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:40.7245237Z 17:39:40 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:40.7246363Z 17:39:40 [INFO] Regione: Trentino-Alto Adige — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:40.7247286Z 17:39:40 [INFO]   Pagina 1: https://www.subito.it/annunci-trentino-alto-adige/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:40.8832306Z 17:39:40 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:42.8854527Z 17:39:42 [INFO]   Pagina 1: https://www.subito.it/annunci-trentino-alto-adige/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:43.0819667Z 17:39:43 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:47.0862875Z 17:39:47 [INFO]   Pagina 1: https://www.subito.it/annunci-trentino-alto-adige/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:47.2302599Z 17:39:47 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:47.2305156Z 17:39:47 [INFO] Regione: Umbria — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:47.2305922Z 17:39:47 [INFO]   Pagina 1: https://www.subito.it/annunci-umbria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:47.3780220Z 17:39:47 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:49.3803260Z 17:39:49 [INFO]   Pagina 1: https://www.subito.it/annunci-umbria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:49.5305116Z 17:39:49 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:53.5348612Z 17:39:53 [INFO]   Pagina 1: https://www.subito.it/annunci-umbria/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:53.6728156Z 17:39:53 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:53.6729504Z 17:39:53 [INFO] Regione: Molise — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:53.6730245Z 17:39:53 [INFO]   Pagina 1: https://www.subito.it/annunci-molise/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:53.8148725Z 17:39:53 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:55.8171716Z 17:39:55 [INFO]   Pagina 1: https://www.subito.it/annunci-molise/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:39:56.0938670Z 17:39:56 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:00.0980339Z 17:40:00 [INFO]   Pagina 1: https://www.subito.it/annunci-molise/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:00.2908682Z 17:40:00 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:00.2909914Z 17:40:00 [INFO] Regione: Basilicata — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:00.2910707Z 17:40:00 [INFO]   Pagina 1: https://www.subito.it/annunci-basilicata/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:00.4377178Z 17:40:00 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:02.4401105Z 17:40:02 [INFO]   Pagina 1: https://www.subito.it/annunci-basilicata/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:02.6096541Z 17:40:02 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:06.6140887Z 17:40:06 [INFO]   Pagina 1: https://www.subito.it/annunci-basilicata/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:06.7663064Z 17:40:06 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:06.7665284Z 17:40:06 [INFO] Regione: Valle d'Aosta — query 'xbox'
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:06.7666147Z 17:40:06 [INFO]   Pagina 1: https://www.subito.it/annunci-valle-d-aosta/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:06.9581278Z 17:40:06 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 1/3). Retry pagina tra 2.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:08.9605144Z 17:40:08 [INFO]   Pagina 1: https://www.subito.it/annunci-valle-d-aosta/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:09.1179510Z 17:40:09 [WARNING]   __NEXT_DATA__ non disponibile (tentativo locale 2/3). Retry pagina tra 4.0s…
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.1223478Z 17:40:13 [INFO]   Pagina 1: https://www.subito.it/annunci-valle-d-aosta/vendita/usato/?q=xbox
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.2731477Z 17:40:13 [WARNING]   __NEXT_DATA__ non disponibile per 3 volte consecutive — stop query.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3001833Z 17:40:13 [INFO] Annunci unici dopo deduplica: 0 (da 0 totali)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3006993Z 17:40:13 [INFO] Totale annunci unici: 0
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3010502Z 17:40:13 [INFO] Salvato: subito_2026-04-06_17-40-13.json  (0 prodotti)
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3020203Z 17:40:13 [INFO] Run report scritto in: /home/runner/work/trader/trader/logs/run_report_2026-04-06_17-40-13.json
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3756792Z ⚠️  DB invariato dopo scrape — possibile fallimento silenzioso
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3877026Z ##[group]Run actions/upload-artifact@v4
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3877331Z with:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3877535Z   name: scrape-log-24042777285
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3877787Z   path: /tmp/scrape.log
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3878012Z   retention-days: 3
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3878220Z   if-no-files-found: warn
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3878449Z   compression-level: 6
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3878662Z   overwrite: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3879060Z   include-hidden-files: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3879291Z env:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3879485Z   TRADER_PLAYWRIGHT_CHANNEL: chromium
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3879777Z   TRADER_VIEWER_OPEN_BROWSER: false
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3880210Z   TRADER_TELEGRAM_TOKEN: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3880472Z   TRADER_TELEGRAM_CHAT_ID: ***
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3880782Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3881222Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib/pkgconfig
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3881682Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3882060Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3882441Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.15/x64
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3882825Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.15/x64/lib
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.3883145Z ##[endgroup]
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.6133167Z With the provided path, there will be 1 file uploaded
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.6138789Z Artifact name is valid!
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.6140507Z Root directory input is valid!
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.7101542Z Beginning upload of artifact content to blob storage
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.7536046Z Uploaded bytes 1403
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.7695746Z Finished uploading artifact content to blob storage!
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.7699541Z SHA256 digest of uploaded artifact zip is acecad6e035094462b4170cc5b9ecc30def9a07387ee23779d4dd17ec47c6964
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.7702145Z Finalizing artifact upload
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.8764539Z Artifact scrape-log-24042777285.zip successfully finalized. Artifact ID 6291030654
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.8766389Z Artifact scrape-log-24042777285 has been successfully uploaded! Final size is 1403 bytes. Artifact ID is 6291030654
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.8774989Z Artifact download URL: https://github.com/LukePalmDev/trader/actions/runs/24042777285/artifacts/6291030654
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:13.8933996Z Post job cleanup.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.0525694Z Cache hit occurred on the primary key setup-python-Linux-x64-24.04-Ubuntu-python-3.11.15-pip-5ee1fa4d3f6da3f69d704fb9039e2c88435ae57ad0910205bacbedd1498bb474, not saving cache.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.0638264Z Post job cleanup.
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.1638719Z [command]/usr/bin/git version
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.1681227Z git version 2.53.0
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.1728015Z Temporarily overriding HOME='/home/runner/work/_temp/bd895bb5-720d-4680-b6cf-3d01be06b37c' before making global git config changes
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.1729903Z Adding repository directory to the temporary git global config as a safe directory
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.1735538Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/trader/trader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.1805785Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.1821490Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.2059588Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.2083758Z http.https://github.com/.extraheader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.2097585Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.2132492Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.2370841Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.2409177Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.2766615Z Cleaning up orphan processes
+scrape-subito	UNKNOWN STEP	2026-04-06T17:40:14.3189651Z ##[warning]Node.js 20 actions are deprecated. The following actions are running on Node.js 20 and may not work as expected: actions/checkout@v4, actions/setup-python@v5, actions/upload-artifact@v4. Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026. Please check if updated versions of these actions are available that support Node.js 24. To opt into Node.js 24 now, set the FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true environment variable on the runner or in your workflow file. Once Node.js 24 becomes the default, you can temporarily opt out by setting ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

@@ -1,0 +1,500 @@
+verify-sold	UNKNOWN STEP	﻿2026-04-13T16:12:02.3224900Z Current runner version: '2.333.1'
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3227210Z Runner name: 'mac-mini-luke'
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3227500Z Runner group name: 'Default'
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3227830Z Machine name: 'Mac-mini'
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3228920Z ##[group]GITHUB_TOKEN Permissions
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3229550Z Actions: write
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3229770Z Contents: write
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3229970Z Metadata: read
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3230190Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3231000Z Secret source: Actions
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3231330Z Prepare workflow directory
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3702390Z Prepare all required actions
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:02.3719530Z Getting action download info
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.0265680Z Download action repository 'actions/checkout@v5' (SHA:93cb6efe18208431cddfb8368fd83d5badbf9bfd)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7447340Z Complete job name: verify-sold
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7737980Z ##[group]Run actions/checkout@v5
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7738310Z with:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7738600Z   token: ***
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7738790Z   ref: main
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7739000Z   repository: LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7739240Z   ssh-strict: true
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7739450Z   ssh-user: git
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7739650Z   persist-credentials: true
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7739880Z   clean: true
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7740090Z   sparse-checkout-cone-mode: true
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7740330Z   fetch-depth: 1
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7740530Z   fetch-tags: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7740730Z   show-progress: true
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7740950Z   lfs: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7741140Z   submodules: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7741350Z   set-safe-directory: true
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7741620Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7741830Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7742090Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.7742340Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9454260Z Syncing repository: LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9455040Z ##[group]Getting Git version info
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9455400Z Working directory is '/Users/luke/actions-runner/_work/trader/trader'
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9455920Z [command]/usr/bin/git version
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9539370Z git version 2.50.1 (Apple Git-155)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9546870Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9551870Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/a656b041-8ef0-4063-9acd-bbb417529094' before making global git config changes
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9552630Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9553460Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9624040Z [command]/usr/bin/git config --local --get remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9681530Z https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9687790Z ##[group]Removing previously created refs, to avoid conflicts
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9689150Z [command]/usr/bin/git rev-parse --symbolic-full-name --verify --quiet HEAD
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9747330Z refs/heads/main
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9750700Z [command]/usr/bin/git checkout --detach
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9849290Z HEAD is now at d4d09a4 chore: scrape subito 2026-04-13T15:15
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9851640Z M	alert_log.json
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9920280Z [command]/usr/bin/git branch --delete --force main
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:03.9987860Z Deleted branch main (was d4d09a4).
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0057870Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0058490Z [command]/usr/bin/git submodule status
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0563950Z ##[group]Cleaning the repository
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0565080Z [command]/usr/bin/git clean -ffdx
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0793180Z Removing __pycache__/
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0793480Z Removing data/
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0793730Z Removing logs/run_report_2026-04-13_17-15-54.json
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0794050Z Removing scrapers/__pycache__/
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0797150Z [command]/usr/bin/git reset --hard HEAD
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0927710Z HEAD is now at d4d09a4 chore: scrape subito 2026-04-13T15:15
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0930130Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0931330Z ##[group]Disabling automatic garbage collection
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.0932790Z [command]/usr/bin/git config --local gc.auto 0
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.1000710Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.1001070Z ##[group]Setting up auth
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.1003300Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.1061330Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.1508450Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.1570950Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.2015840Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.2081380Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.2528060Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.2595030Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.2595430Z ##[group]Fetching the repository
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:04.2598150Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.6893590Z From https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.6893970Z  + d4d09a4...040b7c2 main       -> origin/main  (forced update)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.6929430Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.6929760Z ##[group]Determining the checkout info
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.6931950Z [command]/usr/bin/git branch --list --remote origin/main
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.6999900Z   origin/main
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.7002000Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.7003890Z [command]/usr/bin/git sparse-checkout disable
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.7080930Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.7140780Z ##[group]Checking out the ref
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.7141580Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8601620Z Warning: you are leaving 2 commits behind, not connected to
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8601840Z any of your branches:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8601930Z 
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8602030Z   d4d09a4 chore: scrape subito 2026-04-13T15:15
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8602270Z   eb1bde0 chore: verify-sold 2026-04-13
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8602390Z 
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8602510Z If you want to keep them by creating a new branch, this may be a good time
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8602750Z to do so with:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8602810Z 
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8602890Z  git branch <new-branch-name> d4d09a4
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8603030Z 
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8614290Z Switched to a new branch 'main'
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8617390Z branch 'main' set up to track 'origin/main'.
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8621280Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8698650Z [command]/usr/bin/git log -1 --format=%H
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8758430Z 040b7c24372ec0773e743fe78356bdca99082336
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8860910Z ##[group]Run git pull --rebase
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8861160Z [36;1mgit pull --rebase[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8878040Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8878160Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8878260Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8878420Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:05.8878550Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.4034640Z Already up to date.
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.4084190Z ##[group]Run python3.11 -m pip install -r requirements.lock
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.4084650Z [36;1mpython3.11 -m pip install -r requirements.lock[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.4113850Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.4114060Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.4114930Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.4115170Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.4115490Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6662270Z Ignoring tomli: markers 'python_version < "3.11"' don't match your environment
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6664060Z Requirement already satisfied: playwright==1.52.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 2)) (1.52.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6665700Z Requirement already satisfied: playwright-stealth==2.0.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 3)) (2.0.3)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6667180Z Requirement already satisfied: patchright==1.58.2 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 4)) (1.58.2)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6668640Z Requirement already satisfied: curl-cffi==0.15.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 5)) (0.15.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6670080Z Requirement already satisfied: requests==2.31.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 6)) (2.31.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6671280Z Requirement already satisfied: beautifulsoup4==4.12.3 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 7)) (4.12.3)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6672850Z Requirement already satisfied: anthropic==0.86.0 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 9)) (0.86.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6674630Z Requirement already satisfied: aiohttp==3.11.14 in /opt/homebrew/lib/python3.11/site-packages (from -r requirements.lock (line 10)) (3.11.14)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6680910Z Requirement already satisfied: pyee<14,>=13 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (13.0.1)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6682450Z Requirement already satisfied: greenlet<4.0.0,>=3.1.1 in /opt/homebrew/lib/python3.11/site-packages (from playwright==1.52.0->-r requirements.lock (line 2)) (3.3.2)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6701090Z Requirement already satisfied: cffi>=2.0.0 in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (2.0.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6702490Z Requirement already satisfied: certifi>=2024.2.2 in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (2026.2.25)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6704020Z Requirement already satisfied: rich in /opt/homebrew/lib/python3.11/site-packages (from curl-cffi==0.15.0->-r requirements.lock (line 5)) (14.3.4)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6717700Z Requirement already satisfied: charset-normalizer<4,>=2 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (3.4.7)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6719330Z Requirement already satisfied: idna<4,>=2.5 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (3.11)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6721080Z Requirement already satisfied: urllib3<3,>=1.21.1 in /opt/homebrew/lib/python3.11/site-packages (from requests==2.31.0->-r requirements.lock (line 6)) (2.6.3)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6728200Z Requirement already satisfied: soupsieve>1.2 in /opt/homebrew/lib/python3.11/site-packages (from beautifulsoup4==4.12.3->-r requirements.lock (line 7)) (2.8.3)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6736160Z Requirement already satisfied: anyio<5,>=3.5.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (4.13.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6737610Z Requirement already satisfied: distro<2,>=1.7.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (1.9.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6739700Z Requirement already satisfied: docstring-parser<1,>=0.15 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.17.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6740670Z Requirement already satisfied: httpx<1,>=0.25.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.28.1)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6742110Z Requirement already satisfied: jiter<1,>=0.4.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (0.13.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6743630Z Requirement already satisfied: pydantic<3,>=1.9.0 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (2.12.5)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6744810Z Requirement already satisfied: sniffio in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (1.3.1)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6746360Z Requirement already satisfied: typing-extensions<5,>=4.14 in /opt/homebrew/lib/python3.11/site-packages (from anthropic==0.86.0->-r requirements.lock (line 9)) (4.15.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6757820Z Requirement already satisfied: aiohappyeyeballs>=2.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (2.6.1)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6759120Z Requirement already satisfied: aiosignal>=1.1.2 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.4.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6760890Z Requirement already satisfied: attrs>=17.3.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (26.1.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6762410Z Requirement already satisfied: frozenlist>=1.1.1 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.8.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6763850Z Requirement already satisfied: multidict<7.0,>=4.5 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (6.7.1)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6765230Z Requirement already satisfied: propcache>=0.2.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (0.4.1)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6766690Z Requirement already satisfied: yarl<2.0,>=1.17.0 in /opt/homebrew/lib/python3.11/site-packages (from aiohttp==3.11.14->-r requirements.lock (line 10)) (1.23.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6804960Z Requirement already satisfied: httpcore==1.* in /opt/homebrew/lib/python3.11/site-packages (from httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 9)) (1.0.9)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6815060Z Requirement already satisfied: h11>=0.16 in /opt/homebrew/lib/python3.11/site-packages (from httpcore==1.*->httpx<1,>=0.25.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.16.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6842280Z Requirement already satisfied: annotated-types>=0.6.0 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.7.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6843720Z Requirement already satisfied: pydantic-core==2.41.5 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (2.41.5)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6845600Z Requirement already satisfied: typing-inspection>=0.4.2 in /opt/homebrew/lib/python3.11/site-packages (from pydantic<3,>=1.9.0->anthropic==0.86.0->-r requirements.lock (line 9)) (0.4.2)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6915630Z Requirement already satisfied: pycparser in /opt/homebrew/lib/python3.11/site-packages (from cffi>=2.0.0->curl-cffi==0.15.0->-r requirements.lock (line 5)) (3.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6958060Z Requirement already satisfied: markdown-it-py>=2.2.0 in /opt/homebrew/lib/python3.11/site-packages (from rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (4.0.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6959690Z Requirement already satisfied: pygments<3.0.0,>=2.13.0 in /opt/homebrew/lib/python3.11/site-packages (from rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (2.20.0)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.6974020Z Requirement already satisfied: mdurl~=0.1 in /opt/homebrew/lib/python3.11/site-packages (from markdown-it-py>=2.2.0->rich->curl-cffi==0.15.0->-r requirements.lock (line 5)) (0.1.2)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.7301030Z ##[group]Run python3.11 -m patchright install chromium
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.7301230Z [36;1mpython3.11 -m patchright install chromium[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.7314390Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.7314490Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.7314580Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.7314710Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:06.7314820Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0779830Z ##[group]Run set +e
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0779980Z [36;1mset +e[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0780080Z [36;1mpython3.11 verify_sold.py \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0780200Z [36;1m  --all \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0780300Z [36;1m  --max-runtime-minutes 55 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0780430Z [36;1m  --concurrency 12 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0780540Z [36;1m  --cffi-concurrency 10 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0780650Z [36;1m  --chunk-size 200 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0780770Z [36;1m  --browser-restart-every 4 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0780890Z [36;1m  --nav-timeout-ms 7000 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0781000Z [36;1m  --max-http403-ratio 0.02 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0781150Z [36;1m  --min-coverage-ratio 0.85 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0781290Z [36;1m  --fail-fast-min-attempts 400 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0781440Z [36;1m  --fail-fast-blocked-ratio 0.85 \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0781570Z [36;1m  --fail-fast-403-ratio 0.60[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0781700Z [36;1mVERIFY_EXIT=$?[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0781840Z [36;1mecho "exit_code=${VERIFY_EXIT}" >> "$GITHUB_OUTPUT"[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0782070Z [36;1m# Exit code 3 = coverage sotto soglia: non fallire il job (il retry step gestisce)[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0782330Z [36;1m# Tutti gli altri errori (1, 2, …) falliscono il job normalmente[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0782550Z [36;1m[ "${VERIFY_EXIT}" -eq 0 ] || [ "${VERIFY_EXIT}" -eq 3 ] || exit "${VERIFY_EXIT}"[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0794670Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0794770Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0794880Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0794990Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.0795100Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:07.2177760Z 18:12:07 [INFO] db_subito: Subito DB pronto: /Users/luke/actions-runner/_work/trader/trader/tracker.db
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:08.0488200Z 18:12:08 [INFO] verify_sold: Warmup probe: 10 URL → sold=1 active=9 unknown=0 (0%)
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:08.1065090Z 18:12:08 [INFO] verify_sold: Selezione verify-sold: totale=33979 | status_ok=8458 | attivi_non_venduti=7156 | subset_finale=6881 | esclusi_da_xbox_only=275
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:08.1065910Z 18:12:08 [INFO] verify_sold: Inizio verifica di 6881 annunci (concorrenza=12, cffi=10, chunk=200, stati=approved,pending) | filtro xbox-only ON…
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:09.1899040Z 18:12:09 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:11.7986660Z 18:12:11 [INFO] verify_sold: Browser session restart (chunk 1), pool=12 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:11.7986940Z 18:12:11 [INFO] verify_sold: Chunk 1: verifica annunci 1-200 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4248730Z 18:12:17 [INFO] verify_sold: cffi precheck: sold=19 | active=181 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4271130Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-piu-ps4-messina-621525315.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4272800Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-serie-s-completa-di-scatola-e-manuali-modena-639673631.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4274600Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-500gb-ac-origins-2-controller-36-giochi-perugia-637831933.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4275930Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-varese-637830670.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4277070Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1tb-bolzano-621847085.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4278150Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-512gb-salerno-640705184.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4279450Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-512gb-controller-turtle-beach-perugia-640818096.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4291710Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-elite-120gb-black-completa-con-scatola-foggia-642613053.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4294470Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-controller-reggio-calabria-642712125.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4295690Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-trieste-642139733.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4296870Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-500gb-console-con-accessori-firenze-635801760.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4298040Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-roma-597987154.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4299160Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1-t-siracusa-597979582.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4300230Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-1-t-siracusa-597975510.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4301600Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-da-1-t-leggi-la-descrizione-siracusa-597974005.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4303120Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/console-microsoft-xbox-series-s-512gb-con-pad-nero-milano-640919485.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4304640Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-s-series-digital-512gb-come-nuova-alessandria-642318553.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4305920Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-forli-cesena-641773111.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4307040Z 18:12:17 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-s-1tb-lucca-641698427.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4476960Z 18:12:17 [INFO] verify_sold: Chunk 1 completato in 5.6s (35.41 tentativi/s, verificati=200/200) | reason: active:cffi-200=181, sold:cffi-410=19
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:17.4479880Z 18:12:17 [INFO] verify_sold: Chunk 2: verifica annunci 201-400 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:23.7536550Z 18:12:23 [INFO] verify_sold: cffi precheck: sold=1 | active=199 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:23.7576760Z 18:12:23 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-cosenza-632117984.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:23.7630300Z 18:12:23 [INFO] verify_sold: Chunk 2 completato in 6.3s (31.67 tentativi/s, verificati=200/200) | reason: active:cffi-200=199, sold:cffi-410=1
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:23.7632500Z 18:12:23 [INFO] verify_sold: Chunk 3: verifica annunci 401-600 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:30.9120450Z 18:12:30 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:30.9220160Z 18:12:30 [INFO] verify_sold: Chunk 3 completato in 7.2s (27.94 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:30.9223400Z 18:12:30 [INFO] verify_sold: Chunk 4: verifica annunci 601-800 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:37.7921950Z 18:12:37 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:37.8035510Z 18:12:37 [INFO] verify_sold: Chunk 4 completato in 6.9s (29.07 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:55.4973900Z 18:12:55 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:58.4998430Z 18:12:58 [INFO] verify_sold: Browser session restart (chunk 5), pool=12 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:12:58.4998700Z 18:12:58 [INFO] verify_sold: Chunk 5: verifica annunci 801-1000 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:05.2832380Z 18:13:05 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:05.3016070Z 18:13:05 [INFO] verify_sold: Chunk 5 completato in 6.8s (29.40 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:05.3021000Z 18:13:05 [INFO] verify_sold: Chunk 6: verifica annunci 1001-1200 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:22.6018660Z 18:13:22 [INFO] verify_sold: cffi precheck: sold=1 | active=189 | unknown(→Playwright)=10
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:25.0660410Z 18:13:25 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-18-videogiochi-2-controller-omaggio-nuoro-621103421.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:25.0954390Z 18:13:25 [INFO] verify_sold: Chunk 6 completato in 19.8s (10.10 tentativi/s, verificati=200/200) | reason: active:cffi-200=189, active:dom-ok=10, sold:cffi-410=1
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:25.0954960Z 18:13:25 [INFO] verify_sold: Chunk 7: verifica annunci 1201-1400 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:27.7503360Z 18:13:27 [INFO] verify_sold: cffi precheck: sold=0 | active=25 | unknown(→Playwright)=175
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:27.7504610Z 18:13:27 [WARNING] verify_sold: cffi blocco massivo (88% unknown, sem=10): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:27.7647690Z 18:13:27 [INFO] verify_sold: Chunk 7 completato in 2.7s (84.30 tentativi/s, verificati=25/225) | reason: skipped:cffi-block=200, active:cffi-200=25
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:27.7650460Z 18:13:27 [WARNING] verify_sold: Chunk 7 in cffi-block (88.9%): cffi 10 -> 6
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:27.7651450Z 18:13:27 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-13T16:13:57.7658370Z 18:13:57 [WARNING] verify_sold: Chunk 7 instabile (88.9% error/ban): concorrenza 12 -> 8
+verify-sold	UNKNOWN STEP	2026-04-13T16:14:01.5096800Z 18:14:01 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:14:10.5024800Z 18:14:10 [INFO] verify_sold: Browser session restart (chunk 8), pool=8 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:14:10.5025750Z 18:14:10 [INFO] verify_sold: Chunk 8: verifica annunci 1401-1600 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:14:13.7845130Z 18:14:13 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:14:13.7847430Z 18:14:13 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=6): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-13T16:14:13.7998090Z 18:14:13 [INFO] verify_sold: Chunk 8 completato in 3.3s (60.66 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:14:13.8000770Z 18:14:13 [WARNING] verify_sold: Chunk 8 in cffi-block (100.0%): cffi 6 -> 4
+verify-sold	UNKNOWN STEP	2026-04-13T16:14:13.8001660Z 18:14:13 [WARNING] verify_sold: Cloudflare burst rilevato (2 chunk consecutivi con cffi-block): pausa 60s
+verify-sold	UNKNOWN STEP	2026-04-13T16:15:13.8073150Z 18:15:13 [WARNING] verify_sold: Chunk 8 instabile (100.0% error/ban): concorrenza 8 -> 4
+verify-sold	UNKNOWN STEP	2026-04-13T16:15:14.3334200Z 18:15:14 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:15:14.8350180Z 18:15:14 [INFO] verify_sold: Browser session restart (chunk 9), pool=4 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:15:14.8350480Z 18:15:14 [INFO] verify_sold: Chunk 9: verifica annunci 1601-1800 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:15:19.6463490Z 18:15:19 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:15:19.6464940Z 18:15:19 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=4): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-13T16:15:19.6617020Z 18:15:19 [INFO] verify_sold: Chunk 9 completato in 4.8s (41.44 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:15:19.6619500Z 18:15:19 [WARNING] verify_sold: Cloudflare burst rilevato (3 chunk consecutivi con cffi-block): pausa 120s
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:20.2187900Z 18:17:20 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:21.4433900Z 18:17:21 [INFO] verify_sold: Browser session restart (chunk 10), pool=4 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:21.4434900Z 18:17:21 [INFO] verify_sold: Chunk 10: verifica annunci 1801-2000 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:37.9728490Z 18:17:37 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:37.9932150Z 18:17:37 [INFO] verify_sold: Chunk 10 completato in 16.6s (12.08 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:37.9935080Z 18:17:37 [INFO] verify_sold: cffi recovery dopo 3 chunk bloccati consecutivi.
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:37.9935670Z 18:17:37 [INFO] verify_sold: Chunk 10 stabile: cffi 4 -> 6
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:37.9936340Z 18:17:37 [INFO] verify_sold: Chunk 10 stabile (0.0% error/ban): concorrenza 4 -> 6
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:38.4268940Z 18:17:38 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:39.2022450Z 18:17:39 [INFO] verify_sold: Browser session restart (chunk 11), pool=6 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:39.2024130Z 18:17:39 [INFO] verify_sold: Chunk 11: verifica annunci 2001-2200 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:42.5393340Z 18:17:42 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:42.5394770Z 18:17:42 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=6): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:42.5503700Z 18:17:42 [INFO] verify_sold: Chunk 11 completato in 3.3s (59.74 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:42.5507620Z 18:17:42 [WARNING] verify_sold: Chunk 11 in cffi-block (100.0%): cffi 6 -> 4
+verify-sold	UNKNOWN STEP	2026-04-13T16:17:42.5508400Z 18:17:42 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:12.5520010Z 18:18:12 [WARNING] verify_sold: Chunk 11 instabile (100.0% error/ban): concorrenza 6 -> 4
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:23.7897560Z 18:18:23 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:24.6492990Z 18:18:24 [INFO] verify_sold: Browser session restart (chunk 12), pool=4 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:24.6493310Z 18:18:24 [INFO] verify_sold: Chunk 12: verifica annunci 2201-2400 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:41.3829180Z 18:18:41 [INFO] verify_sold: cffi precheck: sold=1 | active=199 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:41.3861210Z 18:18:41 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1tb-treviso-642134410.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:41.4064340Z 18:18:41 [INFO] verify_sold: Chunk 12 completato in 16.8s (11.94 tentativi/s, verificati=200/200) | reason: active:cffi-200=199, sold:cffi-410=1
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:41.4065880Z 18:18:41 [INFO] verify_sold: cffi recovery dopo 1 chunk bloccati consecutivi.
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:41.4066380Z 18:18:41 [INFO] verify_sold: Chunk 12 stabile: cffi 4 -> 6
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:41.4067360Z 18:18:41 [INFO] verify_sold: Chunk 12 stabile (0.0% error/ban): concorrenza 4 -> 6
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:41.8368940Z 18:18:41 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:43.2628260Z 18:18:43 [INFO] verify_sold: Browser session restart (chunk 13), pool=6 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:43.2629150Z 18:18:43 [INFO] verify_sold: Chunk 13: verifica annunci 2401-2600 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2574350Z 18:18:53 [INFO] verify_sold: cffi precheck: sold=9 | active=191 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2608430Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-2-joystick-e-kinect-sud-sardegna-598017109.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2610010Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-controller-frosinone-597994409.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2611460Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-bianco-white-digital-512gb-roma-641385484.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2619050Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-reggio-emilia-636625448.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2624350Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-series-x-la-spezia-625203768.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2629540Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-e-gioco-f1-23-udine-640847565.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2631410Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-milano-642684283.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2635170Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-s-cagliari-642754397.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2638520Z 18:18:53 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-vecchia-milano-642968243.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2876660Z 18:18:53 [INFO] verify_sold: Chunk 13 completato in 10.0s (19.95 tentativi/s, verificati=200/200) | reason: active:cffi-200=191, sold:cffi-410=9
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2878480Z 18:18:53 [INFO] verify_sold: Chunk 13 stabile: cffi 6 -> 8
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.2879730Z 18:18:53 [INFO] verify_sold: Chunk 13 stabile (0.0% error/ban): concorrenza 6 -> 8
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:53.7366910Z 18:18:53 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:54.5882380Z 18:18:54 [INFO] verify_sold: Browser session restart (chunk 14), pool=8 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:54.5882790Z 18:18:54 [INFO] verify_sold: Chunk 14: verifica annunci 2601-2800 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:57.5983330Z 18:18:57 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:57.5984530Z 18:18:57 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=8): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:57.6131860Z 18:18:57 [INFO] verify_sold: Chunk 14 completato in 3.0s (66.12 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:57.6133610Z 18:18:57 [WARNING] verify_sold: Chunk 14 in cffi-block (100.0%): cffi 8 -> 4
+verify-sold	UNKNOWN STEP	2026-04-13T16:18:57.6134180Z 18:18:57 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-13T16:19:27.6160970Z 18:19:27 [WARNING] verify_sold: Chunk 14 instabile (100.0% error/ban): concorrenza 8 -> 4
+verify-sold	UNKNOWN STEP	2026-04-13T16:19:38.2327230Z 18:19:38 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:19:38.8766250Z 18:19:38 [INFO] verify_sold: Browser session restart (chunk 15), pool=4 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:19:38.8766890Z 18:19:38 [INFO] verify_sold: Chunk 15: verifica annunci 2801-3000 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:19:43.9444610Z 18:19:43 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:19:43.9446010Z 18:19:43 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=4): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-13T16:19:43.9666430Z 18:19:43 [INFO] verify_sold: Chunk 15 completato in 5.1s (39.29 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:19:43.9668340Z 18:19:43 [WARNING] verify_sold: Cloudflare burst rilevato (2 chunk consecutivi con cffi-block): pausa 60s
+verify-sold	UNKNOWN STEP	2026-04-13T16:20:44.5312920Z 18:20:44 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:20:45.2375310Z 18:20:45 [INFO] verify_sold: Browser session restart (chunk 16), pool=4 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:20:45.2375740Z 18:20:45 [INFO] verify_sold: Chunk 16: verifica annunci 3001-3200 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:00.3266640Z 18:21:00 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:00.3430840Z 18:21:00 [INFO] verify_sold: Chunk 16 completato in 15.1s (13.24 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:00.3433270Z 18:21:00 [INFO] verify_sold: cffi recovery dopo 2 chunk bloccati consecutivi.
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:00.3433900Z 18:21:00 [INFO] verify_sold: Chunk 16 stabile: cffi 4 -> 6
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:00.3434490Z 18:21:00 [INFO] verify_sold: Chunk 16 stabile (0.0% error/ban): concorrenza 4 -> 6
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:00.7906390Z 18:21:00 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:02.2093060Z 18:21:02 [INFO] verify_sold: Browser session restart (chunk 17), pool=6 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:02.2093670Z 18:21:02 [INFO] verify_sold: Chunk 17: verifica annunci 3201-3400 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:11.1676690Z 18:21:11 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:11.1822990Z 18:21:11 [INFO] verify_sold: Chunk 17 completato in 9.0s (22.29 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:11.1825320Z 18:21:11 [INFO] verify_sold: Chunk 17 stabile: cffi 6 -> 8
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:11.1826100Z 18:21:11 [INFO] verify_sold: Chunk 17 stabile (0.0% error/ban): concorrenza 6 -> 8
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:11.6509860Z 18:21:11 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:13.6075740Z 18:21:13 [INFO] verify_sold: Browser session restart (chunk 18), pool=8 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:13.6076570Z 18:21:13 [INFO] verify_sold: Chunk 18: verifica annunci 3401-3600 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:21.1524510Z 18:21:21 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:21.1718670Z 18:21:21 [INFO] verify_sold: Chunk 18 completato in 7.6s (26.44 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:21.1723950Z 18:21:21 [INFO] verify_sold: Chunk 18 stabile: cffi 8 -> 10
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:21.1724530Z 18:21:21 [INFO] verify_sold: Chunk 18 stabile (0.0% error/ban): concorrenza 8 -> 10
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:21.6940030Z 18:21:21 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:24.4569670Z 18:21:24 [INFO] verify_sold: Browser session restart (chunk 19), pool=10 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:24.4570350Z 18:21:24 [INFO] verify_sold: Chunk 19: verifica annunci 3601-3800 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:31.0242870Z 18:21:31 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:31.0410780Z 18:21:31 [INFO] verify_sold: Chunk 19 completato in 6.6s (30.38 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:31.0412930Z 18:21:31 [INFO] verify_sold: Chunk 19 stabile (0.0% error/ban): concorrenza 10 -> 12
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:31.5985520Z 18:21:31 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:35.0236440Z 18:21:35 [INFO] verify_sold: Browser session restart (chunk 20), pool=12 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:35.0237130Z 18:21:35 [INFO] verify_sold: Chunk 20: verifica annunci 3801-4000 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:48.5709360Z 18:21:48 [INFO] verify_sold: cffi precheck: sold=0 | active=197 | unknown(→Playwright)=3
+verify-sold	UNKNOWN STEP	2026-04-13T16:21:52.3756530Z 18:21:52 [INFO] verify_sold: Chunk 20 completato in 17.4s (11.53 tentativi/s, verificati=200/200) | reason: active:cffi-200=197, active:dom-ok=3
+verify-sold	UNKNOWN STEP	2026-04-13T16:22:18.9689540Z 18:22:18 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:22:28.4467880Z 18:22:28 [INFO] verify_sold: Browser session restart (chunk 21), pool=12 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:22:28.4468810Z 18:22:28 [INFO] verify_sold: Chunk 21: verifica annunci 4001-4200 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:22:39.3950650Z 18:22:39 [INFO] verify_sold: cffi precheck: sold=0 | active=0 | unknown(→Playwright)=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:22:39.3953660Z 18:22:39 [WARNING] verify_sold: cffi blocco massivo (100% unknown, sem=10): skip Playwright, chunk → pending
+verify-sold	UNKNOWN STEP	2026-04-13T16:22:39.4138420Z 18:22:39 [INFO] verify_sold: Chunk 21 completato in 11.0s (18.24 tentativi/s, verificati=0/200) | reason: skipped:cffi-block=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:22:39.4140010Z 18:22:39 [WARNING] verify_sold: Chunk 21 in cffi-block (100.0%): cffi 10 -> 6
+verify-sold	UNKNOWN STEP	2026-04-13T16:22:39.4140920Z 18:22:39 [WARNING] verify_sold: Cloudflare burst rilevato (1 chunk consecutivi con cffi-block): pausa 30s
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:09.4167610Z 18:23:09 [WARNING] verify_sold: Chunk 21 instabile (100.0% error/ban): concorrenza 12 -> 8
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:09.9174790Z 18:23:09 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:18.6477260Z 18:23:18 [INFO] verify_sold: Browser session restart (chunk 22), pool=8 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:18.6479450Z 18:23:18 [INFO] verify_sold: Chunk 22: verifica annunci 4201-4400 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:33.3436230Z 18:23:33 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:33.3608060Z 18:23:33 [INFO] verify_sold: Chunk 22 completato in 14.7s (13.59 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:33.3609940Z 18:23:33 [INFO] verify_sold: cffi recovery dopo 1 chunk bloccati consecutivi.
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:33.3610520Z 18:23:33 [INFO] verify_sold: Chunk 22 stabile: cffi 6 -> 8
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:33.3611440Z 18:23:33 [INFO] verify_sold: Chunk 22 stabile (0.0% error/ban): concorrenza 8 -> 10
+verify-sold	UNKNOWN STEP	2026-04-13T16:23:57.8147410Z 18:23:57 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:00.4328200Z 18:24:00 [INFO] verify_sold: Browser session restart (chunk 23), pool=10 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:00.4328850Z 18:24:00 [INFO] verify_sold: Chunk 23: verifica annunci 4401-4600 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:08.7996030Z 18:24:08 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:08.8167520Z 18:24:08 [INFO] verify_sold: Chunk 23 completato in 8.4s (23.86 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:08.8174830Z 18:24:08 [INFO] verify_sold: Chunk 23 stabile: cffi 8 -> 10
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:08.8175450Z 18:24:08 [INFO] verify_sold: Chunk 23 stabile (0.0% error/ban): concorrenza 10 -> 12
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:09.3840610Z 18:24:09 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:19.1519960Z 18:24:19 [INFO] verify_sold: Browser session restart (chunk 24), pool=12 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:19.1520750Z 18:24:19 [INFO] verify_sold: Chunk 24: verifica annunci 4601-4800 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:27.1185520Z 18:24:27 [INFO] verify_sold: cffi precheck: sold=1 | active=199 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:27.1223180Z 18:24:27 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-one-s-con-lettore-dvd-milano-626429366.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:27.1407120Z 18:24:27 [INFO] verify_sold: Chunk 24 completato in 8.0s (25.04 tentativi/s, verificati=200/200) | reason: active:cffi-200=199, sold:cffi-410=1
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:27.6693930Z 18:24:27 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:37.1339400Z 18:24:37 [INFO] verify_sold: Browser session restart (chunk 25), pool=12 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:37.1341150Z 18:24:37 [INFO] verify_sold: Chunk 25: verifica annunci 4801-5000 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:24:50.9105310Z 18:24:50 [INFO] verify_sold: cffi precheck: sold=0 | active=193 | unknown(→Playwright)=7
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:02.8282930Z 18:25:02 [INFO] verify_sold: Chunk 25 completato in 25.7s (7.78 tentativi/s, verificati=197/200) | reason: active:cffi-200=193, active:dom-ok=4, blocked:timeout=3
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:02.8284630Z 18:25:02 [INFO] verify_sold: Chunk 26: verifica annunci 5001-5200 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:18.7299250Z 18:25:18 [INFO] verify_sold: cffi precheck: sold=0 | active=191 | unknown(→Playwright)=9
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:26.1389490Z 18:25:26 [INFO] verify_sold: Chunk 26 completato in 23.3s (8.58 tentativi/s, verificati=197/200) | reason: active:cffi-200=191, active:dom-ok=6, blocked:timeout=3
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:26.1392750Z 18:25:26 [INFO] verify_sold: Chunk 27: verifica annunci 5201-5400 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:32.2286360Z 18:25:32 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:32.2387840Z 18:25:32 [INFO] verify_sold: Chunk 27 completato in 6.1s (32.79 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:32.2389170Z 18:25:32 [INFO] verify_sold: Chunk 28: verifica annunci 5401-5600 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:38.2770890Z 18:25:38 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:38.2921830Z 18:25:38 [INFO] verify_sold: Chunk 28 completato in 6.1s (33.04 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:39.8770500Z 18:25:39 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:25:49.7533460Z 18:25:49 [INFO] verify_sold: Browser session restart (chunk 29), pool=12 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:26:05.0528020Z 18:25:49 [INFO] verify_sold: Chunk 29: verifica annunci 5601-5800 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:26:05.0529520Z 18:26:05 [INFO] verify_sold: cffi precheck: sold=0 | active=191 | unknown(→Playwright)=9
+verify-sold	UNKNOWN STEP	2026-04-13T16:26:18.0096610Z 18:26:18 [INFO] verify_sold: Chunk 29 completato in 28.3s (7.08 tentativi/s, verificati=200/200) | reason: active:cffi-200=191, active:dom-ok=9
+verify-sold	UNKNOWN STEP	2026-04-13T16:26:18.0098720Z 18:26:18 [INFO] verify_sold: Chunk 30: verifica annunci 5801-6000 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:26:33.8460170Z 18:26:33 [INFO] verify_sold: cffi precheck: sold=0 | active=191 | unknown(→Playwright)=9
+verify-sold	UNKNOWN STEP	2026-04-13T16:26:35.9402780Z 18:26:35 [INFO] verify_sold: Chunk 30 completato in 17.9s (11.15 tentativi/s, verificati=200/200) | reason: active:cffi-200=191, active:dom-ok=9
+verify-sold	UNKNOWN STEP	2026-04-13T16:26:35.9405410Z 18:26:35 [INFO] verify_sold: Chunk 31: verifica annunci 6001-6200 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:27:29.8323960Z 18:27:29 [INFO] verify_sold: cffi precheck: sold=0 | active=151 | unknown(→Playwright)=49
+verify-sold	UNKNOWN STEP	2026-04-13T16:27:41.1763690Z 18:27:41 [INFO] verify_sold: Chunk 31 completato in 65.2s (3.07 tentativi/s, verificati=188/200) | reason: active:cffi-200=151, active:dom-ok=37, blocked:http-403=11, blocked:timeout=1
+verify-sold	UNKNOWN STEP	2026-04-13T16:27:41.1764310Z 18:27:41 [INFO] verify_sold: Chunk 32: verifica annunci 6201-6400 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:14.1453500Z 18:28:14 [INFO] verify_sold: cffi precheck: sold=1 | active=179 | unknown(→Playwright)=20
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:28.8153510Z 18:28:28 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-serie-x-1tb-nera-2-joystick-e-pile-ricaricab-milano-642637438.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:28.8365980Z 18:28:28 [INFO] verify_sold: Chunk 32 completato in 47.7s (4.20 tentativi/s, verificati=180/200) | reason: active:cffi-200=179, blocked:timeout=20, sold:cffi-410=1
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:29.6088170Z 18:28:29 [INFO] scrapers.base: Playwright browser avviato: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:39.0946000Z 18:28:39 [INFO] verify_sold: Browser session restart (chunk 33), pool=12 worker.
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:39.0947280Z 18:28:39 [INFO] verify_sold: Chunk 33: verifica annunci 6401-6600 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:54.3205870Z 18:28:54 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:54.3355350Z 18:28:54 [INFO] verify_sold: Chunk 33 completato in 15.2s (13.12 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:28:54.3358210Z 18:28:54 [INFO] verify_sold: Chunk 34: verifica annunci 6601-6800 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:05.9461430Z 18:29:05 [INFO] verify_sold: cffi precheck: sold=0 | active=200 | unknown(→Playwright)=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:05.9933490Z 18:29:05 [INFO] verify_sold: Chunk 34 completato in 11.7s (17.16 tentativi/s, verificati=200/200) | reason: active:cffi-200=200
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:05.9934520Z 18:29:05 [INFO] verify_sold: Chunk 35: verifica annunci 6801-6881 / 6881
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:13.8800530Z 18:29:13 [INFO] verify_sold: cffi precheck: sold=1 | active=79 | unknown(→Playwright)=1
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:14.6254560Z 18:29:14 [INFO] verify_sold:   -> VENDUTO: https://www.subito.it/videogiochi/xbox-360-per-halo-4-cagliari-642661179.htm
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:14.6372420Z 18:29:14 [INFO] verify_sold: Chunk 35 completato in 8.6s (9.37 tentativi/s, verificati=81/81) | reason: active:cffi-200=79, active:dom-ok=1, sold:cffi-410=1
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.2749180Z 18:29:15 [INFO] verify_sold: Reason summary sessione: active:cffi-200=5355, skipped:cffi-block=1400, active:dom-ok=79, sold:cffi-410=34, blocked:timeout=27, blocked:http-403=11
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.2750040Z 18:29:15 [INFO] verify_sold: HTTP block summary: 403=11/6906 (0.16%) | cffi-block=1400/6906 (20.27%) | blocked_totali=1438/6906 (20.82%) | timeout=27 | network=0 | error=0
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.2751270Z 18:29:15 [INFO] verify_sold: Verifica completata. 5468 verificati, 1438 skipped (coverage 79.2%): 5434 attivi, 34 venduti nuovi, 0 venduti confermati, 0 riattivati | prezzo medio venduto € 164.88 | tempo attivo medio 14 giorni
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.2752360Z 18:29:15 [ERROR] verify_sold: Coverage finale 79.2% sotto soglia minima 85.0%
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3297170Z ##[group]Run CSV=logs/coverage_history.csv
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3297360Z [36;1mCSV=logs/coverage_history.csv[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3297510Z [36;1mmkdir -p logs[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3297740Z [36;1m[ -f "$CSV" ] || echo "date,coverage_pct,verified,skipped,sold_new" > "$CSV"[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3297970Z [36;1mif [ -f logs/verify_sold_last_run.json ]; then[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3298510Z [36;1m  python3.11 -c "import json,pathlib; d=json.loads(pathlib.Path('logs/verify_sold_last_run.json').read_text()); open('logs/coverage_history.csv','a').write('{},{},{},{},{}\n'.format(d['date'],d['coverage_pct'],d['verified'],d['skipped'],d['sold_new']))"[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3299000Z [36;1mfi[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3405230Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3405340Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3405450Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3405570Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3407700Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3919760Z ##[group]Run git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3920070Z [36;1mgit config user.email "41898282+github-actions[bot]@users.noreply.github.com"[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3920280Z [36;1mgit config user.name "github-actions[bot]"[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3920450Z [36;1mgit fetch origin[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3920560Z [36;1mgit reset --mixed origin/main[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3920710Z [36;1mgit add tracker.db logs/coverage_history.csv[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3920850Z [36;1mgit diff --staged --quiet \[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3921020Z [36;1m  || git commit -m "chore: verify-sold $(date -u +%Y-%m-%d)"[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3921170Z [36;1mgit push[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3932860Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3932980Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3933060Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3933180Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:15.3933280Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:26.9013570Z Unstaged changes after reset:
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:26.9014000Z M	logs/coverage_history.csv
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:26.9014210Z M	tracker.db
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:27.6832200Z [main 8fccb07] chore: verify-sold 2026-04-13
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:27.6832430Z  2 files changed, 1 insertion(+)
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9647710Z To https://github.com/LukePalmDev/trader
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9648810Z    040b7c2..8fccb07  main -> main
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9872230Z ##[group]Run echo "Coverage sotto soglia (exit 3): triggero nuovo run di verify-sold tra ~1 min"
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9873150Z [36;1mecho "Coverage sotto soglia (exit 3): triggero nuovo run di verify-sold tra ~1 min"[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9873840Z [36;1mgh workflow run verify-sold.yml --ref main[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9917320Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9917730Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9918030Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9918410Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9919480Z   GH_TOKEN: ***
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:41.9919870Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:42.0273600Z Coverage sotto soglia (exit 3): triggero nuovo run di verify-sold tra ~1 min
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7667070Z https://github.com/LukePalmDev/trader/actions/runs/24354644537
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7801520Z ##[group]Run echo "::error::Coverage sotto soglia minima (exit code 3). Run automatico ri-schedulato."
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7802800Z [36;1mecho "::error::Coverage sotto soglia minima (exit code 3). Run automatico ri-schedulato."[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7803560Z [36;1mexit 3[0m
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7848860Z shell: /bin/bash -e {0}
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7849180Z env:
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7849480Z   TRADER_PLAYWRIGHT_CHANNEL: chrome
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7849910Z   TRADER_VIEWER_OPEN_BROWSER: false
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.7850260Z ##[endgroup]
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.8237030Z ##[error]Coverage sotto soglia minima (exit code 3). Run automatico ri-schedulato.
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.8242100Z ##[error]Process completed with exit code 3.
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.8307140Z Post job cleanup.
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:43.9969590Z [command]/usr/bin/git version
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0048740Z git version 2.50.1 (Apple Git-155)
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0063960Z Temporarily overriding HOME='/Users/luke/actions-runner/_work/_temp/6c6fd023-f175-485d-a603-75ef178bb36a' before making global git config changes
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0064380Z Adding repository directory to the temporary git global config as a safe directory
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0065790Z [command]/usr/bin/git config --global --add safe.directory /Users/luke/actions-runner/_work/trader/trader
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0132580Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0197830Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0738370Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0797470Z http.https://github.com/.extraheader
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0801960Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.0860930Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.1305340Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.1368070Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verify-sold	UNKNOWN STEP	2026-04-13T16:29:44.1897940Z Cleaning up orphan processes

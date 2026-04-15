@@ -348,7 +348,7 @@ def _vacuum_databases() -> dict[str, int]:
     counts: dict[str, int] = {}
     db_path = _ROOT / "tracker.db"
     if db_path.exists():
-        with sqlite3.connect(str(db_path)) as conn:
+        with sqlite3.connect(str(db_path), timeout=30.0) as conn:
             conn.execute("VACUUM")
         counts["tracker.db"] = 1
     else:

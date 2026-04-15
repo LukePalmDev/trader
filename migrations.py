@@ -63,7 +63,7 @@ def run_migrations(
     ordered = sorted(migrations, key=lambda m: m.version)
     applied_now: list[int] = []
 
-    with sqlite3.connect(str(db_path)) as conn:
+    with sqlite3.connect(str(db_path), timeout=30.0) as conn:
         _ensure_meta(conn)
         done = _applied_versions(conn, namespace)
 
