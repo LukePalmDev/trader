@@ -131,7 +131,7 @@ def _purge_old_entries(log_data: dict) -> int:
 
 _telegram_cfg: dict | None = None
 _last_telegram_send: float = 0.0
-_TELEGRAM_MIN_INTERVAL = 2.0  # secondi minimi tra invii (Telegram limita ~20 msg/min per chat)
+_TELEGRAM_MIN_INTERVAL = 3.1  # secondi minimi tra invii (Telegram limita ~20 msg/min per chat)
 
 def _get_telegram_cfg() -> dict:
     """Carica la config Telegram da config.toml (lazy, una sola volta)."""

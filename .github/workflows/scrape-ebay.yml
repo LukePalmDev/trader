@@ -22,13 +22,14 @@ jobs:
       contents: write
 
     steps:
-      - name: Setup Homebrew PATH
-        run: echo "/opt/homebrew/bin" >> $GITHUB_PATH
-
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+
+      - name: Pull latest DB
+        run: git pull --rebase
 
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
@@ -52,10 +53,7 @@ jobs:
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git fetch origin
-          git reset --mixed origin/main
-          git add tracker.db
-          git add logs/run_report_latest.json || true
+          git add tracker.db logs/run_report_latest.json || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape ebay $(date -u +%Y-%m-%d)"
-          git push
+          git push origin main
