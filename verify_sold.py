@@ -693,6 +693,8 @@ async def _process_rows(
                     skipped_ids,
                 )
             _pending_conn.close()
+        except Exception as e:
+            log.error("Errore aggiornamento pending status: %s", e)
     # Assicura che ogni motivo di blocco/errore sia contato come skipped se non già presente.
     # Questo corregge bug dove skipped_rows poteva essere 0 nonostante reason_counts > 0.
     blocked_count = int(sum(v for k, v in reason_counts.items() if str(k).startswith("blocked:") or str(k).startswith("skipped:")))
