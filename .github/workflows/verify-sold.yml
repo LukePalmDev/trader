@@ -2,8 +2,9 @@ name: Verify Sold
 
 on:
   schedule:
-    # 1 ora dopo ogni scrape Subito: 03:00 09:00 15:00 21:00 UTC → 05/11/17/23 CEST
-    - cron: '0 3,9,15,21 * * *'
+    # 2x/giorno con 12h di cooldown IP: 20:00 UTC (22:00 CEST, sera) + 04:00 UTC (06:00 CEST, mattina)
+    # Ridotto da 4 a 2 run/giorno per minimizzare cffi-block Cloudflare: IP fresco → coverage ~99%
+    - cron: '0 4,20 * * *'
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
 concurrency:
