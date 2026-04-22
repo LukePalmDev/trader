@@ -599,6 +599,10 @@ async def _process_rows(
         skipped_ids.extend(_partial_skipped_ids)
         skipped_rows += len(_partial_skipped_ids)
 
+    # blocked_rows: row objects completi per il retry pass nel caller
+    _skipped_set = set(skipped_ids)
+    blocked_rows_list = [r for r in rows if r["id"] in _skipped_set]
+
     conn = _connect(DB_PATH)
     conn.isolation_level = None
     sold_count = 0
@@ -761,6 +765,7 @@ async def _process_rows(
         "skipped": skipped_rows,
         "time_limit_hit": time_limit_hit,
         "reason_counts": reason_counts,
+        "blocked_rows": blocked_rows_list,
     }
 
 
@@ -1043,6 +1048,7 @@ async def verify_batch(
     current_cffi_concurrency = initial_cffi_concurrency
     force_restart_next = False
     consecutive_cffi_blocks = 0  # Track consecutive chunks with massive cffi blocking
+    retry_rows: list = []  # Accumula ads bloccati da cffi-block per il secondo giro
 
     async def _close_pool(pool: asyncio.Queue) -> None:
         """Chiude worker pool (page + context)."""
@@ -1139,6 +1145,8 @@ async def verify_batch(
                     partial_block_threshold=cfg.partial_block_threshold,
                 )
                 chunk_elapsed = max(0.001, time.perf_counter() - chunk_t0)
+                # Accumula gli ads bloccati per il retry pass post-loop
+                retry_rows.extend(stats.get("blocked_rows") or [])
                 reason_counts = stats.get("reason_counts") or {}
                 attempted_in_chunk = sum(int(v) for v in reason_counts.values())
                 if attempted_in_chunk <= 0:
@@ -1331,6 +1339,60 @@ async def verify_batch(
                         len(all_rows),
                     )
                     break
+
+            # ---------- Retry pass: secondo giro sugli ads bloccati da cffi ----------
+            # Condizione: ci sono ads bloccati, il run non è scaduto, il tempo lo permette.
+            # Un re-probe cffi verifica se l'IP si è ripreso durante il backoff del main loop.
+            if retry_rows and not total_stats["time_limit_hit"] and worker_pool is not None:
+                _remaining_secs = (
+                    (deadline_utc - datetime.now(timezone.utc)).total_seconds()
+                    if deadline_utc else None
+                )
+                if _remaining_secs is None or _remaining_secs > 120:
+                    log.info(
+                        "Retry pass: %d annunci bloccati da cffi → secondo giro (IP probe in corso…)",
+                        len(retry_rows),
+                    )
+                    _retry_conn = _connect(DB_PATH)
+                    _ip_recovered = await _warmup_probe(_retry_conn, cfg)
+                    _retry_conn.close()
+                    if _ip_recovered:
+                        _retry_profile = _CFFI_PROFILES[len(retry_rows) % len(_CFFI_PROFILES)]
+                        retry_stats = await _process_rows(
+                            worker_pool,
+                            retry_rows,
+                            deadline_utc=deadline_utc,
+                            nav_timeout_ms=cfg.nav_timeout_ms,
+                            cffi_concurrency=max(4, current_cffi_concurrency),
+                            cffi_block_unknown_ratio=cfg.cffi_block_unknown_ratio,
+                            cffi_impersonate=_retry_profile,
+                            partial_block_threshold=cfg.partial_block_threshold,
+                        )
+                        _rv = int(retry_stats.get("verified", 0) or 0)
+                        _rs = int(retry_stats.get("sold", 0) or 0)
+                        log.info("Retry pass completato: +%d verificati, +%d venduti", _rv, _rs)
+                        for key in ("verified", "active", "sold", "already_sold", "recovered"):
+                            total_stats[key] += int(retry_stats.get(key, 0) or 0)
+                        # Riduce skipped del numero di ads ora verificati con successo
+                        total_stats["skipped"] = max(
+                            0,
+                            int(total_stats["skipped"]) - _rv,
+                        )
+                        sold_price_sum += float(retry_stats.get("sold_price_sum") or 0.0)
+                        sold_price_count += int(retry_stats.get("sold_price_count") or 0)
+                        sold_hour_sum += float(retry_stats.get("sold_hour_sum") or 0.0)
+                        sold_hour_count += int(retry_stats.get("sold_hour_count") or 0)
+                        for reason, count in (retry_stats.get("reason_counts") or {}).items():
+                            session_reason_counts[reason] = (
+                                session_reason_counts.get(reason, 0) + int(count)
+                            )
+                    else:
+                        log.info("Retry pass: IP ancora bloccato, skip.")
+                else:
+                    log.info(
+                        "Retry pass saltato: %ds rimanenti insufficienti (min 120s).",
+                        int(_remaining_secs),
+                    )
         finally:
             if worker_pool is not None:
                 await _close_pool(worker_pool)
