@@ -61,6 +61,10 @@ DEFAULT_FAIL_FAST_403_RATIO = 0.60
 DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO = 0.85
 DEFAULT_MIN_COVERAGE_RATIO = 0.0
 
+# Profili TLS curl-cffi da ruotare tra chunk per distribuire il JA4 fingerprint.
+# Akamai traccia il fingerprint per IP: sempre lo stesso → ban più rapido.
+_CFFI_PROFILES = ("chrome124", "chrome128", "chrome131", "chrome136")
+
 
 @dataclass
 class VerifyConfig:
@@ -380,6 +384,7 @@ async def _process_rows(
     nav_timeout_ms: int = DEFAULT_NAV_TIMEOUT_MS,
     cffi_concurrency: int = DEFAULT_CFFI_CONCURRENCY,
     cffi_block_unknown_ratio: float = DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO,
+    cffi_impersonate: str = "chrome136",
 ) -> dict:
     """Verifica concorrente con Playwright (+ precheck curl-cffi).
 
@@ -434,7 +439,7 @@ async def _process_rows(
                 await asyncio.sleep(random.uniform(0.03, 0.12))
                 cffi_results[row["id"]] = await _cffi_precheck(row["url"], session)
 
-        async with CffiAsyncSession(impersonate="chrome136") as cffi_session:
+        async with CffiAsyncSession(impersonate=cffi_impersonate) as cffi_session:
             await asyncio.gather(*[_cffi_one(cffi_session, r) for r in rows])
 
         cffi_sold_ids = {r["id"] for r in rows if cffi_results.get(r["id"]) == "sold"}
@@ -1043,6 +1048,7 @@ async def verify_batch(
                 # Dopo ogni browser restart scagliona le prime N navigazioni di 0.15s l'una
                 # per evitare spike di connessioni simultanee verso Subito.
                 chunk_t0 = time.perf_counter()
+                cffi_profile = _CFFI_PROFILES[chunk_no % len(_CFFI_PROFILES)]
                 stats = await _process_rows(
                     worker_pool,
                     chunk,
@@ -1051,6 +1057,7 @@ async def verify_batch(
                     nav_timeout_ms=cfg.nav_timeout_ms,
                     cffi_concurrency=current_cffi_concurrency,
                     cffi_block_unknown_ratio=cfg.cffi_block_unknown_ratio,
+                    cffi_impersonate=cffi_profile,
                 )
                 chunk_elapsed = max(0.001, time.perf_counter() - chunk_t0)
                 reason_counts = stats.get("reason_counts") or {}
