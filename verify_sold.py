@@ -60,6 +60,7 @@ DEFAULT_FAIL_FAST_BLOCKED_RATIO = 0.85
 DEFAULT_FAIL_FAST_403_RATIO = 0.60
 DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO = 0.85
 DEFAULT_MIN_COVERAGE_RATIO = 0.0
+DEFAULT_PARTIAL_BLOCK_THRESHOLD = 0.50
 
 # Profili TLS curl-cffi da ruotare tra chunk per distribuire il JA4 fingerprint.
 # Akamai traccia il fingerprint per IP: sempre lo stesso → ban più rapido.
@@ -80,6 +81,7 @@ class VerifyConfig:
     max_http403_ratio: float = DEFAULT_MAX_HTTP403_RATIO
     min_coverage_ratio: float = DEFAULT_MIN_COVERAGE_RATIO
     cffi_block_unknown_ratio: float = DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO
+    partial_block_threshold: float = DEFAULT_PARTIAL_BLOCK_THRESHOLD
     browser_restart_every: int = DEFAULT_BROWSER_RESTART_EVERY
     selection_sample: int = 0
 
@@ -385,6 +387,7 @@ async def _process_rows(
     cffi_concurrency: int = DEFAULT_CFFI_CONCURRENCY,
     cffi_block_unknown_ratio: float = DEFAULT_CFFI_BLOCK_UNKNOWN_RATIO,
     cffi_impersonate: str = "chrome136",
+    partial_block_threshold: float = DEFAULT_PARTIAL_BLOCK_THRESHOLD,
 ) -> dict:
     """Verifica concorrente con Playwright (+ precheck curl-cffi).
 
@@ -426,12 +429,13 @@ async def _process_rows(
     # I "sold" certi (410/404/redirect) saltano Playwright completamente.
     # I "active" (200) vengono inviati a Playwright per conferma DOM.
     # I "unknown" (403/errore) vengono inviati a Playwright come fallback.
+    cffi_results: dict[int, str] = {}   # inizializzato qui per scope nel partial-block
     cffi_sold_ids: set[int] = set()
     cffi_active_ids: set[int] = set()
     _cffi_block = False  # True se cffi segnala blocco IP massivo (≥80% unknown)
+    _cffi_block_ratio = 0.0
 
     if CffiAsyncSession is not None and not _deadline_reached(deadline_utc):
-        cffi_results: dict[int, str] = {}
         cffi_sem = asyncio.Semaphore(max(1, int(cffi_concurrency)))
 
         async def _cffi_one(session, row) -> None:
@@ -466,10 +470,28 @@ async def _process_rows(
         if CffiAsyncSession is None:
             log.warning("curl-cffi non disponibile: precheck saltato, tutto a Playwright.")
 
+    # Partial block: 50-84% unknown → gli unknown non vanno a Playwright (→ pending).
+    # Evita di bruciare 7s/URL su richieste che riceveranno 403, risparmiando runtime
+    # e riducendo il segnale di burst che peggiora la reputazione IP su Akamai.
+    _partial_skipped_ids: list[int] = []
+    if not _cffi_block and _cffi_block_ratio >= partial_block_threshold:
+        _partial_skipped_ids = [
+            r["id"] for r in rows if cffi_results.get(r["id"]) == "unknown"
+        ]
+        if _partial_skipped_ids:
+            reason_counts["skipped:cffi-partial"] = (
+                reason_counts.get("skipped:cffi-partial", 0) + len(_partial_skipped_ids)
+            )
+            log.info(
+                "cffi blocco parziale (%.0f%% unknown): %d annunci → pending, risparmio Playwright",
+                _cffi_block_ratio * 100,
+                len(_partial_skipped_ids),
+            )
+
     # Annunci già classificati da cffi → escludi da Playwright.
     # Se cffi ha segnalato blocco IP massivo, forza needs_playwright vuoto:
     # tutti i non-sold vengono marcati pending (vedi skipped_ids più sotto).
-    skip_playwright_ids = cffi_sold_ids | cffi_active_ids
+    skip_playwright_ids = cffi_sold_ids | cffi_active_ids | set(_partial_skipped_ids)
     needs_playwright = (
         []
         if _cffi_block
@@ -568,6 +590,11 @@ async def _process_rows(
             # deadline raggiunta prima del check Playwright
             skipped_rows += 1
             skipped_ids.append(ad_id)
+
+    # Aggiungi gli unknown esclusi dal partial-block agli skipped
+    if _partial_skipped_ids:
+        skipped_ids.extend(_partial_skipped_ids)
+        skipped_rows += len(_partial_skipped_ids)
 
     conn = _connect(DB_PATH)
     conn.isolation_level = None
@@ -1058,6 +1085,7 @@ async def verify_batch(
                     cffi_concurrency=current_cffi_concurrency,
                     cffi_block_unknown_ratio=cfg.cffi_block_unknown_ratio,
                     cffi_impersonate=cffi_profile,
+                    partial_block_threshold=cfg.partial_block_threshold,
                 )
                 chunk_elapsed = max(0.001, time.perf_counter() - chunk_t0)
                 reason_counts = stats.get("reason_counts") or {}
@@ -1523,6 +1551,16 @@ def _build_arg_parser() -> argparse.ArgumentParser:
             f"(default {DEFAULT_MIN_COVERAGE_RATIO:.2f} = disabilitata)"
         ),
     )
+    parser.add_argument(
+        "--partial-block-threshold",
+        type=float,
+        default=DEFAULT_PARTIAL_BLOCK_THRESHOLD,
+        metavar="R",
+        help=(
+            "Soglia unknown oltre cui gli unknown cffi vanno → pending invece di Playwright "
+            f"(default {DEFAULT_PARTIAL_BLOCK_THRESHOLD:.2f}; 0.0 = disabilitato)"
+        ),
+    )
     return parser
 
 
@@ -1540,6 +1578,7 @@ if __name__ == "__main__":
         fail_fast_blocked_ratio=args.fail_fast_blocked_ratio,
         fail_fast_403_ratio=args.fail_fast_403_ratio,
         cffi_block_unknown_ratio=args.cffi_block_unknown_ratio,
+        partial_block_threshold=args.partial_block_threshold,
         min_coverage_ratio=args.min_coverage_ratio,
         browser_restart_every=args.browser_restart_every,
         selection_sample=args.selection_sample,
