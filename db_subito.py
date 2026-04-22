@@ -192,6 +192,11 @@ def _migration_v7_verify_status(conn: sqlite3.Connection) -> None:
     conn.execute("UPDATE ads SET verify_status = 'sold' WHERE sold_at IS NOT NULL")
 
 
+def _migration_v8_last_verified_at(conn: sqlite3.Connection) -> None:
+    _add_column_if_missing(conn, "ads", "last_verified_at TEXT")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_last_verified_at ON ads(last_verified_at)")
+
+
 _MIGRATIONS = (
     Migration(
         1,
@@ -268,6 +273,11 @@ _MIGRATIONS = (
         7,
         "add-verify-status",
         callback=_migration_v7_verify_status,
+    ),
+    Migration(
+        8,
+        "add-last-verified-at",
+        callback=_migration_v8_last_verified_at,
     ),
 )
 
