@@ -84,6 +84,9 @@ class VerifyConfig:
     partial_block_threshold: float = DEFAULT_PARTIAL_BLOCK_THRESHOLD
     browser_restart_every: int = DEFAULT_BROWSER_RESTART_EVERY
     selection_sample: int = 0
+    tiered_selection: bool = True
+    staleness_hours: int = 24
+    tier2_sample_ratio: float = 0.30
 
 
 def _compute_cffi_backoff_seconds(consecutive_blocks: int) -> int:
@@ -635,10 +638,11 @@ async def _process_rows(
                             sold_at = NULL,
                             sold_at_estimated = NULL,
                             sold_window_hours = NULL,
-                            verify_status = 'buyable'
+                            verify_status = 'buyable',
+                            last_verified_at = ?
                         WHERE id = ?
                         """,
-                        (now, now, ad_id),
+                        (now, now, now, ad_id),
                     )
                     active_count += 1
                 else:
@@ -664,7 +668,8 @@ async def _process_rows(
                             first_inactive_seen = ?,
                             sold_at_estimated = ?,
                             sold_window_hours = ?,
-                            verify_status = 'sold'
+                            verify_status = 'sold',
+                            last_verified_at = ?
                         WHERE id = ?
                         """,
                         (
@@ -673,6 +678,7 @@ async def _process_rows(
                             first_inactive_seen,
                             sold_at_estimated,
                             sold_window_hours,
+                            now,
                             ad_id,
                         ),
                     )
@@ -867,7 +873,52 @@ async def verify_batch(
     )
 
     active_params: list = list(statuses)
-    if verify_all:
+    if verify_all and cfg.tiered_selection:
+        # Selezione stratificata: riduce volume per run abbassando il segnale Akamai.
+        # Tier 1 (priorità): pending + mai verificati + non verificati nelle ultime N ore.
+        # Tier 2 (campione): annunci recentemente verificati → 30% random.
+        # Sul primo run post-migrazione tutti gli ads hanno last_verified_at=NULL → tier1 li cattura tutti.
+        staleness_cutoff = (
+            datetime.now(timezone.utc) - timedelta(hours=max(1, int(cfg.staleness_hours)))
+        ).isoformat()
+        tier1_base = (
+            f"SELECT {select_cols} FROM ads "
+            f"WHERE ai_status IN ({placeholders}) "
+            "AND last_available = 1 AND sold_at IS NULL "
+            + (_XBOX_SQL_FILTER if xbox_only else "")
+            + " AND (verify_status = 'pending' OR last_verified_at IS NULL OR last_verified_at < ?) "
+            + " ORDER BY CASE verify_status WHEN 'pending' THEN 0 ELSE 1 END,"
+            " COALESCE(last_seen, first_seen) ASC"
+        )
+        tier1_rows = conn.execute(tier1_base, active_params + [staleness_cutoff]).fetchall()
+        # Tier 2: recentemente verificati, campionamento casuale
+        tier2_base = (
+            f"SELECT {select_cols} FROM ads "
+            f"WHERE ai_status IN ({placeholders}) "
+            "AND last_available = 1 AND sold_at IS NULL "
+            + (_XBOX_SQL_FILTER if xbox_only else "")
+            + " AND last_verified_at >= ? "
+            + " ORDER BY RANDOM() LIMIT ?"
+        )
+        tier2_total = conn.execute(
+            f"SELECT COUNT(*) FROM ads WHERE ai_status IN ({placeholders}) "
+            "AND last_available = 1 AND sold_at IS NULL "
+            + (_XBOX_SQL_FILTER if xbox_only else "")
+            + " AND last_verified_at >= ?",
+            active_params + [staleness_cutoff],
+        ).fetchone()[0]
+        tier2_limit = max(0, int(tier2_total * float(cfg.tier2_sample_ratio)))
+        tier2_rows = conn.execute(tier2_base, active_params + [staleness_cutoff, tier2_limit]).fetchall()
+        rows = list(tier1_rows) + list(tier2_rows)
+        log.info(
+            "Selezione stratificata: tier1_stale=%d + tier2_sample=%d/%d (%.0f%%) = %d totali",
+            len(tier1_rows),
+            len(tier2_rows),
+            tier2_total,
+            float(cfg.tier2_sample_ratio) * 100,
+            len(rows),
+        )
+    elif verify_all:
         rows = conn.execute(base_query, active_params).fetchall()
     else:
         rows = conn.execute(base_query + " LIMIT ?", active_params + [int(batch_size)]).fetchall()
@@ -1561,6 +1612,27 @@ def _build_arg_parser() -> argparse.ArgumentParser:
             f"(default {DEFAULT_PARTIAL_BLOCK_THRESHOLD:.2f}; 0.0 = disabilitato)"
         ),
     )
+    parser.add_argument(
+        "--no-tiered-selection",
+        dest="tiered_selection",
+        action="store_false",
+        help="Disabilita selezione stratificata (verifica tutti gli annunci, comportamento legacy).",
+    )
+    parser.set_defaults(tiered_selection=True)
+    parser.add_argument(
+        "--staleness-hours",
+        type=int,
+        default=24,
+        metavar="N",
+        help="Ore dopo cui un annuncio è considerato stale e rientra nel tier1 (default 24).",
+    )
+    parser.add_argument(
+        "--tier2-sample-ratio",
+        type=float,
+        default=0.30,
+        metavar="R",
+        help="Frazione degli annunci recentemente verificati da campionare nel tier2 (default 0.30).",
+    )
     return parser
 
 
@@ -1582,6 +1654,9 @@ if __name__ == "__main__":
         min_coverage_ratio=args.min_coverage_ratio,
         browser_restart_every=args.browser_restart_every,
         selection_sample=args.selection_sample,
+        tiered_selection=args.tiered_selection,
+        staleness_hours=args.staleness_hours,
+        tier2_sample_ratio=args.tier2_sample_ratio,
     )
     stats = asyncio.run(
         verify_batch(
