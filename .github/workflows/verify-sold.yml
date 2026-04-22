@@ -2,9 +2,10 @@ name: Verify Sold
 
 on:
   schedule:
-    # 2x/giorno con 12h di cooldown IP: 20:00 UTC (22:00 CEST, sera) + 04:00 UTC (06:00 CEST, mattina)
-    # Ridotto da 4 a 2 run/giorno per minimizzare cffi-block Cloudflare: IP fresco → coverage ~99%
-    - cron: '0 4,20 * * *'
+    # 2x/giorno: 08:00 UTC (10:00 CEST) + 13:00 UTC (15:00 CEST)
+    # Fascia diurna ottimale da dati empirici (7 run Apr 2026):
+    #   cffi-block 8-17% (10:00-18:00 CEST) vs 30-34% (22:00-07:00 CEST) → coverage 82-91% vs 65-73%
+    - cron: '0 8,13 * * *'
   workflow_dispatch:  # trigger manuale dalla UI GitHub
 
 concurrency:
