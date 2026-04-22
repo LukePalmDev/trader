@@ -476,6 +476,7 @@ async def _process_rows(
     # Partial block: 50-84% unknown → gli unknown non vanno a Playwright (→ pending).
     # Evita di bruciare 7s/URL su richieste che riceveranno 403, risparmiando runtime
     # e riducendo il segnale di burst che peggiora la reputazione IP su Akamai.
+    reason_counts: dict[str, int] = {}
     _partial_skipped_ids: list[int] = []
     if not _cffi_block and _cffi_block_ratio >= partial_block_threshold:
         _partial_skipped_ids = [
@@ -504,7 +505,6 @@ async def _process_rows(
     # ---------- Fase 2: Playwright solo per gli "unknown" ----------
     # La concorrenza è governata dal pool: solo worker_pool.qsize() check girano in parallelo.
     playwright_results: dict[int, tuple[bool | None, str]] = {}  # ad_id → (is_active|None, reason)
-    reason_counts: dict[str, int] = {}
 
     # Numero di worker disponibili all'inizio del chunk (tutti in coda dopo un restart).
     pool_size = worker_pool.qsize()
