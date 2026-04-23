@@ -69,6 +69,7 @@ jobs:
           set +e
           python3.11 verify_sold.py \
             --all \
+            --no-tiered-selection \
             --max-runtime-minutes 50 \
             --concurrency 8 \
             --cffi-concurrency 6 \
