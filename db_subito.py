@@ -197,6 +197,16 @@ def _migration_v8_last_verified_at(conn: sqlite3.Connection) -> None:
     conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_last_verified_at ON ads(last_verified_at)")
 
 
+def _migration_v9_backfill_last_verified_at(conn: sqlite3.Connection) -> None:
+    # Backfill: imposta last_verified_at = now() per tutti gli ads attivi con valore NULL.
+    # Senza questo, al primo run post-migrazione tutti gli ads vanno in Tier 1
+    # (7000+ ads) invece dei ~2100 attesi dal campionamento Tier 2, causando timeout.
+    conn.execute(
+        "UPDATE ads SET last_verified_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now') "
+        "WHERE last_verified_at IS NULL AND last_available = 1 AND sold_at IS NULL"
+    )
+
+
 _MIGRATIONS = (
     Migration(
         1,
@@ -278,6 +288,11 @@ _MIGRATIONS = (
         8,
         "add-last-verified-at",
         callback=_migration_v8_last_verified_at,
+    ),
+    Migration(
+        9,
+        "backfill-last-verified-at",
+        callback=_migration_v9_backfill_last_verified_at,
     ),
 )
 
