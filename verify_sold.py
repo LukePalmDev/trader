@@ -270,7 +270,10 @@ async def _cffi_precheck(url: str, session: "CffiAsyncSession") -> str:
         "unknown" — 403/errore/altro → demanda a Playwright
     """
     try:
-        resp = await session.get(url, timeout=10, allow_redirects=True)
+        resp = await asyncio.wait_for(
+            session.get(url, timeout=10, allow_redirects=True),
+            timeout=15,  # hard cap: 5s buffer over curl's own timeout
+        )
         if resp.status_code in (404, 410):
             return "sold"
         if resp.status_code == 200:
@@ -447,7 +450,17 @@ async def _process_rows(
                 cffi_results[row["id"]] = await _cffi_precheck(row["url"], session)
 
         async with CffiAsyncSession(impersonate=cffi_impersonate) as cffi_session:
-            await asyncio.gather(*[_cffi_one(cffi_session, r) for r in rows])
+            _cffi_tasks = [asyncio.create_task(_cffi_one(cffi_session, r)) for r in rows]
+            _cffi_limit = min(300.0, max(60.0, (len(rows) / max(1, int(cffi_concurrency)) + 3) * 16))
+            _done_cffi, _pending_cffi = await asyncio.wait(_cffi_tasks, timeout=_cffi_limit)
+            if _pending_cffi:
+                for _t in _pending_cffi:
+                    _t.cancel()
+                await asyncio.gather(*_pending_cffi, return_exceptions=True)
+                log.warning(
+                    "cffi gather timeout (%.0fs): %d/%d task bloccati — resto → Playwright",
+                    _cffi_limit, len(_pending_cffi), len(_cffi_tasks),
+                )
 
         cffi_sold_ids = {r["id"] for r in rows if cffi_results.get(r["id"]) == "sold"}
         cffi_active_ids = {r["id"] for r in rows if cffi_results.get(r["id"]) == "active"}
@@ -515,11 +528,15 @@ async def _process_rows(
         await asyncio.sleep(random.uniform(0.3, 0.9))
         worker = await worker_pool.get()
         try:
-            is_active, reason = await check_url(
-                worker,
-                row["url"],
-                nav_timeout_ms=nav_timeout_ms,
-            )
+            _pw_limit = nav_timeout_ms / 1000 + 60
+            try:
+                is_active, reason = await asyncio.wait_for(
+                    check_url(worker, row["url"], nav_timeout_ms=nav_timeout_ms),
+                    timeout=_pw_limit,
+                )
+            except asyncio.TimeoutError:
+                is_active, reason = True, "blocked:timeout-overall"
+                await _reset_worker_session(worker)
             if reason.startswith("blocked:http-403"):
                 # Nessun retry: l'IP è bannato a livello Akamai e un secondo tentativo
                 # sullo stesso IP dopo 0.35s non cambia nulla, bruciando 7s di timeout.
