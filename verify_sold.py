@@ -451,7 +451,7 @@ async def _process_rows(
 
         async with CffiAsyncSession(impersonate=cffi_impersonate) as cffi_session:
             _cffi_tasks = [asyncio.create_task(_cffi_one(cffi_session, r)) for r in rows]
-            _cffi_limit = min(300.0, max(60.0, (len(rows) / max(1, int(cffi_concurrency)) + 3) * 16))
+            _cffi_limit = 90.0  # 76/200 task TCP-morti si ripetono ogni ~4 chunk: tagliali a 90s
             _done_cffi, _pending_cffi = await asyncio.wait(_cffi_tasks, timeout=_cffi_limit)
             if _pending_cffi:
                 for _t in _pending_cffi:
