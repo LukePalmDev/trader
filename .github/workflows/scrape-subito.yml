@@ -73,12 +73,16 @@ jobs:
         if: steps.scrape.outputs.db_changed == 'true'
         run: python3.11 run.py --cleanup
 
+      - name: Export dati statici per GitHub Pages
+        if: steps.scrape.outputs.db_changed == 'true'
+        run: python3.11 export_static.py
+
       - name: Commit and push DB/artifacts
         if: steps.scrape.outputs.db_changed == 'true'
         run: |
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config user.name "github-actions[bot]"
-          git add tracker.db alert_log.json logs/run_report_latest.json || true
+          git add tracker.db alert_log.json logs/run_report_latest.json viewer/data/ || true
           git diff --staged --quiet \
             || git commit -m "chore: scrape subito $(date -u +%Y-%m-%dT%H:%M)"
           git push origin main

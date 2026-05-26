@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espansione — Xbox Price Tracker</title>
+<style>
+  :root {
+    --bg:          #141418;
+    --card:        #1e1e24;
+    --card2:       #24242c;
+    --border:      #2e2e36;
+    --text:        #e4e4e8;
+    --text-s:      #a0a0aa;
+    --text-m:      #606068;
+    --accent:      #f5a623;
+    --green:       #50c050;
+    --red:         #e05050;
+    --blue:        #6ab0f0;
+    --purple:      #b080e0;
+    --gold:        #f5a623;
+    --r:           12px;
+    --r-sm:        6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 60%, rgba(245,166,35,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 28px;
+    font-weight: 500;
+  }
+  .cover h1 {
+    font-size: clamp(52px, 8vw, 96px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+  .cover h1 span { color: var(--accent); }
+  .cover-sub {
+    font-size: 18px;
+    color: var(--text-s);
+    max-width: 560px;
+    margin-bottom: 52px;
+    font-weight: 400;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 48px;
+    font-size: 13px;
+    color: var(--text-m);
+  }
+  .cover-meta span { display: flex; flex-direction: column; gap: 4px; }
+  .cover-meta strong { color: var(--text-s); font-size: 14px; font-weight: 500; }
+  .cover-nav {
+    position: absolute; bottom: 36px;
+    display: flex; gap: 8px;
+  }
+  .cover-nav a {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border); display: block; transition: .2s;
+  }
+  .cover-nav a.active { background: var(--accent); }
+
+  /* ── DIVIDER ── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 80px 40px;
+  }
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    font-weight: 500;
+  }
+  .section h2 {
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .section-intro {
+    color: var(--text-s);
+    max-width: 640px;
+    margin-bottom: 48px;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 28px;
+  }
+  .card-sm {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px 24px;
+  }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  @media(max-width:700px) {
+    .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; }
+  }
+
+  /* ── STAT ── */
+  .stat { text-align: center; }
+  .stat-n {
+    font-size: 36px; font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-n.accent { color: var(--accent); }
+  .stat-n.green  { color: var(--green); }
+  .stat-n.blue   { color: var(--blue); }
+  .stat-n.purple { color: var(--purple); }
+  .stat-label { font-size: 12px; color: var(--text-s); letter-spacing: 0.04em; }
+
+  /* ── TABLE ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .tbl th {
+    text-align: left; padding: 10px 14px;
+    color: var(--text-s);
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .tbl td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: #24242c; }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 9px; border-radius: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+  }
+  .badge-green  { background: #1a3a1a; color: var(--green); }
+  .badge-red    { background: #3a1a1a; color: var(--red); }
+  .badge-gold   { background: #3a2c10; color: var(--accent); }
+  .badge-blue   { background: #1a2a44; color: var(--blue); }
+  .badge-purple { background: #2a1a40; color: var(--purple); }
+  .badge-gray   { background: var(--card2); color: var(--text-s); }
+
+  /* ── BAR CHART ── */
+  .bar-chart { display: flex; flex-direction: column; gap: 10px; }
+  .bar-row { display: flex; align-items: center; gap: 12px; }
+  .bar-label { width: 130px; font-size: 13px; color: var(--text-s); flex-shrink: 0; text-align: right; }
+  .bar-track { flex: 1; height: 8px; background: var(--card2); border-radius: 4px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 4px; transition: width .8s ease; }
+  .bar-val   { width: 48px; font-size: 13px; color: var(--text-s); text-align: right; flex-shrink: 0; }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item  { display: grid; grid-template-columns: 90px 1px 1fr; gap: 0 20px; padding-bottom: 28px; }
+  .tl-date  { font-size: 12px; color: var(--text-m); padding-top: 2px; text-align: right; }
+  .tl-line  { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot   { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 4px; }
+  .tl-track { flex: 1; width: 1px; background: var(--border); margin-top: 4px; }
+  .tl-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .tl-content p  { font-size: 13px; color: var(--text-s); }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch { background: var(--card2); border: 1px solid var(--border); border-radius: var(--r); padding: 32px; font-family: "SF Mono", "Fira Code", monospace; font-size: 12px; line-height: 1.8; color: var(--text-s); overflow-x: auto; }
+  .arch .hl  { color: var(--accent); }
+  .arch .hl2 { color: var(--blue); }
+  .arch .hl3 { color: var(--green); }
+  .arch .hl4 { color: var(--purple); }
+  .arch .dim { color: var(--text-m); }
+
+  /* ── PRO/CON LIST ── */
+  .pro-con { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .pro-con li { display: flex; gap: 10px; font-size: 14px; line-height: 1.5; }
+  .pro-con li::before { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+  .pro-con.pro li::before { content: '✦'; color: var(--green); }
+  .pro-con.con li::before { content: '◆'; color: var(--red); }
+  .pro-con.neutral li::before { content: '◇'; color: var(--accent); }
+
+  /* ── SCENARIO CARD ── */
+  .scenario-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+  .scenario-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .s-a .scenario-num { background: var(--blue); color: #000; }
+  .s-b .scenario-num { background: var(--green); color: #000; }
+  .s-c .scenario-num { background: var(--accent); color: #000; }
+  .s-d .scenario-num { background: var(--purple); color: #000; }
+
+  /* ── PRICE TABLE ── */
+  .price-row { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .price-row:last-child { border-bottom: none; }
+  .price-row .pv { font-size: 18px; font-weight: 700; }
+
+  /* ── QUESTION CARD ── */
+  .q-card { border-left: 3px solid var(--accent); padding-left: 18px; }
+  .q-card h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+  .q-card .q-opts { display: flex; gap: 10px; margin-top: 10px; }
+  .q-opt {
+    padding: 6px 16px; border-radius: 20px; font-size: 12px;
+    font-weight: 600; letter-spacing: 0.04em;
+    border: 1px solid var(--border); color: var(--text-s);
+    cursor: pointer;
+  }
+  .q-opt.yes { border-color: var(--green); color: var(--green); }
+  .q-opt.no  { border-color: var(--red);   color: var(--red);   }
+  .q-implication { margin-top: 10px; font-size: 12px; color: var(--text-m); display: none; }
+  .q-card:hover .q-implication { display: block; }
+
+  /* ── MATRIX ── */
+  .matrix-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    height: 280px;
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    overflow: hidden;
+  }
+  .m-cell {
+    display: flex; flex-direction: column;
+    justify-content: flex-end; padding: 16px;
+    font-size: 12px; line-height: 1.5;
+  }
+  .m-cell strong { font-size: 13px; margin-bottom: 4px; }
+  .m-cell p { color: var(--text-s); font-size: 11px; }
+  .m-tl { background: #1a2a1a; }
+  .m-tr { background: #2a1a1a; }
+  .m-bl { background: #1a1a2a; }
+  .m-br { background: #2a2a1a; }
+  .matrix-axes { display: grid; grid-template-columns: 1fr 1fr; font-size: 11px; color: var(--text-m); margin-top: 8px; text-align: center; }
+
+  /* ── RECOMMENDATION BOX ── */
+  .rec-box {
+    background: linear-gradient(135deg, rgba(245,166,35,0.08), rgba(106,176,240,0.05));
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: var(--r);
+    padding: 36px;
+    text-align: center;
+  }
+  .rec-box h3 { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .rec-box p { color: var(--text-s); max-width: 520px; margin: 0 auto 24px; font-size: 15px; line-height: 1.7; }
+  .rec-steps { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .rec-step {
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 20px; padding: 8px 18px;
+    font-size: 12px; color: var(--text-s); font-weight: 500;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding: 36px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    max-width: 960px; margin: 0 auto;
+    font-size: 12px; color: var(--text-m);
+  }
+
+  /* ── SECTION NAV ── */
+  .section-sep {
+    height: 1px; background: var(--border);
+    max-width: 960px; margin: 0 auto;
+  }
+
+  /* SVG charts */
+  svg text { font-family: -apple-system, sans-serif; }
+
+  /* ── INLINE HIGHLIGHT ── */
+  .hl-text { color: var(--accent); font-weight: 600; }
+  .hl-green { color: var(--green); font-weight: 600; }
+  .hl-blue  { color: var(--blue);  font-weight: 600; }
+  .hl-red   { color: var(--red);   font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════ COVER ══ -->
+<div class="cover">
+  <div class="cover-label">Consiglio di Amministrazione · 14 Maggio 2026</div>
+  <h1>Espa<span>n</span>sione</h1>
+  <p class="cover-sub">Analisi strategica per la transizione da sistema self-hosted locale a infrastruttura dedicata e applicazione nativa macOS</p>
+  <div class="cover-meta">
+    <span><strong>Progetto</strong>Xbox Price Tracker</span>
+    <span><strong>Versione</strong>1.0 — Riservato</span>
+    <span><strong>Revisore</strong>LukePalmDev</span>
+    <span><strong>Status</strong>Per delibera</span>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ══════════════════════════════════════════════ 1. SITUAZIONE ATTUALE ══ -->
+<div class="section">
+  <div class="section-label">01 — Situazione attuale</div>
+  <h2>Architettura as-is</h2>
+  <p class="section-intro">Il sistema è operativo dal 18 marzo 2026. In 57 giorni ha processato oltre 36.000 annunci e accumulato 57 MB di dati storici. L'infrastruttura attuale è interamente dipendente da hardware personale e servizi gratuiti.</p>
+
+  <div class="grid-4" style="margin-bottom:32px">
+    <div class="card stat">
+      <div class="stat-n accent">36.404</div>
+      <div class="stat-label">Annunci Subito indicizzati</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-n green">34.076</div>
+      <div class="stat-label">Annunci attualmente attivi</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-n blue">7.156</div>
+      <div class="stat-label">Sold items eBay tracciati</div>
+    </div>
+    <div class="card stat">
+      <div class="stat-n purple">57,4 MB</div>
+      <div class="stat-label">Dimensione database SQLite</div>
+    </div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card">
+      <div style="font-size:12px;color:var(--text-s);margin-bottom:16px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Cadenza di esecuzione workflow</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label">Subito.it</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--accent)"></div></div>
+          <div class="bar-val">4× / die</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">AI Classify</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--purple)"></div></div>
+          <div class="bar-val">4× / die</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Verify Sold</div>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--green)"></div></div>
+          <div class="bar-val">2× / die</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">eBay</div>
+          <div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--blue)"></div></div>
+          <div class="bar-val">1× / die</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Scraper Fonti</div>
+          <div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--blue)"></div></div>
+          <div class="bar-val">1× / die</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Quality (CI)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:12%;background:var(--text-m)"></div></div>
+          <div class="bar-val">su push</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;color:var(--text-s);margin-bottom:16px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Dipendenze infrastrutturali</div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <div class="bar-label" style="color:var(--red)">Mac Mini (locale)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:75%;background:var(--red)"></div></div>
+          <div class="bar-val">6 run/die</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">GitHub Actions</div>
+          <div class="bar-track"><div class="bar-fill" style="width:50%;background:var(--blue)"></div></div>
+          <div class="bar-val">6 run/die</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">SQLite (locale)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--accent)"></div></div>
+          <div class="bar-val">57,4 MB</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Viewer (localhost)</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;background:var(--purple)"></div></div>
+          <div class="bar-val">127.0.0.1</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">Claude Haiku</div>
+          <div class="bar-track"><div class="bar-fill" style="width:25%;background:var(--text-m)"></div></div>
+          <div class="bar-val">4× / die</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Diagramma architettura attuale</div>
+    <div class="arch">
+<span class="dim">┌─────────────────────────── INFRASTRUTTURA AS-IS ───────────────────────────────┐</span>
+<span class="dim">│</span>                                                                                <span class="dim">│</span>
+<span class="dim">│</span>  <span class="hl">Mac Mini (self-hosted runner)</span>                                               <span class="dim">│</span>
+<span class="dim">│</span>  ┌────────────────────────────────────────────────────────────────────────────┐ <span class="dim">│</span>
+<span class="dim">│</span>  │  scrape-subito.yml  (04/10/16/22 CEST)  ─→  <span class="hl2">subito.py</span>  ─→  <span class="hl3">tracker.db</span>   │ <span class="dim">│</span>
+<span class="dim">│</span>  │  verify-sold.yml   (11:00 / 14:00 CEST) ─→  <span class="hl2">verify_sold.py</span>              │ <span class="dim">│</span>
+<span class="dim">│</span>  │  viewer            (127.0.0.1:8080)     ─→  <span class="hl2">server.py</span>                    │ <span class="dim">│</span>
+<span class="dim">│</span>  └─────────────────────────────────┬──────────────────────────────────────────┘ <span class="dim">│</span>
+<span class="dim">│</span>                                    │ push commit                                 <span class="dim">│</span>
+<span class="dim">│</span>  <span class="hl4">GitHub Actions (ubuntu-latest)</span>   ↓                                             <span class="dim">│</span>
+<span class="dim">│</span>  ┌────────────────────────────────────────────────────────────────────────────┐ <span class="dim">│</span>
+<span class="dim">│</span>  │  ai-classify.yml   (trigger: Subito success)  ─→  <span class="hl4">claude-haiku-4-5</span>        │ <span class="dim">│</span>
+<span class="dim">│</span>  │  scrape-ebay.yml   (00:00 CEST)                                             │ <span class="dim">│</span>
+<span class="dim">│</span>  │  scrape-fonti.yml  (07:00 CEST)                                             │ <span class="dim">│</span>
+<span class="dim">│</span>  │  quality.yml       (on: push / PR)                                          │ <span class="dim">│</span>
+<span class="dim">│</span>  └────────────────────────────────────────────────────────────────────────────┘ <span class="dim">│</span>
+<span class="dim">│</span>                                                                                <span class="dim">│</span>
+<span class="dim">│</span>  <span class="hl2">Alerting:</span>  macOS notification + Telegram → LukePalmDev                      <span class="dim">│</span>
+<span class="dim">│</span>  <span class="hl2">Accesso:</span>   solo localhost — nessun accesso remoto                            <span class="dim">│</span>
+<span class="dim">└────────────────────────────────────────────────────────────────────────────────┘</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════════ 2. CRESCITA ══ -->
+<div class="section">
+  <div class="section-label">02 — Proiezioni di crescita</div>
+  <h2>Trend e volumi attesi</h2>
+  <p class="section-intro">Con un tasso di crescita del database di circa 1 MB/giorno e ~350 ad-changes/giorno, il sistema raggiungerà i limiti operativi dell'hardware corrente entro 12–18 mesi. Di seguito le proiezioni a 24 mesi.</p>
+
+  <!-- SVG: DB growth chart -->
+  <div class="card" style="margin-bottom:24px;overflow-x:auto">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Proiezione crescita database (MB) — 2026–2028</div>
+    <svg viewBox="0 0 860 220" style="width:100%;max-width:860px;display:block">
+      <defs>
+        <linearGradient id="dbGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f5a623" stop-opacity="0.3"/>
+          <stop offset="100%" stop-color="#f5a623" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="adjGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6ab0f0" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#6ab0f0" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- grid -->
+      <line x1="60" y1="10" x2="60" y2="180" stroke="#2e2e36" stroke-width="1"/>
+      <line x1="60" y1="180" x2="840" y2="180" stroke="#2e2e36" stroke-width="1"/>
+      <!-- Y labels -->
+      <text x="52" y="185" fill="#606068" font-size="11" text-anchor="end">0</text>
+      <text x="52" y="140" fill="#606068" font-size="11" text-anchor="end">200</text>
+      <text x="52" y="96"  fill="#606068" font-size="11" text-anchor="end">500</text>
+      <text x="52" y="52"  fill="#606068" font-size="11" text-anchor="end">800</text>
+      <text x="52" y="18"  fill="#606068" font-size="11" text-anchor="end">1 GB</text>
+      <!-- grid lines -->
+      <line x1="60" y1="140" x2="840" y2="140" stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <line x1="60" y1="96"  x2="840" y2="96"  stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <line x1="60" y1="52"  x2="840" y2="52"  stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <line x1="60" y1="18"  x2="840" y2="18"  stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <!-- X labels: monthly from May 2026 to May 2028 = 24 months -->
+      <!-- months: May26 Jun Jul Aug Sep Oct Nov Dec Jan27 Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec Jan28 Feb Mar Apr May28 -->
+      <!-- X range: 60 to 840 = 780px for 25 points (0..24 months) → step = 780/24 = 32.5 -->
+      <text x="60"   y="196" fill="#606068" font-size="10" text-anchor="middle">Mag '26</text>
+      <text x="93"   y="196" fill="#606068" font-size="10" text-anchor="middle">Giu</text>
+      <text x="125"  y="196" fill="#606068" font-size="10" text-anchor="middle">Lug</text>
+      <text x="222"  y="196" fill="#606068" font-size="10" text-anchor="middle">Ott</text>
+      <text x="352"  y="196" fill="#606068" font-size="10" text-anchor="middle">Mar '27</text>
+      <text x="450"  y="196" fill="#606068" font-size="10" text-anchor="middle">Giu '27</text>
+      <text x="580"  y="196" fill="#606068" font-size="10" text-anchor="middle">Nov '27</text>
+      <text x="710"  y="196" fill="#606068" font-size="10" text-anchor="middle">Apr '28</text>
+      <text x="840"  y="196" fill="#606068" font-size="10" text-anchor="middle">Mag '28</text>
+      <!--
+        Scale: 0-1000 MB mapped to 180→18 = 162px
+        1MB = 0.162px
+        Current (May14): 57.4MB → y = 180 - 57.4*0.162 = 170.7
+        Growth: ~1MB/day = ~30MB/month
+        Month step: 32.5px
+        Points: (60+m*32.5, 180-val*0.162)
+        m=0 May26: 57 → y=170.7  x=60
+        m=1 Jun26: 87 → y=166.9  x=92.5
+        m=3 Aug26: 147 → y=156.2 x=157.5
+        m=6 Nov26: 237 → y=141.6 x=255
+        m=9 Feb27: 327 → y=127   x=352.5
+        m=12 May27: 417 → y=112.4 x=450
+        m=18 Nov27: 597 → y=83.3  x=645
+        m=24 May28: 777 → y=54.2  x=840
+      -->
+      <!-- DB growth area -->
+      <polygon points="60,170.7 92.5,166.9 125,162.2 157.5,156.2 190,149.8 222.5,142.6 255,135.4 287.5,127 320,119.6 352.5,112.4 385,105.2 417.5,97.8 450,90.6 482.5,83.3 515,76.1 547.5,68.8 580,61.6 612.5,54.4 645,47.2 677.5,40.1 710,32.9 742.5,25.7 775,18.5 807.5,14 840,14 840,180 60,180"
+        fill="url(#dbGrad)"/>
+      <polyline points="60,170.7 92.5,166.9 125,162.2 157.5,156.2 190,149.8 222.5,142.6 255,135.4 287.5,127 320,119.6 352.5,112.4 385,105.2 417.5,97.8 450,90.6 482.5,83.3 515,76.1 547.5,68.8 580,61.6 612.5,54.4 645,47.2 677.5,40.1 710,32.9 742.5,25.7 775,18.5 807.5,14 840,14"
+        fill="none" stroke="#f5a623" stroke-width="2"/>
+      <!-- current point -->
+      <circle cx="60" cy="170.7" r="4" fill="#f5a623"/>
+      <text x="68" y="167" fill="#f5a623" font-size="11">57 MB (oggi)</text>
+      <!-- 1 year point -->
+      <circle cx="450" cy="90.6" r="4" fill="#6ab0f0"/>
+      <text x="458" y="87" fill="#6ab0f0" font-size="11">~430 MB</text>
+      <!-- 2 year point -->
+      <circle cx="840" cy="14" r="4" fill="#e05050"/>
+      <text x="800" y="12" fill="#e05050" font-size="11">~780 MB</text>
+      <!-- critical threshold line -->
+      <line x1="60" y1="29" x2="840" y2="29" stroke="#e05050" stroke-width="1" stroke-dasharray="6,3"/>
+      <text x="840" y="26" fill="#e05050" font-size="10" text-anchor="end">900 MB — limite pratico SQLite locale</text>
+    </svg>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:24px">
+    <div class="card-sm">
+      <div style="font-size:11px;color:var(--text-m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Oggi — Maggio 2026</div>
+      <div class="price-row"><span>Database</span><span class="pv" style="color:var(--green)">57,4 MB</span></div>
+      <div class="price-row"><span>Ads totali</span><span class="pv">36.404</span></div>
+      <div class="price-row"><span>Run / giorno</span><span class="pv">12</span></div>
+      <div class="price-row"><span>Costo infra</span><span class="pv" style="color:var(--green)">€ 0</span></div>
+    </div>
+    <div class="card-sm" style="border-color:rgba(245,166,35,0.3)">
+      <div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">+12 mesi — Maggio 2027</div>
+      <div class="price-row"><span>Database</span><span class="pv" style="color:var(--accent)">~430 MB</span></div>
+      <div class="price-row"><span>Ads totali</span><span class="pv">~250.000</span></div>
+      <div class="price-row"><span>Run / giorno</span><span class="pv">12–16</span></div>
+      <div class="price-row"><span>Costo infra</span><span class="pv" style="color:var(--accent)">€ 0–9/mese</span></div>
+    </div>
+    <div class="card-sm">
+      <div style="font-size:11px;color:var(--text-m);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">+24 mesi — Maggio 2028</div>
+      <div class="price-row"><span>Database</span><span class="pv" style="color:var(--red)">~780 MB</span></div>
+      <div class="price-row"><span>Ads totali</span><span class="pv">~500.000</span></div>
+      <div class="price-row"><span>Run / giorno</span><span class="pv">12–20</span></div>
+      <div class="price-row"><span>Costo infra</span><span class="pv" style="color:var(--red)">€ 9–20/mese</span></div>
+    </div>
+  </div>
+
+  <!-- Activity bar chart -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Ad-changes giornalieri — ultimi 14 giorni rilevati</div>
+    <svg viewBox="0 0 860 160" style="width:100%;max-width:860px;display:block">
+      <!-- data: Apr11=424, Apr12=3619(anomalia), Apr13=354, Apr15=726, Apr16=372, Apr17=361, Apr18=364, Apr19=388, Apr20=422, Apr21=372, Apr22=304, Apr23=287, Apr24=435, Apr25=272 -->
+      <!-- normalize to max ~800 visible (Apr12 is anomaly, cap at 800) -->
+      <!-- Y: 140→10 = 130px for 0→800, step=130/800=0.1625 -->
+      <!-- bars: 14 bars, width = 860/14 = ~56px, padding 8px each side -->
+      <line x1="40" y1="140" x2="840" y2="140" stroke="#2e2e36" stroke-width="1"/>
+      <line x1="40" y1="10" x2="40" y2="140" stroke="#2e2e36" stroke-width="1"/>
+      <!-- Y labels -->
+      <text x="35" y="143" fill="#606068" font-size="10" text-anchor="end">0</text>
+      <text x="35" y="108" fill="#606068" font-size="10" text-anchor="end">200</text>
+      <text x="35" y="75"  fill="#606068" font-size="10" text-anchor="end">400</text>
+      <text x="35" y="43"  fill="#606068" font-size="10" text-anchor="end">600</text>
+      <text x="35" y="15"  fill="#606068" font-size="10" text-anchor="end">800</text>
+      <!-- grid -->
+      <line x1="40" y1="108" x2="840" y2="108" stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <line x1="40" y1="75"  x2="840" y2="75"  stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <line x1="40" y1="43"  x2="840" y2="43"  stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <!-- bars: step=800/14 = 57.1px -->
+      <!-- Apr11: 424 → h=424*130/800=68.9 -->
+      <rect x="49"  y="71.1" width="44" height="68.9" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="71"  y="155" fill="#606068" font-size="9" text-anchor="middle">11/4</text>
+      <!-- Apr12: 3619 → anomalia, cap 800 → h=130, mark special -->
+      <rect x="106" y="10" width="44" height="130" rx="3" fill="#f5a623" opacity=".9"/>
+      <text x="128" y="8"   fill="#f5a623" font-size="9" text-anchor="middle">3.619 ↑</text>
+      <text x="128" y="155" fill="#f5a623" font-size="9" text-anchor="middle">12/4</text>
+      <!-- Apr13: 354 → h=57.5 -->
+      <rect x="163" y="82.5" width="44" height="57.5" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="185" y="155" fill="#606068" font-size="9" text-anchor="middle">13/4</text>
+      <!-- Apr15: 726 → h=118 -->
+      <rect x="220" y="22" width="44" height="118" rx="3" fill="#b080e0" opacity=".8"/>
+      <text x="242" y="155" fill="#606068" font-size="9" text-anchor="middle">15/4</text>
+      <!-- Apr16: 372 → h=60.5 -->
+      <rect x="277" y="79.5" width="44" height="60.5" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="299" y="155" fill="#606068" font-size="9" text-anchor="middle">16/4</text>
+      <!-- Apr17: 361 → h=58.7 -->
+      <rect x="334" y="81.3" width="44" height="58.7" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="356" y="155" fill="#606068" font-size="9" text-anchor="middle">17/4</text>
+      <!-- Apr18: 364 → h=59.1 -->
+      <rect x="391" y="80.9" width="44" height="59.1" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="413" y="155" fill="#606068" font-size="9" text-anchor="middle">18/4</text>
+      <!-- Apr19: 388 → h=63.1 -->
+      <rect x="448" y="76.9" width="44" height="63.1" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="470" y="155" fill="#606068" font-size="9" text-anchor="middle">19/4</text>
+      <!-- Apr20: 422 → h=68.6 -->
+      <rect x="505" y="71.4" width="44" height="68.6" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="527" y="155" fill="#606068" font-size="9" text-anchor="middle">20/4</text>
+      <!-- Apr21: 372 → h=60.5 -->
+      <rect x="562" y="79.5" width="44" height="60.5" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="584" y="155" fill="#606068" font-size="9" text-anchor="middle">21/4</text>
+      <!-- Apr22: 304 → h=49.4 -->
+      <rect x="619" y="90.6" width="44" height="49.4" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="641" y="155" fill="#606068" font-size="9" text-anchor="middle">22/4</text>
+      <!-- Apr23: 287 → h=46.6 -->
+      <rect x="676" y="93.4" width="44" height="46.6" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="698" y="155" fill="#606068" font-size="9" text-anchor="middle">23/4</text>
+      <!-- Apr24: 435 → h=70.7 -->
+      <rect x="733" y="69.3" width="44" height="70.7" rx="3" fill="#6ab0f0" opacity=".8"/>
+      <text x="755" y="155" fill="#606068" font-size="9" text-anchor="middle">24/4</text>
+      <!-- Apr25: 272 → h=44.2 -->
+      <rect x="790" y="95.8" width="44" height="44.2" rx="3" fill="#50c050" opacity=".8"/>
+      <text x="812" y="155" fill="#606068" font-size="9" text-anchor="middle">25/4</text>
+      <!-- avg line -->
+      <line x1="40" y1="82" x2="840" y2="82" stroke="#f5a623" stroke-width="1" stroke-dasharray="6,4" opacity=".6"/>
+      <text x="844" y="85" fill="#f5a623" font-size="10">ø 358/die</text>
+    </svg>
+  </div>
+</div>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════════ 3. SCENARI ══ -->
+<div class="section">
+  <div class="section-label">03 — Scenari proposti</div>
+  <h2>Quattro opzioni strategiche</h2>
+  <p class="section-intro">Vengono analizzati quattro scenari distinti, ordinati per costo crescente e beneficio crescente. Ogni scenario include costi stimati, impatto tecnico e compatibilità con la roadmap.</p>
+
+  <div class="grid-2" style="gap:20px;margin-bottom:20px">
+
+    <!-- SCENARIO A -->
+    <div class="card s-a">
+      <div class="scenario-badge"><div class="scenario-num">A</div><span style="color:var(--blue)">Status Quo ottimizzato</span></div>
+      <p style="font-size:13px;color:var(--text-s);margin-bottom:16px">Nessuna migrazione. Si mantiene l'architettura esistente con ottimizzazioni minori (alerting migliore, monitoraggio uptime Mac Mini).</p>
+      <div class="price-row"><span style="font-size:13px">Costo mensile</span><span class="pv" style="font-size:20px;color:var(--green)">€ 0</span></div>
+      <div class="price-row"><span style="font-size:13px">Setup iniziale</span><span class="pv" style="font-size:20px;color:var(--green)">€ 0</span></div>
+      <div class="price-row"><span style="font-size:13px">Dipendenza hardware</span><span><span class="badge badge-red">Alta</span></span></div>
+      <div class="price-row"><span style="font-size:13px">Accesso remoto</span><span><span class="badge badge-red">No</span></span></div>
+      <div class="price-row"><span style="font-size:13px">Mac App</span><span><span class="badge badge-gray">No</span></span></div>
+    </div>
+
+    <!-- SCENARIO B -->
+    <div class="card s-b">
+      <div class="scenario-badge"><div class="scenario-num">B</div><span style="color:var(--green)">VPS + Accesso remoto</span></div>
+      <p style="font-size:13px;color:var(--text-s);margin-bottom:16px">Si affitta un VPS cloud (es. Hetzner CX22/CX32) dove girano tutti gli scraper come cron job. Il viewer diventa accessibile da remoto via HTTPS. Nessuna Mac App.</p>
+      <div class="price-row"><span style="font-size:13px">Costo mensile</span><span class="pv" style="font-size:20px;color:var(--accent)">€ 4–9</span></div>
+      <div class="price-row"><span style="font-size:13px">Setup iniziale</span><span class="pv" style="font-size:20px;color:var(--accent)">€ 0–20</span></div>
+      <div class="price-row"><span style="font-size:13px">Dipendenza hardware</span><span><span class="badge badge-green">Nulla</span></span></div>
+      <div class="price-row"><span style="font-size:13px">Accesso remoto</span><span><span class="badge badge-green">Sì</span></span></div>
+      <div class="price-row"><span style="font-size:13px">Mac App</span><span><span class="badge badge-gray">No</span></span></div>
+    </div>
+
+    <!-- SCENARIO C -->
+    <div class="card s-c">
+      <div class="scenario-badge"><div class="scenario-num">C</div><span style="color:var(--accent)">VPS + Mac App</span></div>
+      <p style="font-size:13px;color:var(--text-s);margin-bottom:16px">VPS per scraper + sviluppo di una Mac App nativa (menu bar / WebKit wrapper) che si connette all'API remota. Esperienza desktop premium, notifiche native macOS.</p>
+      <div class="price-row"><span style="font-size:13px">Costo mensile</span><span class="pv" style="font-size:20px;color:var(--accent)">€ 4–9</span></div>
+      <div class="price-row"><span style="font-size:13px">Setup iniziale</span><span class="pv" style="font-size:20px;color:var(--accent)">€ 0 + tempo</span></div>
+      <div class="price-row"><span style="font-size:13px">Dipendenza hardware</span><span><span class="badge badge-green">Nulla</span></span></div>
+      <div class="price-row"><span style="font-size:13px">Accesso remoto</span><span><span class="badge badge-green">Sì</span></span></div>
+      <div class="price-row"><span style="font-size:13px">Mac App</span><span><span class="badge badge-green">Sì</span></span></div>
+    </div>
+
+    <!-- SCENARIO D -->
+    <div class="card s-d">
+      <div class="scenario-badge"><div class="scenario-num">D</div><span style="color:var(--purple)">Dedicato + SaaS multi-utente</span></div>
+      <p style="font-size:13px;color:var(--text-s);margin-bottom:16px">Server dedicato (bare metal), PostgreSQL, architettura multi-tenant. Possibile apertura del servizio ad altri utenti. Richiede investimento significativo in tempo e denaro.</p>
+      <div class="price-row"><span style="font-size:13px">Costo mensile</span><span class="pv" style="font-size:20px;color:var(--red)">€ 40–80</span></div>
+      <div class="price-row"><span style="font-size:13px">Setup iniziale</span><span class="pv" style="font-size:20px;color:var(--red)">€ 100+</span></div>
+      <div class="price-row"><span style="font-size:13px">Dipendenza hardware</span><span><span class="badge badge-green">Nulla</span></span></div>
+      <div class="price-row"><span style="font-size:13px">Accesso remoto</span><span><span class="badge badge-green">Sì</span></span></div>
+      <div class="price-row"><span style="font-size:13px">Mac App</span><span><span class="badge badge-green">Opzionale</span></span></div>
+    </div>
+
+  </div>
+
+  <!-- Comparison table -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Matrice comparativa scenari</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Criterio</th>
+          <th>A — Status Quo</th>
+          <th>B — VPS</th>
+          <th>C — VPS + App</th>
+          <th>D — Dedicato</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Costo annuale stimato</td>
+          <td style="color:var(--green)">€ 0</td>
+          <td style="color:var(--accent)">€ 54–108</td>
+          <td style="color:var(--accent)">€ 54–108</td>
+          <td style="color:var(--red)">€ 480–960</td>
+        </tr>
+        <tr>
+          <td>Uptime garantito</td>
+          <td><span class="badge badge-red">Dipende dal Mac</span></td>
+          <td><span class="badge badge-green">99.9%</span></td>
+          <td><span class="badge badge-green">99.9%</span></td>
+          <td><span class="badge badge-green">99.99%</span></td>
+        </tr>
+        <tr>
+          <td>Accesso da iPhone / iPad</td>
+          <td><span class="badge badge-red">No</span></td>
+          <td><span class="badge badge-green">Sì (web)</span></td>
+          <td><span class="badge badge-green">Sì (web + app)</span></td>
+          <td><span class="badge badge-green">Sì</span></td>
+        </tr>
+        <tr>
+          <td>Playwright/Chromium</td>
+          <td><span class="badge badge-green">Funziona</span></td>
+          <td><span class="badge badge-gold">Richiede headless</span></td>
+          <td><span class="badge badge-gold">Richiede headless</span></td>
+          <td><span class="badge badge-gold">Richiede headless</span></td>
+        </tr>
+        <tr>
+          <td>Difficoltà migrazione</td>
+          <td><span class="badge badge-green">Nessuna</span></td>
+          <td><span class="badge badge-gold">Bassa (2–4 ore)</span></td>
+          <td><span class="badge badge-blue">Media (1–2 settimane)</span></td>
+          <td><span class="badge badge-red">Alta (1–3 mesi)</span></td>
+        </tr>
+        <tr>
+          <td>Scalabilità futura</td>
+          <td><span class="badge badge-red">Limitata</span></td>
+          <td><span class="badge badge-gold">Buona</span></td>
+          <td><span class="badge badge-gold">Buona</span></td>
+          <td><span class="badge badge-green">Eccellente</span></td>
+        </tr>
+        <tr>
+          <td>Rischio tecnico</td>
+          <td><span class="badge badge-gold">Medio</span></td>
+          <td><span class="badge badge-green">Basso</span></td>
+          <td><span class="badge badge-blue">Medio</span></td>
+          <td><span class="badge badge-red">Alto</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════════ 4. PUNTI DI FORZA ══ -->
+<div class="section">
+  <div class="section-label">04 — Analisi</div>
+  <h2>Punti di forza del cambiamento</h2>
+  <p class="section-intro">La transizione verso un'infrastruttura dedicata (scenari B o C) risolve strutturalmente i limiti architetturali dell'attuale setup e abilita funzionalità oggi impossibili.</p>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:16px">✦ Forze — Infrastruttura</div>
+      <ul class="pro-con pro">
+        <li><strong>Uptime garantito 99.9%.</strong> I dati vengono raccolti anche quando il Mac è spento, in aggiornamento o in riparazione. Oggi 1 riavvio del Mac Mini = minimo 3 run Subito perse (ogni 6 ore).</li>
+        <li><strong>Eliminazione del single point of failure.</strong> Il database non risiede più su un solo dispositivo fisico non ridondato.</li>
+        <li><strong>Playwright in headless mode.</strong> Sui VPS Linux, Chromium gira in headless stabile — nessun problema con Xcode, screen server o sessioni utente attive.</li>
+        <li><strong>Backup automatici.</strong> I VPS moderni offrono snapshot giornalieri integrati a €1–2/mese. Oggi il backup del DB dipende da TimeMachine locale.</li>
+        <li><strong>Indipendenza da GitHub Actions.</strong> I workflow possono diventare semplici cron job su crontab/systemd, senza dipendere da quote, runner availability o workflow_run trigger.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:16px">✦ Forze — Usabilità</div>
+      <ul class="pro-con pro">
+        <li><strong>Accesso ovunque.</strong> Il viewer (oggi solo su 127.0.0.1:8080) diventa accessibile da iPhone, iPad, qualsiasi browser con autenticazione Bearer token — già implementata nel codice.</li>
+        <li><strong>Mac App come shell nativa.</strong> WKWebView su macOS permette di incapsulare il viewer esistente in un'app nativa in poche ore, senza riscrivere il frontend. Notifiche native, menu bar, Spotlight integration.</li>
+        <li><strong>Alert Telegram già funzionanti.</strong> L'infrastruttura di alerting è già pronta e non richiede modifiche — solo puntare a un host diverso.</li>
+        <li><strong>API REST già pronta.</strong> I 30+ endpoint di server.py con auth Bearer sono già production-ready per essere esposti pubblicamente con un reverse proxy (nginx/caddy).</li>
+        <li><strong>Eliminazione dipendenza dalla rete locale.</strong> Oggi il viewer non funziona da reti esterne; con HTTPS sul VPS si risolve con un dominio e un certificato Let's Encrypt gratuito.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Strengths radar -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Score comparativo per dimensione (0–10)</div>
+    <svg viewBox="0 0 860 200" style="width:100%;max-width:860px;display:block">
+      <!-- Simple horizontal comparison bars -->
+      <defs>
+        <linearGradient id="gA" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#606068"/><stop offset="100%" stop-color="#404048"/></linearGradient>
+        <linearGradient id="gB" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#6ab0f0"/><stop offset="100%" stop-color="#4090d0"/></linearGradient>
+        <linearGradient id="gC" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#f5a623"/><stop offset="100%" stop-color="#d58000"/></linearGradient>
+        <linearGradient id="gD" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#b080e0"/><stop offset="100%" stop-color="#8050c0"/></linearGradient>
+      </defs>
+      <!-- Dimensions -->
+      <!-- Y: 5 dimensions, height=200, each row=36px starting at y=14 -->
+      <!-- X: 0-10, mapped to 220→800 = 580px per 10 units = 58px/unit -->
+      <!-- Labels -->
+      <text x="15" y="32"  fill="#a0a0aa" font-size="12">Uptime</text>
+      <text x="15" y="68"  fill="#a0a0aa" font-size="12">Accesso remoto</text>
+      <text x="15" y="104" fill="#a0a0aa" font-size="12">Sicurezza dati</text>
+      <text x="15" y="140" fill="#a0a0aa" font-size="12">Usabilità</text>
+      <text x="15" y="176" fill="#a0a0aa" font-size="12">Costo-efficienza</text>
+      <!-- Scenario A (gray): Uptime=4 Accesso=1 Sicurezza=3 Usabilità=4 Costo=10 -->
+      <!-- Scenario B (blue): Uptime=9 Accesso=8 Sicurezza=7 Usabilità=7 Costo=8 -->
+      <!-- Scenario C (gold): Uptime=9 Accesso=10 Sicurezza=7 Usabilità=10 Costo=7 -->
+      <!-- Scenario D (purple): Uptime=10 Accesso=10 Sicurezza=10 Usabilità=10 Costo=3 -->
+      <!-- row 1: Uptime -->
+      <rect x="220" y="18" width="232" height="10" rx="5" fill="url(#gA)"/>
+      <rect x="220" y="30" width="522" height="10" rx="5" fill="url(#gB)"/>
+      <rect x="220" y="42" width="522" height="10" rx="5" fill="url(#gC)"/>
+      <rect x="220" y="54" width="580" height="10" rx="5" fill="url(#gD)"/>
+      <!-- row 2: Accesso remoto -->
+      <rect x="220" y="54" width="58"  height="10" rx="5" fill="url(#gA)" y="90"/>
+      <rect x="220" y="66" width="464" height="10" rx="5" fill="url(#gB)" y="90"/>
+      <rect x="220" y="78" width="580" height="10" rx="5" fill="url(#gC)" y="90"/>
+      <rect x="220" y="90" width="580" height="10" rx="5" fill="url(#gD)" y="90"/>
+      <!-- Rewrite as flat values for simplicity -->
+      <!-- A uptime=4 → 232; B=9→522; C=9→522; D=10→580 -->
+      <!-- A accesso=1 → 58; B=8→464; C=10→580; D=10→580 -->
+      <!-- A sicurezza=3→174; B=7→406; C=7→406; D=10→580 -->
+      <!-- A usabilità=4→232; B=7→406; C=10→580; D=10→580 -->
+      <!-- A costo=10→580; B=8→464; C=7→406; D=3→174 -->
+      <g transform="translate(0,-62)">
+        <!-- Legend -->
+        <rect x="220" y="196" width="12" height="8" rx="2" fill="#606068"/>
+        <text x="236" y="204" fill="#a0a0aa" font-size="11">A — Status Quo</text>
+        <rect x="340" y="196" width="12" height="8" rx="2" fill="#6ab0f0"/>
+        <text x="356" y="204" fill="#a0a0aa" font-size="11">B — VPS</text>
+        <rect x="430" y="196" width="12" height="8" rx="2" fill="#f5a623"/>
+        <text x="446" y="204" fill="#a0a0aa" font-size="11">C — VPS + App</text>
+        <rect x="560" y="196" width="12" height="8" rx="2" fill="#b080e0"/>
+        <text x="576" y="204" fill="#a0a0aa" font-size="11">D — Dedicato</text>
+      </g>
+      <!-- Uptime row (y=10-58) -->
+      <rect x="220" y="10" width="232" height="8" rx="4" fill="#404048"/>
+      <rect x="220" y="20" width="522" height="8" rx="4" fill="#4090d0"/>
+      <rect x="220" y="30" width="522" height="8" rx="4" fill="#d58000"/>
+      <rect x="220" y="40" width="580" height="8" rx="4" fill="#8050c0"/>
+      <!-- Accesso row (y=54-102) -->
+      <rect x="220" y="54" width="58"  height="8" rx="4" fill="#404048"/>
+      <rect x="220" y="64" width="464" height="8" rx="4" fill="#4090d0"/>
+      <rect x="220" y="74" width="580" height="8" rx="4" fill="#d58000"/>
+      <rect x="220" y="84" width="580" height="8" rx="4" fill="#8050c0"/>
+      <!-- Sicurezza row (y=98-138) -->
+      <rect x="220" y="98"  width="174" height="8" rx="4" fill="#404048"/>
+      <rect x="220" y="108" width="406" height="8" rx="4" fill="#4090d0"/>
+      <rect x="220" y="118" width="406" height="8" rx="4" fill="#d58000"/>
+      <rect x="220" y="128" width="580" height="8" rx="4" fill="#8050c0"/>
+      <!-- Usabilità row (y=140-178) -->
+      <rect x="220" y="140" width="232" height="8" rx="4" fill="#404048"/>
+      <rect x="220" y="150" width="406" height="8" rx="4" fill="#4090d0"/>
+      <rect x="220" y="160" width="580" height="8" rx="4" fill="#d58000"/>
+      <rect x="220" y="170" width="580" height="8" rx="4" fill="#8050c0"/>
+    </svg>
+  </div>
+</div>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════════ 5. DEBOLEZZE ══ -->
+<div class="section">
+  <div class="section-label">05 — Analisi</div>
+  <h2>Punti di debolezza e rischi</h2>
+  <p class="section-intro">La migrazione introduce nuove classi di rischio che devono essere valutate prima della decisione. Di seguito i fattori critici per ogni dimensione.</p>
+
+  <div class="grid-2" style="margin-bottom:24px">
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:16px">◆ Criticità tecniche</div>
+      <ul class="pro-con con">
+        <li><strong>Playwright su Linux headless.</strong> L'attuale scraper Subito usa <code style="color:var(--accent);font-size:12px">playwright_channel = "chrome"</code> (Chrome di sistema). Su un VPS Linux non esiste Chrome di sistema: richiede <code style="color:var(--accent);font-size:12px">chromium</code> bundled + dipendenze di sistema (libgbm, libnss, ecc.). Migrazione: 2–4 ore di test.</li>
+        <li><strong>Subito scraper usa fingerprint macOS.</strong> Il user-agent attuale dichiara <code style="color:var(--accent);font-size:12px">Macintosh; Intel Mac OS X 10_15_7</code>. Su Linux va aggiornato per evitare incongruenze TLS/user-agent che possono aumentare la probabilità di ban.</li>
+        <li><strong>SQLite multi-process.</strong> Il DB SQLite non è progettato per accesso multi-processo concorrente su rete. Se si vuole accedere al DB da più istanze contemporanee (es. scraper + API), occorre implementare WAL mode o migrare a PostgreSQL (scenario D).</li>
+        <li><strong>Gestione secrets su VPS.</strong> Le credenziali (Telegram token, Anthropic API key) oggi sono GitHub Secrets. Su VPS vanno gestite manualmente via .env o secret manager.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:16px">◆ Criticità operative</div>
+      <ul class="pro-con con">
+        <li><strong>Costo ricorrente.</strong> Anche il VPS più economico (€4.5/mese) introduce un costo fisso mensile che oggi non esiste. Su 24 mesi: €108–€216.</li>
+        <li><strong>Manutenzione OS.</strong> Un VPS richiede aggiornamenti di sicurezza, monitoraggio dello spazio disco e gestione del processo di avvio dei servizi (systemd units). Stima: 1–2 ore/mese.</li>
+        <li><strong>Mac App: complessità di sviluppo.</strong> Lo sviluppo di una Mac App nativa richiede competenze Swift/SwiftUI o Electron. Un wrapper WKWebView di base richiede 1–2 settimane; un'app menu-bar con notifiche native e auto-launch 3–4 settimane. Nessun componente attuale è Swift.</li>
+        <li><strong>Sicurezza del viewer esposto.</strong> Esporre server.py su internet richiede obbligatoriamente: HTTPS (TLS), reverse proxy (nginx/caddy), rate limiting, e un audit degli endpoint POST. Il token Bearer attuale è vuoto di default in config.toml.</li>
+        <li><strong>Continuità del Mac Mini.</strong> Durante la migrazione, il runner self-hosted sul Mac Mini deve continuare a operare fino al completo switch-over — doppio setup temporaneo.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Risk matrix -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Matrice rischio × impatto</div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center">
+      <div style="font-size:11px;color:var(--text-m);writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;letter-spacing:.1em">PROBABILITÀ →</div>
+      <div>
+        <div class="matrix-grid">
+          <div class="m-cell m-tl">
+            <strong style="color:var(--green)">Alta prob. / Basso impatto</strong>
+            <p>Playwright headless config<br>Secrets management<br>User-agent update</p>
+          </div>
+          <div class="m-cell m-tr">
+            <strong style="color:var(--red)">Alta prob. / Alto impatto</strong>
+            <p>Ban IP da nuovo indirizzo VPS<br>Downtime durante migrazione<br>API token non configurato</p>
+          </div>
+          <div class="m-cell m-bl">
+            <strong style="color:var(--blue)">Bassa prob. / Basso impatto</strong>
+            <p>Provider VPS offline<br>Costo superiore al previsto<br>DNS propagation delay</p>
+          </div>
+          <div class="m-cell m-br">
+            <strong style="color:var(--accent)">Bassa prob. / Alto impatto</strong>
+            <p>Perdita dati DB durante migrazione<br>Incompatibilità Subito anti-bot su Linux<br>Violazione sicurezza viewer esposto</p>
+          </div>
+        </div>
+        <div class="matrix-axes">
+          <div style="text-align:left;padding:8px 0;font-size:11px;color:var(--text-m)">← Basso impatto</div>
+          <div style="text-align:right;padding:8px 0;font-size:11px;color:var(--text-m)">Alto impatto →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════════ 6. CONDIZIONI FAVOREVOLI / SFAVOREVOLI ══ -->
+<div class="section">
+  <div class="section-label">06 — Condizioni</div>
+  <h2>Quando conviene · Quando no</h2>
+  <p class="section-intro">La decisione è contestuale. Le seguenti condizioni determinano se la migrazione è strategicamente vantaggiosa nel momento attuale.</p>
+
+  <div class="grid-2" style="margin-bottom:32px">
+    <div class="card" style="border-color:rgba(80,192,80,0.2)">
+      <div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:12px">Condizioni FAVOREVOLI alla migrazione</div>
+      <ul class="pro-con neutral" style="gap:14px">
+        <li>
+          <span><strong>Il Mac Mini si spegne o va offline frequentemente.</strong><br><span style="font-size:12px;color:var(--text-m)">Ogni ora di downtime = almeno 1 run Subito persa su 491 già eseguite (0.2% dei dati). Su base annua, 10 downtime da 6h = 10 run perse = gap nei trend.</span></span>
+        </li>
+        <li>
+          <span><strong>Si vuole monitorare da mobile o da reti esterne.</strong><br><span style="font-size:12px;color:var(--text-m)">L'alert Telegram notifica ma non permette di vedere i dati senza essere sulla rete locale. Con il VPS bastano dati mobili.</span></span>
+        </li>
+        <li>
+          <span><strong>Il progetto è destinato a crescere oltre il mercato Xbox.</strong><br><span style="font-size:12px;color:var(--text-m)">Aggiungere PlayStation, Nintendo o altri mercati (Vinted, Wallapop) triplica il volume: il Mac Mini diventa collo di bottiglia.</span></span>
+        </li>
+        <li>
+          <span><strong>Si prevede di condividere il tool con altri utenti.</strong><br><span style="font-size:12px;color:var(--text-m)">Un VPS con HTTPS rende il viewer condivisibile via link protetto a zero costo aggiuntivo.</span></span>
+        </li>
+        <li>
+          <span><strong>Il budget mensile per il progetto è ≥ €5.</strong><br><span style="font-size:12px;color:var(--text-m)">Hetzner CX22 a €4.51/mese è il VPS con il miglior rapporto performance/costo disponibile in Europa.</span></span>
+        </li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(224,80,80,0.2)">
+      <div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:12px">Condizioni SFAVOREVOLI alla migrazione</div>
+      <ul class="pro-con con" style="gap:14px">
+        <li>
+          <span><strong>Il Mac Mini è sempre acceso e stabile.</strong><br><span style="font-size:12px;color:var(--text-m)">Se l'uptime attuale è vicino al 100% e non si prevedono interruzioni, il valore marginale del VPS è basso rispetto al costo ricorrente.</span></span>
+        </li>
+        <li>
+          <span><strong>Non si ha familiarità con Linux server administration.</strong><br><span style="font-size:12px;color:var(--text-m)">Configurare systemd, nginx, TLS, firewall e monitoraggio richiede 4–8 ore iniziali e conoscenza del terminale Linux. Senza esperienza, il rischio di misconfigurazioni di sicurezza è elevato.</span></span>
+        </li>
+        <li>
+          <span><strong>Il progetto è strettamente personale e non richiede mobilità.</strong><br><span style="font-size:12px;color:var(--text-m)">Se si accede al viewer sempre dalla stessa rete locale, il beneficio dell'accesso remoto è teorico, non pratico.</span></span>
+        </li>
+        <li>
+          <span><strong>Subito anti-bot blocca l'IP del VPS.</strong><br><span style="font-size:12px;color:var(--text-m)">Gli IP dei datacenter europei (Hetzner, OVH) sono noti ai sistemi anti-bot. Subito potrebbe aumentare il tasso di blocco rispetto a un IP residenziale. Oggi il runner sul Mac Mini usa la connessione di casa.</span></span>
+        </li>
+        <li>
+          <span><strong>Non si vuole investire tempo nella Mac App.</strong><br><span style="font-size:12px;color:var(--text-m)">Lo scenario C porta benefici solo se la Mac App viene sviluppata. Se l'obiettivo è solo la stabilità, lo scenario B è sufficiente e molto più rapido da implementare.</span></span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Proiezione costi -->
+  <div class="card">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Proiezione costi cumulativi a 24 mesi (€)</div>
+    <svg viewBox="0 0 860 180" style="width:100%;max-width:860px;display:block">
+      <!-- Y: 0-220€, 160px range, step=160/220=0.727 -->
+      <!-- X: 0-24 months, 780px range, step=780/24=32.5 -->
+      <line x1="60" y1="10" x2="60" y2="160" stroke="#2e2e36" stroke-width="1"/>
+      <line x1="60" y1="160" x2="840" y2="160" stroke="#2e2e36" stroke-width="1"/>
+      <!-- Y labels -->
+      <text x="52" y="164" fill="#606068" font-size="11" text-anchor="end">€0</text>
+      <text x="52" y="124" fill="#606068" font-size="11" text-anchor="end">€50</text>
+      <text x="52" y="87"  fill="#606068" font-size="11" text-anchor="end">€100</text>
+      <text x="52" y="51"  fill="#606068" font-size="11" text-anchor="end">€150</text>
+      <text x="52" y="15"  fill="#606068" font-size="11" text-anchor="end">€200</text>
+      <!-- grid -->
+      <line x1="60" y1="124" x2="840" y2="124" stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <line x1="60" y1="87"  x2="840" y2="87"  stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <line x1="60" y1="51"  x2="840" y2="51"  stroke="#2e2e36" stroke-width="0.5" stroke-dasharray="4,4"/>
+      <!-- A: always €0 → flat line at y=160 -->
+      <line x1="60" y1="160" x2="840" y2="160" stroke="#606068" stroke-width="2"/>
+      <!-- B: €4.5/month → after 24 months = €108 → y = 160 - 108*0.727 = 81.5 -->
+      <!-- Linear: m=0→160, m=24→81.5; at x=60+m*32.5 -->
+      <line x1="60" y1="160" x2="840" y2="81.5" stroke="#6ab0f0" stroke-width="2"/>
+      <!-- C: €7/month avg → 24 months = €168 → y = 160 - 168*0.727 = 37.8 -->
+      <line x1="60" y1="160" x2="840" y2="37.8" stroke="#f5a623" stroke-width="2"/>
+      <!-- D: €60/month → 24m = €1440 → off chart, show partial to €200 at m=3.3 → just go to boundary -->
+      <line x1="60" y1="160" x2="150" y2="13" stroke="#b080e0" stroke-width="2" stroke-dasharray="6,3"/>
+      <text x="155" y="10" fill="#b080e0" font-size="11">D: fuori scala (€1.440 in 24 mesi)</text>
+      <!-- Labels end -->
+      <text x="844" y="164" fill="#606068" font-size="11">A: €0</text>
+      <text x="844" y="79"  fill="#6ab0f0" font-size="11">B: €108</text>
+      <text x="844" y="35"  fill="#f5a623" font-size="11">C: €168</text>
+      <!-- Legend -->
+      <line x1="60" y1="175" x2="90" y2="175" stroke="#606068" stroke-width="2"/>
+      <text x="95" y="179" fill="#a0a0aa" font-size="11">A</text>
+      <line x1="120" y1="175" x2="150" y2="175" stroke="#6ab0f0" stroke-width="2"/>
+      <text x="155" y="179" fill="#a0a0aa" font-size="11">B — VPS €4,5/mese</text>
+      <line x1="280" y1="175" x2="310" y2="175" stroke="#f5a623" stroke-width="2"/>
+      <text x="315" y="179" fill="#a0a0aa" font-size="11">C — VPS €7/mese (media)</text>
+    </svg>
+  </div>
+</div>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════════ 7. ROADMAP ══ -->
+<div class="section">
+  <div class="section-label">07 — Roadmap</div>
+  <h2>Piano di migrazione suggerito (Scenario B)</h2>
+  <p class="section-intro">Lo scenario B (VPS senza Mac App) è il percorso a minor rischio e massimo beneficio nel breve termine. Di seguito il piano operativo in 4 fasi per una migrazione completa in 1–2 settimane.</p>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-date">Fase 1<br>Ore 0–4</div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
+      <div class="tl-content">
+        <h4>Provisioning VPS e ambiente</h4>
+        <p>Creare VPS Hetzner CX22 (Ubuntu 24.04 LTS, €4.51/mese). Configurare SSH, firewall UFW, aggiornamenti automatici di sicurezza. Installare Python 3.11, pip, Playwright + Chromium in headless mode. Clonare il repository e installare requirements.lock.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Fase 2<br>Ore 4–8</div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
+      <div class="tl-content">
+        <h4>Migrazione database e configurazione</h4>
+        <p>Copia sicura di tracker.db (57 MB) sul VPS via rsync/scp. Aggiornare config.toml: playwright_channel = "chromium", host = "0.0.0.0", api_token = "<token>". Configurare variabili d'ambiente per Telegram e Anthropic API key. Test locale degli scraper.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Fase 3<br>Giorni 2–5</div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
+      <div class="tl-content">
+        <h4>Cron jobs + reverse proxy HTTPS</h4>
+        <p>Sostituire i GitHub Actions workflow con crontab entries equivalenti. Configurare Caddy o nginx come reverse proxy con certificato TLS automatico via Let's Encrypt. Testare tutti e 6 i workflow per 48 ore in parallelo al Mac Mini.</p>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-date">Fase 4<br>Giorni 6–14</div>
+      <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
+      <div class="tl-content">
+        <h4>Switch-over e monitoraggio</h4>
+        <p>Disabilitare i workflow GitHub Actions sul Mac Mini. Verificare l'uptime del VPS per 7 giorni. Configurare backup automatici con Hetzner Backup (€1/mese). Opzionale: registrare un dominio (es. trader.yourdomain.com) a €10–15/anno.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:32px">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Crontab equivalente ai workflow attuali</div>
+    <div class="arch">
+<span class="dim"># /etc/cron.d/trader  (equivalente dei 6 GitHub Actions workflow)</span>
+
+<span class="hl"># Subito.it: 4x/die alle 02/08/14/20 UTC (come cron attuale)</span>
+<span class="hl2">0 2,8,14,20 * * *  trader  cd /opt/trader && python3 run.py --source subito</span>
+
+<span class="hl"># AI Classify: subito dopo ogni run Subito (offset +5 min)</span>
+<span class="hl2">5 2,8,14,20 * * *  trader  cd /opt/trader && python3 run.py --classify --classify-limit 100</span>
+
+<span class="hl"># Verify Sold: 2x/die alle 09/12 UTC</span>
+<span class="hl2">0 9,12      * * *  trader  cd /opt/trader && python3 run.py --verify-sold 500 --verify-xbox-only</span>
+
+<span class="hl"># eBay: 1x/die alle 22 UTC</span>
+<span class="hl2">0 22        * * *  trader  cd /opt/trader && python3 run.py --source ebay</span>
+
+<span class="hl"># Scraper Fonti: 1x/die alle 05 UTC</span>
+<span class="hl2">0 5         * * *  trader  cd /opt/trader && python3 run.py --source gamelife,cex,rebuy,gameshock,gamepeople</span>
+
+<span class="hl"># Cleanup settimanale</span>
+<span class="hl2">0 3         * * 0  trader  cd /opt/trader && python3 run.py --cleanup</span>
+
+<span class="dim"># Viewer server (systemd service — avvio automatico)</span>
+<span class="hl3"># ExecStart=/usr/bin/python3 /opt/trader/run.py --view</span>
+    </div>
+  </div>
+</div>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════════ 8. DOMANDE ══ -->
+<div class="section">
+  <div class="section-label">08 — Delibera</div>
+  <h2>Domande per la decisione</h2>
+  <p class="section-intro">Di seguito le domande chiave che determinano quale scenario è più adatto. La risposta a ciascuna orienta verso una scelta specifica. Rispondere a tutte prima di procedere.</p>
+
+  <div style="display:flex;flex-direction:column;gap:20px">
+
+    <div class="card q-card">
+      <h4>D1. Il Mac Mini rimane acceso e connesso a internet 24/7 senza interruzioni pianificate?</h4>
+      <p style="font-size:13px;color:var(--text-s)">Se il Mac è usato anche per altre attività (sviluppo, multimedia) che richiedono riavvii o spegnimento notturno, la continuità degli scraper è a rischio.</p>
+      <div class="q-opts">
+        <div class="q-opt yes">→ SÌ: Il Mac è stabile</div>
+        <div class="q-opt no">→ NO: Si spegne spesso</div>
+      </div>
+      <div class="q-implication">SÌ → Il beneficio primario del VPS è ridotto. Valutare solo se si vuole accesso remoto. | NO → Il VPS è quasi obbligatorio per garantire la copertura dati.</div>
+    </div>
+
+    <div class="card q-card">
+      <h4>D2. Si vuole accedere al viewer e alle notifiche da iPhone / rete mobile?</h4>
+      <p style="font-size:13px;color:var(--text-s)">Oggi l'unico accesso è da browser locale. L'alert Telegram arriva, ma non è possibile esplorare i dati, filtrare o vedere il prezzo medio senza essere sul Mac.</p>
+      <div class="q-opts">
+        <div class="q-opt yes">→ SÌ: Accesso mobile importante</div>
+        <div class="q-opt no">→ NO: Solo uso locale</div>
+      </div>
+      <div class="q-implication">SÌ → Scenario B o C fortemente raccomandato. | NO → Scenario A sufficiente nel breve termine.</div>
+    </div>
+
+    <div class="card q-card">
+      <h4>D3. Si prevede di espandere il tracker ad altri mercati (PlayStation, Nintendo, Vinted) nei prossimi 12 mesi?</h4>
+      <p style="font-size:13px;color:var(--text-s)">Aggiungere PlayStation 5 raddoppierebbe il volume di annunci Subito monitorati. Il carico computazionale di verify_sold (già 6.800+ annunci/sessione) crescerebbe proporzionalmente.</p>
+      <div class="q-opts">
+        <div class="q-opt yes">→ SÌ: Espansione prevista</div>
+        <div class="q-opt no">→ NO: Solo Xbox</div>
+      </div>
+      <div class="q-implication">SÌ → Scenario B o C urgente: il Mac Mini diventerà insufficiente. Valutare CX32 (4 vCPU). | NO → Scenario A ancora sostenibile per 12–18 mesi.</div>
+    </div>
+
+    <div class="card q-card">
+      <h4>D4. Si è disposti a investire 1–2 settimane di sviluppo per una Mac App nativa?</h4>
+      <p style="font-size:13px;color:var(--text-s)">Una Mac App con WKWebView, menu bar e notifiche native richiederebbe circa 40–60 ore di sviluppo Swift. L'alternativa è accedere al viewer via browser Safari, che è già completamente responsive.</p>
+      <div class="q-opts">
+        <div class="q-opt yes">→ SÌ: Voglio l'app nativa</div>
+        <div class="q-opt no">→ NO: Browser è sufficiente</div>
+      </div>
+      <div class="q-implication">SÌ → Scenario C. Procedere prima con il VPS (B), poi sviluppare l'app. | NO → Scenario B è completo e sufficiente senza sviluppo aggiuntivo.</div>
+    </div>
+
+    <div class="card q-card">
+      <h4>D5. Si ritiene che Subito.it potrebbe bloccare gli scraper se girano su un IP di datacenter?</h4>
+      <p style="font-size:13px;color:var(--text-s)">L'attuale runner usa un IP residenziale italiano (rete di casa). I VPS Hetzner hanno IP di datacenter tedesco, potenzialmente più soggetti a blocco da parte dei sistemi anti-bot di Subito. I dati di verify_sold mostrano già blocchi cffi (21% su alcune sessioni).</p>
+      <div class="q-opts">
+        <div class="q-opt yes">→ SÌ: Il rischio ban è reale</div>
+        <div class="q-opt no">→ NO: Si può gestire</div>
+      </div>
+      <div class="q-implication">SÌ → Mantenere lo scraper Subito sul Mac Mini (IP residenziale) e migrare solo eBay, Fonti, Classify e il viewer sul VPS. Architettura ibrida. | NO → Migrazione completa al VPS è sicura, con monitoraggio del ban rate nelle prime 2 settimane.</div>
+    </div>
+
+    <div class="card q-card">
+      <h4>D6. Si è a proprio agio con la gestione di un server Linux remoto (SSH, systemd, nginx)?</h4>
+      <p style="font-size:13px;color:var(--text-s)">La migrazione richiede configurazione di: Ubuntu 24.04, firewall UFW, systemd services, Caddy/nginx con TLS, monitoraggio log. Senza esperienza precedente, stimare il doppio del tempo per ogni fase.</p>
+      <div class="q-opts">
+        <div class="q-opt yes">→ SÌ: Familiarità con Linux</div>
+        <div class="q-opt no">→ NO: Poca esperienza server</div>
+      </div>
+      <div class="q-implication">SÌ → Procedere con Scenario B. Stima realistica: 4–8 ore totali. | NO → Considerare Railway.app, Render.com o Fly.io: deploy con git push, TLS automatico, zero configurazione server. Costo: €5–10/mese. Oppure rimandare al momento in cui si acquisisce più esperienza.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section-sep"></div>
+
+<!-- ══════════════════════════════════════════════ 9. RACCOMANDAZIONE ══ -->
+<div class="section">
+  <div class="section-label">09 — Conclusione</div>
+  <h2>Raccomandazione strategica</h2>
+  <p class="section-intro">Sulla base dell'analisi dei dati operativi (491 run Subito, 116 Verify Sold, 57 MB DB in 57 giorni), dell'architettura esistente e dei rischi identificati, si formula la seguente raccomandazione.</p>
+
+  <div class="rec-box">
+    <div style="font-size:11px;color:var(--accent);letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px">Raccomandazione</div>
+    <h3>Scenario B — VPS Cloud, implementazione immediata</h3>
+    <p>Hetzner CX22 (€4,51/mese, Ubuntu 24.04, 2 vCPU / 4GB RAM / 40GB SSD) con Caddy per HTTPS automatico. Il viewer diventa accessibile da qualsiasi rete. I cron job sostituiscono i GitHub Actions. Il Mac Mini rimane come fallback durante la transizione. La Mac App (Scenario C) può essere sviluppata in un secondo momento, indipendentemente dal VPS.</p>
+    <div class="rec-steps">
+      <div class="rec-step">Fase 1: VPS provisioning</div>
+      <div class="rec-step">Fase 2: DB migration</div>
+      <div class="rec-step">Fase 3: Cron + HTTPS</div>
+      <div class="rec-step">Fase 4: Switch-over + monitoring</div>
+      <div class="rec-step" style="border-color:rgba(245,166,35,.3);color:var(--accent)">Opt. Fase 5: Mac App (Scenario C)</div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top:24px">
+    <div class="card-sm stat">
+      <div class="stat-n green">€4,51</div>
+      <div class="stat-label">Costo mensile stimato<br>Hetzner CX22</div>
+    </div>
+    <div class="card-sm stat">
+      <div class="stat-n accent">4–8h</div>
+      <div class="stat-label">Tempo di setup<br>con esperienza Linux</div>
+    </div>
+    <div class="card-sm stat">
+      <div class="stat-n blue">99.9%</div>
+      <div class="stat-label">Uptime garantito<br>SLA Hetzner</div>
+    </div>
+  </div>
+
+  <!-- Final summary table -->
+  <div class="card" style="margin-top:24px">
+    <div style="font-size:12px;color:var(--text-s);margin-bottom:20px;font-weight:600;letter-spacing:.08em;text-transform:uppercase">Riepilogo decisionale</div>
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th>Domanda</th>
+          <th>Risposta SÌ → Scenario</th>
+          <th>Risposta NO → Scenario</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>D1. Mac Mini sempre acceso?</td><td>A ancora sostenibile</td><td><strong style="color:var(--blue)">B urgente</strong></td></tr>
+        <tr><td>D2. Accesso mobile necessario?</td><td><strong style="color:var(--blue)">B/C raccomandato</strong></td><td>A sufficiente</td></tr>
+        <tr><td>D3. Espansione mercati prevista?</td><td><strong style="color:var(--blue)">B con CX32</strong></td><td>A sostenibile 12m</td></tr>
+        <tr><td>D4. Mac App desiderata?</td><td><strong style="color:var(--accent)">C (dopo B)</strong></td><td>B sufficiente</td></tr>
+        <tr><td>D5. Rischio ban IP datacenter?</td><td>Architettura ibrida</td><td><strong style="color:var(--blue)">B completo</strong></td></tr>
+        <tr><td>D6. Esperienza Linux?</td><td><strong style="color:var(--blue)">B - setup diretto</strong></td><td>PaaS alternativo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════ FOOTER ══ -->
+<div class="divider"></div>
+<div class="footer">
+  <div>
+    <strong>Espansione</strong> — Xbox Price Tracker<br>
+    <span style="color:var(--text-m)">Documento riservato · LukePalmDev · 14 Maggio 2026</span>
+  </div>
+  <div style="text-align:right">
+    <div>v1.0 — Per delibera CdA</div>
+    <div style="color:var(--text-m)">Generato da Claude Sonnet 4.6</div>
+  </div>
+</div>
+
+</body>
+</html>
