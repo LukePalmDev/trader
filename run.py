@@ -36,6 +36,7 @@ from pathlib import Path
 import db as _db
 import db_ebay as _db_ebay
 import db_subito as _db_subito
+from paths import DB_PATH
 from run_report import RunReport
 from settings import ConfigError, load_default_config
 
@@ -346,13 +347,13 @@ def _archive_old_snapshots(days: int = ARCHIVE_AFTER_DAYS) -> int:
 
 def _vacuum_databases() -> dict[str, int]:
     counts: dict[str, int] = {}
-    db_path = _ROOT / "tracker.db"
+    db_path = DB_PATH
     if db_path.exists():
         with sqlite3.connect(str(db_path), timeout=30.0) as conn:
             conn.execute("VACUUM")
-        counts["tracker.db"] = 1
+        counts[db_path.name] = 1
     else:
-        counts["tracker.db"] = 0
+        counts[db_path.name] = 0
     return counts
 
 

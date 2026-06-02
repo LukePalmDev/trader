@@ -21,10 +21,9 @@ from model_rules import (
     classify_title, detect_family, standardize_title,
     extract_sub_model, extract_edition_name, extract_color_str, extract_kinect,
 )
+from paths import DB_PATH
 
 log = logging.getLogger(__name__)
-
-DB_PATH = Path(__file__).parent / "tracker.db"
 
 # Regex per estrarre dimensione archiviazione dal nome prodotto
 _STORAGE_RE = re.compile(r'(\d[\d.]*)\s*(GB|TB)', re.IGNORECASE)

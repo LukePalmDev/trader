@@ -23,10 +23,10 @@ from pathlib import Path
 
 from migrations import Migration, run_migrations
 from model_rules import classify_title, detect_family
+from paths import DB_PATH
 
 log = logging.getLogger(__name__)
 
-DB_PATH = Path(__file__).parent / "tracker.db"
 CLASSIFY_VERSION_LEGACY = "legacy-v1"
 CLASSIFY_VERSION_RULES_TITLE = "rules:title:v1"
 

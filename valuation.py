@@ -6,8 +6,9 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
+from paths import DB_PATH
+
 ROOT = Path(__file__).parent
-DB_PATH = ROOT / "tracker.db"
 LOGS_DIR = ROOT / "logs"
 
 VAT_RATE = 0.22

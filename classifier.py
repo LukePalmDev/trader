@@ -21,6 +21,7 @@ import sqlite3
 from pathlib import Path
 
 from model_rules import VALID_EDITIONS, VALID_SEGMENTS, classify_title
+from paths import DB_PATH
 
 log = logging.getLogger("classifier")
 logging.basicConfig(
@@ -30,7 +31,6 @@ logging.basicConfig(
 )
 
 ROOT = Path(__file__).parent
-DB_PATH = ROOT / "tracker.db"
 
 VALID_FAMILIES = {"series-x", "series-s", "one-x", "one-s", "one", "360", "original", "other"}
 HAIKU_MODEL = "claude-haiku-4-5-20251001"

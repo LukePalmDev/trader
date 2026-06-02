@@ -25,6 +25,7 @@ data/archive/*.json.gz
 # Report runtime
 logs/run_report_*.json
 !logs/run_report_latest.json
+LogGitHub/
 
 # Log files (generati da cron — non committare)
 logs/*.log
@@ -77,3 +78,9 @@ backups/
 logs/*_corrupted*
 *.corrupted_*
 .env
+.env.*
+!.env.example
+
+# Runtime deploy/server state
+runtime/
+*.sqlite

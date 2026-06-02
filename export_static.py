@@ -8,6 +8,8 @@ import sys
 import tomllib
 from pathlib import Path
 
+from paths import DB_PATH
+
 ROOT = Path(__file__).parent
 OUT_DIR = ROOT / "viewer" / "data"
 
@@ -100,8 +102,7 @@ def export_all() -> None:
 
 def _get_active_ads() -> list[dict]:
     import sqlite3
-    db_path = ROOT / "tracker.db"
-    with sqlite3.connect(db_path) as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute("""
             SELECT id, urn_id, name, console_family, model_segment, edition_class,
@@ -118,8 +119,7 @@ def _get_active_ads() -> list[dict]:
 
 def _get_ebay_sold_limited(limit: int) -> list[dict]:
     import sqlite3
-    db_path = ROOT / "tracker.db"
-    with sqlite3.connect(db_path) as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute("""
             SELECT id, item_id, name, console_family, model_segment, edition_class,

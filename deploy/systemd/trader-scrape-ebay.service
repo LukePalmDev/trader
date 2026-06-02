@@ -1,0 +1,10 @@
+[Unit]
+Description=Trader scrape eBay sold items
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=trader
+Group=trader
+ExecStart=/opt/trader/app/deploy/server_job.sh scrape-ebay

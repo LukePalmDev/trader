@@ -1,0 +1,17 @@
+[Unit]
+Description=Trader viewer/API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=trader
+Group=trader
+WorkingDirectory=/opt/trader/app
+EnvironmentFile=/etc/trader/trader.env
+ExecStart=/opt/trader/venv/bin/python run.py --view
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
