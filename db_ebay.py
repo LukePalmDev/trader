@@ -36,6 +36,7 @@ def _add_column_if_missing(conn: sqlite3.Connection, table_name: str, definition
 
 def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
     _add_column_if_missing(conn, "sold_items", "model_segment TEXT NOT NULL DEFAULT 'unknown'")
+    _add_column_if_missing(conn, "sold_items", "sub_model TEXT")
     _add_column_if_missing(conn, "sold_items", "edition_class TEXT NOT NULL DEFAULT 'standard'")
     _add_column_if_missing(conn, "sold_items", "canonical_model TEXT")
     _add_column_if_missing(conn, "sold_items", "classify_confidence REAL")
@@ -51,6 +52,7 @@ def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
         payload.append(
             (
                 classified.console_family,
+                classified.sub_model,
                 classified.model_segment,
                 classified.edition_class,
                 classified.canonical_model,
@@ -65,6 +67,7 @@ def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
             """
             UPDATE sold_items
             SET console_family = ?,
+                sub_model = ?,
                 model_segment = ?,
                 edition_class = ?,
                 canonical_model = ?,
@@ -76,7 +79,48 @@ def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
         )
 
     conn.execute("CREATE INDEX IF NOT EXISTS idx_sold_segment ON sold_items(model_segment)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_sold_sub_model ON sold_items(sub_model)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_sold_canonical ON sold_items(canonical_model)")
+
+
+def _migration_v5_xbox_taxonomy_20260603(conn: sqlite3.Connection) -> None:
+    """Riclassifica venduti eBay con la tassonomia famiglia -> modello del 3 giugno."""
+    _add_column_if_missing(conn, "sold_items", "sub_model TEXT")
+    rows = conn.execute("SELECT id, name, console_family FROM sold_items").fetchall()
+    payload = []
+    for row in rows:
+        row_id = int(row[0])
+        name = str(row[1] or "")
+        family_hint = row[2]
+        classified = classify_title(name, family_hint=family_hint)
+        payload.append(
+            (
+                classified.console_family,
+                classified.sub_model,
+                classified.model_segment,
+                classified.edition_class,
+                classified.canonical_model,
+                classified.classify_confidence,
+                classified.classify_method,
+                row_id,
+            )
+        )
+    if payload:
+        conn.executemany(
+            """
+            UPDATE sold_items
+            SET console_family = ?,
+                sub_model = ?,
+                model_segment = ?,
+                edition_class = ?,
+                canonical_model = ?,
+                classify_confidence = ?,
+                classify_method = ?
+            WHERE id = ?
+            """,
+            payload,
+        )
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_sold_family_model ON sold_items(console_family, sub_model)")
 
 _MIGRATIONS = (
     Migration(
@@ -124,6 +168,11 @@ _MIGRATIONS = (
             """,
         ),
     ),
+    Migration(
+        5,
+        "xbox-taxonomy-20260603",
+        callback=_migration_v5_xbox_taxonomy_20260603,
+    ),
 )
 
 
@@ -152,6 +201,7 @@ def init_db(db_path: Path = DB_PATH) -> None:
             item_id        TEXT    NOT NULL UNIQUE,   -- es. "EBAY-123456789"
             name           TEXT    NOT NULL,
             console_family TEXT,
+            sub_model      TEXT,
             model_segment  TEXT    NOT NULL DEFAULT 'unknown',
             edition_class  TEXT    NOT NULL DEFAULT 'standard',
             canonical_model TEXT,
@@ -218,6 +268,7 @@ def process_sold_items(
             initial_family = _detect_family(name)
             classified = classify_title(name, family_hint=initial_family)
             family = classified.console_family
+            sub_model = classified.sub_model
             model_segment = classified.model_segment
             edition_class = classified.edition_class
             canonical_model = classified.canonical_model
@@ -247,13 +298,13 @@ def process_sold_items(
                 conn.execute("""
                     INSERT INTO sold_items
                         (item_id, name, console_family,
-                         model_segment, edition_class, canonical_model,
+                         sub_model, model_segment, edition_class, canonical_model,
                          classify_confidence, classify_method,
                          sold_price, sold_date,
                          url, query_label, first_seen, last_seen)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (item_id, name, family,
-                      model_segment, edition_class, canonical_model,
+                      sub_model, model_segment, edition_class, canonical_model,
                       classify_confidence, classify_method,
                       price, sold_date,
                       url, query_label, now, now))
@@ -268,6 +319,7 @@ def process_sold_items(
                     SET last_seen      = ?,
                         url            = COALESCE(NULLIF(?, ''), url),
                         console_family = ?,
+                        sub_model      = ?,
                         model_segment  = ?,
                         edition_class  = ?,
                         canonical_model = ?,
@@ -276,7 +328,7 @@ def process_sold_items(
                         sold_price     = ?,
                         sold_date      = COALESCE(NULLIF(?, ''), sold_date)
                     WHERE id = ?
-                """, (now, url, family,
+                """, (now, url, family, sub_model,
                       model_segment, edition_class, canonical_model,
                       classify_confidence, classify_method,
                       price, sold_date, row_id))
@@ -309,7 +361,7 @@ def get_all_sold(db_path: Path = DB_PATH) -> list[dict]:
     with _connect(db_path) as conn:
         rows = conn.execute("""
             SELECT id, item_id, name, console_family,
-                   model_segment, edition_class, canonical_model,
+                   sub_model, model_segment, edition_class, canonical_model,
                    classify_confidence, classify_method,
                    sold_price, sold_date, url, query_label,
                    first_seen, last_seen

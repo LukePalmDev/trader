@@ -105,7 +105,8 @@ def _get_active_ads() -> list[dict]:
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute("""
-            SELECT id, urn_id, name, console_family, model_segment, edition_class,
+            SELECT id, urn_id, name, console_family, sub_model, model_segment, edition_class,
+                   canonical_model,
                    url, city, region, seller_type, published_at,
                    last_price, last_available, ai_status, ai_confidence,
                    verify_status, sold_at_estimated, sold_window_hours
@@ -122,7 +123,7 @@ def _get_ebay_sold_limited(limit: int) -> list[dict]:
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
         rows = conn.execute("""
-            SELECT id, item_id, name, console_family, model_segment, edition_class,
+            SELECT id, item_id, name, console_family, sub_model, model_segment, edition_class,
                    canonical_model, sold_price, sold_date, url, query_label, first_seen
             FROM sold_items
             ORDER BY first_seen DESC NULLS LAST

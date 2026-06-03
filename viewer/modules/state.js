@@ -11,6 +11,7 @@
       standardGroups: [],
       storageSizes: [],
       subitoAds: [],
+      subitoSold: [],
       subitoOpportunities: [],
       ebaySold: [],
       currentSort: { key: 'last_price', dir: 1 },

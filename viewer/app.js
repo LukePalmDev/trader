@@ -5,21 +5,19 @@
 // ============================================================
 
 const CONSOLE_FAMILIES = [
-  { key: 'series-x', label: 'Series X', re: /series\s*x/i },
-  { key: 'series-s', label: 'Series S', re: /series\s*s/i },
-  { key: 'one-x',    label: 'One X',    re: /one\s*x/i    },
-  { key: 'one-s',    label: 'One S',    re: /one\s*s/i    },
-  { key: 'one',      label: 'One',      re: /\bone\b/i    },
-  { key: '360',      label: '360',      re: /360/         },
-  { key: 'original', label: 'Original', re: /\bxbox\b/i   },
+  { key: 'series',   label: 'Series',   re: /\bxbox\s+series(?:\s*[xs])?\b|\bseries\s*[xs]\b/i },
+  { key: 'one',      label: 'One',      re: /\bxbox\s+one(?:\s*[xs])?\b|\bone\s*[xs]\b|\bone\b/i },
+  { key: '360',      label: '360',      re: /\bxbox\s*360\b|\bxbox360\b|\b360\s*[se]?\b/i },
+  { key: 'original', label: 'Original', re: /\boriginal\b|\bxbox\s+classic\b/i },
 ];
 
 const STRIP_RE = {
+  'series':   /^(Microsoft\s+)?(Console\s+)?Xbox\s+Series\s*/i,
   'series-x': /^(Microsoft\s+)?(Console\s+)?Xbox\s+Series\s+X\s*/i,
   'series-s': /^(Microsoft\s+)?(Console\s+)?Xbox\s+Series\s+S\s*/i,
+  'one':      /^(Microsoft\s+)?(Console\s+)?Xbox\s+One\s*/i,
   'one-x':    /^(Microsoft\s+)?(Console\s+)?Xbox\s+One\s+X\s*/i,
   'one-s':    /^(Microsoft\s+)?(Console\s+)?Xbox\s+One\s+S\s*/i,
-  'one':      /^(Microsoft\s+)?(Console\s+)?Xbox\s+One\s*/i,
   '360':      /^(Microsoft\s+)?(Console\s+)?Xbox\s+(360\s*|250\s*GB\s*)/i,
   'original': /^(Microsoft\s+)?(Console\s+)?Xbox\s*/i,
 };
@@ -34,11 +32,12 @@ const STORE_META = {
 };
 
 const FAMILY_LABELS = {
+  'series':   'Xbox Series',
   'series-x': 'Xbox Series X',
   'series-s': 'Xbox Series S',
+  'one':      'Xbox One',
   'one-x':    'Xbox One X',
   'one-s':    'Xbox One S',
-  'one':      'Xbox One',
   '360':      'Xbox 360',
   'original': 'Xbox Original',
   'other':    '???',
@@ -52,6 +51,7 @@ const VIEWER_STATE = window.ViewerState || {
   baseModels: [],
   storageSizes: [],
   subitoAds: [],
+  subitoSold: [],
   subitoOpportunities: [],
   ebaySold: [],
   currentSort: { key: 'last_price', dir: 1 },
@@ -84,6 +84,7 @@ let BASE_MODELS    = VIEWER_STATE.baseModels;    // DB prodotti con is_base_mode
 let STANDARD_GROUPS= VIEWER_STATE.standardGroups;// gruppi nome standard -> nomi originali
 let STORAGE_SIZES  = VIEWER_STATE.storageSizes;  // dimensioni archiviazione dal DB
 let SUBITO_ADS     = VIEWER_STATE.subitoAds;     // annunci Subito dal DB dedicato (subito.db)
+let SUBITO_SOLD    = VIEWER_STATE.subitoSold;    // annunci Subito venduti
 let SUBITO_OPPS    = VIEWER_STATE.subitoOpportunities; // score fair-value/qualita'
 let EBAY_SOLD      = VIEWER_STATE.ebaySold;      // lotti venduti eBay dal DB dedicato (ebay.db)
 let currentSort    = VIEWER_STATE.currentSort;
@@ -109,11 +110,8 @@ function _familyKey(name) {
   if (!n.trim()) return 'other';
 
   const specificity = {
-    'series-x': 4,
-    'series-s': 4,
-    'one-x': 3,
-    'one-s': 3,
-    'one': 2,
+    'series': 4,
+    'one': 3,
     '360': 2,
   };
 
@@ -131,6 +129,14 @@ function _familyKey(name) {
   if (/\boriginal\b|\bxbox\s+classic\b/i.test(n)) return 'original';
   if (/\bxbox\b/i.test(n)) return 'original';
   return 'other';
+}
+
+function _canonicalFamilyKey(key) {
+  const fk = String(key || '').toLowerCase().trim();
+  if (fk === 'series-x' || fk === 'series-s') return 'series';
+  if (fk === 'one-x' || fk === 'one-s') return 'one';
+  if (fk === 'series' || fk === 'one' || fk === '360' || fk === 'original') return fk;
+  return fk || 'other';
 }
 
 function _shortName(name, familyKey) {
@@ -201,23 +207,37 @@ function enhanceProduct(p) {
     if (ov.e) p._manual_edition = ov.e;
   }
 
-  const fk = p.console_family || _familyKey(p.name);
+  const rawFamily = p.console_family || _familyKey(p.name);
+  const fk = _canonicalFamilyKey(rawFamily);
+  p.console_family = fk;
+
   let pf = 'Altro';
-  if (fk === 'series-x' || fk === 'series-s') pf = 'Serie';
-  else if (fk === 'one' || fk === 'one-s' || fk === 'one-x') pf = 'One';
+  if (fk === 'series') pf = 'Serie';
+  else if (fk === 'one') pf = 'One';
   else if (fk === '360') pf = '360';
   else if (fk === 'original') pf = 'Original';
 
   const t = (p.name || '').toLowerCase();
-  let ps = 'Base';
-  if (fk === 'series-x' || fk === 'one-x') ps = 'X';
-  else if (fk === 'series-s' || fk === 'one-s') ps = 'S';
-  else if (fk === '360') {
+  let ps = p.sub_model || 'Base';
+  if (ps === 'Slim') ps = 'S';
+  if (!p.sub_model && (rawFamily === 'series-x' || rawFamily === 'one-x')) ps = 'X';
+  else if (!p.sub_model && (rawFamily === 'series-s' || rawFamily === 'one-s')) ps = 'S';
+  else if (!p.sub_model && fk === 'series') {
+    if (/\bseries\s*x\b|\bserie\s+x\b/.test(t)) ps = 'X';
+    else if (/\bseries\s*s\b|\bserie\s+s\b/.test(t)) ps = 'S';
+    else ps = 'Unknown';
+  }
+  else if (!p.sub_model && fk === 'one') {
+    if (/\bone\s*x\b/.test(t)) ps = 'X';
+    else if (/\bone\s*s\b/.test(t)) ps = 'S';
+    else ps = 'Base';
+  }
+  else if (!p.sub_model && fk === '360') {
     if (/\b(?:xbox\s*)?360\s*"?[eE]"?\b/.test(t)) ps = 'E';
-    else if (/\b360\s*slim\b|\bslim\b|\b360s\b/.test(t)) ps = 'Slim';
+    else if (/\b360\s*slim\b|\bslim\b|\b360s\b/.test(t)) ps = 'S';
     else if (/\belite\b/.test(t)) ps = 'Elite';
   }
-  else if (fk === 'one') {
+  else if (!p.sub_model && fk === 'one') {
     if (/\belite\b/.test(t)) ps = 'Elite';
   }
 
@@ -342,6 +362,7 @@ function _syncState() {
   VIEWER_STATE.standardGroups = STANDARD_GROUPS;
   VIEWER_STATE.storageSizes = STORAGE_SIZES;
   VIEWER_STATE.subitoAds = SUBITO_ADS;
+  VIEWER_STATE.subitoSold = SUBITO_SOLD;
   VIEWER_STATE.subitoOpportunities = SUBITO_OPPS;
   VIEWER_STATE.ebaySold = EBAY_SOLD;
   VIEWER_STATE.currentSort = currentSort;
@@ -361,6 +382,7 @@ document.querySelectorAll('.tab').forEach(btn => {
     if (btn.dataset.tab === 'subito-b')  loadMarket('subito-b');
     if (btn.dataset.tab === 'subito-p')  loadMarket('subito-p');
     if (btn.dataset.tab === 'subito-s')  loadMarket('subito-s');
+    if (btn.dataset.tab === 'subito-dashboard') loadSubitoSoldDashboard();
     if (btn.dataset.tab === 'ebay')      loadMarket('ebay');
     if (btn.dataset.tab === 'statistiche') renderStatistiche();
     if (btn.dataset.tab === 'trend')     renderTrend();
@@ -2225,7 +2247,6 @@ document.getElementById('subito-grid')?.addEventListener('click', e => {
 // ============================================================
 // SUBITO — VENDUTI
 // ============================================================
-let SUBITO_SOLD      = [];
 let SUBITO_SOLD_STATS = {};
 
 async function loadSubitoSoldData() {
@@ -2825,6 +2846,460 @@ function renderEbay() {
     tableWrapper.appendChild(table);
     card.appendChild(tableWrapper);
     grid.appendChild(card);
+  }
+}
+
+// ============================================================
+// SUBITO — DASHBOARD VENDUTI GIORNALIERI
+// ============================================================
+
+async function loadSubitoSoldDashboard() {
+  const _fb = { ok: false, body: null };
+  try {
+    if (!SUBITO_SOLD.length) {
+      const [rSold] = _settled(
+        await Promise.allSettled([API.fetchJson('/api/subito/sold')]),
+        [_fb],
+      );
+      if (rSold.ok) SUBITO_SOLD = _sanitizeRows(rSold.body);
+      _syncState();
+    }
+    _populateSoldDashConsole();
+    renderSubitoSoldDashboard();
+  } catch (e) {
+    console.warn('Subito sold dashboard:', e.message);
+  }
+}
+
+function _soldDashDate(row) {
+  const raw = row.sold_at_estimated || row.sold_at || row.last_seen;
+  if (!raw) return null;
+  const d = new Date(String(raw).replace(' ', 'T'));
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString().slice(0, 10);
+}
+
+function _soldDashDateLabel(day) {
+  if (!day) return '—';
+  const [y, m, d] = day.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function _soldDashRangeRows() {
+  const range = document.getElementById('sold-dash-range')?.value || '30';
+  let rows = SUBITO_SOLD
+    .map(r => ({ ...r, _sold_day: _soldDashDate(r) }))
+    .filter(r => r._sold_day);
+
+  if (range !== 'all' && rows.length) {
+    const maxDay = rows.reduce((max, r) => r._sold_day > max ? r._sold_day : max, rows[0]._sold_day);
+    const start = new Date(maxDay + 'T00:00:00Z');
+    start.setUTCDate(start.getUTCDate() - Number(range) + 1);
+    const startDay = start.toISOString().slice(0, 10);
+    rows = rows.filter(r => r._sold_day >= startDay);
+  }
+  return rows;
+}
+
+function _soldDashQuantile(sortedValues, q) {
+  if (!sortedValues.length) return null;
+  if (sortedValues.length === 1) return sortedValues[0];
+  const pos = (sortedValues.length - 1) * q;
+  const base = Math.floor(pos);
+  const rest = pos - base;
+  const low = sortedValues[base];
+  const high = sortedValues[Math.min(base + 1, sortedValues.length - 1)];
+  return low + (high - low) * rest;
+}
+
+function _soldDashPriceStats(values) {
+  const nums = values.filter(v => v != null && v > 0).sort((a, b) => a - b);
+  if (!nums.length) {
+    return { count: 0, min: null, max: null, avg: null, median: null, q1: null, q3: null, stdev: null };
+  }
+  const count = nums.length;
+  const sum = nums.reduce((s, v) => s + v, 0);
+  const avg = sum / count;
+  const median = _soldDashQuantile(nums, 0.5);
+  const q1 = _soldDashQuantile(nums, 0.25);
+  const q3 = _soldDashQuantile(nums, 0.75);
+  const variance = nums.reduce((s, v) => s + ((v - avg) ** 2), 0) / count;
+  return {
+    count,
+    min: nums[0],
+    max: nums[nums.length - 1],
+    avg,
+    median,
+    q1,
+    q3,
+    stdev: Math.sqrt(variance),
+  };
+}
+
+function _soldDashDaySeries(rows) {
+  const byDay = new Map();
+  for (const r of rows) {
+    const day = r._sold_day || _soldDashDate(r);
+    if (!day) continue;
+    if (!byDay.has(day)) byDay.set(day, { day, count: 0, prices: [], rows: [] });
+    const bucket = byDay.get(day);
+    bucket.count += 1;
+    if (r.last_price != null && r.last_price > 0) bucket.prices.push(Number(r.last_price));
+    bucket.rows.push(r);
+  }
+  return [...byDay.values()]
+    .map(d => ({
+      ...d,
+      avgPrice: d.prices.length ? d.prices.reduce((s, v) => s + v, 0) / d.prices.length : null,
+    }))
+    .sort((a, b) => a.day.localeCompare(b.day));
+}
+
+function _soldDashFamilySeries(rows) {
+  const families = new Map();
+  for (const row of rows) {
+    const fk = row.console_family || 'other';
+    if (!families.has(fk)) families.set(fk, []);
+    families.get(fk).push(row);
+  }
+
+  return [...families.entries()].map(([family, items]) => {
+    const daySeries = _soldDashDaySeries(items);
+    const prices = items.map(r => Number(r.last_price)).filter(v => v > 0);
+    const stats = _soldDashPriceStats(prices);
+    const sortedItems = items.slice().sort((a, b) => {
+      const da = (a.sold_at_estimated || a.sold_at || '').toString();
+      const db = (b.sold_at_estimated || b.sold_at || '').toString();
+      if (da !== db) return da < db ? 1 : -1;
+      return (Number(b.last_price) || 0) - (Number(a.last_price) || 0);
+    });
+    return {
+      family,
+      label: FAMILY_LABELS[family] || family,
+      items: sortedItems,
+      count: items.length,
+      daySeries,
+      prices,
+      stats,
+    };
+  }).sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, 'it'));
+}
+
+function _buildSeriesSvg(series, {
+  width = 520,
+  height = 180,
+  lineColor = '#ff6600',
+  fillColor = 'rgba(255,102,0,0.10)',
+  showYAxis = true,
+  showXAxis = true,
+  showDots = true,
+  valuePrefix = '',
+  valueSuffix = '',
+  xLabelStep = null,
+  compact = false,
+} = {}) {
+  if (!series.length) {
+    return '<div class="empty-shop">Nessun dato nel periodo selezionato</div>';
+  }
+
+  const values = series.map(p => Number(p.value) || 0);
+  const minV = Math.min(...values);
+  const maxV = Math.max(...values);
+  const range = maxV - minV || 1;
+  const pad = {
+    top: showYAxis ? 12 : 8,
+    right: 14,
+    bottom: showXAxis ? (compact ? 16 : 22) : 10,
+    left: showYAxis ? 40 : 10,
+  };
+
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const xFor = i => pad.left + (series.length === 1 ? plotW / 2 : (plotW * i / (series.length - 1)));
+  const yFor = v => pad.top + plotH - ((v - minV) / range) * plotH;
+  const points = series.map((p, i) => `${xFor(i).toFixed(1)},${yFor(Number(p.value) || 0).toFixed(1)}`).join(' ');
+  const area = `${points} ${xFor(series.length - 1).toFixed(1)},${(pad.top + plotH).toFixed(1)} ${xFor(0).toFixed(1)},${(pad.top + plotH).toFixed(1)}`;
+
+  const yTicks = showYAxis
+    ? [minV, minV + ((maxV - minV) / 2), maxV].map(v => ({ v, y: yFor(v) }))
+    : [];
+
+  const step = xLabelStep || Math.max(1, Math.ceil(series.length / 6));
+  const xTicks = [];
+  if (showXAxis) {
+    for (let i = 0; i < series.length; i += step) {
+      xTicks.push({ label: series[i].label, x: xFor(i) });
+    }
+    if (xTicks.length && xTicks[xTicks.length - 1].label !== series[series.length - 1].label) {
+      xTicks.push({ label: series[series.length - 1].label, x: xFor(series.length - 1) });
+    }
+  }
+
+  return `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Grafico andamento">
+    ${yTicks.map(t => `<line class="sold-chart-grid" x1="${pad.left}" y1="${t.y.toFixed(1)}" x2="${width - pad.right}" y2="${t.y.toFixed(1)}"></line>`).join('')}
+    ${yTicks.map(t => `<text class="sold-chart-axis" x="${pad.left - 8}" y="${(t.y + 4).toFixed(1)}" text-anchor="end">${valuePrefix}${Math.round(t.v)}${valueSuffix}</text>`).join('')}
+    <polygon points="${area}" fill="${fillColor}"></polygon>
+    <polyline class="sold-chart-line" points="${points}" style="stroke:${lineColor};"></polyline>
+    ${showDots ? series.map((p, i) => {
+      const x = xFor(i);
+      const y = yFor(Number(p.value) || 0);
+      const title = p.title || `${p.label}: ${valuePrefix}${Math.round(Number(p.value) || 0)}${valueSuffix}`;
+      return `<circle class="sold-chart-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${compact ? 2.8 : 3.5}" style="stroke:${lineColor};"><title>${title}</title></circle>`;
+    }).join('') : ''}
+    ${xTicks.map(t => `<text class="sold-chart-axis" x="${t.x.toFixed(1)}" y="${height - 5}" text-anchor="middle">${t.label}</text>`).join('')}
+  </svg>`;
+}
+
+function _populateSoldDashConsole() {
+  const sel = document.getElementById('sold-dash-console');
+  if (!sel) return;
+  const current = sel.value;
+  while (sel.options.length > 1) sel.remove(1);
+
+  const families = [...new Set(SUBITO_SOLD.map(r => r.console_family || 'other'))]
+    .sort((a, b) => (FAMILY_LABELS[a] || a).localeCompare(FAMILY_LABELS[b] || b, 'it'));
+  for (const fk of families) {
+    const opt = document.createElement('option');
+    opt.value = fk;
+    opt.textContent = FAMILY_LABELS[fk] || fk;
+    sel.appendChild(opt);
+  }
+  if (families.includes(current)) {
+    sel.value = current;
+  } else if (families.length) {
+    sel.value = families[0];
+  }
+}
+
+function _soldDashCountSeries(rows) {
+  return _soldDashDaySeries(rows).map(d => ({
+    label: d.day.slice(5).replace('-', '/'),
+    value: d.count,
+    title: `${_soldDashDateLabel(d.day)}: ${d.count} venduti`,
+  }));
+}
+
+function _renderSoldDashChart(days) {
+  const cont = document.getElementById('sold-dash-chart');
+  if (!cont) return;
+  if (!days.length) {
+    cont.innerHTML = '<div class="empty-shop">Nessun venduto nel periodo selezionato</div>';
+    return;
+  }
+
+  const w = 920, h = 310;
+  const padL = 48, padR = 20, padT = 24, padB = 44;
+  const plotW = w - padL - padR;
+  const plotH = h - padT - padB;
+  const maxCount = Math.max(1, ...days.map(d => d.count));
+  const step = plotW / Math.max(days.length, 1);
+  const barW = Math.max(3, Math.min(18, step * 0.62));
+  const yFor = count => padT + plotH - (count / maxCount) * plotH;
+  const xFor = i => padL + step * i + step / 2;
+  const points = days.map((d, i) => `${xFor(i).toFixed(1)},${yFor(d.count).toFixed(1)}`).join(' ');
+  const gridVals = [0, Math.ceil(maxCount / 2), maxCount];
+  const labelsEvery = Math.max(1, Math.ceil(days.length / 10));
+
+  const bars = days.map((d, i) => {
+    const x = xFor(i) - barW / 2;
+    const y = yFor(d.count);
+    const bh = padT + plotH - y;
+    return `<rect class="sold-chart-bar" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1, bh).toFixed(1)}" rx="2">
+      <title>${_soldDashDateLabel(d.day)}: ${d.count} venduti</title>
+    </rect>`;
+  }).join('');
+
+  const xLabels = days.map((d, i) => {
+    if (i % labelsEvery !== 0 && i !== days.length - 1) return '';
+    return `<text class="sold-chart-axis" x="${xFor(i).toFixed(1)}" y="${h - 14}" text-anchor="middle">${d.day.slice(5).replace('-', '/')}</text>`;
+  }).join('');
+
+  const yGrid = gridVals.map(v => {
+    const y = yFor(v);
+    return `<line class="sold-chart-grid" x1="${padL}" y1="${y.toFixed(1)}" x2="${w - padR}" y2="${y.toFixed(1)}"></line>
+      <text class="sold-chart-axis" x="${padL - 10}" y="${(y + 4).toFixed(1)}" text-anchor="end">${v}</text>`;
+  }).join('');
+
+  const dots = days.map((d, i) => {
+    const x = xFor(i), y = yFor(d.count);
+    return `<circle class="sold-chart-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5">
+      <title>${_soldDashDateLabel(d.day)}: ${d.count} venduti</title>
+    </circle>`;
+  }).join('');
+
+  cont.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Venduti giornalieri Subito">
+    ${yGrid}
+    ${bars}
+    <polyline class="sold-chart-line" points="${points}"></polyline>
+    ${dots}
+    ${xLabels}
+  </svg>`;
+}
+
+function _renderSoldFamilyGrid(families) {
+  const cont = document.getElementById('sold-family-grid');
+  if (!cont) return;
+  const countEl = document.getElementById('sold-family-count');
+
+  if (!families.length) {
+    if (countEl) countEl.textContent = '—';
+    cont.innerHTML = '<div class="empty-shop">Nessun dato per la panoramica console</div>';
+    return;
+  }
+
+  const total = families.reduce((s, f) => s + f.count, 0);
+  if (countEl) countEl.textContent = `${families.length} console · ${total} venduti`;
+
+  const selectedFamily = document.getElementById('sold-dash-console')?.value || '';
+  const activeFamily = selectedFamily || families[0]?.family || '';
+  cont.innerHTML = '';
+
+  for (const fam of families) {
+    const card = document.createElement('div');
+    card.className = 'sold-family-card' + (activeFamily === fam.family ? ' sold-family-card--selected' : '');
+    card.dataset.family = fam.family;
+    card.addEventListener('click', () => {
+      const sel = document.getElementById('sold-dash-console');
+      if (sel) {
+        sel.value = fam.family;
+        renderSubitoSoldDashboard();
+      }
+      const detail = document.querySelector('.sold-detail-panel');
+      if (detail) detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    const head = document.createElement('div');
+    head.className = 'sold-family-head';
+    head.innerHTML = `
+      <div>
+        <div class="sold-family-title">${fam.label}</div>
+        <div class="sold-family-meta">${fam.count} venduti · media € ${fam.stats.avg != null ? Math.round(fam.stats.avg) : '—'} · mediana € ${fam.stats.median != null ? Math.round(fam.stats.median) : '—'}</div>
+      </div>
+      <div class="sold-family-chip">${fam.daySeries.length} gg</div>`;
+    card.appendChild(head);
+
+    const chart = document.createElement('div');
+    chart.className = 'sold-family-chart';
+    chart.innerHTML = _buildSeriesSvg(_soldDashCountSeries(fam.items), {
+      width: 360,
+      height: 108,
+      lineColor: '#ff6600',
+      fillColor: 'rgba(255,102,0,0.10)',
+      showYAxis: false,
+      showXAxis: false,
+      showDots: true,
+      compact: true,
+    });
+    card.appendChild(chart);
+
+    const stats = document.createElement('div');
+    stats.className = 'sold-family-stats';
+    stats.innerHTML = `
+      <span>min <strong>${fam.stats.min != null ? '€ ' + Math.round(fam.stats.min) : '—'}</strong></span>
+      <span>q1 <strong>${fam.stats.q1 != null ? '€ ' + Math.round(fam.stats.q1) : '—'}</strong></span>
+      <span>q3 <strong>${fam.stats.q3 != null ? '€ ' + Math.round(fam.stats.q3) : '—'}</strong></span>
+      <span>max <strong>${fam.stats.max != null ? '€ ' + Math.round(fam.stats.max) : '—'}</strong></span>`;
+    card.appendChild(stats);
+
+    cont.appendChild(card);
+  }
+}
+
+function renderSubitoSoldDashboard() {
+  const rows = _soldDashRangeRows();
+  const days = _soldDashDaySeries(rows);
+  const families = _soldDashFamilySeries(rows);
+  _populateSoldDashConsole();
+
+  const total = days.reduce((s, d) => s + d.count, 0);
+  const peak = days.length ? days.reduce((best, d) => d.count > best.count ? d : best, days[0]) : null;
+  const avg = days.length ? total / days.length : null;
+  const selectedFamily = document.getElementById('sold-dash-console')?.value || families[0]?.family || '';
+  const selected = families.find(f => f.family === selectedFamily) || families[0] || null;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  set('sold-dash-total', total || '—');
+  set('sold-dash-days', days.length || '—');
+  set('sold-dash-peak', peak ? `${peak.count} (${_soldDashDateLabel(peak.day).slice(0, 5)})` : '—');
+  set('sold-dash-avg', avg != null ? avg.toFixed(1) : '—');
+  set('sold-dash-window', days.length ? `${_soldDashDateLabel(days[0].day)} - ${_soldDashDateLabel(days[days.length - 1].day)}` : '—');
+
+  _renderSoldDashChart(days);
+  _renderSoldFamilyGrid(families);
+
+  const detailTitle = document.getElementById('sold-detail-title');
+  const detailSub = document.getElementById('sold-detail-sub');
+  const detailCount = document.getElementById('sold-detail-count');
+  const detailBadges = document.getElementById('sold-detail-badges');
+  const detailChart = document.getElementById('sold-detail-chart');
+  const detailBody = document.getElementById('sold-detail-tbody');
+  if (!detailTitle || !detailSub || !detailCount || !detailBadges || !detailChart || !detailBody) return;
+
+  if (!selected) {
+    detailTitle.textContent = '—';
+    detailSub.textContent = 'Nessuna console nel periodo selezionato';
+    detailCount.textContent = '—';
+    detailBadges.innerHTML = '';
+    detailChart.innerHTML = '<div class="empty-shop">Nessun dato per la console selezionata</div>';
+    detailBody.innerHTML = '';
+    return;
+  }
+
+  const selectedStats = selected.stats;
+  detailTitle.textContent = selected.label;
+  detailSub.textContent = `${selected.count} venduti nel periodo · ${selected.daySeries.length} giornate attive`;
+  detailCount.textContent = `${selected.count} venduti`;
+  detailBadges.innerHTML = `
+    <span class="sold-detail-pill">media <strong>${selectedStats.avg != null ? '€ ' + Math.round(selectedStats.avg) : '—'}</strong></span>
+    <span class="sold-detail-pill">mediana <strong>${selectedStats.median != null ? '€ ' + Math.round(selectedStats.median) : '—'}</strong></span>
+    <span class="sold-detail-pill">min <strong>${selectedStats.min != null ? '€ ' + Math.round(selectedStats.min) : '—'}</strong></span>
+    <span class="sold-detail-pill">max <strong>${selectedStats.max != null ? '€ ' + Math.round(selectedStats.max) : '—'}</strong></span>
+    <span class="sold-detail-pill">dev.std <strong>${selectedStats.stdev != null ? '€ ' + Math.round(selectedStats.stdev) : '—'}</strong></span>`;
+
+  const priceSeries = selected.items
+    .slice()
+    .sort((a, b) => {
+      const da = (a.sold_at_estimated || a.sold_at || '').toString();
+      const db = (b.sold_at_estimated || b.sold_at || '').toString();
+      if (da !== db) return da < db ? -1 : 1;
+      return (Number(a.last_price) || 0) - (Number(b.last_price) || 0);
+    })
+    .map(r => ({
+      label: _soldDashDateLabel(_soldDashDate(r) || ''),
+      value: Number(r.last_price) || 0,
+      title: `${SAN.sanitizeText(r.name || '')} · ${Number(r.last_price) > 0 ? '€ ' + Math.round(Number(r.last_price)) : '—'}`,
+    }));
+
+  detailChart.innerHTML = _buildSeriesSvg(priceSeries, {
+    width: 980,
+    height: 230,
+    lineColor: '#ff6600',
+    fillColor: 'rgba(255,102,0,0.08)',
+    showYAxis: true,
+    showXAxis: true,
+    showDots: true,
+    valuePrefix: '€ ',
+    compact: false,
+  });
+
+  detailBody.innerHTML = '';
+  for (const r of [...selected.items].sort((a, b) => {
+    const da = (a.sold_at_estimated || a.sold_at || '').toString();
+    const db = (b.sold_at_estimated || b.sold_at || '').toString();
+    if (da !== db) return da < db ? 1 : -1;
+    return (Number(b.last_price) || 0) - (Number(a.last_price) || 0);
+  })) {
+    const tr = document.createElement('tr');
+    const soldAt = _soldDashDate(r);
+    const dateText = soldAt ? _soldDashDateLabel(soldAt) : '—';
+    const priceText = r.last_price != null ? '€ ' + Math.round(Number(r.last_price)) : '—';
+    const place = [r.city, r.region].filter(Boolean).join(' · ') || '—';
+    tr.innerHTML = `
+      <td>${dateText}</td>
+      <td title="${SAN.sanitizeText(r.name || '')}">${SAN.sanitizeText(r.name || '')}</td>
+      <td style="text-align:right; font-weight:800;">${priceText}</td>
+      <td>${SAN.sanitizeText(place)}</td>`;
+    detailBody.appendChild(tr);
   }
 }
 
@@ -3542,9 +4017,9 @@ function renderTrend() {
 // ============================================================
 
 const _SUBMODELS = {
-  '':         ['Base','E','Slim','Elite','X','S'],
+  '':         ['Base','E','S','Elite','X'],
   'Original': ['Base'],
-  '360':      ['Base','E','Slim','Elite'],
+  '360':      ['Base','E','S','Elite'],
   'One':      ['Base','S','X'],
   'Series':   ['X','S'],
 };

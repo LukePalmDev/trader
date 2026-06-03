@@ -29,11 +29,12 @@ log = logging.getLogger(__name__)
 _STORAGE_RE = re.compile(r'(\d[\d.]*)\s*(GB|TB)', re.IGNORECASE)
 
 _FAMILY_TO_CATEGORY = {
+    'series':   'Xbox Series',
     'series-x': 'Xbox Series',
     'series-s': 'Xbox Series',
+    'one':      'Xbox One',
     'one-x':    'Xbox One',
     'one-s':    'Xbox One',
-    'one':      'Xbox One',
     '360':      'Xbox 360',
     'original': 'Xbox Original',
 }
@@ -469,7 +470,9 @@ def _reclassify_products(conn: sqlite3.Connection) -> int:
     rows = conn.execute(
         "SELECT id, source, name FROM products ORDER BY id"
     ).fetchall()
-    payload: list[tuple[str, str, str, str, float, str, str, str, str, int, int]] = []
+    columns = _table_columns(conn, "products")
+    has_search_attrs = {"sub_model", "edition_name", "color", "has_kinect"}.issubset(columns)
+    payload = []
     for row in rows:
         pid = int(row["id"])
         source = str(row["source"] or "")
@@ -482,23 +485,56 @@ def _reclassify_products(conn: sqlite3.Connection) -> int:
             classified.model_segment == "base" and classified.edition_class == "standard"
         )
 
-        payload.append(
-            (
-                classified.console_family,
-                classified.model_segment,
-                classified.edition_class,
-                classified.canonical_model,
-                classified.classify_confidence,
-                classified.classify_method,
-                standardized.standard_name,
-                standardized.standard_key,
-                packaging_state,
-                is_base_auto,
-                pid,
+        item = [
+            classified.console_family,
+            classified.model_segment,
+            classified.edition_class,
+            classified.canonical_model,
+            classified.classify_confidence,
+            classified.classify_method,
+            standardized.standard_name,
+            standardized.standard_key,
+            packaging_state,
+            is_base_auto,
+        ]
+        if has_search_attrs:
+            item.extend(
+                [
+                    classified.sub_model,
+                    extract_edition_name(name),
+                    extract_color_str(name),
+                    extract_kinect(name),
+                ]
             )
-        )
+        item.append(pid)
+        payload.append(tuple(item))
 
-    if payload:
+    if not payload:
+        return 0
+
+    if has_search_attrs:
+        conn.executemany(
+            """
+            UPDATE products
+            SET console_family = ?,
+                model_segment = ?,
+                edition_class = ?,
+                canonical_model = ?,
+                classify_confidence = ?,
+                classify_method = ?,
+                standard_name = ?,
+                standard_key = ?,
+                packaging_state = ?,
+                is_base_model_auto = ?,
+                sub_model = ?,
+                edition_name = ?,
+                color = ?,
+                has_kinect = ?
+            WHERE id = ?
+            """,
+            payload,
+        )
+    else:
         conn.executemany(
             """
             UPDATE products
@@ -556,6 +592,17 @@ def _migration_v11_search_attributes(conn: sqlite3.Connection) -> None:
     conn.execute("CREATE INDEX IF NOT EXISTS idx_products_edition_name ON products(edition_name)")
     # Riclassifica anche standard_name/standard_key per applicare le nuove regole (es. Elite 360)
     _reclassify_products(conn)
+
+
+def _migration_v13_xbox_taxonomy_20260603(conn: sqlite3.Connection) -> None:
+    """Riclassifica i prodotti con la tassonomia famiglia -> modello del 3 giugno."""
+    conn.row_factory = sqlite3.Row
+    _add_column_if_missing(conn, "products", "sub_model TEXT")
+    _add_column_if_missing(conn, "products", "edition_name TEXT")
+    _add_column_if_missing(conn, "products", "color TEXT")
+    _add_column_if_missing(conn, "products", "has_kinect INTEGER")
+    _reclassify_products(conn)
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_products_family_model ON products(console_family, sub_model)")
 
 
 def _normalize_gameshock_records(conn: sqlite3.Connection) -> int:
@@ -803,6 +850,11 @@ _MIGRATIONS = (
             """,
         ),
     ),
+    Migration(
+        13,
+        "xbox-taxonomy-20260603",
+        callback=_migration_v13_xbox_taxonomy_20260603,
+    ),
 )
 
 
@@ -985,7 +1037,7 @@ def process_products(
             )
             standard_name = standardized.standard_name
             standard_key = standardized.standard_key
-            sub_model     = extract_sub_model(name, family)
+            sub_model     = classified.sub_model
             edition_name  = extract_edition_name(name)
             color         = extract_color_str(name)
             has_kinect    = extract_kinect(name)
@@ -1351,7 +1403,7 @@ def search_products(
         "Original": ["original"],
         "360":      ["360"],
         "One":      ["one", "one-s", "one-x"],
-        "Series":   ["series-x", "series-s"],
+        "Series":   ["series", "series-x", "series-s"],
     }
 
     conditions: list[str] = []

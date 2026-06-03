@@ -4,13 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Xbox Tracker</title>
-  <link rel="stylesheet" href="style.css?v=14" />
+  <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+  <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet" />
+  <meta name="theme-color" content="#1d1d22" />
+  <link rel="icon" href="/assets/trader-icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/assets/trader-icon.svg" />
+  <link rel="stylesheet" href="style.css?v=17" />
 </head>
 <body>
 
 <!-- HEADER -->
 <header>
-  <div class="logo">🎮 Xbox Tracker</div>
+  <div class="logo"><img src="/assets/trader-icon.svg" alt="" aria-hidden="true" /> Xbox Tracker</div>
   <nav class="tabs">
     <button class="tab active" data-tab="home">Home</button>
     <button class="tab" data-tab="shop">Riepilogo</button>
@@ -18,6 +23,7 @@
     <button class="tab" data-tab="subito-b">Subito.it B</button>
     <button class="tab" data-tab="subito-p">Subito.it P</button>
     <button class="tab" data-tab="subito-s">Subito.it S</button>
+    <button class="tab" data-tab="subito-dashboard">Subito Dash</button>
     <button class="tab" data-tab="ebay">eBay</button>
     <button class="tab" data-tab="statistiche">📊 Statistiche</button>
     <button class="tab" data-tab="trend">📈 Trend</button>
@@ -301,6 +307,80 @@
   </div>
 </div>
 
+<!-- ======== SUBITO DASHBOARD VENDUTI ======== -->
+<div id="view-subito-dashboard" class="view">
+  <div class="sold-dash">
+    <div class="sold-dash-header">
+      <div>
+        <h1 class="sold-dash-title">Subito.it Venduti</h1>
+        <p class="sold-dash-sub">Volumi giornalieri e analisi prezzi per singola console rilevati da verify_sold sul database locale.</p>
+      </div>
+      <div class="sold-dash-controls">
+        <select id="sold-dash-console" onchange="renderSubitoSoldDashboard()">
+          <option value="">Console dettaglio</option>
+        </select>
+        <select id="sold-dash-range" onchange="renderSubitoSoldDashboard()">
+          <option value="30">Ultimi 30 giorni</option>
+          <option value="60">Ultimi 60 giorni</option>
+          <option value="90">Ultimi 90 giorni</option>
+          <option value="all">Tutto lo storico</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sold-dash-stats">
+      <div class="gstat"><span id="sold-dash-total">—</span><label>Pezzi venduti</label></div>
+      <div class="gstat mkt-s2-subito"><span id="sold-dash-days">—</span><label>Giornate attive</label></div>
+      <div class="gstat"><span id="sold-dash-peak">—</span><label>Max giornaliero</label></div>
+      <div class="gstat"><span id="sold-dash-avg">—</span><label>Media/giorno</label></div>
+    </div>
+
+    <div class="sold-chart-panel">
+      <div class="sold-chart-top">
+        <h2>Andamento giornaliero</h2>
+        <span id="sold-dash-window">—</span>
+      </div>
+      <div id="sold-dash-chart" class="sold-chart"></div>
+    </div>
+
+    <div class="sold-family-panel">
+      <div class="sold-chart-top">
+        <h2>Panoramica per console</h2>
+        <span id="sold-family-count">—</span>
+      </div>
+      <div id="sold-family-grid" class="sold-family-grid"></div>
+    </div>
+
+    <div class="sold-detail-panel">
+      <div class="sold-chart-top">
+        <h2>Analisi prezzi console</h2>
+        <span id="sold-detail-count">—</span>
+      </div>
+      <div class="sold-detail-head">
+        <div>
+          <div class="sold-detail-title" id="sold-detail-title">—</div>
+          <div class="sold-detail-sub" id="sold-detail-sub">—</div>
+        </div>
+        <div class="sold-detail-badges" id="sold-detail-badges"></div>
+      </div>
+      <div id="sold-detail-chart" class="sold-price-chart"></div>
+      <div class="table-scroll">
+        <table class="sold-detail-table">
+          <thead>
+            <tr>
+              <th>Venduto il</th>
+              <th>Titolo</th>
+              <th style="text-align:right;">Prezzo</th>
+              <th>Luogo</th>
+            </tr>
+          </thead>
+          <tbody id="sold-detail-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ======== EBAY VIEW (Venduti eBay) ======== -->
 <div id="view-ebay" class="view">
   <div class="mkt-stats">
@@ -469,9 +549,9 @@
   </div>
 </div>
 
-<script src="modules/state.js?v=14"></script>
-<script src="modules/sanitize.js?v=14"></script>
-<script src="modules/api.js?v=14"></script>
-<script src="app.js?v=14"></script>
+<script src="modules/state.js?v=17"></script>
+<script src="modules/sanitize.js?v=17"></script>
+<script src="modules/api.js?v=17"></script>
+<script src="app.js?v=17"></script>
 </body>
 </html>

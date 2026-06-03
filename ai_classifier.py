@@ -18,7 +18,8 @@ logging.basicConfig(
 )
 log = logging.getLogger("ai_classifier")
 
-from db_subito import DB_PATH, _connect  # noqa: E402
+from db_subito import DB_PATH, _connect, init_db as init_subito_db  # noqa: E402
+from db_ebay import init_db as init_ebay_db  # noqa: E402
 
 try:
     from anthropic import AsyncAnthropic
@@ -34,39 +35,48 @@ DEFAULT_MAX_CONCURRENT_BATCHES = 5
 
 # Valori canonici ammessi — devono corrispondere esattamente a model_rules.py
 _VALID_CANONICALS = {
-    "series-x-1tb", "series-x-2tb", "series-x-digital",
+    "series-x-1tb", "series-x-2tb", "series-x-digital", "series-x-digital-1tb",
     "series-s-512gb", "series-s-1tb",
     "one-x-1tb",
-    "one-s-500gb", "one-s-1tb", "one-s-2tb",
-    "one-500gb", "one-1tb",
+    "one-s-500gb", "one-s-1tb", "one-s-2tb", "one-s-digital-1tb",
+    "one-base-500gb", "one-base-1tb", "one-500gb", "one-1tb",
+    "360-base", "360-base-4gb", "360-base-20gb", "360-base-60gb",
+    "360-base-120gb", "360-base-250gb", "360-base-320gb", "360-base-500gb",
+    "360-s", "360-s-4gb", "360-s-250gb", "360-s-320gb", "360-s-500gb",
+    "360-e", "360-e-4gb", "360-e-250gb", "360-e-500gb",
+    "360-elite", "360-elite-120gb", "360-elite-250gb",
     "360-120gb", "360-250gb", "360-500gb", "360",
-    "original", "other",
+    "original-base-8gb", "original", "other",
 }
-_VALID_FAMILIES  = {"series-x", "series-s", "one-x", "one-s", "one", "360", "original", "other"}
+_VALID_FAMILIES  = {"series", "one", "360", "original", "other"}
+_VALID_SUB_MODELS = {"Base", "S", "X", "E", "Elite", "Unknown"}
 _VALID_EDITIONS  = {"standard", "limited", "special", "bundle"}
 
 SYSTEM_PROMPT = """Analizza ogni annuncio Subito.it e determina: (1) se vende hardware console Xbox, (2) il modello esatto.
 
 Per ogni annuncio restituisci questi campi:
 - console_confidence: intero 0-100 (100=sicuramente console Xbox hardware, 0=non è console, 50=ambiguo)
-- family: "series-x" | "series-s" | "one-x" | "one-s" | "one" | "360" | "original" | "other"
-- canonical: ESATTAMENTE uno tra: "series-x-1tb" | "series-x-2tb" | "series-x-digital" | "series-s-512gb" | "series-s-1tb" | "one-x-1tb" | "one-s-500gb" | "one-s-1tb" | "one-s-2tb" | "one-500gb" | "one-1tb" | "360-120gb" | "360-250gb" | "360-500gb" | "360" | "original" | "other"
+- family: "series" | "one" | "360" | "original" | "other"
+- model: "Base" | "S" | "X" | "E" | "Elite" | "Unknown"
+- canonical: ESATTAMENTE uno tra: "series-x-1tb" | "series-x-2tb" | "series-x-digital-1tb" | "series-s-512gb" | "series-s-1tb" | "one-x-1tb" | "one-s-500gb" | "one-s-1tb" | "one-s-2tb" | "one-s-digital-1tb" | "one-base-500gb" | "one-base-1tb" | "360-base" | "360-base-4gb" | "360-base-20gb" | "360-base-60gb" | "360-base-120gb" | "360-base-250gb" | "360-base-320gb" | "360-base-500gb" | "360-s" | "360-s-4gb" | "360-s-250gb" | "360-s-320gb" | "360-s-500gb" | "360-e" | "360-e-4gb" | "360-e-250gb" | "360-e-500gb" | "360-elite" | "360-elite-120gb" | "360-elite-250gb" | "original-base-8gb" | "other"
 - storage_gb: capacità storage come intero (es. 512, 1024, 2048) oppure null se non specificata
 - edition: "standard" | "limited" | "special" | "bundle"
 
 Regole:
-- Se console_confidence < 75 (non è console Xbox): family="other", canonical="other", storage_gb=null, edition="standard"
+- Se console_confidence < 75 (non è console Xbox): family="other", model="Unknown", canonical="other", storage_gb=null, edition="standard"
+- family è solo il primo livello: "series", "one", "360", "original". Non usare "series-x" o "one-s" come family.
+- model è il secondo livello: Series usa solo X/S; One usa Base/S/X; 360 usa Base/S/E/Elite; Original usa Base.
 - "bundle" = console + giochi o accessori inclusi nel prezzo
 - "limited" = edizione con nome di gioco/brand (Halo, Forza, Cyberpunk, Starfield, ecc.)
 - "special" = edizione speciale senza nome specifico (Anniversary, Galaxy Black, ecc.)
 - "digital" = console senza lettore ottico (Xbox Series X Digital Edition)
 - Per storage: 500GB→500, 512GB→512, 1TB→1024, 2TB→2048
 - Se non è chiaro se è 500GB o 512GB per One S, usa 500
-- Xbox One base senza storage specificato → canonical="one-500gb"
-- Xbox 360 senza storage specificato → canonical="360"
+- Xbox One base senza storage specificato → canonical="one-base-500gb"
+- Xbox 360 senza storage specificato → canonical="360-base"
 
 Rispondi ESCLUSIVAMENTE con un array JSON (nessun testo prima o dopo):
-[{"id": int, "console_confidence": int, "family": "...", "canonical": "...", "storage_gb": int_o_null, "edition": "..."}]"""
+[{"id": int, "console_confidence": int, "family": "...", "model": "...", "canonical": "...", "storage_gb": int_o_null, "edition": "..."}]"""
 
 
 def _normalize_text(raw: str | None) -> str:
@@ -207,6 +217,8 @@ async def run_ai_classifier(
     global SELECTED_MODEL
     SELECTED_MODEL = _validate_model(SELECTED_MODEL)
 
+    init_subito_db(DB_PATH)
+    init_ebay_db(DB_PATH)
     conn = _connect(DB_PATH)
     if reset_first:
         reset_rows = _reset_ai_state(conn)
@@ -284,6 +296,7 @@ async def run_ai_classifier(
 
             # Campi classificazione (presenti solo nelle risposte del nuovo prompt)
             family   = res.get("family")
+            sub_model = res.get("model") or res.get("sub_model")
             canonical = res.get("canonical")
             edition  = res.get("edition")
             storage  = res.get("storage_gb")
@@ -292,6 +305,9 @@ async def run_ai_classifier(
             if family and family not in _VALID_FAMILIES:
                 log.warning("family non valida '%s' per id %s — ignorata.", family, ad_id)
                 family = None
+            if sub_model and sub_model not in _VALID_SUB_MODELS:
+                log.warning("model non valido '%s' per id %s — ignorato.", sub_model, ad_id)
+                sub_model = None
             if canonical and canonical not in _VALID_CANONICALS:
                 log.warning("canonical non valido '%s' per id %s — ignorato.", canonical, ad_id)
                 canonical = None
@@ -311,12 +327,13 @@ async def run_ai_classifier(
                            SET ai_confidence     = ?,
                                ai_status         = ?,
                                console_family    = ?,
+                               sub_model         = COALESCE(?, sub_model),
                                canonical_model   = ?,
                                edition_class     = COALESCE(?, edition_class),
                                classify_method   = 'ai:v1',
                                classify_confidence = ?
                            WHERE id = ?""",
-                        (conf, status, family, canonical, edition,
+                        (conf, status, family, sub_model, canonical, edition,
                          round(conf / 100.0, 3), ad_id),
                     )
                 elif status == "rejected":
@@ -326,6 +343,7 @@ async def run_ai_classifier(
                            SET ai_confidence     = ?,
                                ai_status         = ?,
                                console_family    = 'other',
+                               sub_model         = 'Unknown',
                                canonical_model   = 'other',
                                classify_method   = 'ai:v1',
                                classify_confidence = ?
@@ -478,11 +496,14 @@ async def run_ebay_classifier(
                 continue
 
             family   = res.get("family")
+            sub_model = res.get("model") or res.get("sub_model")
             canonical = res.get("canonical")
             edition  = res.get("edition")
 
             if family and family not in _VALID_FAMILIES:
                 family = None
+            if sub_model and sub_model not in _VALID_SUB_MODELS:
+                sub_model = None
             if canonical and canonical not in _VALID_CANONICALS:
                 canonical = None
             if edition and edition not in _VALID_EDITIONS:
@@ -493,17 +514,19 @@ async def run_ebay_classifier(
                     conn.execute(
                         """UPDATE sold_items
                            SET console_family      = ?,
+                               sub_model           = COALESCE(?, sub_model),
                                canonical_model     = ?,
                                edition_class       = COALESCE(?, edition_class),
                                classify_confidence = ?,
                                classify_method     = 'ai:v1'
                            WHERE id = ?""",
-                        (family, canonical, edition, round(conf / 100.0, 3), item_id),
+                        (family, sub_model, canonical, edition, round(conf / 100.0, 3), item_id),
                     )
                 elif conf <= 25:
                     conn.execute(
                         """UPDATE sold_items
                            SET console_family      = 'other',
+                               sub_model           = 'Unknown',
                                canonical_model     = 'other',
                                classify_confidence = ?,
                                classify_method     = 'ai:v1'

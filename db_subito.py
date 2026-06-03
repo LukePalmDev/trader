@@ -28,7 +28,7 @@ from paths import DB_PATH
 log = logging.getLogger(__name__)
 
 CLASSIFY_VERSION_LEGACY = "legacy-v1"
-CLASSIFY_VERSION_RULES_TITLE = "rules:title:v1"
+CLASSIFY_VERSION_RULES_TITLE = "rules:title:v2:2026-06-03"
 
 def _table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
     rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
@@ -90,6 +90,7 @@ def _estimate_sold_window(
 
 def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
     _add_column_if_missing(conn, "ads", "model_segment TEXT NOT NULL DEFAULT 'unknown'")
+    _add_column_if_missing(conn, "ads", "sub_model TEXT")
     _add_column_if_missing(conn, "ads", "edition_class TEXT NOT NULL DEFAULT 'standard'")
     _add_column_if_missing(conn, "ads", "canonical_model TEXT")
     _add_column_if_missing(conn, "ads", "classify_confidence REAL")
@@ -105,6 +106,7 @@ def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
         payload.append(
             (
                 classified.console_family,
+                classified.sub_model,
                 classified.model_segment,
                 classified.edition_class,
                 classified.canonical_model,
@@ -119,6 +121,7 @@ def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
             """
             UPDATE ads
             SET console_family = ?,
+                sub_model = ?,
                 model_segment = ?,
                 edition_class = ?,
                 canonical_model = ?,
@@ -130,6 +133,7 @@ def _migration_v3_segment_models(conn: sqlite3.Connection) -> None:
         )
 
     conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_segment ON ads(model_segment)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_sub_model ON ads(sub_model)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_canonical ON ads(canonical_model)")
 
 def _migration_v5_ai_columns(conn: sqlite3.Connection) -> None:
@@ -205,6 +209,48 @@ def _migration_v9_backfill_last_verified_at(conn: sqlite3.Connection) -> None:
         "UPDATE ads SET last_verified_at = strftime('%Y-%m-%dT%H:%M:%SZ', 'now') "
         "WHERE last_verified_at IS NULL AND last_available = 1 AND sold_at IS NULL"
     )
+
+
+def _migration_v10_xbox_taxonomy_20260603(conn: sqlite3.Connection) -> None:
+    """Riclassifica annunci Subito con la tassonomia famiglia -> modello del 3 giugno."""
+    _add_column_if_missing(conn, "ads", "sub_model TEXT")
+    rows = conn.execute("SELECT id, name, console_family FROM ads").fetchall()
+    payload = []
+    for row in rows:
+        row_id = int(row[0])
+        name = str(row[1] or "")
+        family_hint = row[2]
+        classified = classify_title(name, family_hint=family_hint)
+        payload.append(
+            (
+                CLASSIFY_VERSION_RULES_TITLE,
+                classified.console_family,
+                classified.sub_model,
+                classified.model_segment,
+                classified.edition_class,
+                classified.canonical_model,
+                classified.classify_confidence,
+                classified.classify_method,
+                row_id,
+            )
+        )
+    if payload:
+        conn.executemany(
+            """
+            UPDATE ads
+            SET classify_version = ?,
+                console_family = ?,
+                sub_model = ?,
+                model_segment = ?,
+                edition_class = ?,
+                canonical_model = ?,
+                classify_confidence = ?,
+                classify_method = ?
+            WHERE id = ?
+            """,
+            payload,
+        )
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_family_model ON ads(console_family, sub_model)")
 
 
 _MIGRATIONS = (
@@ -294,6 +340,11 @@ _MIGRATIONS = (
         "backfill-last-verified-at",
         callback=_migration_v9_backfill_last_verified_at,
     ),
+    Migration(
+        10,
+        "xbox-taxonomy-20260603",
+        callback=_migration_v10_xbox_taxonomy_20260603,
+    ),
 )
 
 
@@ -329,6 +380,7 @@ def init_db(db_path: Path = DB_PATH) -> None:
             text_hash      TEXT,
             classify_version TEXT,
             console_family TEXT,
+            sub_model      TEXT,
             model_segment  TEXT    NOT NULL DEFAULT 'unknown',
             edition_class  TEXT    NOT NULL DEFAULT 'standard',
             canonical_model TEXT,
@@ -413,6 +465,7 @@ def process_ads(
             seller    = p.get("seller_type") or "privato"
             pub_at    = p.get("published_at") or ""
             body_text = _normalize_body_text((p.get("body_text") or p.get("body") or ""))
+            classified = classify_title(name, family_hint=None)
 
             existing = conn.execute(
                 "SELECT * FROM ads WHERE urn_id = ?", (urn_id,)
@@ -443,17 +496,17 @@ def process_ads(
                 cur = conn.execute("""
                     INSERT INTO ads
                         (urn_id, name, body_text, text_hash, classify_version, console_family,
-                         model_segment, edition_class, canonical_model,
+                         sub_model, model_segment, edition_class, canonical_model,
                          classify_confidence, classify_method,
                          url, image_url,
                          city, region, seller_type, published_at,
                          first_seen, last_seen, last_active_seen, first_inactive_seen,
                          last_price, last_available, ai_status,
                          sold_at, sold_at_estimated, sold_window_hours)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (urn_id, name, body_text, text_hash, None, None,
-                      'unknown', 'standard', None,
-                      None, None,
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (urn_id, name, body_text, text_hash, CLASSIFY_VERSION_RULES_TITLE, classified.console_family,
+                      classified.sub_model, classified.model_segment, classified.edition_class, classified.canonical_model,
+                      classified.classify_confidence, classified.classify_method,
                       url, image_url,
                       city, region, seller, pub_at,
                       now, now, last_active_seen, first_inactive_seen,
@@ -571,7 +624,7 @@ def get_all_ads(db_path: Path = DB_PATH) -> list[dict]:
         rows = conn.execute("""
             SELECT
                 id, urn_id, name, console_family,
-                model_segment, edition_class,
+                sub_model, model_segment, edition_class, canonical_model,
                 url, city, region,
                 seller_type, published_at,
                 last_price, last_available,
@@ -608,11 +661,12 @@ def get_recent_changes(days: int = 30, db_path: Path = DB_PATH) -> list[dict]:
 
 _PRICE_FLOORS: dict[str, float] = {
     # Nessuna console di questa famiglia viene venduta sotto questa soglia
+    "series":    50.0,
     "series-x":  80.0,
     "series-s":  50.0,
+    "one":       30.0,
     "one-x":     40.0,
     "one-s":     35.0,
-    "one":       30.0,
     "360":       10.0,
     "original":   8.0,
     "other":      8.0,
@@ -707,7 +761,7 @@ def get_sold_ads(db_path: Path = DB_PATH) -> list[dict]:
         rows = conn.execute("""
             SELECT
                 id, urn_id, name, console_family,
-                model_segment, edition_class, canonical_model,
+                sub_model, model_segment, edition_class, canonical_model,
                 url, city, region,
                 seller_type, published_at,
                 first_seen, sold_at,
