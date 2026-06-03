@@ -1,56 +1,40 @@
 from __future__ import annotations
 
+import json
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
-VALID_SEGMENTS = {"base", "premium", "unknown"}
-VALID_EDITIONS = {"standard", "limited", "special", "bundle"}
+# Tutta la tassonomia (famiglie, alias, etichette, colori, edizioni, regex) è
+# definita in taxonomy.json, modificabile senza toccare il codice.
+TAXONOMY_PATH = Path(__file__).with_name("taxonomy.json")
+
+with TAXONOMY_PATH.open(encoding="utf-8") as _fh:
+    _TAX = json.load(_fh)
+
+
+def _compile(pattern: str) -> re.Pattern[str]:
+    return re.compile(pattern, re.I)
+
+
+VALID_SEGMENTS = set(_TAX["valid_segments"])
+VALID_EDITIONS = set(_TAX["valid_editions"])
 
 _FAMILY_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("series", re.compile(r"\bxbox\s+series(?:\s*[xs])?\b|\bseries\s*[xs]\b", re.I)),
-    ("one", re.compile(r"\bxbox\s+one(?:\s*[xs])?\b|\bone\s*[xs]\b|\bone\b", re.I)),
-    ("360", re.compile(r"\bxbox\s*360\b|\bxbox360\b|\b360\s*[se]?\b", re.I)),
-    ("original", re.compile(r"\boriginal\b|\bxbox\s+classic\b", re.I)),
+    (key, _compile(pat)) for key, pat in _TAX["family_patterns"]
 ]
 
-_STORAGE_RE = re.compile(r"(\d[\d.]*)\s*(GB|TB)", re.I)
+_STORAGE_RE = _compile(_TAX["regexes"]["storage"])
+_LIMITED_RE = _compile(_TAX["regexes"]["limited"])
+_SPECIAL_RE = _compile(_TAX["regexes"]["special"])
+_BUNDLE_RE = _compile(_TAX["regexes"]["bundle"])
+_PREMIUM_MODEL_RE = _compile(_TAX["regexes"]["premium_model"])
+_DIGITAL_RE = _compile(_TAX["regexes"]["digital"])
 
-_LIMITED_RE = re.compile(
-    r"\b(limited|Ltd|collector(?:'s)?|launch|day\s*one|project\s+scorpio|anniversary|"
-    r"halo\w*|forza\w*|gears\w*|starfield|cyberpunk|spider\-?man)\b",
-    re.I,
-)
-_SPECIAL_RE = re.compile(
-    r"\b(special|editione\s+speciale|anniversary|commemorative|commemorativa|"
-    r"galaxy\s+black|20th\s+anniversary|elite\s+series)\b",
-    re.I,
-)
-_BUNDLE_RE = re.compile(
-    r"\b(bundle|pack|con\s+gioco|with\s+game|inclus[oa]|include|bundle\s+edition)\b",
-    re.I,
-)
-_PREMIUM_MODEL_RE = re.compile(
-    r"\b(elite|project\s+scorpio|2\s*tb|2tb|galaxy\s+black)\b",
-    re.I,
-)
-_DIGITAL_RE = re.compile(r"\b(digital|all\s*\-?\s*digital|senza\s+lettore|no\s+disc|edizione\s+digitale)\b", re.I)
-
-_FAMILY_SPECIFICITY = {
-    "series": 4,
-    "one": 3,
-    "360": 2,
-    "original": 1,
-}
+_FAMILY_SPECIFICITY = _TAX["family_specificity"]
 
 _LEGACY_FAMILY_ALIASES = {
-    "series-x": ("series", "X"),
-    "series-s": ("series", "S"),
-    "one-x": ("one", "X"),
-    "one-s": ("one", "S"),
-    "one": ("one", "Base"),
-    "360": ("360", None),
-    "original": ("original", "Base"),
-    "series": ("series", None),
+    key: tuple(val) for key, val in _TAX["legacy_family_aliases"].items()
 }
 
 
@@ -278,101 +262,25 @@ def classify_title(name: str, family_hint: str | None = None) -> ModelClassifica
     )
 
 
-_CANONICAL_STANDARD_LABELS = {
-    "series-x-1tb": "Xbox Series X 1 TB",
-    "series-x-2tb": "Xbox Series X 2 TB",
-    "series-x-digital-1tb": "Xbox Series X Digital 1 TB",
-    "series-x-digital": "Xbox Series X Digital 1 TB",
-    "series-s-512gb": "Xbox Series S 512 GB",
-    "series-s-1tb": "Xbox Series S 1 TB",
-    "one-x-1tb": "Xbox One X 1 TB",
-    "one-s-500gb": "Xbox One S 500 GB",
-    "one-s-1tb": "Xbox One S 1 TB",
-    "one-s-2tb": "Xbox One S 2 TB",
-    "one-s-digital-1tb": "Xbox One S All-Digital 1 TB",
-    "one-base-500gb": "Xbox One 500 GB",
-    "one-base-1tb": "Xbox One 1 TB",
-    "one-500gb": "Xbox One 500 GB",
-    "one-1tb": "Xbox One 1 TB",
-    "360-base-4gb": "Xbox 360 4 GB",
-    "360-base-20gb": "Xbox 360 20 GB",
-    "360-base-60gb": "Xbox 360 60 GB",
-    "360-base-120gb": "Xbox 360 120 GB",
-    "360-base-250gb": "Xbox 360 250 GB",
-    "360-base-320gb": "Xbox 360 320 GB",
-    "360-base-500gb": "Xbox 360 500 GB",
-    "360-s-4gb": "Xbox 360 S 4 GB",
-    "360-s-250gb": "Xbox 360 S 250 GB",
-    "360-s-320gb": "Xbox 360 S 320 GB",
-    "360-s-500gb": "Xbox 360 S 500 GB",
-    "360-e-4gb": "Xbox 360 E 4 GB",
-    "360-e-250gb": "Xbox 360 E 250 GB",
-    "360-e-500gb": "Xbox 360 E 500 GB",
-    "360-elite-120gb": "Xbox 360 Elite 120 GB",
-    "360-elite-250gb": "Xbox 360 Elite 250 GB",
-    "360-base": "Xbox 360",
-    "360-s": "Xbox 360 S",
-    "360-e": "Xbox 360 E",
-    "360-elite": "Xbox 360 Elite",
-    "360-120gb": "Xbox 360 120 GB",
-    "360-250gb": "Xbox 360 250 GB",
-    "360-500gb": "Xbox 360 500 GB",
-    "360": "Xbox 360",
-    "original-base-8gb": "Xbox Original",
-    "original": "Xbox Original",
-}
+_CANONICAL_STANDARD_LABELS = _TAX["canonical_standard_labels"]
 
-_FAMILY_STANDARD_LABELS = {
-    "series": "Xbox Series",
-    "series-x": "Xbox Series X",
-    "series-s": "Xbox Series S",
-    "one": "Xbox One",
-    "one-x": "Xbox One X",
-    "one-s": "Xbox One S",
-    "360": "Xbox 360",
-    "original": "Xbox Original",
-}
+_FAMILY_STANDARD_LABELS = _TAX["family_standard_labels"]
 
-_FALLBACK_NOISE_RE = re.compile(
-    r"\b(microsoft|console|wireless|controller|controllere?|inkl?|incl\.?|con|senza|colore|nero|bianco|rosso|blu|argento|gold|silver)\b",
-    re.I,
-)
+_FALLBACK_NOISE_RE = _compile(_TAX["regexes"]["fallback_noise"])
 _SPACES_RE = re.compile(r"\s+")
 _SLUG_RE = re.compile(r"[^a-z0-9]+")
 
-_XBOX_360_E_RE = re.compile(r"\b(?:xbox\s*)?360\s*\"?e\"?\b", re.I)
-_XBOX_360_SLIM_RE = re.compile(r"\b360\s*slim\b|\bslim\b|\b360[Ss]\b", re.I)
+_XBOX_360_E_RE = _compile(_TAX["regexes"]["xbox_360_e"])
+_XBOX_360_SLIM_RE = _compile(_TAX["regexes"]["xbox_360_slim"])
 # "Elite" è un sotto-modello del 360 fat (2007, nero/120GB); usato solo nel contesto family=="360"
-_XBOX_360_ELITE_RE = re.compile(r"\belite\b", re.I)
+_XBOX_360_ELITE_RE = _compile(_TAX["regexes"]["xbox_360_elite"])
 
 _EDITION_NAME_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("Call Of Duty", re.compile(r"\bcall\s+of\s+duty\b", re.I)),
-    ("Minecraft", re.compile(r"\bminecraft\b", re.I)),
-    ("Halo", re.compile(r"\bhalo\w*\b", re.I)),
-    ("Forza", re.compile(r"\bforza\w*\b", re.I)),
-    ("Gears", re.compile(r"\bgears\w*\b", re.I)),
-    ("Cyberpunk 2077", re.compile(r"\bcyberpunk\b", re.I)),
-    ("Battlefield", re.compile(r"\bbattlefield\b", re.I)),
-    ("Fortnite", re.compile(r"\bfortnite\b", re.I)),
-    ("Sunset Overdrive", re.compile(r"\bsunset\s+overdrive\b", re.I)),
-    ("Project Scorpio", re.compile(r"\bproject\s+scorpio\b", re.I)),
-    ("Starfield", re.compile(r"\bstarfield\b", re.I)),
+    (label, _compile(pat)) for label, pat in _TAX["edition_name_patterns"]
 ]
 
 _COLOR_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("Nero", re.compile(r"\bner[oa]\b|\bblack\b", re.I)),
-    ("Bianco", re.compile(r"\bbianc[oa]\b|\bwhite\b", re.I)),
-    ("Rosso", re.compile(r"\bross[oa]\b|\bred\b", re.I)),
-    ("Blu", re.compile(r"\bblu\b|\bblue\b", re.I)),
-    ("Verde", re.compile(r"\bverd[ei]\b|\bgreen\b", re.I)),
-    ("Argento", re.compile(r"\bargent[oa]\b|\bsilver\b", re.I)),
-    ("Oro", re.compile(r"\boro\b|\bgold\b", re.I)),
-    ("Grigio", re.compile(r"\bgrigi[oa]\b|\bgray\b|\bgrey\b", re.I)),
-    ("Viola", re.compile(r"\bviola\b|\bpurple\b|\blilla\b", re.I)),
-    ("Giallo", re.compile(r"\bgiall[oa]\b|\byellow\b", re.I)),
-    ("Marrone", re.compile(r"\bmarrone\b|\bbrown\b", re.I)),
-    ("Arancione", re.compile(r"\barancione\b|\borange\b", re.I)),
-    ("Rosa", re.compile(r"\brosa\b|\bpink\b", re.I)),
+    (label, _compile(pat)) for label, pat in _TAX["color_patterns"]
 ]
 
 
@@ -522,8 +430,8 @@ def standardize_title(
 # Funzioni di estrazione attributi strutturati (per la tab Ricerca)
 # ---------------------------------------------------------------------------
 
-_KINECT_RE = re.compile(r"\bkinect\b", re.I)
-_NO_KINECT_RE = re.compile(r"\bno\s+kinect\b|\bsenza\s+kinect\b|\(no\s+kinect\)", re.I)
+_KINECT_RE = _compile(_TAX["regexes"]["kinect"])
+_NO_KINECT_RE = _compile(_TAX["regexes"]["no_kinect"])
 
 
 def extract_sub_model(title: str, family: str) -> str:
