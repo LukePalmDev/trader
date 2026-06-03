@@ -5,7 +5,7 @@ La prima versione e' volutamente conservativa:
 
 - codice su GitHub
 - dati runtime sul server in `/var/lib/trader`
-- viewer/API solo su `127.0.0.1`, accessibile via SSH tunnel
+- viewer/API su `127.0.0.1` dietro reverse proxy Nginx per `trader.byluke.org`
 - automazioni con `systemd timers`, non dipendenti dal Mac
 - niente token o `.env` committati
 
@@ -176,9 +176,15 @@ Esegui un job manuale:
 sudo -u trader /opt/trader/app/deploy/server_job.sh scrape-fonti
 ```
 
-### 8. Apri il viewer dal Mac
+### 8. Apri il viewer
 
-Il viewer resta privato sul server. Dal Mac:
+Con dominio configurato:
+
+```text
+https://trader.byluke.org/
+```
+
+Per debug locale via tunnel SSH:
 
 ```bash
 ssh -L 8080:127.0.0.1:8080 root@IP_DEL_SERVER
@@ -187,26 +193,28 @@ ssh -L 8080:127.0.0.1:8080 root@IP_DEL_SERVER
 Poi apri:
 
 ```text
-http://127.0.0.1:8080/viewer/index.html
+http://127.0.0.1:8080/
 ```
 
 ## GitHub dopo la migrazione
 
-Quando i timer server funzionano, disattiva gli schedule GitHub che fanno scraping
-per evitare doppie esecuzioni:
+Dal 3 giugno 2026 gli schedule GitHub sono stati rimossi dall’operatività e archiviati in
+`STORICI3GIUGNO/github-workflows/`:
 
 - `Subito.it`
 - `Scraper Fonti`
 - `eBay`
 - `AI Classify`
 - `Verify Sold`
+- `Quality`
 
-Lascia attivo `Quality` per test/lint su push e PR.
+I test/lint si eseguono localmente prima del commit. Le routine periodiche girano sul server
+con systemd, documentate in `docs/server-routines.md`.
 
 Il flusso consigliato diventa:
 
 ```text
-Mac/dev -> push codice su GitHub -> server fa git pull quando aggiorni -> dati restano sul server
+Mac/dev -> commit/push codice su GitHub -> deploy server -> dati restano sul server
 ```
 
 Per aggiornare codice server:

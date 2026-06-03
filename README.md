@@ -29,7 +29,7 @@ Scraper (8 fonti)  ->  Snapshot JSON  ->  tracker.db (SQLite)  ->  API HTTP  -> 
 | `valuation.py` | Fair value engine: mediana ponderata CEX/Subito/eBay con backtesting |
 | `alerts.py` | Sistema alert prezzi con notifiche macOS + Telegram |
 | `verify_sold.py` | Verifica asincrona stato venduto annunci Subito |
-| `model_rules.py` | Classificazione deterministica regex (famiglia, segmento, edizione) |
+| `model_rules.py` | Classificazione deterministica regex (famiglia, sotto-modello, segmento, edizione) |
 | `settings.py` | Configurazione da `config.toml` + override ENV |
 | `id_utils.py` | Generazione ID stabili per prodotti |
 | `run_report.py` | Tracciamento esecuzione con timing e report JSON |
@@ -49,15 +49,15 @@ Scraper (8 fonti)  ->  Snapshot JSON  ->  tracker.db (SQLite)  ->  API HTTP  -> 
 
 ### Viewer Web
 
-UI single-page statica in `viewer/` con dark mode e 9 tab:
+UI single-page statica in `viewer/` con dark mode e dashboard operative:
 
 | Tab | Descrizione |
 |-----|-------------|
-| Home | Griglia base models per famiglia (Series/One/360/Original) |
-| Mercato | Solo prodotti disponibili con prezzo base model |
-| Tutto | Panoramica globale con statistiche aggregate per store |
+| Home | Dashboard statistiche e riepilogo prezzi |
+| Riepilogo | Panoramica globale con statistiche aggregate per store |
 | Catalogo | Tabella prodotti shop con filtri, ordinamento e toggle base model |
-| Subito | Annunci marketplace con stato AI (approved/pending/rejected) e storico prezzi |
+| Subito.it B/P/S | Annunci marketplace per vista operativa, prezzo e stato |
+| Subito Dash | Dashboard venduti Subito con grafici giornalieri e dettaglio per console |
 | eBay | Venduti eBay con statistiche prezzo per famiglia |
 | Statistiche | Z-score, spread, trend analysis, clustering, fair value |
 | Trend | Grafici SVG storici dei prezzi per i modelli base con filtri periodo/famiglia |
@@ -91,6 +91,20 @@ Tutti i dati risiedono in un singolo file `tracker.db` (SQLite) con 8 tabelle:
 
 Le migrazioni sono gestite con namespace (`products`, `ads`, `ebay`) nella tabella `schema_migrations`.
 
+## Catalogazione Xbox
+
+Dal 3 giugno 2026 il progetto usa una tassonomia a due livelli:
+
+| Campo | Valori principali | Significato |
+|-------|-------------------|-------------|
+| `console_family` | `original`, `360`, `one`, `series`, `other` | Famiglia principale. |
+| `sub_model` | `Base`, `S`, `X`, `E`, `Elite`, `Unknown` | Modello dentro la famiglia. |
+| `canonical_model` | es. `series-x-1tb`, `one-s-digital-1tb`, `360-e-250gb` | Slot tecnico per prezzi/storage. |
+
+Il catalogo operativo è in `console_catalog.md` e il riferimento strutturato è in
+`catalogs/xbox_taxonomy_2026-06-03.json`. Lo schema precedente è archiviato in
+`STORICI3GIUGNO/`.
+
 ## Pipeline di classificazione
 
 ```
@@ -98,7 +112,7 @@ Titolo annuncio
     |
     v
 [1] Regole deterministiche (model_rules.py)
-    -> famiglia, segmento, edizione, canonical_model
+    -> famiglia, sub_model, segmento, edizione, canonical_model
     |
     v
 [2] CEX Matching (Jaccard similarity)
@@ -165,8 +179,9 @@ python3 run.py --test-telegram
 # Maintenance: retention snapshot + archiviazione + VACUUM
 python3 run.py --cleanup
 
-# Crontab per scraping automatico (ogni 6 ore)
-python3 run.py --setup-cron
+# Routine server (systemd timers su VPS)
+systemctl list-timers 'trader-*'
+journalctl -u trader-scrape-subito.service -n 80 --no-pager
 
 # Scrape Subito mirato (una o più regioni)
 python3 run.py --source subito --subito-region lombardia
@@ -257,13 +272,13 @@ I notificati sono tracciati in `alert_log.json` (con purge automatica a 90 giorn
 - Dipendenze: `pip install -r requirements.lock`
 - Browser: `python -m playwright install chromium`
 
-## Test e CI
+## Test e automazioni
 
 - Unit/smoke test: `pytest`
 - Lint: `ruff check .`
-- CI GitHub Actions:
-  - **Quality Gate** su push/PR (lint + test)
-  - **Daily Scrape** schedulato (scrape + cleanup + commit DB)
+- Routine operative: systemd timers sul server, documentati in `docs/server-routines.md`
+- GitHub Actions: workflow storici archiviati in `STORICI3GIUGNO/github-workflows/`
+- GitHub resta repository del codice; scraping, AI, verify e backup girano sul server.
 
 ## Migrazione da vecchi DB
 
@@ -292,6 +307,9 @@ trader/
 ├── alerts.py                # Alert prezzi + notifiche macOS + Telegram
 ├── verify_sold.py           # Verifica stato venduto Subito
 ├── model_rules.py           # Regole classificazione regex
+├── console_catalog.md       # Catalogo operativo dal 3 giugno 2026
+├── catalogs/
+│   └── xbox_taxonomy_2026-06-03.json
 ├── settings.py              # Config validation + ENV override
 ├── id_utils.py              # Generazione ID stabili
 ├── run_report.py            # Tracciamento esecuzione
@@ -320,7 +338,8 @@ trader/
 ├── logs/                    # Report runtime
 ├── tests/                   # Test suite
 ├── docs/runbook.md          # Procedure operative
-└── .github/workflows/       # CI/CD (Quality Gate + Daily Scrape)
+├── docs/server-routines.md  # Timer systemd e mapping routine server
+└── STORICI3GIUGNO/          # Catalogo legacy e vecchi workflow GitHub
 ```
 
 ## Criticità note: verify\_sold

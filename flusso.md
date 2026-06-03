@@ -1,7 +1,7 @@
 # TRADER — FLUSSO DI ESECUZIONE
 
 > Documento di riferimento tecnico per il progetto Xbox Tracker.
-> Aggiornato: 22 aprile 2026.
+> Aggiornato: 3 giugno 2026.
 
 ---
 
@@ -12,8 +12,8 @@ Trader è un price tracker specializzato per hardware console Xbox sul mercato i
 Il sistema ha tre macro-funzioni:
 
 - **Raccolta dati**: scraping periodico delle fonti, ingestion nel DB con change detection
-- **Classificazione**: pipeline a 3 livelli (regole regex → matching CEX → Claude Haiku) che assegna a ogni annuncio `console_family`, `canonical_model`, `model_segment`, `edition_class`
-- **Presentazione**: server HTTP che espone un'API REST e serve una SPA con 9 tab per esplorare prezzi, trend e valutazioni
+- **Classificazione**: pipeline a 3 livelli (regole regex → matching CEX → Claude Haiku) che assegna a ogni annuncio `console_family`, `sub_model`, `canonical_model`, `model_segment`, `edition_class`
+- **Presentazione**: server HTTP che espone un'API REST e serve una SPA con dashboard prezzi, venduti, trend e ricerca
 
 Tutto lo stato persistente vive in `tracker.db`. I file JSON delle scrape sono snapshot temporanei su disco (cartella `data/`), archiviati come `.json.gz` dopo N giorni e poi eliminati.
 
@@ -36,7 +36,7 @@ Tutto lo stato persistente vive in `tracker.db`. I file JSON delle scrape sono s
 | `--subito-rebuild-all` | Ricostruzione completa dataset Subito in 5 step |
 | `--cleanup` | Retention snapshot + archiviazione + VACUUM DB |
 | `--valuation-report` / `--tune-valuation` | Calcolo fair value e tuning pesi |
-| `--setup-cron` | Installa crontab per esecuzione automatica |
+| `--setup-cron` | Legacy locale: preferire i timer systemd server |
 
 Ogni esecuzione è wrappata in un `RunReport` che, al termine, scrive un JSON di log in `logs/` con comando, timing, step, errori e statistiche.
 
@@ -134,11 +134,11 @@ per ogni batch → classify_batch(client, batch)
   ↓  chiamata API Anthropic (claude-haiku-4-5-20251001, temp=0, max_tokens=4096)
   ↓  sistema invia: titolo (max 240 char) + body (max 960 char) + prezzo
   ↓  Claude risponde: array JSON
-     [{id, console_confidence, family, canonical, storage_gb, edition}]
+     [{id, console_confidence, family, model, canonical, storage_gb, edition}]
     ↓
-validazione campi (whitelist per family, canonical, edition)
+validazione campi (whitelist per family, model, canonical, edition)
     ↓
-UPDATE ads SET ai_status, ai_confidence, console_family, canonical_model,
+UPDATE ads SET ai_status, ai_confidence, console_family, sub_model, canonical_model,
               classify_method='ai:v1', classify_confidence
 ```
 
@@ -146,8 +146,8 @@ UPDATE ads SET ai_status, ai_confidence, console_family, canonical_model,
 
 | Confidence | ai_status | Azione |
 |-----------|-----------|--------|
-| ≥ 75 | `approved` | Classificazione salvata (family + canonical + edition) |
-| ≤ 25 | `rejected` | family/canonical = 'other', classificazione azzerata |
+| ≥ 75 | `approved` | Classificazione salvata (family + model + canonical + edition) |
+| ≤ 25 | `rejected` | family/canonical = 'other', model = 'Unknown' |
 | 26–74 | `pending` | Solo ai_confidence aggiornata, classificazione rules intatta |
 
 **Fallback regex:** se la risposta JSON è malformata, un regex cerca almeno `id` e `console_confidence` nel testo grezzo e salva risultati parziali (senza classification).
@@ -156,7 +156,7 @@ La versione eBay (`run_ebay_classifier`) usa lo stesso SYSTEM_PROMPT e la stessa
 
 ### 4b. Classificazione attributi — `classifier.py` (`run.py --classify`)
 
-**Scopo:** assegnare con alta precisione `model_segment`, `edition_class`, `canonical_model` tramite una pipeline ibrida a 3 livelli.
+**Scopo:** assegnare con alta precisione `sub_model`, `model_segment`, `edition_class`, `canonical_model` tramite una pipeline ibrida a 3 livelli.
 
 **Candidati:** annunci con `console_family='other'` OR `model_segment='unknown'` OR `canonical_model` NULL/vuoto OR `classify_version` diversa dalla corrente.
 
@@ -165,7 +165,7 @@ La versione eBay (`run_ebay_classifier`) usa lo stesso SYSTEM_PROMPT e la stessa
 ```
 [Livello 1] classify_title(rules_text, family_hint)   ← model_rules.py
   regex deterministiche su titolo + body_text
-  → assegna family, segment, edition_class, canonical_model, confidence, method='rules:vX'
+  → assegna family, sub_model, segment, edition_class, canonical_model, confidence, method='rules:vX'
 
      ↓ se family != 'other' AND segment == 'base' AND edition == 'standard':
 
@@ -182,7 +182,7 @@ La versione eBay (`run_ebay_classifier`) usa lo stesso SYSTEM_PROMPT e la stessa
   method = 'ai:claude-haiku-4-5-20251001'
 
      ↓
-_apply_classifications() → UPDATE ads SET console_family, model_segment,
+_apply_classifications() → UPDATE ads SET console_family, sub_model, model_segment,
                            edition_class, canonical_model, classify_confidence,
                            classify_method, classify_version
 ```
@@ -360,21 +360,11 @@ Ogni scraper è wrappato in try/except: se `mod.main()` solleva un'eccezione, l'
 
 ## 8. Ciclo di Esecuzione Automatica
 
-### Setup cron (`run.py --setup-cron`)
+### Timer server systemd
 
-Installa due voci nel crontab dell'utente corrente, identificate da marker commentati che permettono a `--setup-cron` di sovrascriverle in modo idempotente senza duplicare:
-
-```cron
-# Scraping ogni 6 ore
-0 */6 * * *  cd "/path/trader" && python3 run.py --source subito >> logs/cron.log 2>&1
-             # xbox-tracker-cron:scrape:subito
-
-# Verifica venduti ogni giorno alle 00:30
-30 0 * * *   cd "/path/trader" && python3 run.py --verify-sold 1200 \
-             --verify-chunk-size 300 --verify-max-runtime-minutes 50 \
-             --verify-browser-restart-every 3 --concurrency 5 >> logs/cron.log 2>&1
-             # xbox-tracker-cron:verify-sold:daily
-```
+Dal 3 giugno 2026 l'esecuzione automatica operativa avviene sul server tramite systemd.
+Le unità sono in `deploy/systemd/` e la mappa completa è in `docs/server-routines.md`.
+I vecchi workflow GitHub sono archiviati in `STORICI3GIUGNO/github-workflows/`.
 
 ### Pipeline `--full` (esecuzione manuale completa)
 
@@ -405,20 +395,11 @@ Versione aggressiva per riallineare tutto il dataset Subito in 5 step:
 [5/5] Done — usa --view per validare
 ```
 
-### GitHub Actions (CI/CD)
+### GitHub Actions
 
-I workflow in `.github/workflows/` orchestrano l'esecuzione automatica in cloud:
-
-| Workflow | Schedule | Runner |
-|----------|----------|--------|
-| `scrape-fonti.yml` | Daily 05:00 UTC | ubuntu (hosted) |
-| `scrape-subito.yml` | Ogni 6 ore | self-hosted (IP fisso) |
-| `ai-classify.yml` | Trigger da scrape-subito | ubuntu (hosted) |
-| `verify-sold.yml` | 2x/day: 08:00 + 13:00 UTC (10:00 + 15:00 CEST) | self-hosted |
-| `scrape-ebay.yml` | Daily 22:00 UTC | ubuntu (hosted) |
-| `quality.yml` | Push/PR su main | ubuntu (hosted) |
-
-Il runner self-hosted è necessario per Subito e verify-sold perché Subito.it blocca i range IP dei cloud provider (AWS, Azure, ecc.); serve un IP residenziale fisso con Chrome di sistema.
+Non ci sono più workflow operativi attivi in `.github/workflows/`. GitHub resta repository
+del codice; scraping, AI classify, verify sold e backup girano su server. Gli YAML storici
+restano consultabili in `STORICI3GIUGNO/github-workflows/`.
 
 ### RunReport
 

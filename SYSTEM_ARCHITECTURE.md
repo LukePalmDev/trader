@@ -388,10 +388,10 @@ Total overhead per scrape: ~4 seconds (0.7%)
 
 ## Integration Points
 
-### With GitHub Actions
-```yaml
-# Update workflow to use:
-run: python3.11 scrape_with_safeguards.py --source subito
+### With Server Systemd Timers
+```bash
+# Esempio job server:
+sudo -u trader /opt/trader/app/deploy/server_job.sh scrape-subito
 
 # Provides:
 # - Pre-scrape verification
@@ -403,11 +403,11 @@ run: python3.11 scrape_with_safeguards.py --source subito
 
 ### With Monitoring
 ```bash
-# Daily health check (cron):
-0 9 * * * cd ~/trader && python db_safeguards.py > logs/daily_health.log
+# Daily health check (systemd timer or cron fallback):
+0 9 * * * cd /opt/trader/app && python db_safeguards.py > /var/log/trader/daily_health.log
 
 # Weekly cleanup:
-0 10 * * 0 cd ~/trader && python cleanup_and_optimize.py
+0 10 * * 0 cd /opt/trader/app && python cleanup_and_optimize.py
 ```
 
 ### With Alerting
@@ -422,5 +422,5 @@ if report['databases']['tracker.db']['overall_status'] != 'healthy':
 
 ---
 
-**Last Updated:** 2026-04-07
+**Last Updated:** 2026-06-03
 **Version:** 1.0 - Production Ready
