@@ -378,6 +378,7 @@ document.querySelectorAll('.tab').forEach(btn => {
     btn.classList.add('active');
     document.getElementById('view-' + btn.dataset.tab).classList.add('active');
     if (btn.dataset.tab === 'home')      renderHome();
+    if (btn.dataset.tab === 'special')   renderSpecial();
     if (btn.dataset.tab === 'standardi') renderStandardGroups();
     if (btn.dataset.tab === 'subito-b')  loadMarket('subito-b');
     if (btn.dataset.tab === 'subito-p')  loadMarket('subito-p');
@@ -492,7 +493,7 @@ function _renderSourceCell(p) {
  * @param {string} opts.emptyId      — ID del messaggio empty
  * @param {boolean} opts.availOnly   — true = mostra solo combo con almeno 1 disponibile (Mercato)
  */
-function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
+function _renderBaseModelGrid({ gridId, emptyId, availOnly, special = false }) {
   const grid  = document.getElementById(gridId);
   const empty = document.getElementById(emptyId);
   grid.innerHTML = '';
@@ -506,7 +507,7 @@ function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
   empty.style.display = 'none';
   grid.style.display  = '';
 
-  const uniqueGroups = getUniqueBaseModels();
+  const uniqueGroups = getUniqueBaseModels({ invert: special });
 
   // La pagina Base/Special confronta solo i prezzi degli store fisici: la
   // disponibilità (filtro e contatori) deve basarsi sulle stesse fonti che la
@@ -670,6 +671,14 @@ function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
 function renderHome() {
   const availOnly = document.getElementById('home-filter-avail')?.checked ?? false;
   _renderBaseModelGrid({ gridId: 'home-grid', emptyId: 'home-empty', availOnly });
+}
+
+// ============================================================
+// SPECIAL VIEW — modelli NON presenti nella pagina Base
+// ============================================================
+function renderSpecial() {
+  const availOnly = document.getElementById('special-filter-avail')?.checked ?? false;
+  _renderBaseModelGrid({ gridId: 'special-grid', emptyId: 'special-empty', availOnly, special: true });
 }
 
 // ============================================================
@@ -1319,7 +1328,8 @@ function _buildComboTitle(p) {
   return `Xbox ${p.parsed_family || '?'} ${p.parsed_segment || ''}${edition}${kinect}${storage}${cond}`.trim();
 }
 
-function getUniqueBaseModels() {
+function getUniqueBaseModels({ invert = false } = {}) {
+  // invert=false → modelli base (preferiti); invert=true → modelli NON base (Special).
   // BASE_MODELS dal DB ha standard_key, model_segment, edition_class ma NON parsed_*.
   // ALL_PRODUCTS viene arricchito da enhanceProduct() e ha combo_key e parsed_*.
   // Strategia: raggruppiamo ALL_PRODUCTS per combo_key, poi teniamo solo i gruppi
@@ -1392,9 +1402,9 @@ function getUniqueBaseModels() {
     }
   });
 
-  // Ritorna i gruppi preferiti, o TUTTI se nessun match (fallback per mostrare qualcosa)
-  const filtered = Object.values(groups).filter(g => favCombos.has(g.key));
-  
+  // invert=false → solo i combo preferiti; invert=true → tutti gli altri (Special).
+  const filtered = Object.values(groups).filter(g => invert ? !favCombos.has(g.key) : favCombos.has(g.key));
+
   // Applica deduplica per ReBuy: tenere solo il prodotto col prezzo più alto
   filtered.forEach(g => {
     const rebuyItems = g.items.filter(p => p.source === 'rebuy');
@@ -1408,6 +1418,8 @@ function getUniqueBaseModels() {
     }
   });
 
+  // In modalità Special non si applica il fallback "mostra tutto".
+  if (invert) return filtered;
   return filtered.length > 0 ? filtered : Object.values(groups);
 }
 

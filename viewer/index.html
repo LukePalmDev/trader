@@ -18,6 +18,7 @@
   <div class="logo"><img src="/assets/trader-icon.svg" alt="" aria-hidden="true" /> Xbox Tracker</div>
   <nav class="tabs">
     <button class="tab active" data-tab="home">Base</button>
+    <button class="tab" data-tab="special">Special</button>
     <button class="tab" data-tab="shop">Riepilogo</button>
     <button class="tab" data-tab="catalogo">Catalogo</button>
     <button class="tab" data-tab="subito-b">Subito.it B</button>
@@ -68,8 +69,43 @@
       </label>
     </div>
 
-    <!-- Griglia modelli base per famiglia -->
+    <!-- Griglia modelli base per modello -->
     <div id="home-grid" class="results-grid"></div>
+
+  </div>
+</div>
+
+<!-- ======== SPECIAL VIEW ======== -->
+<div id="view-special" class="view">
+  <div class="home-inner">
+
+    <div class="home-header">
+      <h1 class="home-title">Modelli Special</h1>
+      <p class="home-sub">Modelli NON presenti nella pagina Base — edizioni speciali o varianti rare</p>
+    </div>
+
+    <!-- Mostrato quando non ci sono modelli base configurati -->
+    <div id="special-empty" style="display:none;">
+      <div class="home-empty-card">
+        <div class="home-empty-icon">✦</div>
+        <h2>Nessun modello da mostrare</h2>
+        <p>
+          Configura prima i modelli base (stella ☆ nel <strong>Catalogo</strong>):
+          qui appariranno tutti gli altri modelli rilevati.
+        </p>
+      </div>
+    </div>
+
+    <!-- Filtri Special -->
+    <div id="special-filters">
+      <label class="filter-avail-label">
+        <input type="checkbox" id="special-filter-avail" onchange="renderSpecial()" />
+        Disponibili
+      </label>
+    </div>
+
+    <!-- Griglia modelli special per modello -->
+    <div id="special-grid" class="results-grid"></div>
 
   </div>
 </div>
