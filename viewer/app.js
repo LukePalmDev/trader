@@ -449,6 +449,21 @@ function _comboStorageGb(combo) {
   return 0;
 }
 
+// Chiave/etichetta di MODELLO (famiglia + sotto-modello) per raggruppare la
+// pagina Base per modello anziché per famiglia.
+function _modelKey(rep) {
+  const fk = rep.console_family || _familyKey(rep.name);
+  const seg = rep.parsed_segment || 'Base';
+  return `${fk}|${seg}`;
+}
+
+function _modelLabel(rep) {
+  const fk = rep.console_family || _familyKey(rep.name);
+  const seg = rep.parsed_segment || 'Base';
+  const base = FAMILY_LABELS[fk] || fk;
+  return ['S', 'X', 'E', 'Elite', 'Slim'].includes(seg) ? `${base} ${seg}` : base;
+}
+
 function _comboShortTitle(rep) {
   const kinectStr = rep.parsed_kinect ? ' + Kinect' : '';
   const edStr = rep.parsed_edition && rep.parsed_edition.toLowerCase() !== 'standard' ? ` ${rep.parsed_edition}` : '';
@@ -500,48 +515,60 @@ function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
   const STORE_SOURCES = new Set(['cex', 'gamelife', 'gamepeople', 'gameshock', 'rebuy']);
   const _isStoreAvail = (p) => STORE_SOURCES.has(p.source) && (p.last_available || p.available);
 
-  const byFamily = {};
-  const totalByFamily = {};
+  const byModel = {};
+  const totalByModel = {};
+  const labelByModel = {};
   for (const group of uniqueGroups) {
     const matching = group.items;
     if (!matching.length) continue;
 
     const rep = matching[0];
-    const fk = rep.console_family || _familyKey(rep.name);
-    if (!totalByFamily[fk]) totalByFamily[fk] = 0;
-    totalByFamily[fk]++;
+    const mk = _modelKey(rep);
+    labelByModel[mk] = _modelLabel(rep);
+    if (!totalByModel[mk]) totalByModel[mk] = 0;
+    totalByModel[mk]++;
 
     if (availOnly) {
       const availItems = matching.filter(_isStoreAvail);
       if (!availItems.length) continue;
-      if (!byFamily[fk]) byFamily[fk] = [];
-      byFamily[fk].push({ key: group.key, rep, matching, availItems });
+      if (!byModel[mk]) byModel[mk] = [];
+      byModel[mk].push({ key: group.key, rep, matching, availItems });
     } else {
-      if (!byFamily[fk]) byFamily[fk] = [];
-      byFamily[fk].push({ key: group.key, rep, matching });
+      if (!byModel[mk]) byModel[mk] = [];
+      byModel[mk].push({ key: group.key, rep, matching });
     }
   }
 
   if (availOnly) {
-    const hasAny = Object.values(byFamily).some(arr => arr.length > 0);
+    const hasAny = Object.values(byModel).some(arr => arr.length > 0);
     if (!hasAny) { empty.style.display = 'block'; return; }
   }
 
+  // Ordine sezioni: per famiglia, poi per sotto-modello.
   const familyOrder = [...CONSOLE_FAMILIES.map(f => f.key), 'other'];
-  for (const fk of familyOrder) {
-    const combos = byFamily[fk];
+  const segOrder = ['Base', 'S', 'X', 'E', 'Elite', 'Slim', 'Unknown'];
+  const modelKeys = Object.keys(byModel).sort((a, b) => {
+    const [fa, sa] = a.split('|');
+    const [fb, sb] = b.split('|');
+    const fi = familyOrder.indexOf(fa); const fj = familyOrder.indexOf(fb);
+    if (fi !== fj) return (fi < 0 ? 99 : fi) - (fj < 0 ? 99 : fj);
+    const si = segOrder.indexOf(sa); const sj = segOrder.indexOf(sb);
+    return (si < 0 ? 99 : si) - (sj < 0 ? 99 : sj);
+  });
+  for (const mk of modelKeys) {
+    const combos = byModel[mk];
     if (!combos?.length) continue;
 
     // Counter label
     const countLabel = availOnly
-      ? `${combos.length}/${totalByFamily[fk]}`
+      ? `${combos.length}/${totalByModel[mk]}`
       : `${combos.filter(c => c.matching.some(_isStoreAvail)).length}/${combos.length}`;
 
     const section = document.createElement('div');
     section.className = 'home-section';
     const title = document.createElement('h2');
     title.className = 'home-section-title';
-    title.innerHTML = `${FAMILY_LABELS[fk] || fk} <span style="font-size:16px; font-weight:normal; color:var(--text-muted); margin-left:12px;">${countLabel}</span>`;
+    title.innerHTML = `${labelByModel[mk] || mk} <span style="font-size:16px; font-weight:normal; color:var(--text-muted); margin-left:12px;">${countLabel}</span>`;
     section.appendChild(title);
 
     const container = document.createElement('div');
