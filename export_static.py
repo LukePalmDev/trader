@@ -2,11 +2,20 @@
 Genera i file JSON statici in viewer/data/ per GitHub Pages.
 Eseguito automaticamente dal workflow scrape-subito dopo ogni run.
 """
+from __future__ import annotations
+
 import json
 import logging
 import sys
-import tomllib
 from pathlib import Path
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    try:
+        import tomli as tomllib
+    except ImportError as exc:
+        raise ImportError("Python < 3.11 richiede 'tomli': pip install tomli") from exc
 
 from paths import DB_PATH
 
