@@ -134,3 +134,44 @@ def test_clean_db_removes_legacy_sources_and_normalizes_data(tmp_path: Path) -> 
     # nessun nome vuoto
     assert con.execute("SELECT COUNT(*) FROM products WHERE name IS NULL OR trim(name)='' ").fetchone()[0] == 0
     con.close()
+
+
+def test_prune_stale_products_keeps_only_latest_scrape(tmp_path: Path) -> None:
+    """I prodotti store delistati (non nell'ultimo scrape) vengono potati,
+    così il Catalogo (DB) resta allineato al Riepilogo (ultimo snapshot)."""
+    db_path = tmp_path / "trader.db"
+    db.init_db(db_path)
+
+    # Primo scrape: due prodotti gamelife.
+    db.process_products(
+        [
+            {"name": "Xbox Series X", "source": "gamelife", "condition": "Nuovo",
+             "price": 499.0, "available": True, "url": "https://gamelife.it/a"},
+            {"name": "Xbox Series S", "source": "gamelife", "condition": "Nuovo",
+             "price": 299.0, "available": True, "url": "https://gamelife.it/b"},
+        ],
+        db_path=db_path,
+    )
+
+    # Forza un last_seen più vecchio sul prodotto "b" per simularne il delisting.
+    con = sqlite3.connect(db_path)
+    con.execute("UPDATE products SET last_seen='2000-01-01T00:00:00' WHERE url='https://gamelife.it/b'")
+    con.commit()
+    con.close()
+
+    # Secondo scrape: solo il prodotto "a" è ancora in vendita.
+    stats = db.process_products(
+        [
+            {"name": "Xbox Series X", "source": "gamelife", "condition": "Nuovo",
+             "price": 489.0, "available": True, "url": "https://gamelife.it/a"},
+        ],
+        db_path=db_path,
+    )
+
+    assert stats["removed_stale"] == 1
+    assert db.verify_no_stale_products(db_path) == {}
+
+    con = sqlite3.connect(db_path)
+    rows = con.execute("SELECT url FROM products WHERE source='gamelife'").fetchall()
+    con.close()
+    assert {r[0] for r in rows} == {"https://gamelife.it/a"}

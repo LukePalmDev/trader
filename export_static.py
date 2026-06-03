@@ -106,7 +106,51 @@ def export_all() -> None:
     log.info("Esportazione sources meta...")
     _write("sources.json", _get_sources_meta(data_dir, sources_cfg, enabled))
 
+    # --- verifica consistenza Catalogo (DB) vs Riepilogo (snapshot) ---
+    _verify_consistency(data_dir, sources_cfg, enabled)
+
     log.info("Esportazione completata in %s", OUT_DIR)
+
+
+def _verify_consistency(data_dir: Path, sources_cfg: dict, enabled: list[str]) -> bool:
+    """Verifica che il conteggio prodotti del Catalogo (DB) coincida con quello
+    del Riepilogo (ultimo snapshot) per ogni fonte store. Logga le discrepanze.
+    """
+    import db
+    from collections import Counter
+
+    db_counts: Counter = Counter()
+    for p in db.get_all_products():
+        src = (p.get("source") or "").lower()
+        if src and src not in {"subito", "ebay"}:
+            db_counts[src] += 1
+
+    snap_counts: Counter = Counter()
+    combined = _get_combined_latest(data_dir, sources_cfg, enabled)
+    for p in combined["products"]:
+        src = (p.get("source") or "").lower()
+        if src and src not in {"subito", "ebay"}:
+            snap_counts[src] += 1
+
+    ok = True
+    for src in sorted(set(db_counts) | set(snap_counts)):
+        if db_counts[src] != snap_counts[src]:
+            ok = False
+            log.warning(
+                "CONSISTENZA: %s Catalogo(DB)=%d != Riepilogo(snapshot)=%d",
+                src, db_counts[src], snap_counts[src],
+            )
+    if ok:
+        log.info(
+            "Consistenza Catalogo/Riepilogo OK (%d prodotti store).",
+            sum(db_counts.values()),
+        )
+    else:
+        log.warning(
+            "Consistenza Catalogo/Riepilogo NON allineata — esegui "
+            "'python3 run.py --cleanup' per potare i prodotti delistati."
+        )
+    return ok
 
 
 def _get_active_ads() -> list[dict]:

@@ -1001,7 +1001,7 @@ def process_products(
         dict con chiavi: new, price_changes, avail_changes, unchanged
     """
     now   = datetime.now(timezone.utc).isoformat()
-    stats = {"new": 0, "price_changes": 0, "avail_changes": 0, "unchanged": 0}
+    stats = {"new": 0, "price_changes": 0, "avail_changes": 0, "unchanged": 0, "removed_stale": 0}
     sources_seen = set()
     conn = _connect(db_path)
     conn.isolation_level = None
@@ -1151,6 +1151,11 @@ def process_products(
             _normalize_gameshock_records(conn)
         if "rebuy" in sources_seen:
             _normalize_rebuy_records(conn)
+
+        # Rimuove i prodotti delistati della/e fonte/i appena scrapata/e così il
+        # catalogo DB resta allineato all'ultimo snapshot (vedi Riepilogo).
+        stats["removed_stale"] = prune_stale_products(conn=conn, sources=sources_seen)
+
         _rebuild_display_ids(conn)
 
         conn.commit()
@@ -1184,6 +1189,7 @@ def clean_db(db_path: Path = DB_PATH) -> dict[str, int]:
         "removed_invalid_rows": 0,
         "conditions_normalized": 0,
         "url_merged_rows": 0,
+        "removed_stale": 0,
         "orphan_changes_removed": 0,
     }
 
@@ -1233,6 +1239,9 @@ def clean_db(db_path: Path = DB_PATH) -> dict[str, int]:
         # 5b) Pulizia specifica Rebuy (legacy -> varianti).
         summary["url_merged_rows"] += _normalize_rebuy_records(conn)
 
+        # 5c) Pota i prodotti store delistati (non nell'ultimo scrape di fonte).
+        summary["removed_stale"] = prune_stale_products(conn=conn)
+
         # 6) Elimina cambi orfani.
         before = conn.execute("SELECT COUNT(*) FROM state_changes").fetchone()[0]
         conn.execute(
@@ -1254,6 +1263,90 @@ def clean_db(db_path: Path = DB_PATH) -> dict[str, int]:
         conn.close()
 
     return summary
+
+
+def prune_stale_products(
+    db_path: Path = DB_PATH,
+    *,
+    sources: set[str] | None = None,
+    conn: sqlite3.Connection | None = None,
+) -> int:
+    """Rimuove i prodotti store non più presenti nell'ultimo scrape.
+
+    Per ogni fonte (escluse subito/ebay, gestite altrove) tiene solo le righe
+    con ``last_seen`` pari al massimo della fonte: tutte le righe più vecchie
+    sono prodotti delistati che il DB altrimenti accumulerebbe per sempre.
+    Garantisce l'invariante "Catalogo (DB) == Riepilogo (ultimo snapshot)".
+
+    Può lavorare su una connessione/transazione già aperta (``conn``) oppure
+    aprirne una propria. ``sources`` limita la potatura alle fonti indicate.
+    """
+    own_conn = conn is None
+    if own_conn:
+        conn = _connect(db_path)
+        conn.isolation_level = None
+        conn.execute("BEGIN IMMEDIATE")
+    removed = 0
+    try:
+        rows = conn.execute(
+            "SELECT DISTINCT source FROM products"
+        ).fetchall()
+        for r in rows:
+            source = (r[0] or "").strip()
+            key = source.lower()
+            if not source or key in _SEPARATE_DB_SOURCES:
+                continue
+            if sources is not None and key not in sources:
+                continue
+            max_seen = conn.execute(
+                "SELECT MAX(last_seen) FROM products WHERE source = ?", (source,)
+            ).fetchone()[0]
+            if not max_seen:
+                continue
+            stale = conn.execute(
+                "SELECT id FROM products WHERE source = ? AND last_seen < ?",
+                (source, max_seen),
+            ).fetchall()
+            removed += _delete_products_by_ids(conn, [int(x[0]) for x in stale])
+        if own_conn:
+            conn.commit()
+    except Exception:
+        if own_conn:
+            conn.rollback()
+        raise
+    finally:
+        if own_conn:
+            conn.close()
+    return removed
+
+
+def verify_no_stale_products(db_path: Path = DB_PATH) -> dict[str, int]:
+    """Verifica l'invariante di consistenza del catalogo.
+
+    Restituisce, per ogni fonte store, il numero di righe "stale" (con
+    ``last_seen`` antecedente all'ultimo scrape della fonte). Un dizionario
+    vuoto significa che Catalogo (DB) e Riepilogo (ultimo snapshot) coincidono.
+    """
+    conn = _connect(db_path)
+    try:
+        result: dict[str, int] = {}
+        for r in conn.execute("SELECT DISTINCT source FROM products").fetchall():
+            source = (r[0] or "").strip()
+            if not source or source.lower() in _SEPARATE_DB_SOURCES:
+                continue
+            n = conn.execute(
+                """
+                SELECT COUNT(*) FROM products
+                WHERE source = ?
+                  AND last_seen < (SELECT MAX(last_seen) FROM products WHERE source = ?)
+                """,
+                (source, source),
+            ).fetchone()[0]
+            if n:
+                result[source] = int(n)
+        return result
+    finally:
+        conn.close()
 
 
 # ---------------------------------------------------------------------------

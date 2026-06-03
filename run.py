@@ -245,11 +245,12 @@ def _update_db_from_snapshot(
             stats = _db.process_products(products)
             log.info(
                 "DB aggiornato — nuovi: %d | prezzi cambiati: %d | "
-                "disponibilita' cambiata: %d | invariati: %d",
+                "disponibilita' cambiata: %d | invariati: %d | delistati rimossi: %d",
                 stats["new"],
                 stats["price_changes"],
                 stats["avail_changes"],
                 stats["unchanged"],
+                stats.get("removed_stale", 0),
             )
         return {"source": source, "total": len(products), **stats}
     except Exception as exc:  # noqa: BLE001
