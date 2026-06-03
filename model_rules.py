@@ -7,12 +7,9 @@ VALID_SEGMENTS = {"base", "premium", "unknown"}
 VALID_EDITIONS = {"standard", "limited", "special", "bundle"}
 
 _FAMILY_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("series-x", re.compile(r"series\s*x", re.I)),
-    ("series-s", re.compile(r"series\s*s", re.I)),
-    ("one-x", re.compile(r"one\s*x", re.I)),
-    ("one-s", re.compile(r"one\s*s", re.I)),
-    ("one", re.compile(r"\bone\b", re.I)),
-    ("360", re.compile(r"\b360[Ss]?\b|\bxbox\s*360", re.I)),
+    ("series", re.compile(r"\bxbox\s+series(?:\s*[xs])?\b|\bseries\s*[xs]\b", re.I)),
+    ("one", re.compile(r"\bxbox\s+one(?:\s*[xs])?\b|\bone\s*[xs]\b|\bone\b", re.I)),
+    ("360", re.compile(r"\bxbox\s*360\b|\bxbox360\b|\b360\s*[se]?\b", re.I)),
     ("original", re.compile(r"\boriginal\b|\bxbox\s+classic\b", re.I)),
 ]
 
@@ -39,19 +36,28 @@ _PREMIUM_MODEL_RE = re.compile(
 _DIGITAL_RE = re.compile(r"\b(digital|all\s*\-?\s*digital|senza\s+lettore|no\s+disc|edizione\s+digitale)\b", re.I)
 
 _FAMILY_SPECIFICITY = {
-    "series-x": 4,
-    "series-s": 4,
-    "one-x": 3,
-    "one-s": 3,
-    "one": 2,
+    "series": 4,
+    "one": 3,
     "360": 2,
     "original": 1,
+}
+
+_LEGACY_FAMILY_ALIASES = {
+    "series-x": ("series", "X"),
+    "series-s": ("series", "S"),
+    "one-x": ("one", "X"),
+    "one-s": ("one", "S"),
+    "one": ("one", "Base"),
+    "360": ("360", None),
+    "original": ("original", "Base"),
+    "series": ("series", None),
 }
 
 
 @dataclass(frozen=True)
 class ModelClassification:
     console_family: str
+    sub_model: str
     model_segment: str
     edition_class: str
     canonical_model: str
@@ -65,12 +71,31 @@ class StandardizedTitle:
     standard_key: str
 
 
+def _canonical_family_key(family: str | None) -> str:
+    key = (family or "").strip().lower()
+    if not key:
+        return "other"
+    mapped = _LEGACY_FAMILY_ALIASES.get(key)
+    if mapped:
+        return mapped[0]
+    if key in {"original", "360", "one", "series", "other"}:
+        return key
+    return key
+
+
+def _legacy_sub_model_hint(family: str | None) -> str | None:
+    mapped = _LEGACY_FAMILY_ALIASES.get((family or "").strip().lower())
+    if not mapped:
+        return None
+    return mapped[1]
+
+
 def detect_family(name: str) -> str:
     title = (name or "").strip()
     if not title:
         return "other"
 
-    # Se il titolo contiene più famiglie (es. "Series S ... Series X controller"),
+    # Se il titolo contiene più famiglie (es. "Series S ... One controller"),
     # usa la prima occorrenza nel testo e, a parità, il pattern più specifico.
     candidates: list[tuple[int, int, str]] = []
     for key, pattern in _FAMILY_PATTERNS:
@@ -114,26 +139,88 @@ def _edition_class(name: str) -> str:
     return "standard"
 
 
-def _canonical_model(name: str, family: str) -> str:
+def _storage_slug(storage_gb: int | None) -> str | None:
+    if storage_gb is None:
+        return None
+    if storage_gb >= 1024 and storage_gb % 1024 == 0:
+        return f"{storage_gb // 1024}tb"
+    return f"{storage_gb}gb"
+
+
+def _detect_sub_model(title: str, family: str, family_hint: str | None = None) -> str:
+    hinted = _legacy_sub_model_hint(family_hint)
+    family = _canonical_family_key(family)
+
+    if family == "series":
+        candidates: list[tuple[int, str]] = []
+        for label, pattern in (
+            ("X", re.compile(r"\bseries\s*x\b|\bserie\s+x\b", re.I)),
+            ("S", re.compile(r"\bseries\s*s\b|\bserie\s+s\b", re.I)),
+        ):
+            match = pattern.search(title)
+            if match:
+                candidates.append((match.start(), label))
+        if candidates:
+            candidates.sort()
+            return candidates[0][1]
+        return hinted or "Unknown"
+
+    if family == "one":
+        candidates = []
+        for label, pattern in (
+            ("X", re.compile(r"\bone\s*x\b", re.I)),
+            ("S", re.compile(r"\bone\s*s\b", re.I)),
+        ):
+            match = pattern.search(title)
+            if match:
+                candidates.append((match.start(), label))
+        if candidates:
+            candidates.sort()
+            return candidates[0][1]
+        return hinted or "Base"
+
+    if family == "360":
+        if _XBOX_360_E_RE.search(title):
+            return "E"
+        if _XBOX_360_SLIM_RE.search(title):
+            return "S"
+        if _XBOX_360_ELITE_RE.search(title):
+            return "Elite"
+        return "Base"
+
+    if family == "original":
+        return "Base"
+
+    return hinted or "Unknown"
+
+
+def _canonical_model(name: str, family: str, sub_model: str) -> str:
+    family = _canonical_family_key(family)
     storage_gb = extract_storage_gb(name)
+    storage_slug = _storage_slug(storage_gb)
     has_digital = bool(_DIGITAL_RE.search(name))
 
-    if family == "series-x":
+    if family == "series" and sub_model == "X":
         if has_digital:
-            return "series-x-digital"
+            return "series-x-digital-1tb"
         if storage_gb and storage_gb >= 1900:
             return "series-x-2tb"
         return "series-x-1tb"
 
-    if family == "series-s":
+    if family == "series" and sub_model == "S":
         if storage_gb and storage_gb >= 900:
             return "series-s-1tb"
         return "series-s-512gb"
 
-    if family == "one-x":
+    if family == "series":
+        return "series-unknown"
+
+    if family == "one" and sub_model == "X":
         return "one-x-1tb"
 
-    if family == "one-s":
+    if family == "one" and sub_model == "S":
+        if has_digital:
+            return "one-s-digital-1tb"
         if storage_gb and storage_gb >= 1900:
             return "one-s-2tb"
         if storage_gb and storage_gb >= 900:
@@ -142,30 +229,32 @@ def _canonical_model(name: str, family: str) -> str:
 
     if family == "one":
         if storage_gb and storage_gb >= 900:
-            return "one-1tb"
-        return "one-500gb"
+            return "one-base-1tb"
+        return "one-base-500gb"
 
     if family == "360":
-        if storage_gb and storage_gb >= 400:
-            return "360-500gb"
-        if storage_gb and storage_gb >= 200:
-            return "360-250gb"
-        if storage_gb and storage_gb >= 100:
-            return "360-120gb"
-        return "360"
+        prefix = {
+            "E": "360-e",
+            "S": "360-s",
+            "Elite": "360-elite",
+            "Base": "360-base",
+        }.get(sub_model, "360-base")
+        return f"{prefix}-{storage_slug}" if storage_slug else prefix
 
     if family == "original":
-        return "original"
+        return "original-base-8gb"
 
     return "unknown"
 
 
 def classify_title(name: str, family_hint: str | None = None) -> ModelClassification:
     title = (name or "").strip()
-    family = family_hint if family_hint and family_hint != "other" else detect_family(title)
+    family_hint_normalized = _canonical_family_key(family_hint)
+    family = family_hint_normalized if family_hint_normalized and family_hint_normalized != "other" else detect_family(title)
+    sub_model = _detect_sub_model(title, family, family_hint=family_hint)
 
     edition_class = _edition_class(title)
-    canonical_model = _canonical_model(title, family)
+    canonical_model = _canonical_model(title, family, sub_model)
 
     if family == "other":
         model_segment = "unknown"
@@ -180,17 +269,19 @@ def classify_title(name: str, family_hint: str | None = None) -> ModelClassifica
 
     return ModelClassification(
         console_family=family,
+        sub_model=sub_model,
         model_segment=model_segment,
         edition_class=edition_class,
         canonical_model=canonical_model,
         classify_confidence=round(confidence, 3),
-        classify_method="rules:v1",
+        classify_method="rules:v2:2026-06-03",
     )
 
 
 _CANONICAL_STANDARD_LABELS = {
     "series-x-1tb": "Xbox Series X 1 TB",
     "series-x-2tb": "Xbox Series X 2 TB",
+    "series-x-digital-1tb": "Xbox Series X Digital 1 TB",
     "series-x-digital": "Xbox Series X Digital 1 TB",
     "series-s-512gb": "Xbox Series S 512 GB",
     "series-s-1tb": "Xbox Series S 1 TB",
@@ -198,21 +289,46 @@ _CANONICAL_STANDARD_LABELS = {
     "one-s-500gb": "Xbox One S 500 GB",
     "one-s-1tb": "Xbox One S 1 TB",
     "one-s-2tb": "Xbox One S 2 TB",
+    "one-s-digital-1tb": "Xbox One S All-Digital 1 TB",
+    "one-base-500gb": "Xbox One 500 GB",
+    "one-base-1tb": "Xbox One 1 TB",
     "one-500gb": "Xbox One 500 GB",
     "one-1tb": "Xbox One 1 TB",
+    "360-base-4gb": "Xbox 360 4 GB",
+    "360-base-20gb": "Xbox 360 20 GB",
+    "360-base-60gb": "Xbox 360 60 GB",
+    "360-base-120gb": "Xbox 360 120 GB",
+    "360-base-250gb": "Xbox 360 250 GB",
+    "360-base-320gb": "Xbox 360 320 GB",
+    "360-base-500gb": "Xbox 360 500 GB",
+    "360-s-4gb": "Xbox 360 S 4 GB",
+    "360-s-250gb": "Xbox 360 S 250 GB",
+    "360-s-320gb": "Xbox 360 S 320 GB",
+    "360-s-500gb": "Xbox 360 S 500 GB",
+    "360-e-4gb": "Xbox 360 E 4 GB",
+    "360-e-250gb": "Xbox 360 E 250 GB",
+    "360-e-500gb": "Xbox 360 E 500 GB",
+    "360-elite-120gb": "Xbox 360 Elite 120 GB",
+    "360-elite-250gb": "Xbox 360 Elite 250 GB",
+    "360-base": "Xbox 360",
+    "360-s": "Xbox 360 S",
+    "360-e": "Xbox 360 E",
+    "360-elite": "Xbox 360 Elite",
     "360-120gb": "Xbox 360 120 GB",
     "360-250gb": "Xbox 360 250 GB",
     "360-500gb": "Xbox 360 500 GB",
     "360": "Xbox 360",
+    "original-base-8gb": "Xbox Original",
     "original": "Xbox Original",
 }
 
 _FAMILY_STANDARD_LABELS = {
+    "series": "Xbox Series",
     "series-x": "Xbox Series X",
     "series-s": "Xbox Series S",
+    "one": "Xbox One",
     "one-x": "Xbox One X",
     "one-s": "Xbox One S",
-    "one": "Xbox One",
     "360": "Xbox 360",
     "original": "Xbox Original",
 }
@@ -320,11 +436,11 @@ def _compose_base_name(
     storage_gb = extract_storage_gb(title)
 
     if family == "360":
-        if _XBOX_360_E_RE.search(title):
+        if classification.sub_model == "E":
             prefix = "Xbox 360 E"
-        elif _XBOX_360_SLIM_RE.search(title):
-            prefix = "Xbox 360 Slim"
-        elif _XBOX_360_ELITE_RE.search(title):
+        elif classification.sub_model == "S":
+            prefix = "Xbox 360 S"
+        elif classification.sub_model == "Elite":
             prefix = "Xbox 360 Elite"
         else:
             prefix = "Xbox 360"
@@ -363,7 +479,7 @@ def standardize_title(
 
     canonical = (classified.canonical_model or "").strip()
     family = classified.console_family
-    is_digital = bool(_DIGITAL_RE.search(title)) or canonical == "series-x-digital"
+    is_digital = bool(_DIGITAL_RE.search(title)) or canonical in {"series-x-digital", "series-x-digital-1tb", "one-s-digital-1tb"}
     edition = _normalized_edition(title, classified)
 
     base_name = _compose_base_name(title, classified)
@@ -411,22 +527,8 @@ _NO_KINECT_RE = re.compile(r"\bno\s+kinect\b|\bsenza\s+kinect\b|\(no\s+kinect\)"
 
 
 def extract_sub_model(title: str, family: str) -> str:
-    """Restituisce il sotto-modello: Base / E / Slim / Elite / X / S."""
-    if family in ("series-x", "one-x"):
-        return "X"
-    if family in ("series-s", "one-s"):
-        return "S"
-    if family in ("one", "original", "other"):
-        return "Base"
-    if family == "360":
-        if _XBOX_360_E_RE.search(title):
-            return "E"
-        if _XBOX_360_SLIM_RE.search(title):
-            return "Slim"
-        if _XBOX_360_ELITE_RE.search(title):
-            return "Elite"
-        return "Base"
-    return "Base"
+    """Restituisce il sotto-modello: Base / E / S / Elite / X."""
+    return _detect_sub_model(title or "", _canonical_family_key(family), family_hint=family)
 
 
 def extract_edition_name(title: str) -> str:
@@ -454,12 +556,13 @@ def extract_kinect(title: str) -> int | None:
 
 def base_family_label(console_family: str) -> str:
     """Mappa console_family alla famiglia base per la UI: Original/360/One/Series."""
-    if console_family in ("series-x", "series-s"):
+    key = _canonical_family_key(console_family)
+    if key == "series":
         return "Series"
-    if console_family in ("one", "one-s", "one-x"):
+    if key == "one":
         return "One"
-    if console_family == "360":
+    if key == "360":
         return "360"
-    if console_family == "original":
+    if key == "original":
         return "Original"
     return "other"

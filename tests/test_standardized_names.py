@@ -81,7 +81,8 @@ def test_classify_title_prefers_first_family_occurrence() -> None:
     classified = classify_title(title)
     standardized = standardize_title(title, classification=classified)
 
-    assert classified.console_family == "series-s"
+    assert classified.console_family == "series"
+    assert classified.sub_model == "S"
     assert classified.canonical_model == "series-s-512gb"
     assert standardized.standard_name.startswith("Xbox Series S 512 GB")
 
@@ -100,15 +101,16 @@ def test_xbox360_no_space_recognized_as_360() -> None:
 
 
 def test_xbox_360s_recognized_as_360_slim() -> None:
-    """'Xbox 360S' (abbreviazione CEX per Slim) deve essere family 360 e sub-model Slim."""
+    """'Xbox 360S' (abbreviazione CEX per Slim) deve essere family 360 e sub-model S."""
     cases = [
-        ("Xbox 360S 320GB MW3 + 2 Pads, Non Imballata", "Xbox 360 Slim 320 GB"),
-        ("Xbox 360S Gears3 Ed+1 Pad (No Gioco), Imballata", "Xbox 360 Slim [Gears]"),
-        ("Xbox 360S Halo Ed +2Casa, Imballata", "Xbox 360 Slim [Halo]"),
+        ("Xbox 360S 320GB MW3 + 2 Pads, Non Imballata", "Xbox 360 S 320 GB"),
+        ("Xbox 360S Gears3 Ed+1 Pad (No Gioco), Imballata", "Xbox 360 S [Gears]"),
+        ("Xbox 360S Halo Ed +2Casa, Imballata", "Xbox 360 S [Halo]"),
     ]
     for name, expected in cases:
         c = classify_title(name)
         assert c.console_family == "360", f"family errata per: {name!r}"
+        assert c.sub_model == "S", f"sub-model errato per: {name!r}"
         s = standardize_title(name, classification=c)
         assert s.standard_name == expected, f"nome errato per: {name!r}\nGOT: {s.standard_name}"
 
@@ -133,7 +135,7 @@ def test_xbox_360_elite_sub_model() -> None:
 
 
 def test_xbox_360_sub_models_are_distinct() -> None:
-    """E / Slim / Elite / base 360 devono avere standard_key diversi."""
+    """E / S / Elite / base 360 devono avere standard_key diversi."""
     names = {
         "base":  "Xbox 360 250GB",
         "E":     "Xbox 360 E 250GB",
@@ -150,6 +152,8 @@ def test_edizione_digitale_recognized_as_digital() -> None:
     name = "Xbox Series X Edizione Digitale, 1TB, Robot White, Imballata"
     c = classify_title(name)
     s = standardize_title(name, classification=c)
+    assert c.console_family == "series"
+    assert c.sub_model == "X"
     assert "Digital" in s.standard_name, f"'Digital' mancante in: {s.standard_name!r}"
     assert s.standard_name == "Xbox Series X Digital 1 TB - Bianco"
 
