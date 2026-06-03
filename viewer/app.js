@@ -493,6 +493,13 @@ function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
 
   const uniqueGroups = getUniqueBaseModels();
 
+  // La pagina Base/Special confronta solo i prezzi degli store fisici: la
+  // disponibilità (filtro e contatori) deve basarsi sulle stesse fonti che la
+  // card mostra, altrimenti un modello disponibile solo su Subito/eBay appare
+  // "disponibile" ma la card elenca 0 store.
+  const STORE_SOURCES = new Set(['cex', 'gamelife', 'gamepeople', 'gameshock', 'rebuy']);
+  const _isStoreAvail = (p) => STORE_SOURCES.has(p.source) && (p.last_available || p.available);
+
   const byFamily = {};
   const totalByFamily = {};
   for (const group of uniqueGroups) {
@@ -505,7 +512,7 @@ function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
     totalByFamily[fk]++;
 
     if (availOnly) {
-      const availItems = matching.filter(p => p.last_available || p.available);
+      const availItems = matching.filter(_isStoreAvail);
       if (!availItems.length) continue;
       if (!byFamily[fk]) byFamily[fk] = [];
       byFamily[fk].push({ key: group.key, rep, matching, availItems });
@@ -528,7 +535,7 @@ function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
     // Counter label
     const countLabel = availOnly
       ? `${combos.length}/${totalByFamily[fk]}`
-      : `${combos.filter(c => c.matching.some(p => p.last_available || p.available)).length}/${combos.length}`;
+      : `${combos.filter(c => c.matching.some(_isStoreAvail)).length}/${combos.length}`;
 
     const section = document.createElement('div');
     section.className = 'home-section';
@@ -552,7 +559,6 @@ function _renderBaseModelGrid({ gridId, emptyId, availOnly }) {
       const { rep, matching } = combo;
 
       // Items da mostrare nella tabella dettagli (solo fonti store, no Subito/eBay)
-      const STORE_SOURCES = new Set(['cex', 'gamelife', 'gamepeople', 'gameshock', 'rebuy']);
       const displayItems = availOnly
         ? [...combo.availItems].filter(p => STORE_SOURCES.has(p.source)).sort((a, b) => (a.last_price ?? a.price ?? Infinity) - (b.last_price ?? b.price ?? Infinity))
         : [...matching].filter(p => STORE_SOURCES.has(p.source)).sort((a, b) => {
