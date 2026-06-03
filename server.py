@@ -338,6 +338,11 @@ def _make_handler(
             elif path.startswith("/viewer/"):
                 # Serve solo la cartella viewer — nient'altro è accessibile
                 super().do_GET()
+            elif path.startswith("/assets/"):
+                # In produzione nginx ha root=viewer/, quindi /assets/ è valido.
+                # In locale rimappiamo /assets/ → /viewer/assets/ per coerenza.
+                self.path = "/viewer" + self.path
+                super().do_GET()
             else:
                 self._json({"error": "not-found"}, status=404)
 
