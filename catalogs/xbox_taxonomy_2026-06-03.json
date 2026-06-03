@@ -1,0 +1,123 @@
+{
+  "version": "2026-06-03",
+  "families": {
+    "original": {
+      "label": "Xbox Original",
+      "models": {
+        "Base": {
+          "aliases": ["xbox original", "xbox classic", "prima xbox"],
+          "canonical_models": {
+            "original-base-8gb": {
+              "label": "Xbox Original",
+              "storage_gb": 8,
+              "notes": "Storage utile 8 GB; revisioni 1.0-1.6b non separate come SKU."
+            }
+          }
+        }
+      }
+    },
+    "360": {
+      "label": "Xbox 360",
+      "models": {
+        "Base": {
+          "aliases": ["xbox 360", "xbox360", "core", "arcade", "pro", "premium"],
+          "canonical_models": {
+            "360-base": {"label": "Xbox 360", "storage_gb": null},
+            "360-base-4gb": {"label": "Xbox 360 4 GB", "storage_gb": 4},
+            "360-base-20gb": {"label": "Xbox 360 20 GB", "storage_gb": 20},
+            "360-base-60gb": {"label": "Xbox 360 60 GB", "storage_gb": 60},
+            "360-base-120gb": {"label": "Xbox 360 120 GB", "storage_gb": 120},
+            "360-base-250gb": {"label": "Xbox 360 250 GB", "storage_gb": 250},
+            "360-base-320gb": {"label": "Xbox 360 320 GB", "storage_gb": 320},
+            "360-base-500gb": {"label": "Xbox 360 500 GB", "storage_gb": 500}
+          }
+        },
+        "S": {
+          "aliases": ["xbox 360 s", "xbox 360s", "xbox 360 slim", "slim"],
+          "canonical_models": {
+            "360-s": {"label": "Xbox 360 S", "storage_gb": null},
+            "360-s-4gb": {"label": "Xbox 360 S 4 GB", "storage_gb": 4},
+            "360-s-250gb": {"label": "Xbox 360 S 250 GB", "storage_gb": 250},
+            "360-s-320gb": {"label": "Xbox 360 S 320 GB", "storage_gb": 320},
+            "360-s-500gb": {"label": "Xbox 360 S 500 GB", "storage_gb": 500}
+          }
+        },
+        "E": {
+          "aliases": ["xbox 360 e", "360 e"],
+          "canonical_models": {
+            "360-e": {"label": "Xbox 360 E", "storage_gb": null},
+            "360-e-4gb": {"label": "Xbox 360 E 4 GB", "storage_gb": 4},
+            "360-e-250gb": {"label": "Xbox 360 E 250 GB", "storage_gb": 250},
+            "360-e-500gb": {"label": "Xbox 360 E 500 GB", "storage_gb": 500}
+          }
+        },
+        "Elite": {
+          "aliases": ["xbox 360 elite", "elite"],
+          "canonical_models": {
+            "360-elite": {"label": "Xbox 360 Elite", "storage_gb": null},
+            "360-elite-120gb": {"label": "Xbox 360 Elite 120 GB", "storage_gb": 120},
+            "360-elite-250gb": {"label": "Xbox 360 Elite 250 GB", "storage_gb": 250}
+          }
+        }
+      }
+    },
+    "one": {
+      "label": "Xbox One",
+      "models": {
+        "Base": {
+          "aliases": ["xbox one", "xbox one fat", "day one"],
+          "canonical_models": {
+            "one-base-500gb": {"label": "Xbox One 500 GB", "storage_gb": 500},
+            "one-base-1tb": {"label": "Xbox One 1 TB", "storage_gb": 1024}
+          }
+        },
+        "S": {
+          "aliases": ["xbox one s", "one s", "all digital", "all-digital"],
+          "canonical_models": {
+            "one-s-500gb": {"label": "Xbox One S 500 GB", "storage_gb": 500},
+            "one-s-1tb": {"label": "Xbox One S 1 TB", "storage_gb": 1024},
+            "one-s-2tb": {"label": "Xbox One S 2 TB", "storage_gb": 2048},
+            "one-s-digital-1tb": {"label": "Xbox One S All-Digital 1 TB", "storage_gb": 1024}
+          }
+        },
+        "X": {
+          "aliases": ["xbox one x", "one x", "project scorpio"],
+          "canonical_models": {
+            "one-x-1tb": {"label": "Xbox One X 1 TB", "storage_gb": 1024}
+          }
+        }
+      }
+    },
+    "series": {
+      "label": "Xbox Series",
+      "models": {
+        "S": {
+          "aliases": ["xbox series s", "series s"],
+          "canonical_models": {
+            "series-s-512gb": {"label": "Xbox Series S 512 GB", "storage_gb": 512},
+            "series-s-1tb": {"label": "Xbox Series S 1 TB", "storage_gb": 1024}
+          }
+        },
+        "X": {
+          "aliases": ["xbox series x", "series x", "digital edition", "galaxy black"],
+          "canonical_models": {
+            "series-x-1tb": {"label": "Xbox Series X 1 TB", "storage_gb": 1024},
+            "series-x-digital-1tb": {"label": "Xbox Series X Digital 1 TB", "storage_gb": 1024},
+            "series-x-2tb": {"label": "Xbox Series X 2 TB", "storage_gb": 2048}
+          }
+        }
+      }
+    }
+  },
+  "constraints": {
+    "one_model_per_family": true,
+    "first_console_occurrence_wins": true,
+    "edition_does_not_change_model": true,
+    "legacy_family_aliases": {
+      "series-x": {"console_family": "series", "sub_model": "X"},
+      "series-s": {"console_family": "series", "sub_model": "S"},
+      "one-x": {"console_family": "one", "sub_model": "X"},
+      "one-s": {"console_family": "one", "sub_model": "S"}
+    }
+  }
+}
