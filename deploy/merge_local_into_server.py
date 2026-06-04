@@ -39,7 +39,8 @@ def _common_columns(con: sqlite3.Connection, table: str) -> list[str]:
 
 
 def merge(server_db: str, incoming_db: str, apply: bool) -> int:
-    con = sqlite3.connect(server_db)
+    con = sqlite3.connect(server_db, timeout=60)
+    con.execute("PRAGMA busy_timeout = 60000")
     con.execute("PRAGMA foreign_keys = OFF")
     con.execute("ATTACH DATABASE ? AS loc", (incoming_db,))
     con.execute("BEGIN IMMEDIATE")
