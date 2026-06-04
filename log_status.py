@@ -14,14 +14,39 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Cadenza attesa (ore) per marcare un job come "stale" se non gira da troppo.
+# Per ogni job: cadenza attesa (ore) e pattern d'esito opzionali.
+#   error_re   -> forza ROSSO (problema che richiede intervento)
+#   problem_re -> forza ARANCIONE (es. 0 risultati / fonte bloccata)
+#   ok_re      -> conferma VERDE anche con warning transitori (run completato)
 _SERVER_JOBS: dict[str, dict] = {
-    "scrape-fonti": {"label": "Scrape Fonti (store)", "cadence_h": 24},
-    "scrape-subito": {"label": "Scrape Subito", "cadence_h": 6},
-    "scrape-ebay": {"label": "Scrape eBay", "cadence_h": 24},
-    "ai-classify": {"label": "Classificazione AI", "cadence_h": 6},
-    "verify-sold": {"label": "Verifica venduti", "cadence_h": 12},
-    "backup": {"label": "Backup DB", "cadence_h": 24},
+    "scrape-fonti": {
+        "label": "Scrape Fonti (store)", "cadence_h": 24,
+        "problem_re": r"tutti i \d+ tentativi falliti|Totale prodotti unici: 0",
+        "ok_re": r"Salvato: cex_\S+ \(\d+ prodotti\)",
+    },
+    "scrape-subito": {
+        "label": "Scrape Subito", "cadence_h": 6,
+        "problem_re": r"Totale annunci unici: 0\b",
+        "ok_re": r"Totale annunci unici: [1-9]",
+    },
+    "scrape-ebay": {
+        "label": "Scrape eBay", "cadence_h": 24,
+        "problem_re": r"Totale item unici: 0\b",
+        "ok_re": r"Totale item unici: [1-9]",
+    },
+    "ai-classify": {
+        "label": "Classificazione AI", "cadence_h": 6,
+        "error_re": r"credit balance is too low|insufficient_quota|authentication_error",
+        "ok_re": r"[Cc]lassificazione completata",
+    },
+    "verify-sold": {
+        "label": "Verifica venduti", "cadence_h": 12,
+        "ok_re": r"Verifica completata",
+    },
+    "backup": {
+        "label": "Backup DB", "cadence_h": 24,
+        "ok_re": r"\[backup\] OK",
+    },
 }
 
 # Cartelle storiche GitHub -> etichetta leggibile.
@@ -73,12 +98,31 @@ def _age_hours(mtime: float) -> float:
     return max(0.0, (datetime.now(timezone.utc).timestamp() - mtime) / 3600.0)
 
 
-def _classify(segment: str, age_h: float, cadence_h: float) -> tuple[str, str]:
-    """Ritorna (stato, riga di sintesi)."""
+def _classify(segment: str, age_h: float, meta: dict) -> tuple[str, str]:
+    """Ritorna (stato, riga di sintesi) in base all'esito reale del run."""
+    cadence_h = meta["cadence_h"]
+    # 1) Errore specifico del job (es. credito API esaurito) -> rosso.
+    if meta.get("error_re"):
+        rx = re.compile(meta["error_re"], re.I)
+        if rx.search(segment):
+            return "error", _first_match_line(segment, rx)
+    # 2) Crash generico -> rosso.
     if _FATAL_RE.search(segment):
         return "error", _first_match_line(segment, _FATAL_RE)
+    # 3) Problema d'esito (0 risultati / fonte bloccata) -> arancione.
+    if meta.get("problem_re"):
+        rx = re.compile(meta["problem_re"], re.I)
+        if rx.search(segment):
+            return "warn", _first_match_line(segment, rx)
+    # 4) Non gira da troppo tempo.
     if age_h > cadence_h * 2:
         return "stale", f"Nessun run da {age_h:.0f}h (cadenza ~{cadence_h:.0f}h)"
+    # 5) Run completato con successo -> verde (ignora warning transitori).
+    if meta.get("ok_re"):
+        rx = re.compile(meta["ok_re"], re.I)
+        if rx.search(segment):
+            return "ok", _last_meaningful_line(segment)
+    # 6) Warning transitori senza conferma di completamento -> arancione.
     if _ISSUE_RE.search(segment):
         return "warn", _first_match_line(segment, _ISSUE_RE)
     return "ok", _last_meaningful_line(segment)
@@ -116,7 +160,7 @@ def _server_jobs(log_dir: Path) -> list[dict]:
             text = _tail(path)
             seg = _last_run_segment(text)
             age = _age_hours(path.stat().st_mtime)
-            status, summary = _classify(seg, age, meta["cadence_h"])
+            status, summary = _classify(seg, age, meta)
             started = _STARTED_RE.search(seg)
             entry.update(
                 status=status,
