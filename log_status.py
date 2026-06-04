@@ -1,0 +1,176 @@
+"""Raccoglie lo stato dei log per la pagina /log.
+
+Due fonti:
+  - job server (systemd): file in /var/log/trader/<job>.log, append per run.
+  - storico GitHub Actions: LogGitHub/<workflow>/#<n>/run.log (archiviati).
+
+Per ognuno calcola uno stato sintetico: "ok" (verde), "warn" (arancione),
+"error" (rosso) o "stale"/"unknown". Tutto best-effort e difensivo: cartelle o
+file mancanti non sollevano eccezioni.
+"""
+from __future__ import annotations
+
+import re
+from datetime import datetime, timezone
+from pathlib import Path
+
+# Cadenza attesa (ore) per marcare un job come "stale" se non gira da troppo.
+_SERVER_JOBS: dict[str, dict] = {
+    "scrape-fonti": {"label": "Scrape Fonti (store)", "cadence_h": 24},
+    "scrape-subito": {"label": "Scrape Subito", "cadence_h": 6},
+    "scrape-ebay": {"label": "Scrape eBay", "cadence_h": 24},
+    "ai-classify": {"label": "Classificazione AI", "cadence_h": 6},
+    "verify-sold": {"label": "Verifica venduti", "cadence_h": 12},
+    "backup": {"label": "Backup DB", "cadence_h": 24},
+}
+
+# Cartelle storiche GitHub -> etichetta leggibile.
+_GH_WORKFLOWS: dict[str, str] = {
+    "Scraper_Fonti": "GitHub · Scrape Fonti",
+    "Subito.it": "GitHub · Scrape Subito",
+    "eBay": "GitHub · Scrape eBay",
+    "AI_Classify": "GitHub · Classificazione AI",
+    "Verify_Sold": "GitHub · Verifica venduti",
+}
+
+_ERROR_RE = re.compile(
+    r"traceback|\berror\b|errore|\bfailed\b|\bfatal\b|exit code [1-9]|"
+    r"exception|critical|killed|oom\b|another job is already running",
+    re.I,
+)
+_WARN_RE = re.compile(r"\bwarn(ing)?\b|attenzione|skip(ped)?\b|retry", re.I)
+_STARTED_RE = re.compile(r"job\s+\S+\s+started at\s+(\S+)")
+
+
+def _tail(path: Path, max_bytes: int = 60_000) -> str:
+    try:
+        size = path.stat().st_size
+        with path.open("rb") as fh:
+            if size > max_bytes:
+                fh.seek(-max_bytes, 2)
+            return fh.read().decode("utf-8", "replace")
+    except OSError:
+        return ""
+
+
+def _last_run_segment(text: str) -> str:
+    """Ritorna il testo dell'ultimo run (dall'ultimo 'started at' in poi)."""
+    idx = text.rfind("] job ")
+    return text[idx:] if idx >= 0 else text
+
+
+def _age_hours(mtime: float) -> float:
+    return max(0.0, (datetime.now(timezone.utc).timestamp() - mtime) / 3600.0)
+
+
+def _classify(segment: str, age_h: float, cadence_h: float) -> tuple[str, str]:
+    """Ritorna (stato, riga di sintesi)."""
+    err = _ERROR_RE.search(segment)
+    if err:
+        line = _first_match_line(segment, _ERROR_RE)
+        return "error", line
+    if age_h > cadence_h * 2:
+        return "stale", f"Nessun run da {age_h:.0f}h (cadenza ~{cadence_h:.0f}h)"
+    if _WARN_RE.search(segment):
+        return "warn", _first_match_line(segment, _WARN_RE)
+    return "ok", _last_meaningful_line(segment)
+
+
+def _first_match_line(text: str, rx: re.Pattern[str]) -> str:
+    for line in text.splitlines():
+        if rx.search(line):
+            return line.strip()[:200]
+    return ""
+
+
+def _last_meaningful_line(text: str) -> str:
+    for line in reversed(text.splitlines()):
+        s = line.strip()
+        if s:
+            return s[:200]
+    return ""
+
+
+def _server_jobs(log_dir: Path) -> list[dict]:
+    out: list[dict] = []
+    for job, meta in _SERVER_JOBS.items():
+        path = log_dir / f"{job}.log"
+        entry = {
+            "id": job,
+            "label": meta["label"],
+            "category": "server",
+            "status": "unknown",
+            "last_run": None,
+            "age_hours": None,
+            "summary": "Nessun log trovato",
+        }
+        if path.exists():
+            text = _tail(path)
+            seg = _last_run_segment(text)
+            age = _age_hours(path.stat().st_mtime)
+            status, summary = _classify(seg, age, meta["cadence_h"])
+            started = _STARTED_RE.search(seg)
+            entry.update(
+                status=status,
+                last_run=(started.group(1) if started else
+                          datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat()),
+                age_hours=round(age, 1),
+                summary=summary or "—",
+            )
+        out.append(entry)
+    return out
+
+
+def _github_archive(app_dir: Path) -> list[dict]:
+    base = app_dir / "LogGitHub"
+    out: list[dict] = []
+    if not base.is_dir():
+        return out
+    for folder, label in _GH_WORKFLOWS.items():
+        wdir = base / folder
+        if not wdir.is_dir():
+            continue
+        runs = []
+        for d in wdir.iterdir():
+            m = re.match(r"#(\d+)", d.name)
+            if m and d.is_dir():
+                runs.append((int(m.group(1)), d))
+        if not runs:
+            continue
+        runs.sort()
+        last_n, last_dir = runs[-1]
+        run_log = last_dir / "run.log"
+        seg = _tail(run_log) if run_log.exists() else ""
+        if _ERROR_RE.search(seg):
+            status, summary = "error", _first_match_line(seg, _ERROR_RE)
+        elif seg:
+            status, summary = "ok", "Ultimo run archiviato completato"
+        else:
+            status, summary = "unknown", "Log non disponibile"
+        out.append({
+            "id": folder,
+            "label": label,
+            "category": "github",
+            "status": status,
+            "runs": len(runs),
+            "last_run": f"#{last_n}",
+            "summary": summary or "—",
+        })
+    return out
+
+
+def collect(app_dir: Path, log_dir: Path) -> dict:
+    """Stato completo dei log (server + storico GitHub)."""
+    jobs = _server_jobs(Path(log_dir))
+    archive = _github_archive(Path(app_dir))
+    rank = {"error": 0, "stale": 1, "warn": 2, "unknown": 3, "ok": 4}
+    overall = "ok"
+    for j in jobs:
+        if rank.get(j["status"], 3) < rank.get(overall, 4):
+            overall = j["status"]
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "overall": overall,
+        "jobs": jobs,
+        "archive": archive,
+    }

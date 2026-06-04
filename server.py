@@ -23,8 +23,13 @@ from urllib.parse import parse_qs, urlparse
 import db as _db
 import db_subito as _db_subito
 import db_ebay as _db_ebay
+import log_status as _log_status
 
 log = logging.getLogger("trader.server")
+
+# Directory app (per LogGitHub) e log server (job systemd).
+_APP_DIR = Path(__file__).resolve().parent
+_LOG_DIR = Path(os.environ.get("TRADER_LOG_DIR", "/var/log/trader"))
 
 # ---------------------------------------------------------------------------
 # Scrape job state (singleton — un solo job alla volta)
@@ -207,8 +212,9 @@ def _make_handler(
             path = self.path.split("?")[0]
             query = self._parse_query()
 
-            # Auth su tutte le API (tranne bootstrap token)
-            if self._is_api_path(path) and path != "/api/token":
+            # Auth su tutte le API (tranne bootstrap token e stato log pubblico)
+            _public_api = {"/api/token", "/api/logs/status"}
+            if self._is_api_path(path) and path not in _public_api:
                 if not self._authorize_request():
                     self._json({"ok": False, "error": "unauthorized"}, status=401)
                     return
@@ -216,6 +222,11 @@ def _make_handler(
             # Bootstrap token (solo localhost)
             if path == "/api/token":
                 self._json({"token": api_token})
+                return
+
+            # Stato dei log (pubblico, solo sintesi non sensibile) — pagina /log
+            if path == "/api/logs/status":
+                self._json(_log_status.collect(_APP_DIR, _LOG_DIR))
                 return
 
             if self.path == "/api/sources":
