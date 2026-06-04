@@ -172,6 +172,14 @@ def _make_handler(
             body = json.dumps(data, ensure_ascii=False).encode("utf-8")
             self._send_json(body, status)
 
+        def _send_text(self, text: str, status: int = 200) -> None:
+            body = text.encode("utf-8")
+            self.send_response(status)
+            self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
         def _send_json(self, body: bytes, status: int) -> None:
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -213,7 +221,7 @@ def _make_handler(
             query = self._parse_query()
 
             # Auth su tutte le API (tranne bootstrap token e stato log pubblico)
-            _public_api = {"/api/token", "/api/logs/status"}
+            _public_api = {"/api/token", "/api/logs/status", "/api/logs/raw"}
             if self._is_api_path(path) and path not in _public_api:
                 if not self._authorize_request():
                     self._json({"ok": False, "error": "unauthorized"}, status=401)
@@ -227,6 +235,17 @@ def _make_handler(
             # Stato dei log (pubblico, solo sintesi non sensibile) — pagina /log
             if path == "/api/logs/status":
                 self._json(_log_status.collect(_APP_DIR, _LOG_DIR))
+                return
+
+            # Log grezzo (pubblico, tail) — comodo per LLM/tool: ?job=<id>&lines=<n>
+            if path == "/api/logs/raw":
+                job = query.get("job", "")
+                n = self._safe_int(query.get("lines", "200"), 200, 1, 1000)
+                text = _log_status.raw_log(_APP_DIR, _LOG_DIR, job, n)
+                if text is None:
+                    self._send_text(f"log non trovato per job: {job}\n", status=404)
+                else:
+                    self._send_text(text)
                 return
 
             if self.path == "/api/sources":

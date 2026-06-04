@@ -84,6 +84,8 @@
       <div class="log-right">
         <span class="badge-state b-${st}">${esc(STATE_LABEL[st] || st)}</span>
         <div style="margin-top:4px;">${right}</div>
+        <a href="/api/logs/raw?job=${encodeURIComponent(item.id)}&lines=400" target="_blank" rel="noopener"
+           style="font-size:11px; color:var(--text-light);">log ↗</a>
       </div>
     </div>`;
   }

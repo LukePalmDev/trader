@@ -35,6 +35,20 @@ def test_collect_classifies_server_jobs(tmp_path: Path) -> None:
     assert res["overall"] == "error"
 
 
+def test_raw_log_tail_and_whitelist(tmp_path: Path) -> None:
+    log_dir = tmp_path / "logs"
+    log_dir.mkdir()
+    (log_dir / "scrape-fonti.log").write_text(
+        "\n".join(f"riga {i}" for i in range(1, 51)) + "\n", encoding="utf-8"
+    )
+    # Tail limitato.
+    out = log_status.raw_log(tmp_path, log_dir, "scrape-fonti", lines=5)
+    assert out.splitlines() == ["riga 46", "riga 47", "riga 48", "riga 49", "riga 50"]
+    # Job sconosciuto / tentativo di traversal => None (whitelist).
+    assert log_status.raw_log(tmp_path, log_dir, "../../etc/passwd", lines=5) is None
+    assert log_status.raw_log(tmp_path, log_dir, "inesistente", lines=5) is None
+
+
 def test_github_archive_parsed(tmp_path: Path) -> None:
     app_dir = tmp_path / "app"
     wf = app_dir / "LogGitHub" / "Subito.it" / "#5"

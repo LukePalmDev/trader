@@ -167,6 +167,41 @@ def _github_archive(app_dir: Path) -> list[dict]:
     return out
 
 
+def _github_last_run_log(app_dir: Path, job: str) -> Path | None:
+    if job not in _GH_WORKFLOWS:
+        return None
+    wdir = app_dir / "LogGitHub" / job
+    if not wdir.is_dir():
+        return None
+    runs = [(int(m.group(1)), d) for d in wdir.iterdir()
+            if d.is_dir() and (m := re.match(r"#(\d+)", d.name))]
+    if not runs:
+        return None
+    runs.sort()
+    return runs[-1][1] / "run.log"
+
+
+def raw_log(app_dir: Path, log_dir: Path, job: str, lines: int = 200) -> str | None:
+    """Tail (max 1000 righe) del log di un job. None se job sconosciuto/assente.
+
+    Il job è validato contro le whitelist (job server o workflow GitHub), quindi
+    niente path traversal.
+    """
+    lines = max(1, min(int(lines), 1000))
+    if job in _SERVER_JOBS:
+        path = Path(log_dir) / f"{job}.log"
+    else:
+        path = _github_last_run_log(Path(app_dir), job)
+    if not path or not path.exists():
+        return None
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    rows = text.splitlines()
+    return "\n".join(rows[-lines:])
+
+
 def collect(app_dir: Path, log_dir: Path) -> dict:
     """Stato completo dei log (server + storico GitHub)."""
     jobs = _server_jobs(Path(log_dir))
