@@ -64,8 +64,8 @@ def _tail(path: Path, max_bytes: int = 60_000) -> str:
 
 
 def _last_run_segment(text: str) -> str:
-    """Ritorna il testo dell'ultimo run (dall'ultimo 'started at' in poi)."""
-    idx = text.rfind("] job ")
+    """Ritorna il testo dell'ultimo run (dall'ultimo marker di avvio in poi)."""
+    idx = max(text.rfind("] job "), text.rfind("[backup] start"))
     return text[idx:] if idx >= 0 else text
 
 
