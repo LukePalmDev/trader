@@ -21,8 +21,8 @@ from pathlib import Path
 _SERVER_JOBS: dict[str, dict] = {
     "scrape-fonti": {
         "label": "Scrape Fonti (store)", "cadence_h": 24,
-        "problem_re": r"tutti i \d+ tentativi falliti|Totale prodotti unici: 0",
-        "ok_re": r"Salvato: cex_\S+ \(\d+ prodotti\)",
+        "problem_re": r"tutti i \d+ tentativi falliti|Totale prodotti unici: 0\b",
+        "ok_re": r"Salvato: cex_.*prodotti\)",
     },
     "scrape-subito": {
         "label": "Scrape Subito (residenziale)", "cadence_h": 12,
