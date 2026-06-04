@@ -33,12 +33,22 @@ _GH_WORKFLOWS: dict[str, str] = {
     "Verify_Sold": "GitHub · Verifica venduti",
 }
 
-_ERROR_RE = re.compile(
-    r"traceback|\berror\b|errore|\bfailed\b|\bfatal\b|exit code [1-9]|"
-    r"exception|critical|killed|oom\b|another job is already running",
+# Fallimento REALE del job (rosso): crash/uscita non-zero, non i singoli
+# errori di fetch transitori che non interrompono il run.
+_FATAL_RE = re.compile(
+    r"traceback \(most recent call last\)|exit code [1-9]|"
+    r"another job is already running|unhandledexception|\bfatal\b|"
+    r"\bcritical\b|killed|\boom\b|segmentation fault|modulenotfounderror",
     re.I,
 )
-_WARN_RE = re.compile(r"\bwarn(ing)?\b|attenzione|skip(ped)?\b|retry", re.I)
+# Problemi non fatali (arancione): errori/warning di singole richieste, retry.
+_ISSUE_RE = re.compile(
+    r"\[error\]|\[warning\]|\berrore\b|\bwarn(ing)?\b|\bfailed\b|"
+    r"429|too many requests|timeout|attenzione",
+    re.I,
+)
+# Run GitHub Actions fallito (storico).
+_GH_FAIL_RE = re.compile(r"##\[error\]|exit code [1-9]|\bfailed\b|\berror:\b", re.I)
 _STARTED_RE = re.compile(r"job\s+\S+\s+started at\s+(\S+)")
 
 
@@ -65,14 +75,12 @@ def _age_hours(mtime: float) -> float:
 
 def _classify(segment: str, age_h: float, cadence_h: float) -> tuple[str, str]:
     """Ritorna (stato, riga di sintesi)."""
-    err = _ERROR_RE.search(segment)
-    if err:
-        line = _first_match_line(segment, _ERROR_RE)
-        return "error", line
+    if _FATAL_RE.search(segment):
+        return "error", _first_match_line(segment, _FATAL_RE)
     if age_h > cadence_h * 2:
         return "stale", f"Nessun run da {age_h:.0f}h (cadenza ~{cadence_h:.0f}h)"
-    if _WARN_RE.search(segment):
-        return "warn", _first_match_line(segment, _WARN_RE)
+    if _ISSUE_RE.search(segment):
+        return "warn", _first_match_line(segment, _ISSUE_RE)
     return "ok", _last_meaningful_line(segment)
 
 
@@ -141,8 +149,8 @@ def _github_archive(app_dir: Path) -> list[dict]:
         last_n, last_dir = runs[-1]
         run_log = last_dir / "run.log"
         seg = _tail(run_log) if run_log.exists() else ""
-        if _ERROR_RE.search(seg):
-            status, summary = "error", _first_match_line(seg, _ERROR_RE)
+        if _GH_FAIL_RE.search(seg):
+            status, summary = "error", _first_match_line(seg, _GH_FAIL_RE)
         elif seg:
             status, summary = "ok", "Ultimo run archiviato completato"
         else:
