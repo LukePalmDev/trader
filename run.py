@@ -481,6 +481,14 @@ def main() -> None:
         help="Tutto: scrape Subito + eBay + classifica AI + viewer",
     )
     parser.add_argument("--cleanup", action="store_true", help="Retention + archiviazione + VACUUM DB")
+    parser.add_argument(
+        "--ingest-snapshot",
+        nargs="+",
+        default=None,
+        metavar="PATH",
+        help="Ingerisce nel DB uno o più snapshot JSON già pronti (senza scrapare). "
+             "Usato dal deploy remoto: lo scrape gira su GitHub, l'ingest sul server.",
+    )
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"Porta web (default {DEFAULT_PORT})")
     parser.add_argument("--host", default=DEFAULT_HOST, help=f"Host web (default {DEFAULT_HOST})")
     parser.add_argument("--no-browser", action="store_true", help="Non aprire automaticamente il browser")
@@ -678,6 +686,18 @@ def main() -> None:
             _db.init_db()
             _db_subito.init_db()
             _db_ebay.init_db()
+
+        if args.ingest_snapshot:
+            with report.step("ingest_snapshot"):
+                for raw in args.ingest_snapshot:
+                    path = Path(raw).expanduser()
+                    if not path.exists():
+                        log.warning("Snapshot inesistente, salto: %s", path)
+                        continue
+                    stats = _update_db_from_snapshot(path, report=report)
+                    log.info("Ingest %s -> %s", path.name, stats or "nessun dato")
+            ok = True
+            return
 
         if args.source == "all":
             sources = _enabled_sources()

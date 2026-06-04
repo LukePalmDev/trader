@@ -1,0 +1,80 @@
+name: Scrape remoto (rebuy + subito)
+
+# Scrape delle fonti che bloccano l'IP del server (rebuy 429, subito 403):
+# qui gli IP GitHub funzionano per rebuy. Lo snapshot viene spedito al server
+# che lo ingerisce nel DB reale (lo scrape NON tocca il DB di GitHub).
+
+on:
+  schedule:
+    - cron: '0 5,17 * * *'   # 05:00 e 17:00 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: scrape-remote
+  cancel-in-progress: false
+
+jobs:
+  scrape-and-ship:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.lock
+          python -m playwright install chromium
+
+      - name: Scrape rebuy (+ subito se raggiungibile)
+        env:
+          TRADER_PLAYWRIGHT_CHANNEL: chromium
+          TRADER_VIEWER_OPEN_BROWSER: "false"
+        run: |
+          python run.py --source rebuy || true
+          code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 \
+            -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0" \
+            'https://www.subito.it/annunci-italia/vendita/usato/?q=xbox' || echo 000)
+          echo "subito precheck http=$code"
+          if [ "$code" = "200" ]; then
+            python run.py --source subito || true
+          else
+            echo "subito bloccato ($code) da questo runner: salto"
+          fi
+
+      - name: Ship snapshot al server e ingest
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          KNOWN: ${{ secrets.SERVER_KNOWN_HOSTS }}
+          H: ${{ secrets.SERVER_HOST }}
+          U: ${{ secrets.SERVER_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+          remote_paths=""
+          for src in rebuy subito; do
+            f=$(ls -t data/${src}_*.json 2>/dev/null | head -1 || true)
+            [ -z "$f" ] && continue
+            tot=$(python -c "import json;print(json.load(open('$f')).get('total',0))")
+            if [ "$tot" -gt 0 ]; then
+              scp -i ~/.ssh/id_ed25519 "$f" "$U@$H:/var/lib/trader/data/"
+              remote_paths="$remote_paths /var/lib/trader/data/$(basename "$f")"
+              echo "spedito $f ($tot prodotti)"
+            else
+              echo "salto $src: 0 prodotti (probabilmente bloccato)"
+            fi
+          done
+          if [ -n "$remote_paths" ]; then
+            E="TRADER_DB_PATH=/var/lib/trader/tracker.db TRADER_OUTPUT_DIR=/var/lib/trader/data"
+            ssh -i ~/.ssh/id_ed25519 "$U@$H" \
+              "$E /opt/trader/venv/bin/python /opt/trader/app/run.py --ingest-snapshot$remote_paths && \
+               $E /opt/trader/venv/bin/python /opt/trader/app/run.py --cleanup"
+          else
+            echo "Nessuno snapshot non-vuoto da ingerire."
+          fi
