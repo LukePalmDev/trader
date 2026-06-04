@@ -1,0 +1,9 @@
+[Unit]
+Description=Trader auto-deploy (allinea il codice a origin/main)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/opt/trader/app/deploy/auto_deploy.sh
