@@ -17,10 +17,11 @@
 - Se necessario, forzare `VACUUM` manuale e riavviare scraping selettivo.
 
 ## 4) Routine server fallisce
-- Controlla timer e ultimo run: `systemctl list-timers 'trader-*'`.
-- Leggi log unità: `journalctl -u trader-scrape-subito.service -n 80 --no-pager`.
+- Stato a colpo d'occhio: `https://trader.byluke.org/log` (o `GET /api/logs/status`).
+- Senza SSH: `curl "https://trader.byluke.org/api/logs/raw?job=<id>&lines=300"` (vedi §8).
+- Con SSH: `systemctl list-timers 'trader-*'`; `journalctl -u trader-scrape-subito.service -n 80 --no-pager`.
 - Riprova manualmente il job: `sudo -u trader /opt/trader/app/deploy/server_job.sh <job>`.
-- Se il fix richiede codice: modifica in locale, commit, deploy sul server, poi restart unità interessata.
+- Fix di codice: modifica in locale, commit + push su `main`; l'auto-deploy lo applica entro ~5 min (vedi §8).
 
 ## 5) Aggiornamento schema DB
 - Le migrazioni sono automatiche in `init_db()` tramite `migrations.py`.
@@ -36,3 +37,19 @@
 - Dal 3 giugno 2026 `console_family` è solo `original`, `360`, `one`, `series`, `other`.
 - Il modello specifico è in `sub_model` (`Base`, `S`, `X`, `E`, `Elite`, `Unknown`).
 - Consulta `console_catalog.md` per gli slot operativi e `STORICI3GIUGNO/README.md` per leggere i dati legacy.
+
+## 8) Log via HTTP e auto-deploy
+Lo scraping NON gira più su GitHub Actions (workflow archiviati in `STORICI3GIUGNO/github-workflows/`, GitHub Pages disabilitato). Tutto gira sul server via systemd timer; il codice si aggiorna da solo.
+
+**Auto-deploy**: `trader-deploy.timer` ogni 5 min esegue `deploy/auto_deploy.sh` (`git fetch` + `reset --hard origin/main` + restart `trader-viewer`, reinstalla deps solo se `requirements.lock` cambia). Quindi basta `git push` su `main` per aggiornare il sito entro ~5 min. nginx NON è auto-deployato (config in `/etc/nginx/sites-available/trader.byluke.org`).
+- Nota: gli script `deploy/*.sh` vanno committati con bit eseguibile (`git update-index --chmod=+x`), altrimenti il `reset --hard` li rende 644 e systemd fallisce.
+- Forzare un deploy subito: `sudo /opt/trader/app/deploy/auto_deploy.sh`.
+
+**Lettura log (pubblica, no SSH)** — comoda per persone, tool o LLM:
+- Stato sintetico a colori (JSON): `GET https://trader.byluke.org/api/logs/status`.
+- Pagina UI: `https://trader.byluke.org/log` (pulsante 🩺 nell'header).
+- Log grezzo (tail): `GET https://trader.byluke.org/api/logs/raw?job=<id>&lines=<n>` (default 200, max 1000).
+  - Job server: `scrape-fonti`, `scrape-subito`, `scrape-ebay`, `ai-classify`, `verify-sold`, `backup`.
+  - Archivio GitHub: `Scraper_Fonti`, `Subito.it`, `eBay`, `AI_Classify`, `Verify_Sold`.
+- Stati: 🟢 ok · 🟠 warn/non recente · 🔴 fallimento reale (crash/exit-code) · ⚪ sconosciuto.
+- File sul server: `/var/log/trader/*.log`; backend in `log_status.py`, endpoint in `server.py`.
