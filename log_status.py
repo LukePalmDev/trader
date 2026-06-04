@@ -25,9 +25,13 @@ _SERVER_JOBS: dict[str, dict] = {
         "ok_re": r"Salvato: cex_\S+ \(\d+ prodotti\)",
     },
     "scrape-subito": {
-        "label": "Scrape Subito", "cadence_h": 6,
+        "label": "Scrape Subito (residenziale)", "cadence_h": 12,
         "problem_re": r"Totale annunci unici: 0\b",
-        "ok_re": r"Totale annunci unici: [1-9]",
+        "ok_re": r"job scrape-subito OK|Totale annunci unici: [1-9]",
+    },
+    "scrape-rebuy": {
+        "label": "Scrape rebuy (GitHub)", "cadence_h": 24,
+        "ok_re": r"job scrape-rebuy OK",
     },
     "scrape-ebay": {
         "label": "Scrape eBay", "cadence_h": 24,
