@@ -11,6 +11,9 @@ BRANCH="${DEPLOY_BRANCH:-main}"
 
 cd "$APP_DIR"
 
+# Lo script gira come root su una dir di proprietà 'trader': autorizza git.
+git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
+
 git fetch --quiet origin "$BRANCH"
 local_sha="$(git rev-parse HEAD)"
 remote_sha="$(git rev-parse "origin/$BRANCH")"
