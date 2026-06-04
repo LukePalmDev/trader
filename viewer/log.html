@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Stato Log · Xbox Tracker</title>
+<link rel="icon" href="/assets/trader-icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/style.css" />
+<style>
+  .log-wrap { max-width: 880px; margin: 0 auto; padding: 28px 20px 60px; }
+  .log-head { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+  .log-head h1 { font-size: 22px; margin: 0; font-weight: 600; }
+  .log-head a.back { text-decoration: none; color: var(--text-light); font-size: 13px;
+    border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 10px; }
+  .log-head a.back:hover { background: var(--card-bg); }
+  .log-sub { color: var(--text-muted); font-size: 12.5px; margin: 0 0 22px; }
+  .overall { display: inline-flex; align-items: center; gap: 9px; font-weight: 600;
+    padding: 8px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--card-bg); margin-bottom: 26px; font-size: 14px; }
+  .sec-title { font-size: 13px; text-transform: uppercase; letter-spacing: .8px;
+    color: var(--text-muted); margin: 26px 0 12px; }
+  .cards { display: flex; flex-direction: column; gap: 8px; }
+  .log-card { display: flex; align-items: center; gap: 14px; padding: 13px 16px;
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+  .dot { width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto; }
+  .s-ok { background: #58b258; }
+  .s-warn, .s-stale { background: #e8a33d; }
+  .s-error { background: #d4574e; }
+  .s-unknown { background: var(--text-muted); }
+  .log-meta { flex: 1 1 auto; min-width: 0; }
+  .log-name { font-weight: 600; font-size: 14px; }
+  .log-summary { color: var(--text-light); font-size: 12px; margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .log-right { text-align: right; color: var(--text-muted); font-size: 11.5px; flex: 0 0 auto; }
+  .badge-state { font-size: 10.5px; text-transform: uppercase; letter-spacing: .5px;
+    padding: 2px 7px; border-radius: 999px; color: #fff; font-weight: 600; }
+  .b-ok { background: #58b258; } .b-warn, .b-stale { background: #e8a33d; }
+  .b-error { background: #d4574e; } .b-unknown { background: var(--text-muted); }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 28px;
+    color: var(--text-muted); font-size: 12px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .err { color: #d4574e; }
+</style>
+</head>
+<body>
+<div class="log-wrap">
+  <div class="log-head">
+    <h1>Stato Log</h1>
+    <a class="back" href="/">← Dashboard</a>
+    <a class="back" href="#" onclick="load();return false;">↻ Aggiorna</a>
+  </div>
+  <p class="log-sub" id="generated">Caricamento…</p>
+  <div id="overall"></div>
+  <div id="content"></div>
+  <div class="legend">
+    <span><i class="dot s-ok"></i> OK</span>
+    <span><i class="dot s-warn"></i> Attenzione / non recente</span>
+    <span><i class="dot s-error"></i> Errore</span>
+    <span><i class="dot s-unknown"></i> Sconosciuto</span>
+  </div>
+</div>
+
+<script>
+  // Tema coerente col resto del sito.
+  if (localStorage.getItem('xbox-tracker-theme') !== 'light')
+    document.documentElement.setAttribute('data-theme', 'dark');
+
+  const STATE_LABEL = { ok: 'OK', warn: 'Attenzione', stale: 'Non recente', error: 'Errore', unknown: 'N/D' };
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function card(item) {
+    const st = item.status || 'unknown';
+    const right = item.category === 'github'
+      ? `${esc(item.runs)} run · ${esc(item.last_run)}`
+      : (item.age_hours != null ? `${esc(item.age_hours)}h fa` : '—');
+    return `<div class="log-card">
+      <i class="dot s-${st}"></i>
+      <div class="log-meta">
+        <div class="log-name">${esc(item.label)}</div>
+        <div class="log-summary ${st === 'error' ? 'err' : ''}">${esc(item.summary)}</div>
+      </div>
+      <div class="log-right">
+        <span class="badge-state b-${st}">${esc(STATE_LABEL[st] || st)}</span>
+        <div style="margin-top:4px;">${right}</div>
+      </div>
+    </div>`;
+  }
+
+  async function load() {
+    document.getElementById('generated').textContent = 'Caricamento…';
+    try {
+      const r = await fetch('/api/logs/status', { cache: 'no-store' });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const ov = d.overall || 'unknown';
+      document.getElementById('overall').innerHTML =
+        `<div class="overall"><i class="dot s-${ov}"></i> Stato generale: ${esc(STATE_LABEL[ov] || ov)}</div>`;
+      const jobs = (d.jobs || []).map(card).join('');
+      const arch = (d.archive || []).map(card).join('');
+      document.getElementById('content').innerHTML =
+        `<div class="sec-title">Job server (systemd)</div><div class="cards">${jobs || '<p class="log-sub">Nessun job.</p>'}</div>` +
+        `<div class="sec-title">Storico GitHub Actions (archiviato)</div><div class="cards">${arch || '<p class="log-sub">Nessuno storico.</p>'}</div>`;
+      const ts = d.generated_at ? new Date(d.generated_at).toLocaleString('it-IT') : '';
+      document.getElementById('generated').textContent = 'Aggiornato: ' + ts;
+    } catch (e) {
+      document.getElementById('generated').innerHTML =
+        `<span class="err">Errore nel caricamento: ${esc(e.message)}</span>`;
+    }
+  }
+  load();
+</script>
+</body>
+</html>
