@@ -252,7 +252,9 @@ def _update_db_from_snapshot(
                 stats["unchanged"],
                 stats.get("removed_stale", 0),
             )
-        return {"source": source, "total": len(products), **stats}
+        result = {"source": source, "total": len(products), **stats}
+        _write_source_marker(result)
+        return result
     except Exception as exc:  # noqa: BLE001
         msg = f"Errore aggiornamento DB da {snapshot_path.name}: {exc}"
         log.exception(msg)
@@ -466,9 +468,10 @@ def _build_command_string() -> str:
     return "python3 run.py " + " ".join(shlex.quote(arg) for arg in sys.argv[1:])
 
 
-def _write_ingest_marker(stats: dict | None) -> None:
-    """Scrive una riga di esito nel log del job, così /log riflette l'ingest
-    remoto (scrape eseguito altrove: GitHub per rebuy, Mac residenziale per subito)."""
+def _write_source_marker(stats: dict | None) -> None:
+    """Scrive una riga di esito per-fonte in source-<fonte>.log, così la pagina
+    /log mostra ogni singola fonte in modo indipendente, ovunque giri lo scrape
+    (server, Mac residenziale o GitHub via --ingest-snapshot)."""
     if not stats or not stats.get("source"):
         return
     src = stats["source"]
@@ -477,11 +480,11 @@ def _write_ingest_marker(stats: dict | None) -> None:
         log_dir.mkdir(parents=True, exist_ok=True)
         ts = datetime.now(timezone.utc).isoformat()
         line = (
-            f"{ts} [trader] job scrape-{src} OK (ingest remoto): "
+            f"{ts} [trader] job scrape-{src} OK: "
             f"total={stats.get('total', 0)} new={stats.get('new', 0)} "
             f"price={stats.get('price_changes', 0)} avail={stats.get('avail_changes', 0)}\n"
         )
-        with (log_dir / f"scrape-{src}.log").open("a", encoding="utf-8") as fh:
+        with (log_dir / f"source-{src}.log").open("a", encoding="utf-8") as fh:
             fh.write(line)
     except OSError:
         pass
@@ -717,7 +720,6 @@ def main() -> None:
                         continue
                     stats = _update_db_from_snapshot(path, report=report)
                     log.info("Ingest %s -> %s", path.name, stats or "nessun dato")
-                    _write_ingest_marker(stats)
             ok = True
             return
 

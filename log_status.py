@@ -14,43 +14,41 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 
-# Per ogni job: cadenza attesa (ore) e pattern d'esito opzionali.
+# Per ogni job: cadenza attesa (ore), file di log e pattern d'esito opzionali.
+#   log_file   -> file in TRADER_LOG_DIR (default: "<id>.log")
 #   error_re   -> forza ROSSO (problema che richiede intervento)
 #   problem_re -> forza ARANCIONE (es. 0 risultati / fonte bloccata)
 #   ok_re      -> conferma VERDE anche con warning transitori (run completato)
+#
+# Ogni fonte è una voce separata, in ordine. Le fonti scrivono un marker
+# per-fonte in source-<fonte>.log (vedi run.py:_write_source_marker), così
+# l'esito è indipendente ovunque giri lo scrape (server, Mac, GitHub).
+def _src(label: str, src: str, cadence: int) -> dict:
+    return {"label": label, "cadence_h": cadence,
+            "log_file": f"source-{src}.log", "ok_re": rf"job scrape-{src} OK"}
+
+
 _SERVER_JOBS: dict[str, dict] = {
-    "scrape-fonti": {
-        "label": "Scrape Fonti (store)", "cadence_h": 24,
-        "problem_re": r"tutti i \d+ tentativi falliti|Totale prodotti unici: 0\b",
-        "ok_re": r"Salvato: cex_.*prodotti\)",
-    },
-    "scrape-subito": {
-        "label": "Scrape Subito (residenziale)", "cadence_h": 12,
-        "problem_re": r"Totale annunci unici: 0\b",
-        "ok_re": r"job scrape-subito OK|Totale annunci unici: [1-9]",
-    },
-    "scrape-rebuy": {
-        "label": "Scrape rebuy (GitHub)", "cadence_h": 24,
-        "ok_re": r"job scrape-rebuy OK",
-    },
-    "scrape-gamelife": {
-        "label": "Scrape GameLife (residenziale)", "cadence_h": 12,
-        "ok_re": r"job scrape-gamelife OK",
-    },
-    "scrape-ebay": {
-        "label": "Scrape eBay", "cadence_h": 24,
-        "problem_re": r"Totale item unici: 0\b",
-        "ok_re": r"Totale item unici: [1-9]",
+    # --- Fonti negozi ---
+    "scrape-cex": _src("CEX (store)", "cex", 36),
+    "scrape-gameshock": _src("GameShock (store)", "gameshock", 36),
+    "scrape-gamepeople": _src("GamePeople (store)", "gamepeople", 36),
+    "scrape-gamelife": _src("GameLife (residenziale)", "gamelife", 18),
+    "scrape-rebuy": _src("rebuy (GitHub)", "rebuy", 30),
+    # --- Marketplace ---
+    "scrape-subito": _src("Subito — annunci (residenziale)", "subito", 18),
+    "scrape-ebay": _src("eBay — venduti (scrape)", "ebay", 30),
+    # --- Verifiche / AI ---
+    "verify-sold": {
+        "label": "Verifica venduti Subito", "cadence_h": 12,
+        "ok_re": r"Verifica completata",
     },
     "ai-classify": {
-        "label": "Classificazione AI", "cadence_h": 6,
+        "label": "Classificazione AI", "cadence_h": 12,
         "error_re": r"credit balance is too low|insufficient_quota|authentication_error",
         "ok_re": r"[Cc]lassificazione completata",
     },
-    "verify-sold": {
-        "label": "Verifica venduti", "cadence_h": 12,
-        "ok_re": r"Verifica completata",
-    },
+    # --- Sistema ---
     "backup": {
         "label": "Backup DB", "cadence_h": 24,
         "ok_re": r"\[backup\] OK",
@@ -154,7 +152,7 @@ def _last_meaningful_line(text: str) -> str:
 def _server_jobs(log_dir: Path) -> list[dict]:
     out: list[dict] = []
     for job, meta in _SERVER_JOBS.items():
-        path = log_dir / f"{job}.log"
+        path = log_dir / meta.get("log_file", f"{job}.log")
         entry = {
             "id": job,
             "label": meta["label"],
@@ -241,7 +239,7 @@ def raw_log(app_dir: Path, log_dir: Path, job: str, lines: int = 200) -> str | N
     """
     lines = max(1, min(int(lines), 1000))
     if job in _SERVER_JOBS:
-        path = Path(log_dir) / f"{job}.log"
+        path = Path(log_dir) / _SERVER_JOBS[job].get("log_file", f"{job}.log")
     else:
         path = _github_last_run_log(Path(app_dir), job)
     if not path or not path.exists():
