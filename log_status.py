@@ -33,6 +33,10 @@ _SERVER_JOBS: dict[str, dict] = {
         "label": "Scrape rebuy (GitHub)", "cadence_h": 24,
         "ok_re": r"job scrape-rebuy OK",
     },
+    "scrape-gamelife": {
+        "label": "Scrape GameLife (residenziale)", "cadence_h": 12,
+        "ok_re": r"job scrape-gamelife OK",
+    },
     "scrape-ebay": {
         "label": "Scrape eBay", "cadence_h": 24,
         "problem_re": r"Totale item unici: 0\b",

@@ -28,8 +28,9 @@ run_python() {
 run_case() {
   case "$job" in
     scrape-fonti)
-      # rebuy escluso: blocca l'IP del server (429). Arriva via GitHub Actions.
-      run_python run.py --source gamelife,gamepeople,gameshock,cex
+      # rebuy (GitHub) e gamelife (Mac residenziale) esclusi: bloccano l'IP del
+      # server. Qui restano solo le fonti che funzionano da datacenter.
+      run_python run.py --source gamepeople,gameshock,cex
       run_python run.py --cleanup
       ;;
     scrape-subito)
