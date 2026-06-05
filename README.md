@@ -26,6 +26,7 @@ Scraper (8 fonti)  ->  Snapshot JSON  ->  tracker.db (SQLite)  ->  API HTTP  -> 
 | `migrations.py` | Framework migrazioni schema versionato con namespace |
 | `classifier.py` | Pipeline classificazione: regole + CEX matching + fallback AI |
 | `ai_classifier.py` | Filtro AI asincrono: distingue console hardware da giochi/accessori |
+| `ai_cascade_classifier.py` | Nuova classificazione OpenAI a cascata con tassonomia vincolata e review umana |
 | `valuation.py` | Fair value engine: mediana ponderata CEX/Subito/eBay con backtesting |
 | `alerts.py` | Sistema alert prezzi con notifiche macOS + Telegram |
 | `verify_sold.py` | Verifica asincrona stato venduto annunci Subito |
@@ -131,6 +132,15 @@ Processo separato per Subito: distingue console hardware da giochi/accessori.
 - >= 75 → approved, <= 25 → rejected, 25-75 → pending
 - Batch da 50, 5 batch paralleli (asyncio.gather)
 
+### AI Cascade Classifier (taxonomy-first)
+
+Pipeline OpenAI opzionale per Subito:
+- Input: titolo, descrizione e prezzo.
+- Output vincolato: `taxonomy_id` canonico oppure `other`, confidence 0-100, tipo oggetto e segnale prezzo.
+- Cascata modelli: `gpt-4o-mini` → `gpt-4.1-mini` → `gpt-5.1-mini` configurabile via `OPENAI_CASCADE_MODELS`.
+- Soglia default 80: sotto soglia passa al modello successivo; sotto soglia anche al terzo finisce in `pending_review`.
+- Audit su `classification_runs`, `classification_attempts`, `human_reviews`.
+
 ## Fair Value Engine
 
 Calcola il "prezzo equo" per ogni modello Xbox:
@@ -166,6 +176,10 @@ python3 run.py --view
 # Classificazione AI manuale
 python3 run.py --classify
 python3 run.py --classify --classify-limit 100 --classify-dry-run
+
+# Classificazione OpenAI a cascata su annunci Subito
+python3 run.py --ai-cascade-classify --ai-cascade-limit 200
+python3 run.py --ai-cascade-classify --ai-cascade-all --ai-cascade-threshold 80
 
 # Report fair value
 python3 run.py --valuation-report
@@ -213,6 +227,8 @@ File `config.toml` con override via variabili d'ambiente `TRADER_*`:
 | `TRADER_TELEGRAM_CHAT_ID` | (vuoto) | Chat ID destinatario Telegram |
 | `ANTHROPIC_API_KEY` | — | Chiave API per classificazione AI |
 | `ANTHROPIC_MODEL` | (auto-detect) | Modello Claude da usare |
+| `OPENAI_API_KEY` | — | Chiave API OpenAI per `ai_cascade_classifier.py` |
+| `OPENAI_CASCADE_MODELS` | `gpt-4o-mini,gpt-4.1-mini,gpt-5.1-mini` | Modelli OpenAI in cascata |
 
 ## Notifiche Telegram
 

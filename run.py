@@ -550,6 +550,20 @@ def main() -> None:
         action="store_true",
         help="Classifica ai_status/ai_confidence con Haiku 4.5 (titolo+descrizione).",
     )
+    parser.add_argument(
+        "--ai-cascade-classify",
+        action="store_true",
+        help="Classifica annunci Subito con cascata OpenAI taxonomy-first.",
+    )
+    parser.add_argument("--ai-cascade-limit", type=int, default=200, help="Limite annunci per AI cascade")
+    parser.add_argument("--ai-cascade-threshold", type=int, default=80, help="Soglia confidence AI cascade")
+    parser.add_argument("--ai-cascade-all", action="store_true", help="Riclassifica tutti gli annunci")
+    parser.add_argument("--ai-cascade-dry-run", action="store_true", help="AI cascade senza salvare")
+    parser.add_argument(
+        "--ai-cascade-models",
+        default="",
+        help="Modelli OpenAI separati da virgola (default: gpt-4o-mini,gpt-4.1-mini,gpt-5.1-mini).",
+    )
     parser.add_argument("--ai-limit", type=int, default=None, help="Limite annunci/item per ai_classifier")
     parser.add_argument("--ai-batch-size", type=int, default=50, help="Batch size ai_classifier")
     parser.add_argument("--ai-concurrency", type=int, default=5, help="Concorrenza ai_classifier")
@@ -864,6 +878,23 @@ def main() -> None:
                             reclassify_all=args.ai_ebay_reclassify_all,
                         )
                     )
+            ok = True
+            return
+
+        if args.ai_cascade_classify:
+            import ai_cascade_classifier as _cascade
+
+            models = tuple(
+                part.strip() for part in args.ai_cascade_models.split(",") if part.strip()
+            ) or None
+            with report.step("ai_cascade_classify"):
+                _cascade.run_ai_cascade_classifier(
+                    limit=args.ai_cascade_limit,
+                    classify_all=args.ai_cascade_all,
+                    threshold=args.ai_cascade_threshold,
+                    dry_run=args.ai_cascade_dry_run,
+                    models=models,
+                )
             ok = True
             return
 

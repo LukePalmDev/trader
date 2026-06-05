@@ -1,0 +1,10 @@
+[Unit]
+Description=Run trader AI cascade classify after scrape windows
+
+[Timer]
+OnCalendar=*-*-* 05,11,17,23:10:00
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

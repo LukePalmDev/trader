@@ -266,6 +266,62 @@ _CANONICAL_STANDARD_LABELS = _TAX["canonical_standard_labels"]
 
 _FAMILY_STANDARD_LABELS = _TAX["family_standard_labels"]
 
+
+def canonical_taxonomy_ids(*, include_other: bool = True) -> list[str]:
+    """Return the stable canonical IDs accepted by AI classifiers."""
+    ids = sorted(_CANONICAL_STANDARD_LABELS)
+    if include_other:
+        ids.append("other")
+    return ids
+
+
+def fields_from_canonical_id(canonical_id: str) -> ModelClassification:
+    """Map a canonical taxonomy ID back to the DB classification fields."""
+    canonical = (canonical_id or "").strip()
+    if canonical == "other":
+        return ModelClassification(
+            console_family="other",
+            sub_model="Unknown",
+            model_segment="unknown",
+            edition_class="standard",
+            canonical_model="other",
+            classify_confidence=0.0,
+            classify_method="taxonomy-map:v1",
+        )
+
+    if canonical.startswith("series-x"):
+        family, sub_model = "series", "X"
+    elif canonical.startswith("series-s"):
+        family, sub_model = "series", "S"
+    elif canonical.startswith("one-x"):
+        family, sub_model = "one", "X"
+    elif canonical.startswith("one-s"):
+        family, sub_model = "one", "S"
+    elif canonical.startswith("one-base") or canonical.startswith("one-"):
+        family, sub_model = "one", "Base"
+    elif canonical.startswith("360-e"):
+        family, sub_model = "360", "E"
+    elif canonical.startswith("360-s"):
+        family, sub_model = "360", "S"
+    elif canonical.startswith("360-elite"):
+        family, sub_model = "360", "Elite"
+    elif canonical.startswith("360"):
+        family, sub_model = "360", "Base"
+    elif canonical.startswith("original"):
+        family, sub_model = "original", "Base"
+    else:
+        family, sub_model, canonical = "other", "Unknown", "other"
+
+    return ModelClassification(
+        console_family=family,
+        sub_model=sub_model,
+        model_segment=("unknown" if family == "other" else "base"),
+        edition_class="standard",
+        canonical_model=canonical,
+        classify_confidence=0.0,
+        classify_method="taxonomy-map:v1",
+    )
+
 _FALLBACK_NOISE_RE = _compile(_TAX["regexes"]["fallback_noise"])
 _SPACES_RE = re.compile(r"\s+")
 _SLUG_RE = re.compile(r"[^a-z0-9]+")

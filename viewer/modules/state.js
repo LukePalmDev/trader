@@ -11,6 +11,7 @@
       standardGroups: [],
       storageSizes: [],
       subitoAds: [],
+      aiPendingReviews: [],
       subitoSold: [],
       subitoOpportunities: [],
       ebaySold: [],

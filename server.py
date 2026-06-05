@@ -322,6 +322,12 @@ def _make_handler(
                 self._json(_db_subito.get_sold_ads())
             elif path == "/api/subito/sold-stats":
                 self._json(_db_subito.get_sold_stats())
+            elif path == "/api/subito/pending-reviews":
+                limit = self._safe_int(query.get("limit", "250"), 250, lo=1, hi=1000)
+                self._json(_db_subito.get_pending_reviews(limit=limit))
+            elif path == "/api/subito/classification-attempts":
+                ad_id = self._safe_int(query.get("ad_id", "0"), 0, lo=0, hi=100000000)
+                self._json(_db_subito.get_classification_attempts(ad_id))
             elif path == "/api/ebay/sold":
                 self._json(_db_ebay.get_all_sold())
             elif path == "/api/ebay/stats":
@@ -409,6 +415,8 @@ def _make_handler(
                 pass
             elif path == "/api/subito/update-ai":
                 pass
+            elif path == "/api/subito/review":
+                pass
             else:
                 self._json({"ok": False, "error": "not-found"}, status=404)
                 return
@@ -433,11 +441,25 @@ def _make_handler(
                 elif path == "/api/subito/update-ai":
                     ad_id = int(payload["id"])
                     status = str(payload["status"])
-                    if status not in ("approved", "pending", "rejected"):
+                    if status not in (
+                        "approved", "pending", "rejected",
+                        "approved_auto", "rejected_auto", "pending_review",
+                        "approved_manual", "rejected_manual",
+                    ):
                         self._json({"ok": False, "error": "invalid-status"}, status=400)
                         return
                     _db_subito.update_ai_status(ad_id, status)
                     self._json({"ok": True})
+
+                elif path == "/api/subito/review":
+                    result = _db_subito.save_human_review(
+                        ad_id=int(payload["id"]),
+                        human_taxonomy_id=str(payload["taxonomy_id"]),
+                        human_status=(str(payload["status"]) if payload.get("status") else None),
+                        review_reason=str(payload.get("reason") or ""),
+                        run_id=(int(payload["run_id"]) if payload.get("run_id") else None),
+                    )
+                    self._json(result)
 
             except (ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
                 self._json({"ok": False, "error": str(exc)}, status=400)

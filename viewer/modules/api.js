@@ -19,6 +19,7 @@
     '/api/subito/stats':                   './data/subito-stats.json',
     '/api/subito/sold':                    './data/subito-sold.json',
     '/api/subito/sold-stats':              './data/subito-sold-stats.json',
+    '/api/subito/pending-reviews':          './data/subito-pending-reviews.json',
     '/api/ebay/sold':                      './data/ebay-sold.json',
     '/api/ebay/stats':                     './data/ebay-stats.json',
     '/api/valuation/subito-opportunities': './data/valuation-opportunities.json',

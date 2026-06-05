@@ -43,6 +43,21 @@ const FAMILY_LABELS = {
   'other':    '???',
 };
 
+const TAXONOMY_IDS = [
+  'series-x-1tb', 'series-x-2tb', 'series-x-digital-1tb',
+  'series-s-512gb', 'series-s-1tb',
+  'one-x-1tb',
+  'one-s-500gb', 'one-s-1tb', 'one-s-2tb', 'one-s-digital-1tb',
+  'one-base-500gb', 'one-base-1tb',
+  '360-base', '360-base-4gb', '360-base-20gb', '360-base-60gb',
+  '360-base-120gb', '360-base-250gb', '360-base-320gb', '360-base-500gb',
+  '360-s', '360-s-4gb', '360-s-250gb', '360-s-320gb', '360-s-500gb',
+  '360-e', '360-e-4gb', '360-e-250gb', '360-e-500gb',
+  '360-elite', '360-elite-120gb', '360-elite-250gb',
+  'original-base-8gb',
+  'other',
+];
+
 const VIEWER_STATE = window.ViewerState || {
   sourcesMeta: [],
   allProducts: [],
@@ -84,6 +99,7 @@ let BASE_MODELS    = VIEWER_STATE.baseModels;    // DB prodotti con is_base_mode
 let STANDARD_GROUPS= VIEWER_STATE.standardGroups;// gruppi nome standard -> nomi originali
 let STORAGE_SIZES  = VIEWER_STATE.storageSizes;  // dimensioni archiviazione dal DB
 let SUBITO_ADS     = VIEWER_STATE.subitoAds;     // annunci Subito dal DB dedicato (subito.db)
+let AI_PENDING_REVIEWS = VIEWER_STATE.aiPendingReviews || [];
 let SUBITO_SOLD    = VIEWER_STATE.subitoSold;    // annunci Subito venduti
 let SUBITO_OPPS    = VIEWER_STATE.subitoOpportunities; // score fair-value/qualita'
 let EBAY_SOLD      = VIEWER_STATE.ebaySold;      // lotti venduti eBay dal DB dedicato (ebay.db)
@@ -103,6 +119,14 @@ function _settled(results, fallbacks) {
     console.warn(`API #${i} fallita:`, r.reason?.message || r.reason);
     return fallbacks[i] !== undefined ? fallbacks[i] : { ok: false, body: null };
   });
+}
+
+function _isAiApproved(row) {
+  return ['approved', 'approved_auto', 'approved_manual'].includes(row?.ai_status || '');
+}
+
+function _isAiPending(row) {
+  return ['pending', 'pending_review'].includes(row?.ai_status || 'pending');
 }
 
 function _familyKey(name) {
@@ -362,6 +386,7 @@ function _syncState() {
   VIEWER_STATE.standardGroups = STANDARD_GROUPS;
   VIEWER_STATE.storageSizes = STORAGE_SIZES;
   VIEWER_STATE.subitoAds = SUBITO_ADS;
+  VIEWER_STATE.aiPendingReviews = AI_PENDING_REVIEWS;
   VIEWER_STATE.subitoSold = SUBITO_SOLD;
   VIEWER_STATE.subitoOpportunities = SUBITO_OPPS;
   VIEWER_STATE.ebaySold = EBAY_SOLD;
@@ -382,6 +407,7 @@ document.querySelectorAll('.tab').forEach(btn => {
     if (btn.dataset.tab === 'standardi') renderStandardGroups();
     if (btn.dataset.tab === 'subito-b')  loadMarket('subito-b');
     if (btn.dataset.tab === 'subito-p')  loadMarket('subito-p');
+    if (btn.dataset.tab === 'ai-review') loadAiReview();
     if (btn.dataset.tab === 'subito-s')  loadMarket('subito-s');
     if (btn.dataset.tab === 'subito-dashboard') loadSubitoSoldDashboard();
     if (btn.dataset.tab === 'ebay')      loadMarket('ebay');
@@ -1365,7 +1391,7 @@ function getUniqueBaseModels({ invert = false } = {}) {
   
   // Aggiungiamo anche gli annunci Subito approvati dall'AI
   const approvedSubito = SUBITO_ADS
-    .filter(a => a.ai_status === 'approved')
+    .filter(a => _isAiApproved(a))
     .map(a => ({
       ...a,
       source: 'subito',
@@ -2078,7 +2104,7 @@ function renderSubito() {
 
   let filtered = SUBITO_ADS.slice();
   if (aiFilter !== 'all') {
-    filtered = filtered.filter(a => (a.ai_status || 'pending') === aiFilter);
+    filtered = filtered.filter(a => aiFilter === 'approved' ? _isAiApproved(a) : aiFilter === 'pending' ? _isAiPending(a) : (a.ai_status || 'pending') === aiFilter);
   }
   if (q)         filtered = filtered.filter(a => a.name.toLowerCase().includes(q));
   if (famFilter) filtered = filtered.filter(a => a.console_family === famFilter);
@@ -2186,7 +2212,7 @@ function renderSubito() {
       
       // Aggiungi pulsanti per revisione (delegation via data-* attributes)
       let reviewActions = '';
-      if (aiFilter === 'pending' || ad.ai_status === 'pending') {
+      if (aiFilter === 'pending' || _isAiPending(ad)) {
          reviewActions = `
            <div style="margin-top:4px;">
              <button data-ai-action="approved" data-ad-id="${ad.id}" style="font-size:10px; cursor:pointer; background:#2e7d32; color:white; border:none; border-radius:3px; margin-right:4px;">Approva</button>
@@ -3402,8 +3428,8 @@ async function loadMarket(mode) {
         SUBITO_OPPS = _sanitizeRows(payload.items || []);
       }
       // Update stats for both sibling modes since we loaded all ads
-      const bRows = SUBITO_ADS.filter(a => a.ai_status === 'approved' && !!a.last_available);
-      const pRows = SUBITO_ADS.filter(a => (a.ai_status || 'pending') === 'pending');
+      const bRows = SUBITO_ADS.filter(a => _isAiApproved(a) && !!a.last_available);
+      const pRows = SUBITO_ADS.filter(a => _isAiPending(a));
       _updateMktStats('subito-b', bRows);
       _updateMktStats('subito-p', pRows);
       _populateMktRegionFilter('subito-b', bRows);
@@ -3544,9 +3570,9 @@ function renderMarket(mode) {
   // Base dataset per mode
   let rows;
   if (mode === 'subito-b') {
-    rows = SUBITO_ADS.filter(a => a.ai_status === 'approved' && !!a.last_available);
+    rows = SUBITO_ADS.filter(a => _isAiApproved(a) && !!a.last_available);
   } else if (mode === 'subito-p') {
-    rows = SUBITO_ADS.filter(a => (a.ai_status || 'pending') === 'pending');
+    rows = SUBITO_ADS.filter(a => _isAiPending(a));
   } else if (mode === 'subito-s') {
     rows = SUBITO_SOLD.slice();
   } else {
@@ -3678,8 +3704,8 @@ async function _updateMktAiStatus(adId, status) {
     const ad = SUBITO_ADS.find(a => a.id === adId);
     if (ad) ad.ai_status = status;
     // Aggiorna entrambe le viste
-    const bRows = SUBITO_ADS.filter(a => a.ai_status === 'approved' && !!a.last_available);
-    const pRows = SUBITO_ADS.filter(a => (a.ai_status || 'pending') === 'pending');
+    const bRows = SUBITO_ADS.filter(a => _isAiApproved(a) && !!a.last_available);
+    const pRows = SUBITO_ADS.filter(a => _isAiPending(a));
     _updateMktStats('subito-b', bRows);
     _updateMktStats('subito-p', pRows);
     renderMarket('subito-p');
@@ -3687,6 +3713,143 @@ async function _updateMktAiStatus(adId, status) {
   } catch (e) {
     console.error('_updateMktAiStatus:', e);
   }
+}
+
+// ============================================================
+// AI REVIEW — pending_review dalla cascata OpenAI
+// ============================================================
+
+function _taxonomyOptions(selected) {
+  return TAXONOMY_IDS.map(id => {
+    const sel = id === selected ? ' selected' : '';
+    return `<option value="${id}"${sel}>${id}</option>`;
+  }).join('');
+}
+
+async function loadAiReview() {
+  const grid = document.getElementById('ai-review-grid');
+  const count = document.getElementById('ai-review-count');
+  if (grid) grid.innerHTML = '<div class="empty-shop">Caricamento...</div>';
+  try {
+    const res = await API.fetchJson('/api/subito/pending-reviews?limit=500');
+    if (!res.ok) {
+      if (grid) grid.innerHTML = '<div class="empty-shop">Errore caricamento review</div>';
+      return;
+    }
+    AI_PENDING_REVIEWS = _sanitizeRows(res.body);
+    if (count) count.textContent = AI_PENDING_REVIEWS.length + ' annunci';
+    _syncState();
+    renderAiReview();
+  } catch (e) {
+    if (grid) grid.innerHTML = '<div class="empty-shop">Errore rete</div>';
+    console.warn('loadAiReview:', e.message);
+  }
+}
+
+async function _loadAiAttempts(adId) {
+  const box = document.getElementById('ai-attempts-' + adId);
+  if (!box) return;
+  if (box.dataset.loaded === '1') {
+    box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    return;
+  }
+  box.innerHTML = '<div style="padding:8px;color:var(--text-muted);">Caricamento tentativi...</div>';
+  box.style.display = 'block';
+  const res = await API.fetchJson('/api/subito/classification-attempts?ad_id=' + encodeURIComponent(adId));
+  if (!res.ok) {
+    box.innerHTML = '<div style="padding:8px;color:#b71c1c;">Errore tentativi</div>';
+    return;
+  }
+  const rows = _sanitizeRows(res.body || []);
+  if (!rows.length) {
+    box.innerHTML = '<div style="padding:8px;color:var(--text-muted);">Nessun tentativo salvato</div>';
+    box.dataset.loaded = '1';
+    return;
+  }
+  box.innerHTML = rows.map(a => `
+    <div style="display:grid;grid-template-columns:80px 140px 1fr 80px;gap:8px;padding:7px 10px;border-top:1px solid var(--border);font-size:12px;">
+      <strong>#${a.step_number || '—'}</strong>
+      <span>${SAN.sanitizeText(a.model || '')}</span>
+      <span>${SAN.sanitizeText(a.taxonomy_id || '')} · ${SAN.sanitizeText(a.object_type || '')} · ${SAN.sanitizeText(a.price_signal || '')}</span>
+      <strong style="text-align:right;">${a.confidence ?? '—'}%</strong>
+      <div style="grid-column:1 / -1;color:var(--text-muted);font-size:11px;">${SAN.sanitizeText(a.decision_reason || '')}</div>
+    </div>
+  `).join('');
+  box.dataset.loaded = '1';
+}
+
+async function _submitAiReview(adId, runId, action) {
+  const select = document.getElementById('ai-taxonomy-' + adId);
+  const reason = document.getElementById('ai-reason-' + adId);
+  const taxonomyId = action === 'other' ? 'other' : (select?.value || 'other');
+  const status = taxonomyId === 'other' ? 'rejected_manual' : 'approved_manual';
+  const res = await API.fetchJson('/api/subito/review', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: adId,
+      run_id: runId || null,
+      taxonomy_id: taxonomyId,
+      status,
+      reason: reason?.value || '',
+    }),
+  });
+  if (!res.ok) {
+    alert('Errore review: ' + (res.body?.error || res.status));
+    return;
+  }
+  AI_PENDING_REVIEWS = AI_PENDING_REVIEWS.filter(r => r.id !== adId);
+  SUBITO_ADS = SUBITO_ADS.map(a => {
+    if (a.id !== adId) return a;
+    return { ...a, ai_status: status, ai_taxonomy_id: taxonomyId, canonical_model: taxonomyId };
+  });
+  _syncState();
+  renderAiReview();
+}
+
+function renderAiReview() {
+  const grid = document.getElementById('ai-review-grid');
+  const count = document.getElementById('ai-review-count');
+  if (!grid) return;
+  if (count) count.textContent = AI_PENDING_REVIEWS.length + ' annunci';
+  if (!AI_PENDING_REVIEWS.length) {
+    grid.innerHTML = '<div class="empty-shop">Nessuna review in sospeso</div>';
+    return;
+  }
+
+  grid.innerHTML = AI_PENDING_REVIEWS.map(row => {
+    const price = row.last_price != null ? '€ ' + Number(row.last_price).toFixed(0) : '—';
+    const location = [row.city, row.region].filter(Boolean).join(' · ') || '—';
+    const tax = row.ai_taxonomy_id || row.canonical_model || 'other';
+    const conf = row.ai_confidence != null ? row.ai_confidence + '%' : '—';
+    return `
+      <div class="store-card" style="--store-accent:#ff6600;margin-bottom:12px;">
+        <div class="store-card-header">
+          <span class="store-name" style="color:#ff6600;">${SAN.sanitizeText(row.name || '')}</span>
+          <span class="store-header-right"><span class="store-count">${conf}</span></span>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(220px,1.3fr) 110px 160px minmax(180px,0.8fr);gap:12px;align-items:start;padding:12px 16px;border-top:1px solid var(--border);">
+          <div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">${SAN.sanitizeText(location)} · ${price}</div>
+            ${row.url ? `<a class="prod-link" href="${row.url}" target="_blank" rel="noopener">Apri annuncio</a>` : ''}
+            <div id="ai-attempts-${row.id}" style="display:none;margin-top:10px;border:1px solid var(--border);border-radius:6px;overflow:hidden;"></div>
+          </div>
+          <div style="font-size:12px;">
+            <strong>${SAN.sanitizeText(tax)}</strong>
+            <div style="color:var(--text-muted);margin-top:4px;">${SAN.sanitizeText(row.ai_object_type || 'unknown')} · ${SAN.sanitizeText(row.ai_price_signal || '—')}</div>
+          </div>
+          <div>
+            <select id="ai-taxonomy-${row.id}" style="width:100%;font-size:12px;">${_taxonomyOptions(tax)}</select>
+            <input id="ai-reason-${row.id}" type="text" placeholder="Motivo" style="width:100%;margin-top:7px;font-size:12px;" />
+          </div>
+          <div style="display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;">
+            <button onclick="_loadAiAttempts(${row.id})">Tentativi</button>
+            <button onclick="_submitAiReview(${row.id}, ${row.run_id || 'null'}, 'confirm')">Conferma</button>
+            <button onclick="_submitAiReview(${row.id}, ${row.run_id || 'null'}, 'other')">Other</button>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 // ============================================================

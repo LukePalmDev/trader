@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from migrations import Migration, run_migrations
-from model_rules import classify_title, detect_family
+from model_rules import canonical_taxonomy_ids, classify_title, detect_family, fields_from_canonical_id
 from paths import DB_PATH
 
 log = logging.getLogger(__name__)
@@ -253,6 +253,93 @@ def _migration_v10_xbox_taxonomy_20260603(conn: sqlite3.Connection) -> None:
     conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_family_model ON ads(console_family, sub_model)")
 
 
+def _migration_v11_ai_cascade_review(conn: sqlite3.Connection) -> None:
+    _add_column_if_missing(conn, "ads", "ai_taxonomy_id TEXT")
+    _add_column_if_missing(conn, "ads", "ai_object_type TEXT")
+    _add_column_if_missing(conn, "ads", "ai_price_signal TEXT")
+    _add_column_if_missing(conn, "ads", "ai_prompt_version TEXT")
+    _add_column_if_missing(conn, "ads", "ai_input_hash TEXT")
+    _add_column_if_missing(conn, "ads", "ai_reviewed_at TEXT")
+
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_ai_taxonomy ON ads(ai_taxonomy_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ads_ai_input_hash ON ads(ai_input_hash)")
+
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS classification_runs (
+            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            ad_id               INTEGER NOT NULL REFERENCES ads(id),
+            input_hash          TEXT NOT NULL,
+            title               TEXT NOT NULL,
+            body_text           TEXT,
+            price               REAL,
+            taxonomy_version    TEXT NOT NULL,
+            prompt_version      TEXT NOT NULL,
+            status_final        TEXT NOT NULL,
+            taxonomy_id_final   TEXT NOT NULL,
+            confidence_final    INTEGER NOT NULL,
+            selected_model      TEXT NOT NULL,
+            created_at          TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_classification_runs_ad ON classification_runs(ad_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_classification_runs_hash ON classification_runs(input_hash)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_classification_runs_status ON classification_runs(status_final)"
+    )
+
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS classification_attempts (
+            id              INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_id          INTEGER NOT NULL REFERENCES classification_runs(id),
+            ad_id           INTEGER NOT NULL REFERENCES ads(id),
+            step_number     INTEGER NOT NULL,
+            model           TEXT NOT NULL,
+            taxonomy_id     TEXT NOT NULL,
+            confidence      INTEGER NOT NULL,
+            object_type     TEXT NOT NULL,
+            price_signal    TEXT NOT NULL,
+            decision_reason TEXT,
+            raw_response    TEXT,
+            input_tokens    INTEGER,
+            output_tokens   INTEGER,
+            cost_estimate   REAL,
+            latency_ms      INTEGER,
+            created_at      TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_classification_attempts_ad ON classification_attempts(ad_id)"
+    )
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS idx_classification_attempts_run ON classification_attempts(run_id)"
+    )
+
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS human_reviews (
+            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            ad_id               INTEGER NOT NULL REFERENCES ads(id),
+            run_id              INTEGER REFERENCES classification_runs(id),
+            ai_taxonomy_id      TEXT,
+            human_taxonomy_id   TEXT NOT NULL,
+            human_status        TEXT NOT NULL,
+            review_reason       TEXT,
+            reviewed_at         TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_human_reviews_ad ON human_reviews(ad_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_human_reviews_status ON human_reviews(human_status)")
+
+
 _MIGRATIONS = (
     Migration(
         1,
@@ -345,6 +432,11 @@ _MIGRATIONS = (
         "xbox-taxonomy-20260603",
         callback=_migration_v10_xbox_taxonomy_20260603,
     ),
+    Migration(
+        11,
+        "ai-cascade-review",
+        callback=_migration_v11_ai_cascade_review,
+    ),
 )
 
 
@@ -400,6 +492,12 @@ def init_db(db_path: Path = DB_PATH) -> None:
             last_available INTEGER NOT NULL DEFAULT 1,
             ai_status      TEXT    NOT NULL DEFAULT 'pending',
             ai_confidence  REAL,
+            ai_taxonomy_id TEXT,
+            ai_object_type TEXT,
+            ai_price_signal TEXT,
+            ai_prompt_version TEXT,
+            ai_input_hash TEXT,
+            ai_reviewed_at TEXT,
             verify_status  TEXT    NOT NULL DEFAULT 'buyable',
             sold_at        TEXT,
             sold_at_estimated TEXT,
@@ -629,6 +727,7 @@ def get_all_ads(db_path: Path = DB_PATH) -> list[dict]:
                 seller_type, published_at,
                 last_price, last_available,
                 ai_status, ai_confidence,
+                ai_taxonomy_id, ai_object_type, ai_price_signal,
                 verify_status,
                 sold_at_estimated, sold_window_hours
             FROM ads
@@ -640,6 +739,136 @@ def update_ai_status(ad_id: int, status: str, db_path: Path = DB_PATH) -> None:
     """Aggiorna lo stato AI di un annuncio."""
     with _connect(db_path) as conn:
         conn.execute("UPDATE ads SET ai_status = ? WHERE id = ?", (status, ad_id))
+
+
+def get_pending_reviews(limit: int = 250, db_path: Path = DB_PATH) -> list[dict]:
+    """Annunci in attesa di review manuale, con ultimo run AI."""
+    with _connect(db_path) as conn:
+        rows = conn.execute(
+            """
+            SELECT
+                a.id, a.urn_id, a.name, a.body_text, a.last_price, a.url, a.image_url,
+                a.city, a.region, a.ai_status, a.ai_confidence, a.ai_taxonomy_id,
+                a.ai_object_type, a.ai_price_signal, a.canonical_model,
+                r.id AS run_id, r.selected_model, r.created_at AS classified_at
+            FROM ads a
+            LEFT JOIN classification_runs r
+              ON r.id = (
+                SELECT id FROM classification_runs
+                WHERE ad_id = a.id
+                ORDER BY id DESC
+                LIMIT 1
+              )
+            WHERE a.ai_status = 'pending_review'
+            ORDER BY a.ai_confidence DESC, a.id DESC
+            LIMIT ?
+            """,
+            (int(limit),),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_classification_attempts(ad_id: int, db_path: Path = DB_PATH) -> list[dict]:
+    with _connect(db_path) as conn:
+        rows = conn.execute(
+            """
+            SELECT
+                ca.id, ca.run_id, ca.step_number, ca.model, ca.taxonomy_id,
+                ca.confidence, ca.object_type, ca.price_signal, ca.decision_reason,
+                ca.input_tokens, ca.output_tokens, ca.cost_estimate, ca.latency_ms,
+                ca.created_at
+            FROM classification_attempts ca
+            WHERE ca.ad_id = ?
+            ORDER BY ca.run_id DESC, ca.step_number ASC
+            """,
+            (int(ad_id),),
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def save_human_review(
+    *,
+    ad_id: int,
+    human_taxonomy_id: str,
+    human_status: str | None = None,
+    review_reason: str = "",
+    run_id: int | None = None,
+    db_path: Path = DB_PATH,
+) -> dict:
+    """Salva la review umana e aggiorna la classificazione operativa dell'annuncio."""
+    taxonomy_id = (human_taxonomy_id or "").strip()
+    if not taxonomy_id:
+        raise ValueError("human_taxonomy_id required")
+    if taxonomy_id not in set(canonical_taxonomy_ids()):
+        raise ValueError("invalid taxonomy_id")
+    status = human_status or ("rejected_manual" if taxonomy_id == "other" else "approved_manual")
+    if status not in {"approved_manual", "rejected_manual"}:
+        raise ValueError("invalid human_status")
+
+    mapped = fields_from_canonical_id(taxonomy_id)
+    now = datetime.now(timezone.utc).isoformat()
+    with _connect(db_path) as conn:
+        ad = conn.execute("SELECT id, ai_taxonomy_id FROM ads WHERE id = ?", (int(ad_id),)).fetchone()
+        if not ad:
+            raise ValueError("ad not found")
+        if run_id is None:
+            latest = conn.execute(
+                "SELECT id FROM classification_runs WHERE ad_id = ? ORDER BY id DESC LIMIT 1",
+                (int(ad_id),),
+            ).fetchone()
+            run_id = int(latest["id"]) if latest else None
+
+        conn.execute(
+            """
+            INSERT INTO human_reviews (
+                ad_id, run_id, ai_taxonomy_id, human_taxonomy_id,
+                human_status, review_reason, reviewed_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                int(ad_id),
+                run_id,
+                ad["ai_taxonomy_id"],
+                taxonomy_id,
+                status,
+                review_reason,
+                now,
+            ),
+        )
+        conn.execute(
+            """
+            UPDATE ads
+            SET ai_status = ?,
+                ai_taxonomy_id = ?,
+                ai_reviewed_at = ?,
+                console_family = ?,
+                sub_model = ?,
+                model_segment = ?,
+                edition_class = ?,
+                canonical_model = ?,
+                classify_method = 'human-review:v1',
+                classify_confidence = 1.0
+            WHERE id = ?
+            """,
+            (
+                status,
+                taxonomy_id,
+                now,
+                mapped.console_family,
+                mapped.sub_model,
+                mapped.model_segment,
+                mapped.edition_class,
+                mapped.canonical_model,
+                int(ad_id),
+            ),
+        )
+
+    return {
+        "ok": True,
+        "ad_id": int(ad_id),
+        "human_taxonomy_id": taxonomy_id,
+        "human_status": status,
+    }
 
 def get_recent_changes(days: int = 30, db_path: Path = DB_PATH) -> list[dict]:
     """Cambi di prezzo/disponibilità degli ultimi N giorni."""

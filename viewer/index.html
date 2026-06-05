@@ -23,6 +23,7 @@
     <button class="tab" data-tab="catalogo">Catalogo</button>
     <button class="tab" data-tab="subito-b">Subito.it B</button>
     <button class="tab" data-tab="subito-p">Subito.it P</button>
+    <button class="tab" data-tab="ai-review">Review AI</button>
     <button class="tab" data-tab="subito-s">Subito.it S</button>
     <button class="tab" data-tab="subito-dashboard">Subito Dash</button>
     <button class="tab" data-tab="ebay">eBay</button>
@@ -546,6 +547,21 @@
     <div id="ricerca-status"></div>
     <div id="ricerca-results"></div>
 
+  </div>
+</div>
+
+<!-- ======== AI REVIEW VIEW ======== -->
+<div id="view-ai-review" class="view">
+  <div class="home-inner">
+    <div class="home-header">
+      <h1 class="home-title">Review AI</h1>
+      <p class="home-sub">Annunci sotto soglia dopo la cascata AI.</p>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px;">
+      <button id="btn-ai-review-refresh" onclick="loadAiReview()">Aggiorna</button>
+      <span id="ai-review-count" style="margin-left:auto;font-size:12px;color:var(--text-muted);">—</span>
+    </div>
+    <div id="ai-review-grid"></div>
   </div>
 </div>
 

@@ -1,0 +1,12 @@
+[Unit]
+Description=Trader AI cascade classify pending review ads
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=trader
+Group=trader
+EnvironmentFile=/etc/trader/trader.env
+WorkingDirectory=/opt/trader/app
+ExecStart=/opt/trader/venv/bin/python /opt/trader/app/run.py --ai-cascade-classify --ai-cascade-limit 1000
