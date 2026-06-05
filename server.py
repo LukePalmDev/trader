@@ -24,6 +24,7 @@ import db as _db
 import db_subito as _db_subito
 import db_ebay as _db_ebay
 import log_status as _log_status
+import job_runs as _job_runs
 
 log = logging.getLogger("trader.server")
 
@@ -221,7 +222,7 @@ def _make_handler(
             query = self._parse_query()
 
             # Auth su tutte le API (tranne bootstrap token e stato log pubblico)
-            _public_api = {"/api/token", "/api/logs/status", "/api/logs/raw"}
+            _public_api = {"/api/token", "/api/logs/status", "/api/jobs/status", "/api/logs/raw"}
             if self._is_api_path(path) and path not in _public_api:
                 if not self._authorize_request():
                     self._json({"ok": False, "error": "unauthorized"}, status=401)
@@ -233,8 +234,10 @@ def _make_handler(
                 return
 
             # Stato dei log (pubblico, solo sintesi non sensibile) — pagina /log
-            if path == "/api/logs/status":
-                self._json(_log_status.collect(_APP_DIR, _LOG_DIR))
+            if path in ("/api/logs/status", "/api/jobs/status"):
+                payload = _job_runs.status()
+                payload["archive"] = _log_status._github_archive(_APP_DIR)
+                self._json(payload)
                 return
 
             # Log grezzo (pubblico, tail) — comodo per LLM/tool: ?job=<id>&lines=<n>
@@ -411,6 +414,8 @@ def _make_handler(
                 t.start()
                 self._json({"ok": True, "source": source})
                 return
+            elif path == "/api/jobs/run":
+                pass
             elif path == "/api/db/set-base":
                 pass
             elif path == "/api/subito/update-ai":
@@ -429,7 +434,18 @@ def _make_handler(
                 body = self.rfile.read(length)
                 payload = json.loads(body)
 
-                if path == "/api/db/set-base":
+                if path == "/api/jobs/run":
+                    _job_runs.record(
+                        str(payload["job"]),
+                        str(payload.get("status", "ok")),
+                        host=payload.get("host"),
+                        source=payload.get("source"),
+                        counts=payload.get("counts"),
+                        error=payload.get("error"),
+                    )
+                    self._json({"ok": True})
+
+                elif path == "/api/db/set-base":
                     product_id = int(payload["id"])
                     value = payload.get("value")
                     if not isinstance(value, bool):
