@@ -55,4 +55,9 @@ if [ "$systemd_changed" = true ]; then
 fi
 
 systemctl restart trader-viewer.service
+
+# Registra l'evento di deploy (solo sui deploy reali, non sui no-op).
+TRADER_DB_PATH="${TRADER_DB_PATH:-/var/lib/trader/tracker.db}" TRADER_HOST=server \
+  "$VENV_DIR/bin/python" "$APP_DIR/job_runs.py" record deploy ok 2>/dev/null || true
+
 echo "[deploy] completato a $(date -u +%FT%TZ) -> ${remote_sha:0:8}"
