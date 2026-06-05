@@ -173,6 +173,34 @@ function _shortName(name, familyKey) {
 function _storeLabel(id)  { return STORE_META[id]?.label  ?? id;        }
 function _storeAccent(id) { return STORE_META[id]?.accent ?? '#cccccc'; }
 
+function _bibleId(row) {
+  const id = row?.bible_id || row?.ai_taxonomy_id || row?.canonical_model || '';
+  return id && id !== 'other' && id !== 'unknown' ? String(id) : '';
+}
+
+function _bibleLabel(row) {
+  if (row?.bible_label) return row.bible_label;
+  const id = _bibleId(row);
+  if (id) return id;
+  return FAMILY_LABELS[row?.console_family || 'other'] || row?.console_family || 'Altro';
+}
+
+function _marketGroupKey(row, mode) {
+  if (mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s') {
+    return _bibleId(row) || 'other';
+  }
+  return row.console_family || 'other';
+}
+
+function _marketGroupLabel(key, items, mode) {
+  if (mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s') {
+    const sample = items.find(r => _bibleId(r) === key) || items[0] || {};
+    if (key === 'other') return 'Altro / non classificato';
+    return _bibleLabel(sample);
+  }
+  return FAMILY_LABELS[key] || key;
+}
+
 const MANUAL_OVERRIDES = {
   1122: { e: 'Digital' },
   1123: { e: 'Digital' },
@@ -1737,7 +1765,7 @@ function _renderTable(products) {
   table.style.display = ''; emptyMsg.style.display = 'none';
 
   if (!products.length) {
-    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text-muted);">Nessun risultato</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:40px;color:var(--text-muted);">Nessun risultato</td></tr>';
     return;
   }
 
@@ -1765,6 +1793,13 @@ function _renderTable(products) {
     }
     tr.appendChild(tdId);
 
+    const tdBibleId = document.createElement('td');
+    tdBibleId.style.cssText = 'text-align:center;font-size:11px;color:var(--text-muted);font-variant-numeric:tabular-nums;';
+    const bibleId = _bibleId(p);
+    tdBibleId.textContent = bibleId || '—';
+    tdBibleId.title = p.bible_label || '';
+    tr.appendChild(tdBibleId);
+
     // Nome
     const tdName = document.createElement('td');
     const a = document.createElement('a');
@@ -1774,15 +1809,15 @@ function _renderTable(products) {
 
     // Nuove colonne griglia
     const tdFamily = document.createElement('td');
-    tdFamily.textContent = p.parsed_family || p.console_family || '—';
+    tdFamily.textContent = p.bible_family || p.parsed_family || p.console_family || '—';
     tr.appendChild(tdFamily);
 
     const tdSegment = document.createElement('td');
-    tdSegment.textContent = p.parsed_segment || p.model_segment || '—';
+    tdSegment.textContent = p.bible_model || p.parsed_segment || p.model_segment || '—';
     tr.appendChild(tdSegment);
 
     const tdEdition = document.createElement('td');
-    tdEdition.textContent = p.parsed_edition || '—';
+    tdEdition.textContent = p.bible_shell || p.parsed_edition || '—';
     tr.appendChild(tdEdition);
 
     const tdKinect = document.createElement('td');
@@ -1798,9 +1833,9 @@ function _renderTable(products) {
 
     // Storage
     const tdStorage = document.createElement('td');
-    if (p.storage_label) {
+    if (p.bible_memory || p.storage_label) {
       const sb = document.createElement('span');
-      sb.className = 'storage-badge'; sb.textContent = p.storage_label;
+      sb.className = 'storage-badge'; sb.textContent = p.bible_memory || p.storage_label;
       tdStorage.appendChild(sb);
     } else {
       tdStorage.textContent = '—'; tdStorage.style.color = 'var(--text-muted)';
@@ -3381,9 +3416,7 @@ function _updateMktStats(mode, rows) {
   const total  = rows.length;
   const minP   = prices.length ? Math.min(...prices) : null;
   const avgP   = prices.length ? prices.reduce((s, v) => s + v, 0) / prices.length : null;
-  const s2val  = mode === 'subito-p'
-    ? rows.filter(r => r.last_price != null).length
-    : new Set(rows.map(r => r.console_family).filter(Boolean)).size;
+  const s2val  = new Set(rows.map(r => _marketGroupKey(r, mode)).filter(Boolean)).size;
 
   const pfx = 'mkt-' + mode + '-';
   const set  = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
@@ -3596,16 +3629,18 @@ function renderMarket(mode) {
     return;
   }
 
-  // Raggruppa per famiglia
-  const byFamily = {};
+  // Per Subito B/P/S la profondita' di analisi e' il modello Bibbia, non la famiglia.
+  const byGroup = {};
   for (const r of rows) {
-    const fk = r.console_family || 'other';
-    if (!byFamily[fk]) byFamily[fk] = [];
-    byFamily[fk].push(r);
+    const key = _marketGroupKey(r, mode);
+    if (!byGroup[key]) byGroup[key] = [];
+    byGroup[key].push(r);
   }
 
   const accent    = mode === 'ebay' ? '#e53935' : '#ff6600';
-  const famOrder  = [...CONSOLE_FAMILIES.map(f => f.key), 'other'];
+  const famOrder  = mode === 'ebay'
+    ? [...CONSOLE_FAMILIES.map(f => f.key), 'other']
+    : Object.keys(byGroup).sort((a, b) => _marketGroupLabel(a, byGroup[a], mode).localeCompare(_marketGroupLabel(b, byGroup[b], mode), 'it'));
   const _famAvgs  = mode === 'subito-b' ? _computeFamilyAvgs(SUBITO_ADS) : {};
   const _oppByUrn = mode === 'subito-b' ? _buildOppMap(SUBITO_OPPS)      : {};
   const priceField = mode === 'ebay' ? 'sold_price' : 'last_price';
@@ -3613,7 +3648,7 @@ function renderMarket(mode) {
   const rowLabel = (mode === 'ebay' || mode === 'subito-s') ? 'venduti' : 'annunci';
 
   for (const fk of famOrder) {
-    const items = byFamily[fk];
+    const items = byGroup[fk];
     if (!items?.length) continue;
 
     // Ordinamento
@@ -3631,7 +3666,7 @@ function renderMarket(mode) {
       });
     }
 
-    const famLabel = FAMILY_LABELS[fk] || fk;
+    const famLabel = _marketGroupLabel(fk, items, mode);
     const prices   = items.map(r => r[priceField]).filter(v => v != null && v > 0);
     const minPx    = prices.length ? Math.min(...prices) : null;
 

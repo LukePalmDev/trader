@@ -20,6 +20,7 @@ from migrations import Migration, run_migrations
 from model_rules import (
     classify_title, detect_family, standardize_title,
     extract_sub_model, extract_edition_name, extract_color_str, extract_kinect,
+    taxonomy_entry,
 )
 from paths import DB_PATH
 
@@ -38,6 +39,34 @@ _FAMILY_TO_CATEGORY = {
     '360':      'Xbox 360',
     'original': 'Xbox Original',
 }
+
+
+def _with_bible_fields(row: dict) -> dict:
+    """Aggiunge i campi Bibbia derivati da canonical_model senza cambiare schema DB."""
+    entry = taxonomy_entry(str(row.get("canonical_model") or ""))
+    if not entry:
+        row.update({
+            "bible_id": None,
+            "bible_product": None,
+            "bible_type": None,
+            "bible_family": None,
+            "bible_model": None,
+            "bible_memory": None,
+            "bible_shell": None,
+            "bible_label": None,
+        })
+        return row
+    row.update({
+        "bible_id": str(entry.get("id") or ""),
+        "bible_product": entry.get("prodotto"),
+        "bible_type": entry.get("type"),
+        "bible_family": entry.get("famiglia"),
+        "bible_model": entry.get("modello"),
+        "bible_memory": entry.get("memoria"),
+        "bible_shell": entry.get("cuscio"),
+        "bible_label": entry.get("label"),
+    })
+    return row
 
 _SOURCE_PREFIX = {
     "cex": 1,
@@ -1374,7 +1403,7 @@ def get_all_products(db_path: Path = DB_PATH) -> list[dict]:
             LEFT JOIN storage_sizes s ON s.id = p.storage_id
             ORDER BY p.console_family, p.name, p.source, p.condition
         """).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 
 def get_base_models(db_path: Path = DB_PATH) -> list[dict]:
@@ -1398,7 +1427,7 @@ def get_base_models(db_path: Path = DB_PATH) -> list[dict]:
             WHERE p.is_base_model = 1
             ORDER BY p.console_family, p.name, p.source
         """).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 
 def get_standard_groups(db_path: Path = DB_PATH) -> list[dict]:
@@ -1548,7 +1577,7 @@ def search_products(
     """
     with _connect(db_path) as conn:
         rows = conn.execute(sql, params).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 
 def get_recent_changes(days: int = 30, db_path: Path = DB_PATH) -> list[dict]:

@@ -22,13 +22,47 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from migrations import Migration, run_migrations
-from model_rules import canonical_taxonomy_ids, classify_title, detect_family, fields_from_canonical_id
+from model_rules import (
+    canonical_taxonomy_ids,
+    classify_title,
+    detect_family,
+    fields_from_canonical_id,
+    taxonomy_entry,
+)
 from paths import DB_PATH
 
 log = logging.getLogger(__name__)
 
 CLASSIFY_VERSION_LEGACY = "legacy-v1"
 CLASSIFY_VERSION_RULES_TITLE = "rules:title:v2:2026-06-03"
+
+
+def _with_bible_fields(row: dict) -> dict:
+    taxonomy_id = str(row.get("ai_taxonomy_id") or row.get("canonical_model") or "")
+    entry = taxonomy_entry(taxonomy_id)
+    if not entry:
+        row.update({
+            "bible_id": None,
+            "bible_product": None,
+            "bible_type": None,
+            "bible_family": None,
+            "bible_model": None,
+            "bible_memory": None,
+            "bible_shell": None,
+            "bible_label": None,
+        })
+        return row
+    row.update({
+        "bible_id": str(entry.get("id") or ""),
+        "bible_product": entry.get("prodotto"),
+        "bible_type": entry.get("type"),
+        "bible_family": entry.get("famiglia"),
+        "bible_model": entry.get("modello"),
+        "bible_memory": entry.get("memoria"),
+        "bible_shell": entry.get("cuscio"),
+        "bible_label": entry.get("label"),
+    })
+    return row
 
 def _table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
     rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
@@ -733,7 +767,7 @@ def get_all_ads(db_path: Path = DB_PATH) -> list[dict]:
             FROM ads
             ORDER BY console_family, last_price ASC NULLS LAST
         """).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 def update_ai_status(ad_id: int, status: str, db_path: Path = DB_PATH) -> None:
     """Aggiorna lo stato AI di un annuncio."""
@@ -765,7 +799,7 @@ def get_pending_reviews(limit: int = 250, db_path: Path = DB_PATH) -> list[dict]
             """,
             (int(limit),),
         ).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 
 def get_classification_attempts(ad_id: int, db_path: Path = DB_PATH) -> list[dict]:
@@ -783,7 +817,7 @@ def get_classification_attempts(ad_id: int, db_path: Path = DB_PATH) -> list[dic
             """,
             (int(ad_id),),
         ).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 
 def save_human_review(
@@ -885,7 +919,7 @@ def get_recent_changes(days: int = 30, db_path: Path = DB_PATH) -> list[dict]:
             WHERE c.changed_at >= datetime('now', ?)
             ORDER BY c.changed_at DESC
         """, (f"-{days} days",)).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 
 _PRICE_FLOORS: dict[str, float] = {
@@ -1001,7 +1035,7 @@ def get_sold_ads(db_path: Path = DB_PATH) -> list[dict]:
             WHERE sold_at IS NOT NULL
             ORDER BY sold_at DESC
         """).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 
 def get_sold_stats(db_path: Path = DB_PATH) -> dict:
