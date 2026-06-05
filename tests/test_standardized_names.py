@@ -15,8 +15,8 @@ def test_standardize_title_groups_equivalent_console_names() -> None:
     sa = standardize_title(a, classification=ca)
     sb = standardize_title(b, classification=cb)
 
-    assert sa.standard_name == "Xbox One X 1 TB - Nero"
-    assert sb.standard_name == "Xbox One X 1 TB - Nero"
+    assert sa.standard_name == "Xbox One X 1 T - Nero"
+    assert sb.standard_name == "Xbox One X 1 T - Nero"
     assert sa.standard_key == sb.standard_key
 
 
@@ -27,9 +27,9 @@ def test_standardize_title_keeps_limited_separate() -> None:
     s_base = standardize_title(base, classification=classify_title(base))
     s_limited = standardize_title(limited, classification=classify_title(limited))
 
-    assert s_base.standard_name == "Xbox One X 1 TB - Nero"
-    assert s_limited.standard_name == "Xbox One X 1 TB [Project Scorpio] - Nero"
-    assert s_base.standard_key != s_limited.standard_key
+    assert s_base.standard_name == "Xbox One X 1 T - Nero"
+    assert s_limited.standard_name == "Xbox One X 1 T - Nero"
+    assert s_base.standard_key == s_limited.standard_key
 
 
 def test_process_products_stores_original_and_standardized_name(tmp_path: Path) -> None:
@@ -59,7 +59,7 @@ def test_process_products_stores_original_and_standardized_name(tmp_path: Path) 
 
     assert row is not None
     assert row["name"] == "Microsoft Xbox One X 1TB [controller wireless incluso] nero"
-    assert row["standard_name"] == "Xbox One X 1 TB - Nero"
+    assert row["standard_name"] == "Xbox One X 1 T - Nero"
     assert row["standard_key"] is not None and row["standard_key"] != ""
     assert row["packaging_state"] == "Imballata"
 
@@ -71,7 +71,7 @@ def test_standardize_title_keeps_xbox_360_e_distinct() -> None:
     s_base = standardize_title(base, classification=classify_title(base))
     s_e = standardize_title(e_model, classification=classify_title(e_model))
 
-    assert s_base.standard_name == "Xbox 360 250 GB - Nero"
+    assert s_base.standard_name == "Xbox 360 Base/Core 250 GB - Bianco"
     assert s_e.standard_name == "Xbox 360 E 250 GB - Nero"
     assert s_base.standard_key != s_e.standard_key
 
@@ -83,15 +83,15 @@ def test_classify_title_prefers_first_family_occurrence() -> None:
 
     assert classified.console_family == "series"
     assert classified.sub_model == "S"
-    assert classified.canonical_model == "series-s-512gb"
-    assert standardized.standard_name.startswith("Xbox Series S 512 GB")
+    assert classified.canonical_model == "14111"
+    assert standardized.standard_name == "Xbox Series S 512 GB - Bianca"
 
 
 def test_xbox360_no_space_recognized_as_360() -> None:
     """'Xbox360' (senza spazio) deve essere riconosciuto come family 360."""
     cases = [
-        ("Xbox360 250GB HaloR + 1 Pad Pad, Imballata", "Xbox 360 250 GB [Halo]"),
-        ("Xbox360 320GB Halo4 + 1 Pad Pad, Non Imballata", "Xbox 360 320 GB [Halo]"),
+        ("Xbox360 250GB HaloR + 1 Pad Pad, Imballata", "Xbox 360 Base/Core 250 GB - Bianco"),
+        ("Xbox360 320GB Halo4 + 1 Pad Pad, Non Imballata", "Xbox 360 Base/Core 0 GB - Bianco"),
     ]
     for name, expected in cases:
         c = classify_title(name)
@@ -103,9 +103,9 @@ def test_xbox360_no_space_recognized_as_360() -> None:
 def test_xbox_360s_recognized_as_360_slim() -> None:
     """'Xbox 360S' (abbreviazione CEX per Slim) deve essere family 360 e sub-model S."""
     cases = [
-        ("Xbox 360S 320GB MW3 + 2 Pads, Non Imballata", "Xbox 360 S 320 GB"),
-        ("Xbox 360S Gears3 Ed+1 Pad (No Gioco), Imballata", "Xbox 360 S [Gears]"),
-        ("Xbox 360S Halo Ed +2Casa, Imballata", "Xbox 360 S [Halo]"),
+        ("Xbox 360S 320GB MW3 + 2 Pads, Non Imballata", "Xbox 360 Slim/S 320 GB - Nero"),
+        ("Xbox 360S Gears3 Ed+1 Pad (No Gioco), Imballata", "Xbox 360 Slim/S 4 GB - Nero"),
+        ("Xbox 360S Halo Ed +2Casa, Imballata", "Xbox 360 Slim/S 320 GB - Halo 4"),
     ]
     for name, expected in cases:
         c = classify_title(name)
@@ -127,9 +127,9 @@ def test_xbox_360_elite_sub_model() -> None:
     s_elite_ns = standardize_title(elite_no_storage, classification=classify_title(elite_no_storage))
     s_base = standardize_title(base, classification=classify_title(base))
 
-    assert s_elite.standard_name == "Xbox 360 Elite 120 GB"
-    assert s_elite_color.standard_name == "Xbox 360 Elite 120 GB - Rosso"
-    assert s_elite_ns.standard_name == "Xbox 360 Elite [LIMITED]"
+    assert s_elite.standard_name == "Xbox 360 Elite 120 GB - Nero"
+    assert s_elite_color.standard_name == "Xbox 360 Elite 120 GB - Nero"
+    assert s_elite_ns.standard_name == "Xbox 360 Elite 120 GB - Nero"
     # Elite deve avere standard_key diverso da base 360
     assert s_elite.standard_key != s_base.standard_key
 
@@ -155,30 +155,30 @@ def test_edizione_digitale_recognized_as_digital() -> None:
     assert c.console_family == "series"
     assert c.sub_model == "X"
     assert "Digital" in s.standard_name, f"'Digital' mancante in: {s.standard_name!r}"
-    assert s.standard_name == "Xbox Series X Digital 1 TB - Bianco"
+    assert s.standard_name == "Xbox Series X 1 T - All-Digital Bianca"
 
 
-def test_ltd_abbreviation_recognized_as_limited() -> None:
-    """'Ltd.' (abbreviazione di Limited) deve essere riconosciuta come edizione limitata."""
+def test_ltd_abbreviation_does_not_override_bible_type() -> None:
+    """'Ltd.' non trasforma una riga Canonico in Speciale fuori dalla Bibbia."""
     name = "Xbox 360 Elite, Resident Evil 5 Ltd. Ed. (No Gioco)"
     c = classify_title(name)
-    assert c.edition_class == "limited", f"edition_class errata: {c.edition_class!r}"
+    assert c.edition_class == "standard", f"edition_class errata: {c.edition_class!r}"
+    assert c.canonical_model == "12352"
 
 
-def test_halo_forza_gears_with_trailing_chars() -> None:
-    """Halo4, Gears3, HaloR ecc. devono essere riconosciuti come edition descriptor."""
+def test_halo_forza_gears_with_trailing_chars_do_not_create_non_bible_containers() -> None:
+    """I descriptor nel titolo non creano contenitori fuori dalla Bibbia."""
     cases = [
-        ("Xbox360 250GB HaloR + 1 Pad Pad", "Halo"),
-        ("Xbox360 320GB Halo4 + 1 Pad Pad", "Halo"),
-        ("Xbox 360S Gears3 Ed+1 Pad (No Gioco)", "Gears"),
-        ("Xbox 360 Halo 3 Special Edizione", "Halo"),
+        ("Xbox360 250GB HaloR + 1 Pad Pad", "12161"),
+        ("Xbox360 320GB Halo4 + 1 Pad Pad", "12111"),
+        ("Xbox 360S Gears3 Ed+1 Pad (No Gioco)", "12512"),
+        ("Xbox 360 Halo 3 Special Edizione", "12111"),
     ]
-    for name, expected_descriptor in cases:
+    for name, expected_id in cases:
         c = classify_title(name)
         s = standardize_title(name, classification=c)
-        assert f"[{expected_descriptor}]" in s.standard_name, (
-            f"[{expected_descriptor}] mancante per {name!r}\nGOT: {s.standard_name}"
-        )
+        assert c.canonical_model == expected_id
+        assert s.standard_key.endswith("|standard")
 
 
 def test_process_products_sets_cex_packaging_from_name(tmp_path: Path) -> None:

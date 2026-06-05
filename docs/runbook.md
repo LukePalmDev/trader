@@ -34,9 +34,9 @@
 - Ripristina baseline con scrape mirato e valida UI/API prima di riattivare schedule.
 
 ## 7) Catalogazione Xbox
-- Dal 3 giugno 2026 `console_family` è solo `original`, `360`, `one`, `series`, `other`.
-- Il modello specifico è in `sub_model` (`Base`, `S`, `X`, `E`, `Elite`, `Unknown`).
-- Consulta `console_catalog.md` per gli slot operativi e `STORICI3GIUGNO/README.md` per leggere i dati legacy.
+- Dal 5 giugno 2026 `Bibbia.md` è la fonte canonica dei contenitori Xbox.
+- `canonical_model` e `ai_taxonomy_id` usano l'`ID` numerico della Bibbia.
+- Consulta `Bibbia.md` e `console_catalog.md` per gli slot operativi; `STORICI3GIUGNO/README.md` resta solo per leggere i dati legacy.
 
 ## 8) Log via HTTP e auto-deploy
 Lo scraping NON gira più su GitHub Actions (workflow archiviati in `STORICI3GIUGNO/github-workflows/`, GitHub Pages disabilitato). Tutto gira sul server via systemd timer; il codice si aggiorna da solo.

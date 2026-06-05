@@ -36,6 +36,7 @@ from pathlib import Path
 import db as _db
 import db_ebay as _db_ebay
 import db_subito as _db_subito
+import logging_setup
 from paths import DB_PATH
 from run_report import RunReport
 from settings import ConfigError, load_default_config
@@ -54,12 +55,8 @@ RETENTION = _CFG["data"]["retention_keep"]
 ARCHIVE_AFTER_DAYS = _CFG["data"]["archive_after_days"]
 SOURCES_CFG = _CFG.get("sources", {})
 
+logging_setup.setup()
 log = logging.getLogger("trader")
-logging.basicConfig(
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%H:%M:%S",
-    level=logging.INFO,
-)
 
 # Mappa nome_sorgente → modulo Python da importare
 _SCRAPER_MODULES = {

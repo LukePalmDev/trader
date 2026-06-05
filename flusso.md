@@ -12,7 +12,7 @@ Trader è un price tracker specializzato per hardware console Xbox sul mercato i
 Il sistema ha tre macro-funzioni:
 
 - **Raccolta dati**: scraping periodico delle fonti, ingestion nel DB con change detection
-- **Classificazione**: pipeline taxonomy-first con GPT/OpenRouter, regole regex e matching CEX che assegna a ogni annuncio `console_family`, `sub_model`, `canonical_model`, `model_segment`, `edition_class`
+- **Classificazione**: pipeline Bibbia-first con GPT/OpenRouter, regole regex e matching CEX che assegna a ogni annuncio `console_family`, `sub_model`, `canonical_model`, `model_segment`, `edition_class`
 - **Presentazione**: server HTTP che espone un'API REST e serve una SPA con dashboard prezzi, venduti, trend e ricerca
 
 Tutto lo stato persistente vive in `tracker.db`. I file JSON delle scrape sono snapshot temporanei su disco (cartella `data/`), archiviati come `.json.gz` dopo N giorni e poi eliminati.
@@ -30,7 +30,7 @@ Tutto lo stato persistente vive in `tracker.db`. I file JSON delle scrape sono s
 | `--source <nome>` / nessun flag | Scraping delle fonti abilitate |
 | `--classify` | Pipeline di classificazione attributi |
 | `--ai-classify` | Alias compatibile del nuovo cascade GPT su Subito |
-| `--ai-cascade-classify` | Classificazione GPT taxonomy-first su Subito |
+| `--ai-cascade-classify` | Classificazione GPT Bibbia-first su Subito |
 | `--verify-sold N` | Verifica annunci Subito scaduti via Playwright |
 | `--view` | Avvia solo il server web |
 | `--full` | Pipeline completa (scrape + verify + AI + classify + viewer) |
@@ -120,7 +120,7 @@ La classificazione opera in **due fasi distinte** con scopi diversi.
 
 ### 4a. AI cascade GPT — `ai_cascade_classifier.py` (`run.py --ai-cascade-classify`)
 
-**Scopo:** determinare se un annuncio vende realmente hardware console Xbox e assegnare direttamente un `taxonomy_id` canonico, usando titolo, descrizione e prezzo.
+**Scopo:** determinare se un annuncio vende realmente hardware console Xbox e assegnare direttamente un `taxonomy_id` numerico della Bibbia, usando titolo, descrizione e prezzo.
 
 **Flusso:**
 
@@ -132,7 +132,7 @@ hash input + prompt/taxonomy version
 cascade modelli OpenRouter/OpenAI-compatible
   openai/gpt-4o-mini → openai/gpt-4.1-mini → openai/gpt-5-mini
     ↓
-response_format json_schema vincolato
+response_format json_schema vincolato alla Bibbia
   {taxonomy_id, confidence, object_type, price_signal, decision_reason}
     ↓
 validazione locale tassonomia + controllo prezzo

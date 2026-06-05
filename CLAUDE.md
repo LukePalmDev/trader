@@ -61,7 +61,7 @@ Single-purpose price tracker for Xbox hardware on Italian resale markets. All pe
 **Data flow:**
 1. **Scrapers** (`scrapers/`) fetch data from 8 sources → JSON snapshots on disk
 2. **DB ingestion** (`db.py`, `db_subito.py`, `db_ebay.py`) deduplicates and upserts into `tracker.db`, logging changes to `*_changes` tables
-3. **Classification** (`classifier.py` + `model_rules.py` + `ai_classifier.py`) tags each item with `console_family`, `sub_model`, `canonical_model`, `model_segment`, `edition_class` via a 3-tier pipeline: regex rules → CEX Jaccard matching → Claude Haiku fallback
+3. **Classification** (`classifier.py` + `model_rules.py` + `ai_cascade_classifier.py`) tags each item with `console_family`, `sub_model`, `canonical_model`, `model_segment`, `edition_class` via Bibbia-first rules and GPT/OpenRouter cascade
 4. **Verification** (`verify_sold.py`) uses async Playwright to detect sold Subito ads
 5. **Valuation** (`valuation.py`) computes fair value as weighted average: CEX 45% + eBay 35% + Subito 20%, with trimmed mean (15% outlier removal)
 6. **Alerting** (`alerts.py`) fires macOS notification + Telegram when price < CEX threshold; deduplicates via `alert_log.json`
@@ -70,7 +70,7 @@ Single-purpose price tracker for Xbox hardware on Italian resale markets. All pe
 
 **Key design decisions:**
 - `tracker.db` was merged from 3 separate DBs; `migrations.py` uses namespace-aware versioning (`products`/`ads`/`ebay`) to prevent migration conflicts
-- Since 2026-06-03, Xbox taxonomy is two-level: `console_family` is only `original`/`360`/`one`/`series`/`other`, while `sub_model` stores `Base`/`S`/`X`/`E`/`Elite`/`Unknown`
+- Since 2026-06-05, `Bibbia.md` is the canonical Xbox container source; `canonical_model` stores the numeric `ID` from the Bibbia.
 - Subito ads have a two-stage AI filter: `ai_classifier.py` scores hardware confidence (0–100, threshold ≥75 approved / ≤25 rejected), then `classifier.py` applies model classification
 - Classification 3-tier: rules (fast regex) → CEX matching (Jaccard ≥ 0.45) → Claude Haiku (batch 15, only for `family="other"` or confidence < 0.6)
 - Playwright scrapers use fresh browser contexts per request to bypass Akamai/Cloudflare; fall back from system Chrome to bundled Chromium

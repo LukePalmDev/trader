@@ -94,17 +94,17 @@ Le migrazioni sono gestite con namespace (`products`, `ads`, `ebay`) nella tabel
 
 ## Catalogazione Xbox
 
-Dal 3 giugno 2026 il progetto usa una tassonomia a due livelli:
+Dal 5 giugno 2026 il progetto usa `Bibbia.md` come fonte canonica dei contenitori Xbox:
 
 | Campo | Valori principali | Significato |
 |-------|-------------------|-------------|
 | `console_family` | `original`, `360`, `one`, `series`, `other` | Famiglia principale. |
-| `sub_model` | `Base`, `S`, `X`, `E`, `Elite`, `Unknown` | Modello dentro la famiglia. |
-| `canonical_model` | es. `series-x-1tb`, `one-s-digital-1tb`, `360-e-250gb` | Slot tecnico per prezzi/storage. |
+| `sub_model` | Derivato da `Modello` nella Bibbia | Modello dentro la famiglia. |
+| `canonical_model` | es. `12622`, `14111`, `24221` | ID canonico della riga Bibbia. |
 
-Il catalogo operativo è in `console_catalog.md` e il riferimento strutturato è in
-`catalogs/xbox_taxonomy_2026-06-03.json`. Lo schema precedente è archiviato in
-`STORICI3GIUGNO/`.
+Il catalogo operativo è in `Bibbia.md` e `console_catalog.md`; il riferimento strutturato
+è in `taxonomy.json` e `catalogs/xbox_bibbia_2026-06-05.json`. Lo schema precedente è
+archiviato in `STORICI3GIUGNO/`.
 
 ## Pipeline di classificazione
 
@@ -132,11 +132,11 @@ operativi `--ai-classify` e `trader-ai-classify` ora instradano sul cascade GPT.
 Il fallback Anthropic in `classifier.py` resta disponibile solo impostando
 `TRADER_ENABLE_LEGACY_ANTHROPIC=true`.
 
-### AI Cascade Classifier (taxonomy-first)
+### AI Cascade Classifier (Bibbia-first)
 
 Pipeline OpenAI/OpenRouter operativa per Subito:
 - Input: titolo, descrizione e prezzo.
-- Output vincolato: `taxonomy_id` canonico oppure `other`, confidence 0-100, tipo oggetto e segnale prezzo.
+- Output vincolato: `taxonomy_id` numerico della Bibbia oppure `other`, confidence 0-100, tipo oggetto e segnale prezzo.
 - Cascata modelli via OpenRouter: `openai/gpt-4o-mini` → `openai/gpt-4.1-mini` → `openai/gpt-5-mini`, configurabile via `OPENAI_CASCADE_MODELS`.
 - Soglia default 80: sotto soglia passa al modello successivo; sotto soglia anche al terzo finisce in `pending_review`.
 - Audit su `classification_runs`, `classification_attempts`, `human_reviews`.
@@ -320,14 +320,16 @@ trader/
 ├── migrations.py            # Framework migrazioni schema
 ├── classifier.py            # Pipeline classificazione (rules + AI)
 ├── ai_classifier.py         # Legacy Anthropic deprecato
-├── ai_cascade_classifier.py # Classificazione GPT/OpenRouter taxonomy-first
+├── ai_cascade_classifier.py # Classificazione GPT/OpenRouter Bibbia-first
 ├── valuation.py             # Fair value engine + backtesting
 ├── alerts.py                # Alert prezzi + notifiche macOS + Telegram
 ├── verify_sold.py           # Verifica stato venduto Subito
 ├── model_rules.py           # Regole classificazione regex
-├── console_catalog.md       # Catalogo operativo dal 3 giugno 2026
+├── Bibbia.md                # Fonte canonica umana dei contenitori Xbox
+├── console_catalog.md       # Vista catalogo allineata alla Bibbia
 ├── catalogs/
-│   └── xbox_taxonomy_2026-06-03.json
+│   ├── xbox_bibbia_2026-06-05.json
+│   └── xbox_taxonomy_2026-06-03.json  # compat legacy
 ├── settings.py              # Config validation + ENV override
 ├── id_utils.py              # Generazione ID stabili
 ├── run_report.py            # Tracciamento esecuzione

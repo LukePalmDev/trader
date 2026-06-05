@@ -1,4 +1,6 @@
 {
+  "version": "bibbia:2026-06-05",
+  "source": "/Users/luke/Desktop/Bibbia.csv",
   "valid_segments": [
     "base",
     "premium",
@@ -13,7 +15,7 @@
   "family_patterns": [
     [
       "series",
-      "\\bxbox\\s+series(?:\\s*[xs])?\\b|\\bseries\\s*[xs]\\b"
+      "\\bxbox\\s+series(?:\\s*[xs])?\\b|\\bseries\\s*[xs]\\b|\\bserie\\s*[xs]\\b"
     ],
     [
       "one",
@@ -25,7 +27,7 @@
     ],
     [
       "original",
-      "\\boriginal\\b|\\bxbox\\s+classic\\b"
+      "\\boriginal\\b|\\bog\\b|\\bxbox\\s+classic\\b"
     ]
   ],
   "family_specificity": {
@@ -53,7 +55,7 @@
     ],
     "one": [
       "one",
-      "Base"
+      "Originale/Base"
     ],
     "360": [
       "360",
@@ -69,61 +71,22 @@
     ]
   },
   "regexes": {
-    "storage": "(\\d[\\d.]*)\\s*(GB|TB)",
-    "limited": "\\b(limited|Ltd|collector(?:'s)?|launch|day\\s*one|project\\s+scorpio|anniversary|halo\\w*|forza\\w*|gears\\w*|starfield|cyberpunk|spider\\-?man)\\b",
-    "special": "\\b(special|editione\\s+speciale|anniversary|commemorative|commemorativa|galaxy\\s+black|20th\\s+anniversary|elite\\s+series)\\b",
+    "storage": "(\\d[\\d.]*)\\s*(GB|TB|T)\\b",
+    "storage_mb": "\\b(256)\\s*MB\\b|\\bmemory\\s*unit\\b|\\bflash\\b",
+    "limited": "\\b(limited|ltd|collector(?:'s)?|launch|day\\s*one|project\\s+scorpio|anniversary|halo\\w*|forza\\w*|gears\\w*|starfield|cyberpunk)\\b",
+    "special": "\\b(special|editione\\s+speciale|edizione\\s+speciale|anniversary|commemorative|commemorativa|galaxy\\s+black|20th\\s+anniversary|elite\\s+series)\\b",
     "bundle": "\\b(bundle|pack|con\\s+gioco|with\\s+game|inclus[oa]|include|bundle\\s+edition)\\b",
     "premium_model": "\\b(elite|project\\s+scorpio|2\\s*tb|2tb|galaxy\\s+black)\\b",
     "digital": "\\b(digital|all\\s*\\-?\\s*digital|senza\\s+lettore|no\\s+disc|edizione\\s+digitale)\\b",
-    "fallback_noise": "\\b(microsoft|console|wireless|controller|controllere?|inkl?|incl\\.?|con|senza|colore|nero|bianco|rosso|blu|argento|gold|silver)\\b",
+    "fallback_noise": "\\b(microsoft|console|wireless|controller|controllere?|inkl?|incl\\.?|con|senza|colore)\\b",
     "xbox_360_e": "\\b(?:xbox\\s*)?360\\s*\\\"?e\\\"?\\b",
     "xbox_360_slim": "\\b360\\s*slim\\b|\\bslim\\b|\\b360[Ss]\\b",
     "xbox_360_elite": "\\belite\\b",
+    "xbox_360_core": "\\b(core|base)\\b",
+    "xbox_360_premium": "\\b(premium|pro)\\b",
+    "xbox_360_arcade": "\\barcade\\b",
     "kinect": "\\bkinect\\b",
     "no_kinect": "\\bno\\s+kinect\\b|\\bsenza\\s+kinect\\b|\\(no\\s+kinect\\)"
-  },
-  "canonical_standard_labels": {
-    "series-x-1tb": "Xbox Series X 1 TB",
-    "series-x-2tb": "Xbox Series X 2 TB",
-    "series-x-digital-1tb": "Xbox Series X Digital 1 TB",
-    "series-x-digital": "Xbox Series X Digital 1 TB",
-    "series-s-512gb": "Xbox Series S 512 GB",
-    "series-s-1tb": "Xbox Series S 1 TB",
-    "one-x-1tb": "Xbox One X 1 TB",
-    "one-s-500gb": "Xbox One S 500 GB",
-    "one-s-1tb": "Xbox One S 1 TB",
-    "one-s-2tb": "Xbox One S 2 TB",
-    "one-s-digital-1tb": "Xbox One S All-Digital 1 TB",
-    "one-base-500gb": "Xbox One 500 GB",
-    "one-base-1tb": "Xbox One 1 TB",
-    "one-500gb": "Xbox One 500 GB",
-    "one-1tb": "Xbox One 1 TB",
-    "360-base-4gb": "Xbox 360 4 GB",
-    "360-base-20gb": "Xbox 360 20 GB",
-    "360-base-60gb": "Xbox 360 60 GB",
-    "360-base-120gb": "Xbox 360 120 GB",
-    "360-base-250gb": "Xbox 360 250 GB",
-    "360-base-320gb": "Xbox 360 320 GB",
-    "360-base-500gb": "Xbox 360 500 GB",
-    "360-s-4gb": "Xbox 360 S 4 GB",
-    "360-s-250gb": "Xbox 360 S 250 GB",
-    "360-s-320gb": "Xbox 360 S 320 GB",
-    "360-s-500gb": "Xbox 360 S 500 GB",
-    "360-e-4gb": "Xbox 360 E 4 GB",
-    "360-e-250gb": "Xbox 360 E 250 GB",
-    "360-e-500gb": "Xbox 360 E 500 GB",
-    "360-elite-120gb": "Xbox 360 Elite 120 GB",
-    "360-elite-250gb": "Xbox 360 Elite 250 GB",
-    "360-base": "Xbox 360",
-    "360-s": "Xbox 360 S",
-    "360-e": "Xbox 360 E",
-    "360-elite": "Xbox 360 Elite",
-    "360-120gb": "Xbox 360 120 GB",
-    "360-250gb": "Xbox 360 250 GB",
-    "360-500gb": "Xbox 360 500 GB",
-    "360": "Xbox 360",
-    "original-base-8gb": "Xbox Original",
-    "original": "Xbox Original"
   },
   "family_standard_labels": {
     "series": "Xbox Series",
@@ -133,12 +96,12 @@
     "one-x": "Xbox One X",
     "one-s": "Xbox One S",
     "360": "Xbox 360",
-    "original": "Xbox Original"
+    "original": "Xbox Original/OG"
   },
   "edition_name_patterns": [
     [
       "Call Of Duty",
-      "\\bcall\\s+of\\s+duty\\b"
+      "\\bcall\\s+of\\s+duty\\b|\\bmodern\\s+warfare\\b"
     ],
     [
       "Minecraft",
@@ -157,82 +120,898 @@
       "\\bgears\\w*\\b"
     ],
     [
-      "Cyberpunk 2077",
-      "\\bcyberpunk\\b"
+      "Cyberpunk",
+      "\\bcyber\\s*punk\\b|\\bcyberpunk\\b"
     ],
     [
-      "Battlefield",
-      "\\bbattlefield\\b"
+      "Star Wars Kinect",
+      "\\bstar\\s+wars\\b"
     ],
     [
-      "Fortnite",
-      "\\bfortnite\\b"
+      "Resident Evil 5",
+      "\\bresident\\s+evil\\s*5\\b"
     ],
     [
-      "Sunset Overdrive",
-      "\\bsunset\\s+overdrive\\b"
+      "The Simpsons Movie",
+      "\\bsimpsons\\b"
     ],
     [
-      "Project Scorpio",
-      "\\bproject\\s+scorpio\\b"
+      "Xbox Live 10th Anniversary",
+      "\\bxbox\\s+live\\s+10th\\s+anniversary\\b|\\b10th\\s+anniversary\\b"
     ],
     [
-      "Starfield",
-      "\\bstarfield\\b"
+      "Gold Rush",
+      "\\bgold\\s+rush\\b"
+    ],
+    [
+      "Hyperspace",
+      "\\bhyperspace\\b"
+    ],
+    [
+      "Robot White",
+      "\\brobot\\s+white\\b"
+    ],
+    [
+      "Galaxy Black",
+      "\\bgalaxy\\s+black\\b"
+    ],
+    [
+      "Carbon Black",
+      "\\bcarbon\\s+black\\b"
+    ],
+    [
+      "Verde Militare",
+      "\\bverde\\s+militare\\b"
+    ],
+    [
+      "Blu Profondo",
+      "\\bblu\\s+profondo\\b"
+    ],
+    [
+      "Crystal",
+      "\\bcrystal\\b"
     ]
   ],
   "color_patterns": [
     [
       "Nero",
-      "\\bner[oa]\\b|\\bblack\\b"
+      "\\bnero\\b|\\bnera\\b|\\bblack\\b"
     ],
     [
       "Bianco",
-      "\\bbianc[oa]\\b|\\bwhite\\b"
+      "\\bbianco\\b|\\bbianca\\b|\\bwhite\\b"
     ],
     [
-      "Rosso",
-      "\\bross[oa]\\b|\\bred\\b"
+      "Verde",
+      "\\bverde\\b|\\bgreen\\b"
+    ],
+    [
+      "Crystal",
+      "\\bcrystal\\b"
     ],
     [
       "Blu",
       "\\bblu\\b|\\bblue\\b"
     ],
     [
-      "Verde",
-      "\\bverd[ei]\\b|\\bgreen\\b"
-    ],
-    [
-      "Argento",
-      "\\bargent[oa]\\b|\\bsilver\\b"
-    ],
-    [
-      "Oro",
-      "\\boro\\b|\\bgold\\b"
-    ],
-    [
-      "Grigio",
-      "\\bgrigi[oa]\\b|\\bgray\\b|\\bgrey\\b"
+      "Rosso",
+      "\\brosso\\b|\\bred\\b"
     ],
     [
       "Viola",
-      "\\bviola\\b|\\bpurple\\b|\\blilla\\b"
+      "\\bviola\\b|\\bpurple\\b"
     ],
     [
-      "Giallo",
-      "\\bgiall[oa]\\b|\\byellow\\b"
-    ],
-    [
-      "Marrone",
-      "\\bmarrone\\b|\\bbrown\\b"
-    ],
-    [
-      "Arancione",
-      "\\barancione\\b|\\borange\\b"
-    ],
-    [
-      "Rosa",
-      "\\brosa\\b|\\bpink\\b"
+      "Oro",
+      "\\bgold\\b|\\boro\\b"
     ]
+  ],
+  "canonical_standard_labels": {
+    "11111": "Xbox Original/OG Base 8 GB - Nero",
+    "21112": "Xbox Original/OG Base 8 GB - Verde",
+    "21113": "Xbox Original/OG Base 8 GB - Crystal",
+    "12111": "Xbox 360 Base/Core 0 GB - Bianco",
+    "12121": "Xbox 360 Base/Core 256 MB - Bianco",
+    "12131": "Xbox 360 Base/Core 20 GB - Bianco",
+    "12141": "Xbox 360 Base/Core 60 GB - Bianco",
+    "12151": "Xbox 360 Base/Core 120 GB - Bianco",
+    "12161": "Xbox 360 Base/Core 250 GB - Bianco",
+    "12231": "Xbox 360 Premium/Pro 20 GB - Bianco",
+    "12241": "Xbox 360 Premium/Pro 60 GB - Bianco",
+    "12352": "Xbox 360 Elite 120 GB - Nero",
+    "12362": "Xbox 360 Elite 250 GB - Nero",
+    "12411": "Xbox 360 Arcade 0 GB - Bianco",
+    "12421": "Xbox 360 Arcade 256 MB - Bianco",
+    "12431": "Xbox 360 Arcade 20 GB - Bianco",
+    "12441": "Xbox 360 Arcade 60 GB - Bianco",
+    "12451": "Xbox 360 Arcade 120 GB - Bianco",
+    "12461": "Xbox 360 Arcade 250 GB - Bianco",
+    "12512": "Xbox 360 Slim/S 4 GB - Nero",
+    "12522": "Xbox 360 Slim/S 250 GB - Nero",
+    "12532": "Xbox 360 Slim/S 320 GB - Nero",
+    "12542": "Xbox 360 Slim/S 500 GB - Nero",
+    "12612": "Xbox 360 E 4 GB - Nero",
+    "12622": "Xbox 360 E 250 GB - Nero",
+    "12632": "Xbox 360 E 320 GB - Nero",
+    "12642": "Xbox 360 E 500 GB - Nero",
+    "22231": "Xbox 360 Premium/Pro 20 GB - Halo 3",
+    "22232": "Xbox 360 Premium/Pro 20 GB - The Simpsons Movie",
+    "22233": "Xbox 360 Premium/Pro 20 GB - Gears of War 2",
+    "22351": "Xbox 360 Elite 120 GB - Resident Evil 5 Red",
+    "22362": "Xbox 360 Elite 250 GB - Modern Warfare 2",
+    "22431": "Xbox 360 Slim/S 320 GB - Halo: Reach",
+    "22432": "Xbox 360 Slim/S 320 GB - Call of Duty: Modern Warfare 3",
+    "22433": "Xbox 360 Slim/S 320 GB - Gears of War 3",
+    "22434": "Xbox 360 Slim/S 320 GB - Star Wars Kinect",
+    "22435": "Xbox 360 Slim/S 320 GB - Halo 4",
+    "22436": "Xbox 360 Slim/S 320 GB - Xbox Live 10th Anniversary",
+    "13111": "Xbox One Originale/Base 500 GB - Nero",
+    "13112": "Xbox One Originale/Base 500 GB - Bianco",
+    "13121": "Xbox One Originale/Base 1 T - Nero",
+    "13212": "Xbox One S 500 GB - Bianco",
+    "13222": "Xbox One S 1 T - Bianco",
+    "13232": "Xbox One S 2 T - Bianco",
+    "13321": "Xbox One X 1 T - Nero",
+    "23111": "Xbox One Originale/Base 1 T - Call of Duty",
+    "23112": "Xbox One Originale/Base 1 T - Forza Blu LE",
+    "23113": "Xbox One Originale/Base 1 T - Halo 5",
+    "23114": "Xbox One Originale/Base 1 T - Elite",
+    "23115": "Xbox One Originale/Base 1 T - Verde Militare",
+    "23116": "Xbox One Originale/Base 1 T - Minecraft",
+    "23117": "Xbox One Originale/Base 1 T - Viola",
+    "23211": "Xbox One S 500 GB - Blu Profondo",
+    "23222": "Xbox One S 1 T - All-Digital Binaca",
+    "23233": "Xbox One S 2 T - Gears of War 5",
+    "23311": "Xbox One X 1 T - CyberPunk",
+    "23312": "Xbox One X 1 T - Gears of War 5",
+    "23313": "Xbox One X 1 T - Gold Rush",
+    "23314": "Xbox One X 1 T - Hyperspace",
+    "23315": "Xbox One X 1 T - Robot White",
+    "14111": "Xbox Series S 512 GB - Bianca",
+    "14121": "Xbox Series S 1 T - Bianca",
+    "14122": "Xbox Series S 1 T - Carbon Black",
+    "14221": "Xbox Series X 1 T - Nera",
+    "14222": "Xbox Series X 1 T - All-Digital Bianca",
+    "14233": "Xbox Series X 2 T - Galaxy Black",
+    "24221": "Xbox Series X 1 T - Halo Infinite"
+  },
+  "bible_entries": [
+    {
+      "id": "11111",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "Original/OG",
+      "modello": "Base",
+      "memoria": "8 GB",
+      "cuscio": "Nero",
+      "label": "Xbox Original/OG Base 8 GB - Nero",
+      "storage_gb": 8
+    },
+    {
+      "id": "21112",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "Original/OG",
+      "modello": "Base",
+      "memoria": "8 GB",
+      "cuscio": "Verde",
+      "label": "Xbox Original/OG Base 8 GB - Verde",
+      "storage_gb": 8
+    },
+    {
+      "id": "21113",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "Original/OG",
+      "modello": "Base",
+      "memoria": "8 GB",
+      "cuscio": "Crystal",
+      "label": "Xbox Original/OG Base 8 GB - Crystal",
+      "storage_gb": 8
+    },
+    {
+      "id": "12111",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Base/Core",
+      "memoria": "0 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Base/Core 0 GB - Bianco",
+      "storage_gb": 0
+    },
+    {
+      "id": "12121",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Base/Core",
+      "memoria": "256 MB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Base/Core 256 MB - Bianco",
+      "storage_gb": 0.25
+    },
+    {
+      "id": "12131",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Base/Core",
+      "memoria": "20 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Base/Core 20 GB - Bianco",
+      "storage_gb": 20
+    },
+    {
+      "id": "12141",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Base/Core",
+      "memoria": "60 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Base/Core 60 GB - Bianco",
+      "storage_gb": 60
+    },
+    {
+      "id": "12151",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Base/Core",
+      "memoria": "120 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Base/Core 120 GB - Bianco",
+      "storage_gb": 120
+    },
+    {
+      "id": "12161",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Base/Core",
+      "memoria": "250 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Base/Core 250 GB - Bianco",
+      "storage_gb": 250
+    },
+    {
+      "id": "12231",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Premium/Pro",
+      "memoria": "20 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Premium/Pro 20 GB - Bianco",
+      "storage_gb": 20
+    },
+    {
+      "id": "12241",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Premium/Pro",
+      "memoria": "60 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Premium/Pro 60 GB - Bianco",
+      "storage_gb": 60
+    },
+    {
+      "id": "12352",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Elite",
+      "memoria": "120 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 Elite 120 GB - Nero",
+      "storage_gb": 120
+    },
+    {
+      "id": "12362",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Elite",
+      "memoria": "250 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 Elite 250 GB - Nero",
+      "storage_gb": 250
+    },
+    {
+      "id": "12411",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Arcade",
+      "memoria": "0 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Arcade 0 GB - Bianco",
+      "storage_gb": 0
+    },
+    {
+      "id": "12421",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Arcade",
+      "memoria": "256 MB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Arcade 256 MB - Bianco",
+      "storage_gb": 0.25
+    },
+    {
+      "id": "12431",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Arcade",
+      "memoria": "20 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Arcade 20 GB - Bianco",
+      "storage_gb": 20
+    },
+    {
+      "id": "12441",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Arcade",
+      "memoria": "60 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Arcade 60 GB - Bianco",
+      "storage_gb": 60
+    },
+    {
+      "id": "12451",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Arcade",
+      "memoria": "120 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Arcade 120 GB - Bianco",
+      "storage_gb": 120
+    },
+    {
+      "id": "12461",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Arcade",
+      "memoria": "250 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox 360 Arcade 250 GB - Bianco",
+      "storage_gb": 250
+    },
+    {
+      "id": "12512",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "4 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 Slim/S 4 GB - Nero",
+      "storage_gb": 4
+    },
+    {
+      "id": "12522",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "250 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 Slim/S 250 GB - Nero",
+      "storage_gb": 250
+    },
+    {
+      "id": "12532",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "320 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 Slim/S 320 GB - Nero",
+      "storage_gb": 320
+    },
+    {
+      "id": "12542",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "500 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 Slim/S 500 GB - Nero",
+      "storage_gb": 500
+    },
+    {
+      "id": "12612",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "E",
+      "memoria": "4 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 E 4 GB - Nero",
+      "storage_gb": 4
+    },
+    {
+      "id": "12622",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "E",
+      "memoria": "250 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 E 250 GB - Nero",
+      "storage_gb": 250
+    },
+    {
+      "id": "12632",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "E",
+      "memoria": "320 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 E 320 GB - Nero",
+      "storage_gb": 320
+    },
+    {
+      "id": "12642",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "360",
+      "modello": "E",
+      "memoria": "500 GB",
+      "cuscio": "Nero",
+      "label": "Xbox 360 E 500 GB - Nero",
+      "storage_gb": 500
+    },
+    {
+      "id": "22231",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Premium/Pro",
+      "memoria": "20 GB",
+      "cuscio": "Halo 3",
+      "label": "Xbox 360 Premium/Pro 20 GB - Halo 3",
+      "storage_gb": 20
+    },
+    {
+      "id": "22232",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Premium/Pro",
+      "memoria": "20 GB",
+      "cuscio": "The Simpsons Movie",
+      "label": "Xbox 360 Premium/Pro 20 GB - The Simpsons Movie",
+      "storage_gb": 20
+    },
+    {
+      "id": "22233",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Premium/Pro",
+      "memoria": "20 GB",
+      "cuscio": "Gears of War 2",
+      "label": "Xbox 360 Premium/Pro 20 GB - Gears of War 2",
+      "storage_gb": 20
+    },
+    {
+      "id": "22351",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Elite",
+      "memoria": "120 GB",
+      "cuscio": "Resident Evil 5 Red",
+      "label": "Xbox 360 Elite 120 GB - Resident Evil 5 Red",
+      "storage_gb": 120
+    },
+    {
+      "id": "22362",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Elite",
+      "memoria": "250 GB",
+      "cuscio": "Modern Warfare 2",
+      "label": "Xbox 360 Elite 250 GB - Modern Warfare 2",
+      "storage_gb": 250
+    },
+    {
+      "id": "22431",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "320 GB",
+      "cuscio": "Halo: Reach",
+      "label": "Xbox 360 Slim/S 320 GB - Halo: Reach",
+      "storage_gb": 320
+    },
+    {
+      "id": "22432",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "320 GB",
+      "cuscio": "Call of Duty: Modern Warfare 3",
+      "label": "Xbox 360 Slim/S 320 GB - Call of Duty: Modern Warfare 3",
+      "storage_gb": 320
+    },
+    {
+      "id": "22433",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "320 GB",
+      "cuscio": "Gears of War 3",
+      "label": "Xbox 360 Slim/S 320 GB - Gears of War 3",
+      "storage_gb": 320
+    },
+    {
+      "id": "22434",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "320 GB",
+      "cuscio": "Star Wars Kinect",
+      "label": "Xbox 360 Slim/S 320 GB - Star Wars Kinect",
+      "storage_gb": 320
+    },
+    {
+      "id": "22435",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "320 GB",
+      "cuscio": "Halo 4",
+      "label": "Xbox 360 Slim/S 320 GB - Halo 4",
+      "storage_gb": 320
+    },
+    {
+      "id": "22436",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "360",
+      "modello": "Slim/S",
+      "memoria": "320 GB",
+      "cuscio": "Xbox Live 10th Anniversary",
+      "label": "Xbox 360 Slim/S 320 GB - Xbox Live 10th Anniversary",
+      "storage_gb": 320
+    },
+    {
+      "id": "13111",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "500 GB",
+      "cuscio": "Nero",
+      "label": "Xbox One Originale/Base 500 GB - Nero",
+      "storage_gb": 500
+    },
+    {
+      "id": "13112",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "500 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox One Originale/Base 500 GB - Bianco",
+      "storage_gb": 500
+    },
+    {
+      "id": "13121",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "1 T",
+      "cuscio": "Nero",
+      "label": "Xbox One Originale/Base 1 T - Nero",
+      "storage_gb": 1024
+    },
+    {
+      "id": "13212",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "One",
+      "modello": "S",
+      "memoria": "500 GB",
+      "cuscio": "Bianco",
+      "label": "Xbox One S 500 GB - Bianco",
+      "storage_gb": 500
+    },
+    {
+      "id": "13222",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "One",
+      "modello": "S",
+      "memoria": "1 T",
+      "cuscio": "Bianco",
+      "label": "Xbox One S 1 T - Bianco",
+      "storage_gb": 1024
+    },
+    {
+      "id": "13232",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "One",
+      "modello": "S",
+      "memoria": "2 T",
+      "cuscio": "Bianco",
+      "label": "Xbox One S 2 T - Bianco",
+      "storage_gb": 2048
+    },
+    {
+      "id": "13321",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "One",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "Nero",
+      "label": "Xbox One X 1 T - Nero",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23111",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "1 T",
+      "cuscio": "Call of Duty",
+      "label": "Xbox One Originale/Base 1 T - Call of Duty",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23112",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "1 T",
+      "cuscio": "Forza Blu LE",
+      "label": "Xbox One Originale/Base 1 T - Forza Blu LE",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23113",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "1 T",
+      "cuscio": "Halo 5",
+      "label": "Xbox One Originale/Base 1 T - Halo 5",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23114",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "1 T",
+      "cuscio": "Elite",
+      "label": "Xbox One Originale/Base 1 T - Elite",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23115",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "1 T",
+      "cuscio": "Verde Militare",
+      "label": "Xbox One Originale/Base 1 T - Verde Militare",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23116",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "1 T",
+      "cuscio": "Minecraft",
+      "label": "Xbox One Originale/Base 1 T - Minecraft",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23117",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "Originale/Base",
+      "memoria": "1 T",
+      "cuscio": "Viola",
+      "label": "Xbox One Originale/Base 1 T - Viola",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23211",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "S",
+      "memoria": "500 GB",
+      "cuscio": "Blu Profondo",
+      "label": "Xbox One S 500 GB - Blu Profondo",
+      "storage_gb": 500
+    },
+    {
+      "id": "23222",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "S",
+      "memoria": "1 T",
+      "cuscio": "All-Digital Binaca",
+      "label": "Xbox One S 1 T - All-Digital Binaca",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23233",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "S",
+      "memoria": "2 T",
+      "cuscio": "Gears of War 5",
+      "label": "Xbox One S 2 T - Gears of War 5",
+      "storage_gb": 2048
+    },
+    {
+      "id": "23311",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "CyberPunk",
+      "label": "Xbox One X 1 T - CyberPunk",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23312",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "Gears of War 5",
+      "label": "Xbox One X 1 T - Gears of War 5",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23313",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "Gold Rush",
+      "label": "Xbox One X 1 T - Gold Rush",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23314",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "Hyperspace",
+      "label": "Xbox One X 1 T - Hyperspace",
+      "storage_gb": 1024
+    },
+    {
+      "id": "23315",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "One",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "Robot White",
+      "label": "Xbox One X 1 T - Robot White",
+      "storage_gb": 1024
+    },
+    {
+      "id": "14111",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "Serie",
+      "modello": "S",
+      "memoria": "512 GB",
+      "cuscio": "Bianca",
+      "label": "Xbox Series S 512 GB - Bianca",
+      "storage_gb": 512
+    },
+    {
+      "id": "14121",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "Serie",
+      "modello": "S",
+      "memoria": "1 T",
+      "cuscio": "Bianca",
+      "label": "Xbox Series S 1 T - Bianca",
+      "storage_gb": 1024
+    },
+    {
+      "id": "14122",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "Serie",
+      "modello": "S",
+      "memoria": "1 T",
+      "cuscio": "Carbon Black",
+      "label": "Xbox Series S 1 T - Carbon Black",
+      "storage_gb": 1024
+    },
+    {
+      "id": "14221",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "Serie",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "Nera",
+      "label": "Xbox Series X 1 T - Nera",
+      "storage_gb": 1024
+    },
+    {
+      "id": "14222",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "Serie",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "All-Digital Bianca",
+      "label": "Xbox Series X 1 T - All-Digital Bianca",
+      "storage_gb": 1024
+    },
+    {
+      "id": "14233",
+      "prodotto": "XBOX",
+      "type": "Canonico",
+      "famiglia": "Serie",
+      "modello": "X",
+      "memoria": "2 T",
+      "cuscio": "Galaxy Black",
+      "label": "Xbox Series X 2 T - Galaxy Black",
+      "storage_gb": 2048
+    },
+    {
+      "id": "24221",
+      "prodotto": "XBOX",
+      "type": "Speciale",
+      "famiglia": "Serie",
+      "modello": "X",
+      "memoria": "1 T",
+      "cuscio": "Halo Infinite",
+      "label": "Xbox Series X 1 T - Halo Infinite",
+      "storage_gb": 1024
+    }
   ]
 }

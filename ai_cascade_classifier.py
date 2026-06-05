@@ -14,17 +14,14 @@ from typing import Any
 import requests
 
 from db_subito import DB_PATH, _connect, init_db as init_subito_db
-from model_rules import canonical_taxonomy_ids, fields_from_canonical_id
+from model_rules import canonical_taxonomy_ids, fields_from_canonical_id, taxonomy_entry
 
+import logging_setup
+logging_setup.setup()
 log = logging.getLogger("ai_cascade_classifier")
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%H:%M:%S",
-)
 
-PROMPT_VERSION = "ai-cascade:v1:taxonomy+price:2026-06-05"
-TAXONOMY_VERSION = "xbox-taxonomy:2026-06-03"
+PROMPT_VERSION = "ai-cascade:v2:bibbia+price:2026-06-05"
+TAXONOMY_VERSION = "xbox-bibbia:2026-06-05"
 DEFAULT_MODELS = ("openai/gpt-4o-mini", "openai/gpt-4.1-mini", "openai/gpt-5-mini")
 DEFAULT_THRESHOLD = 80
 DEFAULT_LIMIT = 200
@@ -114,12 +111,19 @@ def _taxonomy_payload() -> list[dict[str, str]]:
     payload: list[dict[str, str]] = []
     for taxonomy_id in canonical_taxonomy_ids(include_other=False):
         fields = fields_from_canonical_id(taxonomy_id)
+        entry = taxonomy_entry(taxonomy_id) or {}
         payload.append(
             {
                 "id": taxonomy_id,
+                "prodotto": str(entry.get("prodotto", "")),
+                "type": str(entry.get("type", "")),
                 "family": fields.console_family,
                 "model": fields.sub_model,
-                "label": taxonomy_id.replace("-", " "),
+                "famiglia": str(entry.get("famiglia", "")),
+                "modello": str(entry.get("modello", "")),
+                "memoria": str(entry.get("memoria", "")),
+                "cuscio": str(entry.get("cuscio", "")),
+                "label": str(entry.get("label", taxonomy_id)),
             }
         )
     payload.append(
@@ -161,15 +165,16 @@ def _schema() -> dict[str, Any]:
 def _system_prompt() -> str:
     taxonomy = json.dumps(_taxonomy_payload(), ensure_ascii=False, separators=(",", ":"))
     return (
-        "Classifica annunci marketplace italiani di console Xbox. "
+        "Classifica annunci marketplace italiani di console Xbox usando la Bibbia canonica. "
         "Ricevi titolo, descrizione e prezzo. Devi scegliere esattamente un taxonomy_id "
-        "dalla tassonomia fornita oppure other. Non inventare ID. "
+        "dalla tassonomia fornita oppure other. Il taxonomy_id è il campo ID della Bibbia. Non inventare ID. "
         "Usa other per controller, giochi, accessori, ricambi, scatole vuote, account, servizi "
         "o qualunque oggetto non presente nella tassonomia. "
+        "I campi ufficiali sono Prodotto, Type, Famiglia, Modello, Memoria e Cuscio. "
         "Il prezzo è un segnale di plausibilità: non basta da solo, ma un prezzo incompatibile "
         "deve ridurre la confidence o produrre other se il testo indica accessori/parti. "
         "Esempi: 'controller Xbox Series' -> other; 'Xbox One con giochi e pad' -> modello Xbox One più probabile; "
-        "'scatola Xbox Series X' -> other; 'Xbox 360 E 250GB' -> 360-e-250gb. "
+        "'scatola Xbox Series X' -> other; 'Xbox 360 E 250GB' -> ID della riga Bibbia con Famiglia=360, Modello=E, Memoria=250 GB. "
         f"Tassonomia: {taxonomy}"
     )
 

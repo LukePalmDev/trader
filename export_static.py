@@ -17,12 +17,13 @@ else:
     except ImportError as exc:
         raise ImportError("Python < 3.11 richiede 'tomli': pip install tomli") from exc
 
+import logging_setup
 from paths import DB_PATH
 
 ROOT = Path(__file__).parent
 OUT_DIR = ROOT / "viewer" / "data"
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+logging_setup.setup()
 log = logging.getLogger(__name__)
 
 

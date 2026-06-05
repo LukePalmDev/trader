@@ -1,4 +1,4 @@
-# Catalogo Console Xbox - Bibbia operativa
+# Bibbia Console Xbox
 
 Fonte canonica: `/Users/luke/Desktop/Bibbia.csv`.
 

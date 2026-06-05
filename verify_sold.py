@@ -13,12 +13,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-# Configurazione logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%H:%M:%S",
-)
+import logging_setup
+logging_setup.setup()
 log = logging.getLogger("verify_sold")
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))

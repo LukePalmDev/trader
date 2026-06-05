@@ -33,12 +33,12 @@ def _row() -> sqlite3.Row:
 
 
 def test_fields_from_canonical_id_maps_taxonomy_to_db_fields() -> None:
-    fields = fields_from_canonical_id("360-e-250gb")
+    fields = fields_from_canonical_id("12622")
 
     assert fields.console_family == "360"
     assert fields.sub_model == "E"
     assert fields.model_segment == "base"
-    assert fields.canonical_model == "360-e-250gb"
+    assert fields.canonical_model == "12622"
 
 
 def test_classify_row_escalates_until_threshold(monkeypatch) -> None:
@@ -49,7 +49,7 @@ def test_classify_row_escalates_until_threshold(monkeypatch) -> None:
         if model == "m1":
             return (
                 {
-                    "taxonomy_id": "series-s-512gb",
+                    "taxonomy_id": "14111",
                     "confidence": 61,
                     "object_type": "console",
                     "price_signal": "compatible",
@@ -58,8 +58,8 @@ def test_classify_row_escalates_until_threshold(monkeypatch) -> None:
                 {"raw_response": "{}", "input_tokens": 10, "output_tokens": 5, "latency_ms": 1},
             )
         return (
-            {
-                "taxonomy_id": "series-s-512gb",
+                {
+                    "taxonomy_id": "14111",
                 "confidence": 88,
                 "object_type": "console",
                 "price_signal": "compatible",
@@ -73,7 +73,7 @@ def test_classify_row_escalates_until_threshold(monkeypatch) -> None:
     result = cascade.classify_row(_row(), api_key="test", models=("m1", "m2", "m3"), threshold=80)
 
     assert calls == ["m1", "m2"]
-    assert result.taxonomy_id == "series-s-512gb"
+    assert result.taxonomy_id == "14111"
     assert result.confidence == 88
     assert result.status == "approved_auto"
 

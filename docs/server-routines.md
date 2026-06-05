@@ -11,7 +11,7 @@ I vecchi workflow sono archiviati in `STORICI3GIUGNO/github-workflows/`.
 | Scrape Subito | `trader-scrape-subito.timer` / `trader-scrape-subito.service` | Aggiorna annunci Subito e storico prezzi/disponibilità. |
 | Scrape eBay venduti | `trader-scrape-ebay.timer` / `trader-scrape-ebay.service` | Aggiorna lotti venduti eBay. |
 | AI classify compat | `trader-ai-classify.timer` / `trader-ai-classify.service` | Alias operativo del cascade GPT, mantenuto per timer già installati. |
-| AI cascade classify | `trader-ai-cascade.timer` / `trader-ai-cascade.service` | Classifica nuovi annunci Subito con cascata OpenAI taxonomy-first e coda review. |
+| AI cascade classify | `trader-ai-cascade.timer` / `trader-ai-cascade.service` | Classifica nuovi annunci Subito con cascata OpenAI Bibbia-first e coda review. |
 | Verify sold | `trader-verify-sold.timer` / `trader-verify-sold.service` | Verifica annunci Subito non più disponibili e marca venduti. |
 | Backup DB | `trader-backup.timer` / `trader-backup.service` | Copia il DB operativo in archivio backup. |
 | Viewer/API | `trader-viewer.service` | Espone viewer e API locali dietro Nginx. |

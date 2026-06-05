@@ -23,12 +23,9 @@ from pathlib import Path
 from model_rules import VALID_EDITIONS, VALID_SEGMENTS, classify_title
 from paths import DB_PATH
 
+import logging_setup
+logging_setup.setup()
 log = logging.getLogger("classifier")
-logging.basicConfig(
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%H:%M:%S",
-    level=logging.INFO,
-)
 
 ROOT = Path(__file__).parent
 

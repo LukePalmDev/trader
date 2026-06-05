@@ -10,12 +10,8 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Configurazione logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%H:%M:%S"
-)
+import logging_setup
+logging_setup.setup()
 log = logging.getLogger("ai_classifier")
 
 from db_subito import DB_PATH, _connect, init_db as init_subito_db  # noqa: E402
