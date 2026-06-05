@@ -201,6 +201,16 @@ function _marketGroupLabel(key, items, mode) {
   return FAMILY_LABELS[key] || key;
 }
 
+function _isSubitoMarket(mode) {
+  return mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s';
+}
+
+function _subitoPublicId(row) {
+  const raw = String(row?.urn_id || row?.id || '');
+  const match = raw.match(/(\d{5,})$/);
+  return match ? match[1] : raw;
+}
+
 const MANUAL_OVERRIDES = {
   1122: { e: 'Digital' },
   1123: { e: 'Digital' },
@@ -3501,6 +3511,37 @@ function _renderMktRow(row, mode, famAvgs, oppByUrn) {
   const tr = document.createElement('tr');
   tr.className = 'product-row';
 
+  if (_isSubitoMarket(mode)) {
+    const tdName = document.createElement('td');
+    tdName.className = 'prod-name-cell mkt-id-cell';
+    const publicId = _subitoPublicId(row);
+    tdName.innerHTML = row.url
+      ? `<a href="${row.url}" target="_blank" rel="noopener noreferrer" class="prod-link" title="${row.name || publicId}">${publicId}</a>`
+      : `<span class="prod-link" title="${row.name || publicId}">${publicId}</span>`;
+    tr.appendChild(tdName);
+
+    const tdPrice = document.createElement('td');
+    tdPrice.className = 'prod-price-cell';
+    tdPrice.textContent = price != null ? '€ ' + price.toFixed(0) : '—';
+    tr.appendChild(tdPrice);
+
+    const tdData = document.createElement('td');
+    tdData.className = 'mkt-compact-muted';
+    if (mode === 'subito-s') {
+      const rawD = row.sold_at_estimated || row.sold_at;
+      tdData.textContent = rawD ? _fmtSubitoDate(rawD) : '—';
+    } else {
+      tdData.textContent = _fmtSubitoDate(row.published_at);
+    }
+    tr.appendChild(tdData);
+
+    const tdZona = document.createElement('td');
+    tdZona.className = 'mkt-compact-muted';
+    tdZona.textContent = row.city || '—';
+    tr.appendChild(tdZona);
+    return tr;
+  }
+
   // 1. Annuncio
   const tdName = document.createElement('td');
   tdName.className = 'prod-name-cell';
@@ -3596,6 +3637,7 @@ function renderMarket(mode) {
   const grid = document.getElementById('mkt-' + mode + '-grid');
   if (!grid) return;
   grid.innerHTML = '';
+  grid.classList.toggle('subito-compact-grid', _isSubitoMarket(mode));
 
   // Base dataset per mode
   let rows;
@@ -3616,7 +3658,10 @@ function renderMarket(mode) {
   const selF   = document.getElementById(pfx + 'seller')?.value     || '';
   const regF   = document.getElementById(pfx + 'region')?.value     || '';
 
-  if (q)    rows = rows.filter(r => (r.name || '').toLowerCase().includes(q));
+  if (q)    rows = rows.filter(r =>
+    (r.name || '').toLowerCase().includes(q) ||
+    _subitoPublicId(r).toLowerCase().includes(q)
+  );
   if (famF) rows = rows.filter(r => r.console_family === famF);
   if (selF && mode !== 'ebay') rows = rows.filter(r => r.seller_type === selF);
   if (regF && mode !== 'ebay') rows = rows.filter(r => r.region === regF);
@@ -3671,7 +3716,7 @@ function renderMarket(mode) {
     const minPx    = prices.length ? Math.min(...prices) : null;
 
     const card = document.createElement('div');
-    card.className = 'store-card';
+    card.className = 'store-card' + (_isSubitoMarket(mode) ? ' mkt-subito-compact-card' : '');
     card.style.setProperty('--store-accent', accent);
 
     const header = document.createElement('div');
@@ -3688,15 +3733,22 @@ function renderMarket(mode) {
     table.className = 'console-table';
 
     const thead = document.createElement('thead');
-    thead.innerHTML = `<tr style="background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-      <th style="${thSt} padding-left:18px;">Annuncio</th>
-      <th style="${thSt}">Zona</th>
-      <th style="${thSt} text-align:center;">Tipo</th>
-      <th style="${thSt}">Data</th>
-      <th style="${thSt} text-align:right;">Prezzo</th>
-      <th style="${thSt} text-align:center;">Info</th>
-      <th style="${thSt} text-align:center;">Stato</th>
-    </tr>`;
+    thead.innerHTML = _isSubitoMarket(mode)
+      ? `<tr style="background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+          <th style="${thSt} padding-left:12px;">Annuncio</th>
+          <th style="${thSt} text-align:right;">Prezzo</th>
+          <th style="${thSt}">Data</th>
+          <th style="${thSt}">Zona</th>
+        </tr>`
+      : `<tr style="background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+          <th style="${thSt} padding-left:18px;">Annuncio</th>
+          <th style="${thSt}">Zona</th>
+          <th style="${thSt} text-align:center;">Tipo</th>
+          <th style="${thSt}">Data</th>
+          <th style="${thSt} text-align:right;">Prezzo</th>
+          <th style="${thSt} text-align:center;">Info</th>
+          <th style="${thSt} text-align:center;">Stato</th>
+        </tr>`;
     table.appendChild(thead);
 
     const tbody = document.createElement('tbody');
