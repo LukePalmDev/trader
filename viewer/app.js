@@ -3735,7 +3735,7 @@ function renderMarket(mode) {
     const thead = document.createElement('thead');
     thead.innerHTML = _isSubitoMarket(mode)
       ? `<tr style="background:var(--bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-          <th style="${thSt} padding-left:12px;">Annuncio</th>
+          <th style="${thSt} padding-left:6px;">Annuncio</th>
           <th style="${thSt} text-align:right;">Prezzo</th>
           <th style="${thSt}">Data</th>
           <th style="${thSt}">Zona</th>
