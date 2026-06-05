@@ -50,7 +50,6 @@ if [ "$systemd_changed" = true ]; then
   install -m 0644 "$APP_DIR/deploy/systemd/"*.timer /etc/systemd/system/
   systemctl daemon-reload
   systemctl enable --now trader-ai-cascade.timer
-  systemctl restart trader-ai-cascade.service 2>/dev/null || true
 fi
 
 systemctl restart trader-viewer.service
