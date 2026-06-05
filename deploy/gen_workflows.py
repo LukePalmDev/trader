@@ -69,10 +69,10 @@ def _load() -> dict:
 
 
 def _execstart(spec: dict) -> str:
-    exe = spec["exec"]
-    if exe.endswith(".py"):
-        return f"{VENV_PY} {APP_DIR}/{exe.split()[0]} {' '.join(exe.split()[1:])}".strip()
-    return f"{APP_DIR}/{exe}"
+    parts = spec["exec"].split()
+    if parts[0].endswith(".py"):
+        return f"{VENV_PY} {APP_DIR}/{parts[0]} {' '.join(parts[1:])}".strip()
+    return f"{APP_DIR}/{spec['exec']}"
 
 
 def _render(name: str, spec: dict) -> tuple[str, str]:
