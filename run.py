@@ -254,6 +254,14 @@ def _update_db_from_snapshot(
             )
         result = {"source": source, "total": len(products), **stats}
         _write_source_marker(result)
+        try:
+            import job_runs as _job_runs
+            _job_runs.record(
+                f"scrape-{source}", "ok", source=source,
+                counts={k: result.get(k) for k in ("total", "new", "price_changes", "avail_changes")},
+            )
+        except Exception:  # noqa: BLE001 — il recording non deve mai rompere il run
+            pass
         return result
     except Exception as exc:  # noqa: BLE001
         msg = f"Errore aggiornamento DB da {snapshot_path.name}: {exc}"

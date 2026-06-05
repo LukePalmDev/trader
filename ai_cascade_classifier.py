@@ -622,13 +622,25 @@ def run_ai_cascade_classifier(
         pending_review,
         errors,
     )
-    return {
+    result = {
         "total": len(rows),
         "updated": updated,
         "errors": errors,
         "reused": reused_count,
         "pending_review": pending_review,
     }
+    try:
+        import job_runs as _job_runs
+        if errors and not updated:
+            _st, _msg = "error", f"{errors} errori, 0 aggiornati (controlla credito/API)"
+        elif errors:
+            _st, _msg = "warn", f"{errors} errori su {len(rows)}"
+        else:
+            _st, _msg = "ok", None
+        _job_runs.record("ai-cascade", _st, counts=result, error=_msg)
+    except Exception:  # noqa: BLE001
+        pass
+    return result
 
 
 def _build_parser() -> argparse.ArgumentParser:

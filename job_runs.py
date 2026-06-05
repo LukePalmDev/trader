@@ -8,11 +8,16 @@ tabella, senza più dedurre lo stato dal testo dei log.
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 from paths import DB_PATH
+
+# Host di provenienza dell'esecuzione (server / github / mac). Override via env.
+HOST = os.environ.get("TRADER_HOST", "server")
 
 # Catalogo job: id -> (etichetta, cadenza attesa in ore). L'ordine definisce
 # anche l'ordine di visualizzazione su /log.
@@ -71,6 +76,8 @@ def record(
     """Registra l'esito di un job. status ∈ {ok, warn, error}."""
     if status not in _VALID_STATUS:
         status = "error"
+    if host is None:
+        host = HOST
     init(db_path)
     ended_at = ended_at or datetime.now(timezone.utc).isoformat()
     with sqlite3.connect(db_path) as conn:
@@ -149,3 +156,25 @@ def status(db_path: Path = DB_PATH) -> dict:
         "overall": overall,
         "jobs": jobs_out,
     }
+
+
+def _main(argv: list[str]) -> int:
+    """CLI per i job in bash: job_runs.py record JOB STATUS [--source S] [--error E]."""
+    if len(argv) < 3 or argv[0] != "record":
+        print("uso: job_runs.py record <job> <ok|warn|error> [--source S] [--error E]",
+              file=sys.stderr)
+        return 64
+    job, st = argv[1], argv[2]
+    source = err = None
+    rest = argv[3:]
+    for i, tok in enumerate(rest):
+        if tok == "--source" and i + 1 < len(rest):
+            source = rest[i + 1]
+        elif tok == "--error" and i + 1 < len(rest):
+            err = rest[i + 1]
+    record(job, st, source=source, error=err)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(_main(sys.argv[1:]))

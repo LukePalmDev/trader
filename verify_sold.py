@@ -1764,5 +1764,19 @@ if __name__ == "__main__":
     except Exception as _lre:
         log.debug("Last-run JSON write error: %s", _lre)
 
+    try:
+        import job_runs as _job_runs
+        _cov = float(stats.get("coverage_ratio", 0) or 0)
+        _st = "ok" if _cov >= 0.70 else ("warn" if _cov >= 0.40 else "error")
+        _job_runs.record(
+            "verify-sold", _st,
+            counts={"verificati": int(stats.get("verified", 0) or 0),
+                    "venduti": int(stats.get("sold", 0) or 0),
+                    "coverage_pct": round(_cov * 100, 1)},
+            error=None if _st == "ok" else f"coverage {_cov * 100:.0f}%",
+        )
+    except Exception:  # noqa: BLE001
+        pass
+
     if args.min_coverage_ratio and stats.get("coverage_below_min"):
         sys.exit(3)

@@ -21,7 +21,12 @@ mkdir -p "$BACKUP_DIR"
 LOG_FILE="$LOG_DIR/backup.log"
 mkdir -p "$LOG_DIR" 2>/dev/null || true
 log_line() { echo "$(date -u +%FT%TZ) $*" >>"$LOG_FILE" 2>/dev/null || true; }
-trap 'rc=$?; [ $rc -ne 0 ] && log_line "[backup] ERROR exit code $rc"' EXIT
+
+APP="$(cd "$(dirname "$0")/.." && pwd)"
+PY="${TRADER_PYTHON:-/opt/trader/venv/bin/python}"
+[ -x "$PY" ] || PY="python3"
+rec() { (cd "$APP" && "$PY" job_runs.py record backup "$1" ${2:+--error "$2"}) 2>/dev/null || true; }
+trap 'rc=$?; if [ $rc -ne 0 ]; then log_line "[backup] ERROR exit code $rc"; rec error "exit code $rc"; fi' EXIT
 
 log_line "[backup] start"
 
@@ -36,3 +41,4 @@ sqlite3 "$DB_PATH" ".backup '$BACKUP_DIR/tracker-$stamp.db'"
 deleted="$(find "$BACKUP_DIR" -name 'tracker-*.db' -mtime +"$RETENTION_DAYS" -print -delete | wc -l | tr -d ' ')"
 size="$(stat -c %s "$BACKUP_DIR/tracker-$stamp.db" 2>/dev/null || echo 0)"
 log_line "[backup] OK tracker-$stamp.db ($size byte) — vecchi rimossi: $deleted"
+rec ok
