@@ -1,0 +1,12 @@
+[Unit]
+Description=Trader watchdog (alert Telegram su job falliti/stale)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=trader
+Group=trader
+EnvironmentFile=/etc/trader/trader.env
+WorkingDirectory=/opt/trader/app
+ExecStart=/opt/trader/venv/bin/python job_runs.py check

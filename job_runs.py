@@ -81,6 +81,10 @@ def record(
     init(db_path)
     ended_at = ended_at or datetime.now(timezone.utc).isoformat()
     with sqlite3.connect(db_path) as conn:
+        prev = conn.execute(
+            "SELECT status FROM job_runs WHERE job = ? ORDER BY id DESC LIMIT 1", (job,)
+        ).fetchone()
+        prev_status = prev[0] if prev else None
         conn.execute(
             "INSERT INTO job_runs (job, host, source, status, started_at, ended_at, "
             "duration_s, counts, error) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -90,6 +94,23 @@ def record(
                 (error or None),
             ),
         )
+
+    # Alert solo alla transizione verso error/warn (evita spam su errori ripetuti).
+    if status in ("error", "warn") and status != prev_status:
+        _alert(job, status, error)
+
+
+def _alert(job: str, status: str, error: str | None) -> None:
+    try:
+        import alerts
+        label = _LABELS.get(job, job)
+        icon = "🔴" if status == "error" else "🟠"
+        alerts._send_telegram(
+            f"{icon} Job '{label}' → {status}",
+            (error or "Vedi https://trader.byluke.org/log"),
+        )
+    except Exception:  # noqa: BLE001 — l'alert non deve mai rompere il recording
+        pass
 
 
 def _age_hours(ended_at: str | None) -> float | None:
@@ -162,11 +183,42 @@ def status(db_path: Path = DB_PATH) -> dict:
     }
 
 
+def check_and_alert(db_path: Path = DB_PATH) -> dict:
+    """Watchdog: alza un alert Telegram per i job in error/warn (incl. stale),
+    con dedup: avvisa solo quando l'insieme dei job problematici cambia."""
+    s = status(db_path)
+    bad = {j["id"]: j["status"] for j in s["jobs"] if j["status"] in ("error", "warn")}
+    state_file = Path(os.environ.get("TRADER_LOG_DIR", "/var/log/trader")) / ".watchdog.json"
+    try:
+        prev = json.loads(state_file.read_text()) if state_file.exists() else {}
+    except (OSError, ValueError):
+        prev = {}
+    if bad and bad != prev:
+        labels = {jid: lbl for jid, lbl, _ in JOBS}
+        righe = "\n".join(f"{'🔴' if st == 'error' else '🟠'} {labels.get(j, j)}: {st}"
+                          for j, st in bad.items())
+        try:
+            import alerts
+            alerts._send_telegram("Watchdog job trader", righe +
+                                  "\nhttps://trader.byluke.org/log")
+        except Exception:  # noqa: BLE001
+            pass
+    try:
+        state_file.write_text(json.dumps(bad))
+    except OSError:
+        pass
+    return {"bad": bad, "changed": bad != prev}
+
+
 def _main(argv: list[str]) -> int:
     """CLI per i job in bash: job_runs.py record JOB STATUS [--source S] [--error E]."""
+    if argv and argv[0] == "check":
+        res = check_and_alert()
+        print(f"watchdog: bad={res['bad']} changed={res['changed']}")
+        return 0
     if len(argv) < 3 or argv[0] != "record":
-        print("uso: job_runs.py record <job> <ok|warn|error> [--source S] [--error E]",
-              file=sys.stderr)
+        print("uso: job_runs.py record <job> <ok|warn|error> [--source S] [--error E]\n"
+              "     job_runs.py check", file=sys.stderr)
         return 64
     job, st = argv[1], argv[2]
     source = err = None
