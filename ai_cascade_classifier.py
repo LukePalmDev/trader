@@ -25,10 +25,10 @@ logging.basicConfig(
 
 PROMPT_VERSION = "ai-cascade:v1:taxonomy+price:2026-06-05"
 TAXONOMY_VERSION = "xbox-taxonomy:2026-06-03"
-DEFAULT_MODELS = ("gpt-4o-mini", "gpt-4.1-mini", "gpt-5.1-mini")
+DEFAULT_MODELS = ("openai/gpt-4o-mini", "openai/gpt-4.1-mini", "openai/gpt-5-mini")
 DEFAULT_THRESHOLD = 80
 DEFAULT_LIMIT = 200
-OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions"
+DEFAULT_OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
 
 OBJECT_TYPES = (
     "console",
@@ -100,6 +100,14 @@ def _models_from_env() -> tuple[str, ...]:
         return DEFAULT_MODELS
     models = tuple(part.strip() for part in raw.split(",") if part.strip())
     return models or DEFAULT_MODELS
+
+
+def _chat_completions_url() -> str:
+    base_url = os.environ.get("OPENAI_BASE_URL", DEFAULT_OPENAI_BASE_URL).strip()
+    base_url = base_url.rstrip("/")
+    if base_url.endswith("/chat/completions"):
+        return base_url
+    return f"{base_url}/chat/completions"
 
 
 def _taxonomy_payload() -> list[dict[str, str]]:
@@ -196,7 +204,7 @@ def _row_to_user_message(row: sqlite3.Row | dict[str, Any]) -> str:
 def _post_openai(model: str, row: sqlite3.Row | dict[str, Any], api_key: str) -> tuple[dict[str, Any], dict[str, Any]]:
     started = time.monotonic()
     response = requests.post(
-        OPENAI_CHAT_COMPLETIONS_URL,
+        _chat_completions_url(),
         headers={
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
@@ -634,7 +642,10 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--models",
         default="",
-        help="Lista modelli separata da virgola. Default: OPENAI_CASCADE_MODELS o gpt-4o-mini,gpt-4.1-mini,gpt-5.1-mini.",
+        help=(
+            "Lista modelli separata da virgola. Default: OPENAI_CASCADE_MODELS "
+            "o openai/gpt-4o-mini,openai/gpt-4.1-mini,openai/gpt-5-mini."
+        ),
     )
     return parser
 

@@ -24,6 +24,18 @@ I vecchi workflow sono archiviati in `STORICI3GIUGNO/github-workflows/`.
 - Log: `/var/log/trader`
 - Backup: `/var/backups/trader`
 
+## OpenRouter
+
+La cascata AI usa OpenRouter come endpoint OpenAI-compatible di default. In
+`/etc/trader/trader.env` deve essere compilata solo la chiave:
+
+```bash
+OPENAI_API_KEY=sk-or-v1-...
+```
+
+`OPENAI_BASE_URL` e `OPENAI_CASCADE_MODELS` sono già valorizzati in
+`deploy/trader.env.example` per usare OpenRouter.
+
 ## Comandi utili
 
 ```bash
