@@ -21,3 +21,12 @@ def test_status_invalido_diventa_error(tmp_path: Path) -> None:
     job_runs.record("backup", "bogus", db_path=db)
     by = {j["id"]: j for j in job_runs.status(db)["jobs"]}
     assert by["backup"]["status"] == "error"
+
+
+def test_history(tmp_path):
+    db = tmp_path / "t.db"
+    job_runs.record("scrape-cex", "ok", db_path=db, counts={"total": 1})
+    job_runs.record("scrape-cex", "warn", db_path=db, error="x")
+    h = job_runs.history("scrape-cex", db_path=db)
+    assert len(h) == 2 and h[0]["status"] == "warn"
+    assert job_runs.history("inesistente", db_path=db) == []

@@ -210,6 +210,31 @@ def check_and_alert(db_path: Path = DB_PATH) -> dict:
     return {"bad": bad, "changed": bad != prev}
 
 
+def history(job: str, limit: int = 20, db_path: Path = DB_PATH) -> list[dict]:
+    """Ultime esecuzioni di un job (più recente prima), per la dashboard /log."""
+    init(db_path)
+    limit = max(1, min(int(limit), 200))
+    if job not in _LABELS:
+        return []
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        rows = conn.execute(
+            "SELECT status, host, source, ended_at, duration_s, counts, error "
+            "FROM job_runs WHERE job = ? ORDER BY id DESC LIMIT ?",
+            (job, limit),
+        ).fetchall()
+    out = []
+    for r in rows:
+        try:
+            counts = json.loads(r["counts"]) if r["counts"] else {}
+        except (ValueError, TypeError):
+            counts = {}
+        out.append({"status": r["status"], "host": r["host"], "source": r["source"],
+                    "ended_at": r["ended_at"], "duration_s": r["duration_s"],
+                    "counts": counts, "error": r["error"]})
+    return out
+
+
 def _main(argv: list[str]) -> int:
     """CLI per i job in bash: job_runs.py record JOB STATUS [--source S] [--error E]."""
     if argv and argv[0] == "check":

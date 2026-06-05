@@ -222,7 +222,8 @@ def _make_handler(
             query = self._parse_query()
 
             # Auth su tutte le API (tranne bootstrap token e stato log pubblico)
-            _public_api = {"/api/token", "/api/logs/status", "/api/jobs/status", "/api/logs/raw"}
+            _public_api = {"/api/token", "/api/logs/status", "/api/jobs/status",
+                           "/api/jobs/history", "/api/logs/raw"}
             if self._is_api_path(path) and path not in _public_api:
                 if not self._authorize_request():
                     self._json({"ok": False, "error": "unauthorized"}, status=401)
@@ -238,6 +239,12 @@ def _make_handler(
                 payload = _job_runs.status()
                 payload["archive"] = _log_status._github_archive(_APP_DIR)
                 self._json(payload)
+                return
+
+            # Storico esecuzioni di un job (dashboard /log): ?job=<id>&limit=<n>
+            if path == "/api/jobs/history":
+                n = self._safe_int(query.get("limit", "20"), 20, 1, 200)
+                self._json(_job_runs.history(query.get("job", ""), n))
                 return
 
             # Log grezzo (pubblico, tail) — comodo per LLM/tool: ?job=<id>&lines=<n>
