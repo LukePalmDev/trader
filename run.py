@@ -548,7 +548,7 @@ def main() -> None:
     parser.add_argument(
         "--ai-classify",
         action="store_true",
-        help="Classifica ai_status/ai_confidence con Haiku 4.5 (titolo+descrizione).",
+        help="Compat: usa la nuova classificazione AI cascade GPT.",
     )
     parser.add_argument(
         "--ai-cascade-classify",
@@ -562,36 +562,36 @@ def main() -> None:
     parser.add_argument(
         "--ai-cascade-models",
         default="",
-        help="Modelli OpenAI separati da virgola (default: gpt-4o-mini,gpt-4.1-mini,gpt-5.1-mini).",
+        help="Modelli OpenAI separati da virgola (default: openai/gpt-4o-mini,openai/gpt-4.1-mini,openai/gpt-5-mini).",
     )
-    parser.add_argument("--ai-limit", type=int, default=None, help="Limite annunci/item per ai_classifier")
-    parser.add_argument("--ai-batch-size", type=int, default=50, help="Batch size ai_classifier")
-    parser.add_argument("--ai-concurrency", type=int, default=5, help="Concorrenza ai_classifier")
+    parser.add_argument("--ai-limit", type=int, default=None, help="Limite annunci per alias --ai-classify/cascade")
+    parser.add_argument("--ai-batch-size", type=int, default=50, help="Legacy: ignorato dal cascade GPT")
+    parser.add_argument("--ai-concurrency", type=int, default=5, help="Legacy: ignorato dal cascade GPT")
     parser.add_argument(
         "--ai-source",
         choices=["subito", "ebay", "all"],
         default="subito",
-        help="Sorgente per --ai-classify: subito (default), ebay, all",
+        help="Sorgente per --ai-classify compat: subito/all usano cascade GPT; ebay viene saltato.",
     )
     parser.add_argument(
         "--ai-all",
         action="store_true",
-        help="(Subito) Classifica tutti gli annunci in ai_classifier (non solo pending+NULL).",
+        help="Classifica tutti gli annunci nel cascade GPT.",
     )
     parser.add_argument(
         "--ai-reset-first",
         action="store_true",
-        help="(Subito) Resetta ai_status/ai_confidence prima di ai_classifier.",
+        help="Legacy: ignorato dal cascade GPT.",
     )
     parser.add_argument(
         "--ai-ebay-reclassify-all",
         action="store_true",
-        help="(eBay) Riclassifica tutti gli item eBay, non solo quelli con canonical non risolto.",
+        help="Legacy Anthropic/eBay: ignorato dal flusso GPT.",
     )
     parser.add_argument(
         "--subito-rebuild-all",
         action="store_true",
-        help="Pipeline completa Subito: scrape -> verify sold -> reset AI -> ai_classifier all -> classifier rebuild.",
+        help="Pipeline completa Subito: scrape -> verify sold -> AI cascade GPT -> classifier locale.",
     )
     parser.add_argument(
         "--subito-region",
@@ -855,29 +855,23 @@ def main() -> None:
             return
 
         if args.ai_classify:
-            import ai_classifier as _aic
+            import ai_cascade_classifier as _cascade
 
-            if args.ai_source in ("subito", "all"):
-                with report.step("ai_classify_subito"):
-                    asyncio.run(
-                        _aic.run_ai_classifier(
-                            batch_size=args.ai_batch_size,
-                            concurrency=args.ai_concurrency,
-                            classify_all=args.ai_all,
-                            reset_first=args.ai_reset_first,
-                            limit=args.ai_limit,
-                        )
-                    )
-            if args.ai_source in ("ebay", "all"):
-                with report.step("ai_classify_ebay"):
-                    asyncio.run(
-                        _aic.run_ebay_classifier(
-                            batch_size=args.ai_batch_size,
-                            concurrency=args.ai_concurrency,
-                            limit=args.ai_limit,
-                            reclassify_all=args.ai_ebay_reclassify_all,
-                        )
-                    )
+            if args.ai_source == "ebay":
+                log.warning("--ai-source ebay non è supportato dal nuovo cascade GPT; nessuna chiamata Anthropic eseguita.")
+                ok = True
+                return
+            models = tuple(
+                part.strip() for part in args.ai_cascade_models.split(",") if part.strip()
+            ) or None
+            with report.step("ai_cascade_classify"):
+                _cascade.run_ai_cascade_classifier(
+                    limit=args.ai_limit if args.ai_limit is not None else args.ai_cascade_limit,
+                    classify_all=args.ai_all,
+                    threshold=args.ai_cascade_threshold,
+                    dry_run=args.ai_cascade_dry_run,
+                    models=models,
+                )
             ok = True
             return
 
@@ -928,20 +922,21 @@ def main() -> None:
                     )
                 )
 
-            log.info("[ 3/5 ] Reset + AI classify completo (Haiku 4.5)…")
-            import ai_classifier as _aic
-            with report.step("ai_classify_subito"):
-                asyncio.run(
-                    _aic.run_ai_classifier(
-                        batch_size=max(args.ai_batch_size, 50),
-                        concurrency=max(args.ai_concurrency, 5),
-                        classify_all=True,
-                        reset_first=True,
-                        limit=args.ai_limit,
-                    )
+            log.info("[ 3/5 ] AI cascade GPT completo…")
+            import ai_cascade_classifier as _cascade
+            models = tuple(
+                part.strip() for part in args.ai_cascade_models.split(",") if part.strip()
+            ) or None
+            with report.step("ai_cascade_classify"):
+                _cascade.run_ai_cascade_classifier(
+                    limit=args.ai_limit if args.ai_limit is not None else args.ai_cascade_limit,
+                    classify_all=True,
+                    threshold=args.ai_cascade_threshold,
+                    dry_run=args.ai_cascade_dry_run,
+                    models=models,
                 )
 
-            log.info("[ 4/5 ] Ricatalogazione completa attributi (title+body)…")
+            log.info("[ 4/5 ] Ricatalogazione regole locali (title+body)…")
             import classifier as _classifier
             with report.step("classify"):
                 _classifier.run_classifier(
@@ -1030,37 +1025,24 @@ def main() -> None:
                     )
                 )
 
-            log.info("[ 4/6 ] Filtro AI su Subito + eBay (ai_classifier)…")
-            if os.environ.get("ANTHROPIC_API_KEY"):
-                import ai_classifier as _aic
-                with report.step("ai_classify_subito"):
-                    asyncio.run(
-                        _aic.run_ai_classifier(
-                            batch_size=args.ai_batch_size,
-                            concurrency=args.ai_concurrency,
-                            classify_all=args.ai_all,
-                            reset_first=args.ai_reset_first,
-                            limit=args.ai_limit,
-                        )
-                    )
-                with report.step("ai_classify_ebay"):
-                    asyncio.run(
-                        _aic.run_ebay_classifier(
-                            batch_size=args.ai_batch_size,
-                            concurrency=args.ai_concurrency,
-                            limit=args.ai_limit,
-                        )
-                    )
-            else:
-                log.warning("ANTHROPIC_API_KEY non trovata — filtro AI Subito/eBay saltato.")
+            log.info("[ 4/6 ] Classificazione AI cascade GPT su Subito…")
+            import ai_cascade_classifier as _cascade
+            models = tuple(
+                part.strip() for part in args.ai_cascade_models.split(",") if part.strip()
+            ) or None
+            with report.step("ai_cascade_classify"):
+                _cascade.run_ai_cascade_classifier(
+                    limit=args.ai_limit if args.ai_limit is not None else args.ai_cascade_limit,
+                    classify_all=args.ai_all,
+                    threshold=args.ai_cascade_threshold,
+                    dry_run=args.ai_cascade_dry_run,
+                    models=models,
+                )
 
-            log.info("[ 5/6 ] Classificazione attributi Globale (classifier)…")
-            if os.environ.get("ANTHROPIC_API_KEY"):
-                import classifier as _classifier
-                with report.step("classify"):
-                    _classifier.run_classifier(rebuild_all=args.classify_rebuild_all)
-            else:
-                log.warning("ANTHROPIC_API_KEY non trovata — classificazione AI saltata.")
+            log.info("[ 5/6 ] Classificazione attributi locale (classifier)…")
+            import classifier as _classifier
+            with report.step("classify"):
+                _classifier.run_classifier(rebuild_all=args.classify_rebuild_all)
 
             log.info("[ 6/6 ] Avvio viewer…")
             with report.step("view"):

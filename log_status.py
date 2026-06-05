@@ -44,9 +44,14 @@ _SERVER_JOBS: dict[str, dict] = {
         "ok_re": r"Verifica completata",
     },
     "ai-classify": {
-        "label": "Classificazione AI", "cadence_h": 12,
-        "error_re": r"credit balance is too low|insufficient_quota|authentication_error",
-        "ok_re": r"[Cc]lassificazione completata",
+        "label": "Classificazione AI (GPT, compat)", "cadence_h": 12,
+        "error_re": r"OPENAI_API_KEY non impostata|insufficient_quota|authentication_error|invalid_api_key",
+        "ok_re": r"AI cascade completata",
+    },
+    "ai-cascade": {
+        "label": "Classificazione AI cascade (GPT)", "cadence_h": 12,
+        "error_re": r"OPENAI_API_KEY non impostata|insufficient_quota|authentication_error|invalid_api_key",
+        "ok_re": r"AI cascade completata",
     },
     # --- Sistema ---
     "backup": {

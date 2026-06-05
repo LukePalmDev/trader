@@ -30,13 +30,27 @@ reqs_changed=false
 if ! git diff --quiet "$local_sha" "$remote_sha" -- requirements.lock; then
   reqs_changed=true
 fi
+systemd_changed=false
+if ! git diff --quiet "$local_sha" "$remote_sha" -- deploy/systemd deploy/server_job.sh deploy/backup_db.sh; then
+  systemd_changed=true
+fi
 
 git reset --hard "origin/$BRANCH"
 chown -R trader:trader "$APP_DIR" 2>/dev/null || true
+chmod +x "$APP_DIR/deploy/server_job.sh" "$APP_DIR/deploy/backup_db.sh" 2>/dev/null || true
 
 if [ "$reqs_changed" = true ] && [ -x "$VENV_DIR/bin/pip" ]; then
   echo "[deploy] requirements.lock cambiato: aggiorno dipendenze"
   "$VENV_DIR/bin/pip" install -q -r requirements.lock || true
+fi
+
+if [ "$systemd_changed" = true ]; then
+  echo "[deploy] unità systemd/deploy cambiate: aggiorno servizi e timer"
+  install -m 0644 "$APP_DIR/deploy/systemd/"*.service /etc/systemd/system/
+  install -m 0644 "$APP_DIR/deploy/systemd/"*.timer /etc/systemd/system/
+  systemctl daemon-reload
+  systemctl enable --now trader-ai-cascade.timer
+  systemctl restart trader-ai-cascade.service 2>/dev/null || true
 fi
 
 systemctl restart trader-viewer.service

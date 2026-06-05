@@ -570,8 +570,7 @@ def run_ai_cascade_classifier(
 ) -> dict[str, int]:
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key and not dry_run:
-        log.error("OPENAI_API_KEY non impostata.")
-        return {"total": 0, "updated": 0, "errors": 0, "reused": 0, "pending_review": 0}
+        raise RuntimeError("OPENAI_API_KEY non impostata.")
 
     init_subito_db(DB_PATH)
     conn = _connect(DB_PATH)

@@ -25,7 +25,7 @@ Scraper (8 fonti)  ->  Snapshot JSON  ->  tracker.db (SQLite)  ->  API HTTP  -> 
 | `db_ebay.py` | Modulo eBay venduti — schema `sold_items` + `sold_changes` |
 | `migrations.py` | Framework migrazioni schema versionato con namespace |
 | `classifier.py` | Pipeline classificazione: regole + CEX matching + fallback AI |
-| `ai_classifier.py` | Filtro AI asincrono: distingue console hardware da giochi/accessori |
+| `ai_classifier.py` | Legacy Anthropic deprecato; il flusso operativo usa `ai_cascade_classifier.py` |
 | `ai_cascade_classifier.py` | Nuova classificazione OpenAI a cascata con tassonomia vincolata e review umana |
 | `valuation.py` | Fair value engine: mediana ponderata CEX/Subito/eBay con backtesting |
 | `alerts.py` | Sistema alert prezzi con notifiche macOS + Telegram |
@@ -120,21 +120,21 @@ Titolo annuncio
     -> boost confidence se match >= 0.45
     |
     v
-[3] AI Fallback (Claude Haiku)
-    -> solo per family="other" o confidence < 0.6
-    -> batch da 15, max_tokens=4096
+[3] AI Cascade GPT (OpenRouter/OpenAI-compatible)
+    -> taxonomy_id canonico oppure other
+    -> review umana se confidence bassa o prezzo incoerente
 ```
 
-### AI Classifier (filtro hardware)
+### AI Classifier legacy
 
-Processo separato per Subito: distingue console hardware da giochi/accessori.
-- Score 0-100 (100 = console, 0 = gioco)
-- >= 75 → approved, <= 25 → rejected, 25-75 → pending
-- Batch da 50, 5 batch paralleli (asyncio.gather)
+Il vecchio filtro Anthropic e il fallback Claude sono deprecati. Gli entrypoint
+operativi `--ai-classify` e `trader-ai-classify` ora instradano sul cascade GPT.
+Il fallback Anthropic in `classifier.py` resta disponibile solo impostando
+`TRADER_ENABLE_LEGACY_ANTHROPIC=true`.
 
 ### AI Cascade Classifier (taxonomy-first)
 
-Pipeline OpenAI opzionale per Subito:
+Pipeline OpenAI/OpenRouter operativa per Subito:
 - Input: titolo, descrizione e prezzo.
 - Output vincolato: `taxonomy_id` canonico oppure `other`, confidence 0-100, tipo oggetto e segnale prezzo.
 - Cascata modelli via OpenRouter: `openai/gpt-4o-mini` → `openai/gpt-4.1-mini` → `openai/gpt-5-mini`, configurabile via `OPENAI_CASCADE_MODELS`.
@@ -167,17 +167,18 @@ python3 run.py --source subito,ebay
 # Scrape + viewer web
 python3 run.py --all
 
-# Pipeline completo: Subito + eBay + verify sold + AI classify + viewer
+# Pipeline completo: Subito + eBay + verify sold + AI cascade GPT + viewer
 python3 run.py --full
 
 # Solo viewer web (senza scraping)
 python3 run.py --view
 
-# Classificazione AI manuale
+# Classificazione attributi locale
 python3 run.py --classify
 python3 run.py --classify --classify-limit 100 --classify-dry-run
 
 # Classificazione OpenAI a cascata su annunci Subito
+python3 run.py --ai-classify --ai-limit 200        # alias compatibile
 python3 run.py --ai-cascade-classify --ai-cascade-limit 200
 python3 run.py --ai-cascade-classify --ai-cascade-all --ai-cascade-threshold 80
 
@@ -225,11 +226,10 @@ File `config.toml` con override via variabili d'ambiente `TRADER_*`:
 | `TRADER_TELEGRAM_ENABLED` | `false` | Abilita notifiche Telegram |
 | `TRADER_TELEGRAM_TOKEN` | (vuoto) | Token bot Telegram (da @BotFather) |
 | `TRADER_TELEGRAM_CHAT_ID` | (vuoto) | Chat ID destinatario Telegram |
-| `ANTHROPIC_API_KEY` | — | Chiave API per classificazione AI |
-| `ANTHROPIC_MODEL` | (auto-detect) | Modello Claude da usare |
 | `OPENAI_API_KEY` | — | Chiave API OpenRouter/OpenAI-compatible per `ai_cascade_classifier.py` |
 | `OPENAI_BASE_URL` | `https://openrouter.ai/api/v1` | Endpoint OpenAI-compatible |
 | `OPENAI_CASCADE_MODELS` | `openai/gpt-4o-mini,openai/gpt-4.1-mini,openai/gpt-5-mini` | Modelli OpenRouter in cascata |
+| `TRADER_ENABLE_LEGACY_ANTHROPIC` | `false` | Riabilita il vecchio fallback Anthropic solo per recuperi manuali |
 
 ## Notifiche Telegram
 
@@ -319,7 +319,8 @@ trader/
 ├── db_ebay.py               # Modulo DB venduti eBay
 ├── migrations.py            # Framework migrazioni schema
 ├── classifier.py            # Pipeline classificazione (rules + AI)
-├── ai_classifier.py         # Filtro AI hardware/giochi
+├── ai_classifier.py         # Legacy Anthropic deprecato
+├── ai_cascade_classifier.py # Classificazione GPT/OpenRouter taxonomy-first
 ├── valuation.py             # Fair value engine + backtesting
 ├── alerts.py                # Alert prezzi + notifiche macOS + Telegram
 ├── verify_sold.py           # Verifica stato venduto Subito

@@ -1,7 +1,7 @@
 # TRADER — FLUSSO DI ESECUZIONE
 
 > Documento di riferimento tecnico per il progetto Xbox Tracker.
-> Aggiornato: 3 giugno 2026.
+> Aggiornato: 5 giugno 2026.
 
 ---
 
@@ -12,7 +12,7 @@ Trader è un price tracker specializzato per hardware console Xbox sul mercato i
 Il sistema ha tre macro-funzioni:
 
 - **Raccolta dati**: scraping periodico delle fonti, ingestion nel DB con change detection
-- **Classificazione**: pipeline a 3 livelli (regole regex → matching CEX → Claude Haiku) che assegna a ogni annuncio `console_family`, `sub_model`, `canonical_model`, `model_segment`, `edition_class`
+- **Classificazione**: pipeline taxonomy-first con GPT/OpenRouter, regole regex e matching CEX che assegna a ogni annuncio `console_family`, `sub_model`, `canonical_model`, `model_segment`, `edition_class`
 - **Presentazione**: server HTTP che espone un'API REST e serve una SPA con dashboard prezzi, venduti, trend e ricerca
 
 Tutto lo stato persistente vive in `tracker.db`. I file JSON delle scrape sono snapshot temporanei su disco (cartella `data/`), archiviati come `.json.gz` dopo N giorni e poi eliminati.
@@ -29,7 +29,8 @@ Tutto lo stato persistente vive in `tracker.db`. I file JSON delle scrape sono s
 |------|--------|
 | `--source <nome>` / nessun flag | Scraping delle fonti abilitate |
 | `--classify` | Pipeline di classificazione attributi |
-| `--ai-classify` | Filtro AI (Haiku) su Subito e/o eBay |
+| `--ai-classify` | Alias compatibile del nuovo cascade GPT su Subito |
+| `--ai-cascade-classify` | Classificazione GPT taxonomy-first su Subito |
 | `--verify-sold N` | Verifica annunci Subito scaduti via Playwright |
 | `--view` | Avvia solo il server web |
 | `--full` | Pipeline completa (scrape + verify + AI + classify + viewer) |
@@ -117,42 +118,41 @@ Dopo ogni scrape, due processi separati gestiscono la pulizia su disco:
 
 La classificazione opera in **due fasi distinte** con scopi diversi.
 
-### 4a. Filtro hardware — `ai_classifier.py` (`run.py --ai-classify`)
+### 4a. AI cascade GPT — `ai_cascade_classifier.py` (`run.py --ai-cascade-classify`)
 
-**Scopo:** determinare se un annuncio vende realmente hardware console Xbox (non giochi, accessori, ecc.) e assegnare una prima classificazione del modello.
+**Scopo:** determinare se un annuncio vende realmente hardware console Xbox e assegnare direttamente un `taxonomy_id` canonico, usando titolo, descrizione e prezzo.
 
 **Flusso:**
 
 ```
-_load_rows()                    # annunci con ai_status='pending' (o tutti se --all)
+_load_rows()                    # pending, pending_review, prompt obsoleto o --all
     ↓
-suddivisione in batch da N annunci (default 50)
+hash input + prompt/taxonomy version
     ↓
-asyncio.gather(tutti i batch)   # concorrenza limitata da asyncio.Semaphore (default 5)
+cascade modelli OpenRouter/OpenAI-compatible
+  openai/gpt-4o-mini → openai/gpt-4.1-mini → openai/gpt-5-mini
     ↓
-per ogni batch → classify_batch(client, batch)
-  ↓  chiamata API Anthropic (claude-haiku-4-5-20251001, temp=0, max_tokens=4096)
-  ↓  sistema invia: titolo (max 240 char) + body (max 960 char) + prezzo
-  ↓  Claude risponde: array JSON
-     [{id, console_confidence, family, model, canonical, storage_gb, edition}]
+response_format json_schema vincolato
+  {taxonomy_id, confidence, object_type, price_signal, decision_reason}
     ↓
-validazione campi (whitelist per family, model, canonical, edition)
+validazione locale tassonomia + controllo prezzo
     ↓
-UPDATE ads SET ai_status, ai_confidence, console_family, sub_model, canonical_model,
-              classify_method='ai:v1', classify_confidence
+UPDATE ads SET ai_status, ai_confidence, ai_taxonomy_id, ai_object_type,
+              ai_price_signal, console_family, sub_model, canonical_model,
+              classify_method='ai-cascade:<model>'
+    ↓
+audit su classification_runs + classification_attempts
 ```
 
 **Soglie di decisione:**
 
 | Confidence | ai_status | Azione |
 |-----------|-----------|--------|
-| ≥ 75 | `approved` | Classificazione salvata (family + model + canonical + edition) |
-| ≤ 25 | `rejected` | family/canonical = 'other', model = 'Unknown' |
-| 26–74 | `pending` | Solo ai_confidence aggiornata, classificazione rules intatta |
+| ≥ threshold e taxonomy valida | `approved_auto` | Classificazione salvata |
+| ≥ threshold e `other` | `rejected_auto` | Non-console/accessorio/gioco/scatola/servizio |
+| < threshold o conflitto prezzo | `pending_review` | Coda review umana |
 
-**Fallback regex:** se la risposta JSON è malformata, un regex cerca almeno `id` e `console_confidence` nel testo grezzo e salva risultati parziali (senza classification).
-
-La versione eBay (`run_ebay_classifier`) usa lo stesso SYSTEM_PROMPT e la stessa logica, ma opera su `sold_items`. Poiché `sold_items` non ha `ai_status`, usa `classify_method='ai:v1'` come tracciatore di stato.
+Il vecchio `ai_classifier.py` Anthropic è deprecato. `run.py --ai-classify` resta come alias compatibile del cascade GPT; eBay non ha più classificazione Anthropic automatica.
 
 ### 4b. Classificazione attributi — `classifier.py` (`run.py --classify`)
 
@@ -176,10 +176,8 @@ La versione eBay (`run_ebay_classifier`) usa lo stesso SYSTEM_PROMPT e la stessa
 
      ↓ se ancora unresolved (family='other' OR segment='unknown' OR confidence < 0.6):
 
-[Livello 3] classify_batch(ads, client)               ← Claude Haiku sincrono, batch=15
-  input: titolo + body troncati
-  output: [{id, family, segment, edition_class, canonical_model, confidence}]
-  method = 'ai:claude-haiku-4-5-20251001'
+[Livello 3] fallback Anthropic legacy                 ← disabilitato di default
+  attivo solo con TRADER_ENABLE_LEGACY_ANTHROPIC=true
 
      ↓
 _apply_classifications() → UPDATE ads SET console_family, sub_model, model_segment,
@@ -374,10 +372,8 @@ Sequenza in 6 step con log esplicito per ogni fase:
 [1/6] Scrape Subito        → cmd_scrape(["subito"])
 [2/6] Scrape eBay sold     → cmd_scrape(["ebay"])
 [3/6] Verify sold Subito   → asyncio.run(verify_batch(...))
-[4/6] AI classify          → run_ai_classifier() + run_ebay_classifier()
-                             ↳ saltato se ANTHROPIC_API_KEY non presente
-[5/6] Classify attributi   → run_classifier()
-                             ↳ saltato se ANTHROPIC_API_KEY non presente
+[4/6] AI cascade GPT       → run_ai_cascade_classifier()
+[5/6] Classify attributi   → run_classifier() regole/CEX, fallback Anthropic off
 [6/6] Avvio viewer         → start_server()
 ```
 
@@ -388,8 +384,8 @@ Versione aggressiva per riallineare tutto il dataset Subito in 5 step:
 ```
 [1/5] Scrape completo Subito
 [2/5] Verify sold incrementale (batch=2000, concurrency=5, max_runtime=50 min)
-[3/5] Reset ai_status/ai_confidence su TUTTI gli annunci
-      → run_ai_classifier(classify_all=True, reset_first=True)
+[3/5] AI cascade GPT su TUTTI gli annunci
+      → run_ai_cascade_classifier(classify_all=True)
 [4/5] Riclassifica TUTTI gli attributi
       → run_classifier(rebuild_all=True)
 [5/5] Done — usa --view per validare

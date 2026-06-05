@@ -50,7 +50,7 @@ Lo scraping NON gira più su GitHub Actions (workflow archiviati in `STORICI3GIU
 - Pagina UI: `https://trader.byluke.org/log` (pulsante 🩺 nell'header).
 - Log grezzo (tail): `GET https://trader.byluke.org/api/logs/raw?job=<id>&lines=<n>` (default 200, max 1000).
   - Fonti (una per voce): `scrape-cex`, `scrape-gameshock`, `scrape-gamepeople`, `scrape-gamelife`, `scrape-rebuy`, `scrape-subito`, `scrape-ebay`.
-  - Verifiche/sistema: `verify-sold` (venduti Subito), `ai-classify`, `backup`.
+  - Verifiche/sistema: `verify-sold` (venduti Subito), `ai-classify` compat, `ai-cascade`, `backup`.
   - Archivio GitHub: `Scraper_Fonti`, `Subito.it`, `eBay`, `AI_Classify`, `Verify_Sold`.
 - Ogni fonte scrive un marker per-run in `source-<fonte>.log` (run.py:_write_source_marker), così lo stato è indipendente ovunque giri lo scrape (server / Mac residenziale / GitHub).
 - Ripartizione scrape: rebuy → GitHub Actions; subito+gamelife → Mac residenziale (launchd, blocco IP datacenter); gamepeople+gameshock+cex+ebay → server.

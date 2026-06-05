@@ -39,11 +39,13 @@ run_case() {
       ;;
     scrape-ebay)
       run_python run.py --source ebay
-      run_python ai_classifier.py --source ebay
       run_python run.py --cleanup
       ;;
     ai-classify)
-      run_python ai_classifier.py
+      run_python run.py --ai-cascade-classify --ai-cascade-limit "${AI_CASCADE_LIMIT:-1000}"
+      ;;
+    ai-cascade)
+      run_python run.py --ai-cascade-classify --ai-cascade-limit "${AI_CASCADE_LIMIT:-1000}"
       ;;
     verify-sold)
       run_python verify_sold.py \
@@ -62,7 +64,7 @@ run_case() {
         --fail-fast-403-ratio 0.60
       ;;
     *)
-      echo "Usage: $0 {scrape-fonti|scrape-subito|scrape-ebay|ai-classify|verify-sold}" >&2
+      echo "Usage: $0 {scrape-fonti|scrape-subito|scrape-ebay|ai-classify|ai-cascade|verify-sold}" >&2
       exit 64
       ;;
   esac

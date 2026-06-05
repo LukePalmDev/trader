@@ -2,7 +2,7 @@
 Pipeline classificazione Subito:
 1) regole locali deterministiche (model_rules)
 2) match con catalogo CEX base (canonical_model)
-3) fallback AI (Claude) solo per casi ambigui
+3) fallback AI legacy Anthropic solo per casi ambigui, se abilitato esplicitamente
 
 Usage:
   python3 classifier.py
@@ -352,10 +352,21 @@ def run_classifier(
     ai_updates = 0
     errors = 0
 
-    if unresolved and not rules_only:
+    legacy_anthropic_enabled = os.environ.get("TRADER_ENABLE_LEGACY_ANTHROPIC", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+    if unresolved and not rules_only and not legacy_anthropic_enabled:
+        log.info(
+            "Fallback Anthropic legacy disabilitato: %d annunci restano gestiti da regole/cascade.",
+            len(unresolved),
+        )
+
+    if unresolved and not rules_only and legacy_anthropic_enabled:
         api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
         if not api_key:
-            log.warning("ANTHROPIC_API_KEY non impostata: fallback AI saltato (%d unresolved)", len(unresolved))
+            log.warning("ANTHROPIC_API_KEY non impostata: fallback legacy saltato (%d unresolved)", len(unresolved))
         else:
             try:
                 import anthropic

@@ -565,8 +565,8 @@ async def run_ebay_classifier(
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Classifica annunci Subito e/o eBay con Claude Haiku: valida hardware console Xbox "
-            "E assegna family/canonical/edition direttamente nel DB (classify_method=ai:v1)."
+            "LEGACY: vecchio classificatore Anthropic. Il flusso operativo usa "
+            "run.py --ai-cascade-classify."
         )
     )
     parser.add_argument(
@@ -616,6 +616,17 @@ def _build_arg_parser() -> argparse.ArgumentParser:
 
 async def main():
     args = _build_arg_parser().parse_args()
+    legacy_enabled = os.environ.get("TRADER_ENABLE_LEGACY_ANTHROPIC", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    }
+    if not legacy_enabled:
+        log.error(
+            "ai_classifier.py è deprecato. Usa run.py --ai-cascade-classify oppure imposta "
+            "TRADER_ENABLE_LEGACY_ANTHROPIC=true per un recupero manuale legacy."
+        )
+        return
 
     if args.source in ("subito", "all"):
         await run_ai_classifier(

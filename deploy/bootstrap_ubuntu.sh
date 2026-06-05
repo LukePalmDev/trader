@@ -62,6 +62,7 @@ systemctl enable --now \
   trader-scrape-subito.timer \
   trader-scrape-ebay.timer \
   trader-ai-classify.timer \
+  trader-ai-cascade.timer \
   trader-verify-sold.timer \
   trader-backup.timer
 
