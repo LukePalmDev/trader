@@ -133,6 +133,7 @@ def _classify(segment: str, age_h: float, meta: dict) -> tuple[str, str]:
         rx = re.compile(meta["ok_re"], re.I)
         if rx.search(segment):
             return "ok", _last_meaningful_line(segment)
+        return "warn", f"Run senza conferma di completamento: {_last_meaningful_line(segment)}"
     # 6) Warning transitori senza conferma di completamento -> arancione.
     if _ISSUE_RE.search(segment):
         return "warn", _first_match_line(segment, _ISSUE_RE)
