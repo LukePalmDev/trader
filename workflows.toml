@@ -1,0 +1,69 @@
+# Unica fonte di verità dei workflow trader.
+# host: server (systemd) | github (Actions) | mac (launchd residenziale)
+# schedule: OnCalendar systemd (server) o nota leggibile (github/mac)
+# Generatore/verifica: deploy/gen_workflows.py
+
+[jobs.scrape-fonti]
+description = "Scrape store (gamepeople, gameshock, cex)"
+host = "server"
+user = "trader"
+exec = "deploy/server_job.sh scrape-fonti"
+oncalendar = "*-*-* 07:00:00"
+
+[jobs.scrape-ebay]
+description = "Scrape eBay venduti"
+host = "server"
+user = "trader"
+exec = "deploy/server_job.sh scrape-ebay"
+oncalendar = "*-*-* 00:30:00"
+
+[jobs.ai-cascade]
+description = "Classificazione AI cascade"
+host = "server"
+user = "trader"
+exec = "deploy/server_job.sh ai-cascade"
+oncalendar = "*-*-* 05,11,17,23:10:00"
+
+[jobs.verify-sold]
+description = "Verifica venduti Subito"
+host = "server"
+user = "trader"
+exec = "deploy/server_job.sh verify-sold"
+oncalendar = "*-*-* 11,14:00:00"
+
+[jobs.backup]
+description = "Backup SQLite"
+host = "server"
+user = "trader"
+exec = "deploy/backup_db.sh"
+oncalendar = "*-*-* 03:15:00"
+
+[jobs.watchdog]
+description = "Watchdog alert job falliti/stale"
+host = "server"
+user = "trader"
+exec = "job_runs.py check"
+interval = "3h"
+
+[jobs.deploy]
+description = "Auto-deploy da origin/main"
+host = "server"
+user = "root"
+exec = "deploy/auto_deploy.sh"
+interval = "5min"
+
+# --- Job su IP residenziale/non bloccato (non systemd) ---
+[jobs.scrape-rebuy]
+description = "Scrape rebuy (IP datacenter non bloccato)"
+host = "github"
+schedule = "cron 0 5,17 * * * (.github/workflows/scrape-remote.yml)"
+
+[jobs.scrape-subito]
+description = "Scrape Subito annunci (IP residenziale)"
+host = "mac"
+schedule = "launchd ogni 6h (deploy/residential_scrape.sh subito,gamelife)"
+
+[jobs.scrape-gamelife]
+description = "Scrape GameLife (IP residenziale)"
+host = "mac"
+schedule = "launchd ogni 6h (deploy/residential_scrape.sh subito,gamelife)"
