@@ -111,7 +111,6 @@ def status(db_path: Path = DB_PATH) -> dict:
     gira da oltre 2x la cadenza attesa (stale). Job senza run -> 'unknown'.
     """
     init(db_path)
-    rank = {"error": 0, "warn": 1, "unknown": 2, "ok": 3}
     with sqlite3.connect(db_path) as conn:
         conn.row_factory = sqlite3.Row
         latest: dict[str, sqlite3.Row] = {}
@@ -122,7 +121,9 @@ def status(db_path: Path = DB_PATH) -> dict:
             latest[row["job"]] = row
 
     jobs_out: list[dict] = []
-    overall = "ok"
+    # overall riflette solo gli stati azionabili (error > warn); 'unknown' (job
+    # senza dati) non degrada lo stato generale.
+    has_error = has_warn = False
     for jid, label, cadence in JOBS:
         row = latest.get(jid)
         if row is None:
@@ -147,10 +148,13 @@ def status(db_path: Path = DB_PATH) -> dict:
                      "last_run": row["ended_at"],
                      "age_hours": round(age, 1) if age is not None else None,
                      "host": row["host"], "source": row["source"]}
-        if rank.get(entry["status"], 2) < rank.get(overall, 3):
-            overall = entry["status"]
+        if entry["status"] == "error":
+            has_error = True
+        elif entry["status"] == "warn":
+            has_warn = True
         jobs_out.append(entry)
 
+    overall = "error" if has_error else ("warn" if has_warn else "ok")
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "overall": overall,
