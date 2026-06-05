@@ -182,6 +182,29 @@ def deduplicate(products: list[dict]) -> list[dict]:
 
 
 # --------------------------------------------------------------------------- #
+# Egress / proxy configurabile
+# --------------------------------------------------------------------------- #
+
+def proxy_url() -> str:
+    """URL del proxy egress da env TRADER_PROXY (vuoto = connessione diretta).
+
+    Esempio: http://utente:password@host:porta (proxy residenziale per superare
+    il blocco anti-bot degli IP datacenter su subito/rebuy/gamelife)."""
+    return (os.environ.get("TRADER_PROXY") or "").strip()
+
+
+def setup_proxy_env() -> None:
+    """Se TRADER_PROXY è impostato, propaga HTTP(S)_PROXY così requests,
+    cloudscraper e aiohttp(trust_env) lo usano senza modifiche per-scraper."""
+    url = proxy_url()
+    if not url:
+        return
+    for var in ("HTTP_PROXY", "HTTPS_PROXY", "http_proxy", "https_proxy"):
+        os.environ.setdefault(var, url)
+    log.info("Egress via proxy configurato (TRADER_PROXY).")
+
+
+# --------------------------------------------------------------------------- #
 # Playwright browser launch con fallback
 # --------------------------------------------------------------------------- #
 
@@ -199,6 +222,10 @@ async def launch_chromium(playwright, headless: bool = True, preferred_channel: 
         attempts.append({"channel": requested})
     attempts.append({})
 
+    # Egress via proxy se configurato (TRADER_PROXY).
+    _proxy = proxy_url()
+    _launch_extra = {"proxy": {"server": _proxy}} if _proxy else {}
+
     _stealth_args = [
         "--disable-blink-features=AutomationControlled",
         "--disable-infobars",
@@ -210,7 +237,7 @@ async def launch_chromium(playwright, headless: bool = True, preferred_channel: 
     for opts in attempts:
         label = opts.get("channel", "bundled-chromium")
         try:
-            browser = await playwright.chromium.launch(headless=headless, args=_stealth_args, **opts)
+            browser = await playwright.chromium.launch(headless=headless, args=_stealth_args, **opts, **_launch_extra)
             log.info("Playwright browser avviato: %s", label)
             return browser
         except Exception as exc:  # noqa: BLE001

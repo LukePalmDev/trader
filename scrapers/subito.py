@@ -454,6 +454,7 @@ async def run_scraper(
     async with aiohttp.ClientSession(
         headers=_HTTP_HEADERS,
         connector=connector,
+        trust_env=True,  # onora HTTP(S)_PROXY (egress via TRADER_PROXY)
     ) as session, async_playwright() as p:
         browser = await launch_chromium(
             p,

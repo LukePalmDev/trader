@@ -174,6 +174,8 @@ def cmd_scrape(
     Returns:
         (paths, stats_by_source) dove stats_by_source è {source: {total, new, ...}}
     """
+    from scrapers.base import setup_proxy_env
+    setup_proxy_env()  # egress via TRADER_PROXY se configurato
     results: list[Path] = []
     stats_by_source: dict[str, dict] = {}
     for source in sources:
