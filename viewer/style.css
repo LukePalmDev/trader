@@ -1362,18 +1362,32 @@ header {
 }
 
 .mkt-subito-compact-card {
+  --subito-card-header-h: 74px;
+  --subito-card-table-h: 104px;
   width: 100%;
   min-width: 0;
   max-width: none;
+  height: calc(var(--subito-card-header-h) + var(--subito-card-table-h) + 3px);
+  max-height: none;
+  align-self: stretch;
 }
 
 .mkt-subito-compact-card .store-card-header {
-  min-height: auto;
+  height: var(--subito-card-header-h);
+  min-height: var(--subito-card-header-h);
   padding: 8px 10px;
+  flex: 0 0 var(--subito-card-header-h);
+  overflow: hidden;
 }
 
 .mkt-subito-compact-card .store-name {
   font-size: 15px;
+  line-height: 1.35;
+  min-width: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .mkt-subito-compact-card .store-count,
@@ -1390,8 +1404,12 @@ header {
 }
 
 .mkt-subito-compact-card .console-table-wrapper {
-  height: 104px;
+  height: var(--subito-card-table-h);
+  min-height: var(--subito-card-table-h);
+  max-height: var(--subito-card-table-h);
+  flex: 0 0 var(--subito-card-table-h);
   overflow-y: auto;
+  overflow-x: hidden;
   background: var(--card-bg);
 }
 
