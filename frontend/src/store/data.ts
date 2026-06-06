@@ -3,8 +3,11 @@
 import { signal } from "@preact/signals";
 import { bootstrapToken, fetchJson } from "../lib/api";
 import { sanitizeCollection, sanitizeRecord } from "../lib/sanitize";
+import { enhanceProduct } from "../lib/enhance";
 
 type Row = Record<string, unknown>;
+
+const enhanceAll = (rows: Row[]): Row[] => rows.map((r) => enhanceProduct(r) as Row);
 
 export const sources = signal<Row[]>([]);
 export const allProducts = signal<Row[]>([]);
@@ -59,13 +62,13 @@ export async function loadAll(): Promise<void> {
 
     const srcRes = val(src, { ok: false, status: 0, body: null } as Awaited<ReturnType<typeof fetchJson<Row[]>>>);
     sources.value = srcRes.ok && Array.isArray(srcRes.body) ? sanitizeCollection(srcRes.body as Row[]) : [];
-    allProducts.value = val(combined, []);
-    dbProducts.value = val(dbp, []);
-    baseModels.value = val(base, []);
+    allProducts.value = enhanceAll(val(combined, []));
+    dbProducts.value = enhanceAll(val(dbp, []));
+    baseModels.value = enhanceAll(val(base, []));
     storageSizes.value = val(storage, []);
     standardGroups.value = val(stdg, []);
     priceHistory.value = val(hist, []);
-    subitoAds.value = val(sAds, []);
+    subitoAds.value = enhanceAll(val(sAds, []));
     subitoSold.value = val(sSold, []);
     ebaySold.value = val(eSold, []);
     subitoPendingReviews.value = val(pending, []);
