@@ -1,6 +1,7 @@
 import { NAV, domainOf } from "./nav";
 import { route, navigate } from "./router";
 import { theme, toggleTheme } from "./theme";
+import { loadAll, loading, lastUpdate } from "./store/data";
 import css from "./app.module.css";
 
 function View() {
@@ -34,9 +35,13 @@ export function App() {
             ))}
           </nav>
           <div class={css.right}>
+            <span style="font-size:11.5px;color:var(--text-muted)">
+              {lastUpdate.value ? "Agg. " + new Date(lastUpdate.value).toLocaleString("it-IT") : ""}
+            </span>
             <button class={css.iconbtn} title="Tema chiaro/scuro" onClick={toggleTheme}>
               {theme.value === "dark" ? "🌙" : "☀️"}
             </button>
+            <button class={css.iconbtn} title="Aggiorna dati" disabled={loading.value} onClick={() => void loadAll()}>↻</button>
             <a class={css.iconbtn} href="/log" target="_blank" rel="noopener" title="Stato log">🩺</a>
           </div>
         </div>
