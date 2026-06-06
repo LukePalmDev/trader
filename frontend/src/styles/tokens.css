@@ -1,0 +1,43 @@
+/* Design tokens — light (default) / dark. Portati dal viewer attuale. */
+:root {
+  --bg: #f5f4f1;
+  --card-bg: #ffffff;
+  --border: #eaeae6;
+  --text: #1c1c1c;
+  --text-light: #6b6b6b;
+  --text-muted: #b4b4b4;
+  --accent: #1c1c1c;
+  --nuovo-bg: #dff0df; --nuovo-text: #2c742c;
+  --usato-bg: #fdebd4; --usato-text: #8a4810;
+  --avail-ok: #58b258; --avail-ko: #d4d4d4;
+  --star-active: #f5a623;
+  --radius: 14px; --radius-sm: 8px;
+  --shadow: 0 1px 6px rgba(0,0,0,0.06);
+  --hover-row: #fafaf8;
+  --storage-bg: #e8f0fe; --storage-text: #2355a0;
+}
+[data-theme="dark"] {
+  --bg: #141418;
+  --card-bg: #1e1e24;
+  --border: #2e2e36;
+  --text: #e4e4e8;
+  --text-light: #a0a0aa;
+  --text-muted: #606068;
+  --accent: #e4e4e8;
+  --nuovo-bg: #1a3a1a; --nuovo-text: #6fcf6f;
+  --usato-bg: #3a2a18; --usato-text: #e0a868;
+  --avail-ok: #50c050; --avail-ko: #444450;
+  --star-active: #f5a623;
+  --shadow: 0 1px 8px rgba(0,0,0,0.30);
+  --hover-row: #24242c;
+  --storage-bg: #1a2a44; --storage-text: #6ab0f0;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+  background: var(--bg); color: var(--text);
+  font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
