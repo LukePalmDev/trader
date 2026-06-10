@@ -1,0 +1,31 @@
+name: Autorizza chiave residenziale (one-off)
+
+# Job temporaneo: aggiunge la pubkey del Mac residenziale ad authorized_keys
+# del server, così deploy/residential_scrape.sh può spedire gli snapshot.
+# Da rimuovere dopo l'esecuzione.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Aggiungi pubkey su server
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          KNOWN: ${{ secrets.SERVER_KNOWN_HOSTS }}
+          H: ${{ secrets.SERVER_HOST }}
+          U: ${{ secrets.SERVER_USER }}
+          PUBKEY: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILhfXp/ZNFYjlVEB/956HDwbtO1JWE7w4qggZf1Vplqo trader-residential-mac
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN" > ~/.ssh/known_hosts
+          ssh -i ~/.ssh/id_ed25519 "$U@$H" \
+            "mkdir -p ~/.ssh && chmod 700 ~/.ssh && \
+             grep -qF '$PUBKEY' ~/.ssh/authorized_keys 2>/dev/null || \
+             printf '%s\n' '$PUBKEY' >> ~/.ssh/authorized_keys; \
+             chmod 600 ~/.ssh/authorized_keys"
