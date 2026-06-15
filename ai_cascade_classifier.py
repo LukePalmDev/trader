@@ -756,43 +756,60 @@ def run_ebay_cascade_classifier(
             threshold=threshold,
         )
 
+    def _record_result(row: sqlite3.Row, result: CascadeResult) -> None:
+        nonlocal updated, pending_review
+        _insert_ebay_run(conn, row, result, dry_run=dry_run)
+        _apply_result_to_ebay_item(conn, row, result, dry_run=dry_run)
+        updated += 1
+        if result.status == "pending_review":
+            pending_review += 1
+        if not dry_run and updated % 25 == 0:
+            conn.commit()
+        if updated % 100 == 0 or updated == len(rows):
+            log.info(
+                "AI cascade eBay progresso: %d/%d updated=%d reused=%d pending_review=%d errors=%d",
+                updated + errors,
+                len(rows),
+                updated,
+                reused_count,
+                pending_review,
+                errors,
+            )
+
     pending: dict[Any, sqlite3.Row] = {}
+    row_iter = iter(rows)
     with ThreadPoolExecutor(max_workers=concurrency) as executor:
-        for row in rows:
-            try:
-                input_hash = _input_hash(row)
-                reusable = _find_reusable_ebay_result(conn, input_hash) if reuse and not dry_run else None
-                if reusable is not None:
-                    result = _result_from_reuse(row, reusable, input_hash)
-                    reused_count += 1
-                    _insert_ebay_run(conn, row, result, dry_run=dry_run)
-                    _apply_result_to_ebay_item(conn, row, result, dry_run=dry_run)
-                    updated += 1
-                    if result.status == "pending_review":
-                        pending_review += 1
-                    if not dry_run and updated % 25 == 0:
-                        conn.commit()
-                    continue
-                pending[executor.submit(_classify_async, row)] = row
-            except Exception as exc:  # noqa: BLE001
-                log.error("Errore preparazione classificazione cascade eBay item %s: %s", row["id"], exc)
-                errors += 1
+        def _submit_next() -> bool:
+            nonlocal reused_count, errors
+            for row in row_iter:
+                try:
+                    input_hash = _input_hash(row)
+                    reusable = _find_reusable_ebay_result(conn, input_hash) if reuse and not dry_run else None
+                    if reusable is not None:
+                        result = _result_from_reuse(row, reusable, input_hash)
+                        reused_count += 1
+                        _record_result(row, result)
+                        continue
+                    pending[executor.submit(_classify_async, row)] = row
+                    return True
+                except Exception as exc:  # noqa: BLE001
+                    log.error("Errore preparazione classificazione cascade eBay item %s: %s", row["id"], exc)
+                    errors += 1
+            return False
 
-        for future in as_completed(pending):
-            row = pending[future]
-            try:
-                result = future.result()
-                _insert_ebay_run(conn, row, result, dry_run=dry_run)
-                _apply_result_to_ebay_item(conn, row, result, dry_run=dry_run)
-                updated += 1
-                if result.status == "pending_review":
-                    pending_review += 1
+        for _ in range(concurrency):
+            if not _submit_next():
+                break
 
-                if not dry_run and updated % 25 == 0:
-                    conn.commit()
+        while pending:
+            future = next(as_completed(tuple(pending)))
+            row = pending.pop(future)
+            try:
+                _record_result(row, future.result())
             except Exception as exc:  # noqa: BLE001
                 log.error("Errore classificazione cascade eBay item %s: %s", row["id"], exc)
                 errors += 1
+            _submit_next()
 
     if not dry_run:
         conn.commit()

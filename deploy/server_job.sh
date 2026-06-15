@@ -48,7 +48,7 @@ run_case() {
       run_python run.py --ai-cascade-classify --ai-cascade-limit "${AI_CASCADE_LIMIT:-1000}"
       ;;
     ai-ebay-cascade)
-      run_python run.py --ai-ebay-cascade-classify --ai-cascade-limit "${AI_EBAY_CASCADE_LIMIT:-0}" --ai-concurrency "${AI_EBAY_CASCADE_CONCURRENCY:-4}" --ai-ebay-reclassify-all
+      run_python run.py --ai-ebay-cascade-classify --ai-cascade-limit "${AI_EBAY_CASCADE_LIMIT:-0}" --ai-concurrency "${AI_EBAY_CASCADE_CONCURRENCY:-8}"
       ;;
     verify-sold)
       run_python verify_sold.py \
