@@ -887,6 +887,7 @@ def main() -> None:
                         classify_all=args.ai_all or args.ai_ebay_reclassify_all,
                         threshold=args.ai_cascade_threshold,
                         dry_run=args.ai_cascade_dry_run,
+                        concurrency=args.ai_concurrency,
                         models=models,
                     )
             ok = True
@@ -913,6 +914,7 @@ def main() -> None:
                         classify_all=args.ai_cascade_all or args.ai_ebay_reclassify_all,
                         threshold=args.ai_cascade_threshold,
                         dry_run=args.ai_cascade_dry_run,
+                        concurrency=args.ai_concurrency,
                         models=models,
                     )
             ok = True

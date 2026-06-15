@@ -7,6 +7,7 @@ import logging
 import os
 import sqlite3
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
@@ -725,6 +726,7 @@ def run_ebay_cascade_classifier(
     threshold: int = DEFAULT_THRESHOLD,
     dry_run: bool = False,
     reuse: bool = True,
+    concurrency: int = 4,
     models: tuple[str, ...] | None = None,
 ) -> dict[str, int]:
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
@@ -744,44 +746,65 @@ def run_ebay_cascade_classifier(
     pending_review = 0
     selected_models = models or _models_from_env()
     threshold = max(0, min(int(threshold), 100))
+    concurrency = max(1, int(concurrency))
 
-    for row in rows:
-        try:
-            input_hash = _input_hash(row)
-            reusable = _find_reusable_ebay_result(conn, input_hash) if reuse and not dry_run else None
-            if reusable is not None:
-                result = _result_from_reuse(row, reusable, input_hash)
-                reused_count += 1
-            else:
-                result = classify_row(
-                    row,
-                    api_key=api_key,
-                    models=selected_models,
-                    threshold=threshold,
-                )
+    def _classify_async(row: sqlite3.Row) -> CascadeResult:
+        return classify_row(
+            row,
+            api_key=api_key,
+            models=selected_models,
+            threshold=threshold,
+        )
 
-            _insert_ebay_run(conn, row, result, dry_run=dry_run)
-            _apply_result_to_ebay_item(conn, row, result, dry_run=dry_run)
-            updated += 1
-            if result.status == "pending_review":
-                pending_review += 1
+    pending: dict[Any, sqlite3.Row] = {}
+    with ThreadPoolExecutor(max_workers=concurrency) as executor:
+        for row in rows:
+            try:
+                input_hash = _input_hash(row)
+                reusable = _find_reusable_ebay_result(conn, input_hash) if reuse and not dry_run else None
+                if reusable is not None:
+                    result = _result_from_reuse(row, reusable, input_hash)
+                    reused_count += 1
+                    _insert_ebay_run(conn, row, result, dry_run=dry_run)
+                    _apply_result_to_ebay_item(conn, row, result, dry_run=dry_run)
+                    updated += 1
+                    if result.status == "pending_review":
+                        pending_review += 1
+                    if not dry_run and updated % 25 == 0:
+                        conn.commit()
+                    continue
+                pending[executor.submit(_classify_async, row)] = row
+            except Exception as exc:  # noqa: BLE001
+                log.error("Errore preparazione classificazione cascade eBay item %s: %s", row["id"], exc)
+                errors += 1
 
-            if not dry_run and updated % 25 == 0:
-                conn.commit()
-        except Exception as exc:  # noqa: BLE001
-            log.error("Errore classificazione cascade eBay item %s: %s", row["id"], exc)
-            errors += 1
+        for future in as_completed(pending):
+            row = pending[future]
+            try:
+                result = future.result()
+                _insert_ebay_run(conn, row, result, dry_run=dry_run)
+                _apply_result_to_ebay_item(conn, row, result, dry_run=dry_run)
+                updated += 1
+                if result.status == "pending_review":
+                    pending_review += 1
+
+                if not dry_run and updated % 25 == 0:
+                    conn.commit()
+            except Exception as exc:  # noqa: BLE001
+                log.error("Errore classificazione cascade eBay item %s: %s", row["id"], exc)
+                errors += 1
 
     if not dry_run:
         conn.commit()
     conn.close()
     log.info(
-        "AI cascade eBay completata: total=%d updated=%d reused=%d pending_review=%d errors=%d",
+        "AI cascade eBay completata: total=%d updated=%d reused=%d pending_review=%d errors=%d concurrency=%d",
         len(rows),
         updated,
         reused_count,
         pending_review,
         errors,
+        concurrency,
     )
     result = {
         "total": len(rows),
@@ -896,6 +919,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--threshold", type=int, default=DEFAULT_THRESHOLD)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--no-reuse", action="store_true")
+    parser.add_argument("--concurrency", type=int, default=4, help="Concorrenza per source=ebay.")
     parser.add_argument(
         "--models",
         default="",
@@ -917,6 +941,7 @@ def main() -> None:
             threshold=args.threshold,
             dry_run=args.dry_run,
             reuse=not args.no_reuse,
+            concurrency=args.concurrency,
             models=models,
         )
     else:
