@@ -23,6 +23,7 @@ log = logging.getLogger("ai_cascade_classifier")
 PROMPT_VERSION = "ai-cascade:v2:bibbia+price:2026-06-05"
 TAXONOMY_VERSION = "xbox-bibbia:2026-06-05"
 DEFAULT_MODELS = ("openai/gpt-5-nano", "openai/gpt-4.1-nano", "openai/gpt-5.4-nano")
+LEGACY_DEFAULT_MODELS = ("openai/gpt-4o-mini", "openai/gpt-4.1-mini", "openai/gpt-5-mini")
 DEFAULT_THRESHOLD = 80
 DEFAULT_LIMIT = 200
 DEFAULT_OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
@@ -96,6 +97,13 @@ def _models_from_env() -> tuple[str, ...]:
     if not raw:
         return DEFAULT_MODELS
     models = tuple(part.strip() for part in raw.split(",") if part.strip())
+    if models == LEGACY_DEFAULT_MODELS:
+        log.warning(
+            "OPENAI_CASCADE_MODELS usa il vecchio default %s; applico il nuovo default %s.",
+            ",".join(LEGACY_DEFAULT_MODELS),
+            ",".join(DEFAULT_MODELS),
+        )
+        return DEFAULT_MODELS
     return models or DEFAULT_MODELS
 
 

@@ -52,6 +52,19 @@ def test_default_ai_cascade_models_follow_configured_steps(monkeypatch) -> None:
     )
 
 
+def test_legacy_env_default_is_upgraded_to_configured_steps(monkeypatch) -> None:
+    monkeypatch.setenv(
+        "OPENAI_CASCADE_MODELS",
+        "openai/gpt-4o-mini,openai/gpt-4.1-mini,openai/gpt-5-mini",
+    )
+
+    assert cascade._models_from_env() == (
+        "openai/gpt-5-nano",
+        "openai/gpt-4.1-nano",
+        "openai/gpt-5.4-nano",
+    )
+
+
 def test_classify_row_escalates_until_threshold(monkeypatch) -> None:
     calls: list[str] = []
 
