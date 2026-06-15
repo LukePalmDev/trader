@@ -18,10 +18,39 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from migrations import Migration, run_migrations
-from model_rules import classify_title, detect_family
+from model_rules import classify_title, detect_family, taxonomy_entry
 from paths import DB_PATH
 
 log = logging.getLogger(__name__)
+
+
+def _with_bible_fields(row: dict) -> dict:
+    taxonomy_id = str(row.get("canonical_model") or "")
+    entry = taxonomy_entry(taxonomy_id)
+    if not entry:
+        row.update({
+            "bible_id": None,
+            "bible_product": None,
+            "bible_type": None,
+            "bible_family": None,
+            "bible_model": None,
+            "bible_memory": None,
+            "bible_shell": None,
+            "bible_label": None,
+        })
+        return row
+    row.update({
+        "bible_id": str(entry.get("id") or ""),
+        "bible_product": entry.get("prodotto"),
+        "bible_type": entry.get("type"),
+        "bible_family": entry.get("famiglia"),
+        "bible_model": entry.get("modello"),
+        "bible_memory": entry.get("memoria"),
+        "bible_shell": entry.get("cuscio"),
+        "bible_label": entry.get("label"),
+    })
+    return row
+
 
 def _table_columns(conn: sqlite3.Connection, table_name: str) -> set[str]:
     rows = conn.execute(f"PRAGMA table_info({table_name})").fetchall()
@@ -122,6 +151,54 @@ def _migration_v5_xbox_taxonomy_20260603(conn: sqlite3.Connection) -> None:
         )
     conn.execute("CREATE INDEX IF NOT EXISTS idx_sold_family_model ON sold_items(console_family, sub_model)")
 
+
+def _migration_v6_ai_cascade_audit(conn: sqlite3.Connection) -> None:
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS ebay_classification_runs (
+            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            sold_item_id        INTEGER NOT NULL REFERENCES sold_items(id),
+            input_hash          TEXT NOT NULL,
+            title               TEXT NOT NULL,
+            price               REAL,
+            taxonomy_version    TEXT NOT NULL,
+            prompt_version      TEXT NOT NULL,
+            status_final        TEXT NOT NULL,
+            taxonomy_id_final   TEXT NOT NULL,
+            confidence_final    INTEGER NOT NULL,
+            selected_model      TEXT NOT NULL,
+            created_at          TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ebay_classification_runs_item ON ebay_classification_runs(sold_item_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ebay_classification_runs_hash ON ebay_classification_runs(input_hash)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ebay_classification_runs_status ON ebay_classification_runs(status_final)")
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS ebay_classification_attempts (
+            id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+            run_id              INTEGER NOT NULL REFERENCES ebay_classification_runs(id),
+            sold_item_id        INTEGER NOT NULL REFERENCES sold_items(id),
+            step_number         INTEGER NOT NULL,
+            model               TEXT NOT NULL,
+            taxonomy_id         TEXT NOT NULL,
+            confidence          INTEGER NOT NULL,
+            object_type         TEXT NOT NULL,
+            price_signal        TEXT NOT NULL,
+            decision_reason     TEXT,
+            raw_response        TEXT,
+            input_tokens        INTEGER,
+            output_tokens       INTEGER,
+            cost_estimate       REAL,
+            latency_ms          INTEGER,
+            created_at          TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ebay_classification_attempts_item ON ebay_classification_attempts(sold_item_id)")
+    conn.execute("CREATE INDEX IF NOT EXISTS idx_ebay_classification_attempts_run ON ebay_classification_attempts(run_id)")
+
 _MIGRATIONS = (
     Migration(
         1,
@@ -172,6 +249,11 @@ _MIGRATIONS = (
         5,
         "xbox-taxonomy-20260603",
         callback=_migration_v5_xbox_taxonomy_20260603,
+    ),
+    Migration(
+        6,
+        "ebay-ai-cascade-audit",
+        callback=_migration_v6_ai_cascade_audit,
     ),
 )
 
@@ -368,7 +450,7 @@ def get_all_sold(db_path: Path = DB_PATH) -> list[dict]:
             FROM sold_items
             ORDER BY console_family, sold_date DESC NULLS LAST
         """).fetchall()
-    return [dict(r) for r in rows]
+    return [_with_bible_fields(dict(r)) for r in rows]
 
 
 def get_stats(db_path: Path = DB_PATH) -> dict:

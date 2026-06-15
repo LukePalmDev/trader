@@ -137,7 +137,7 @@ Il fallback Anthropic in `classifier.py` resta disponibile solo impostando
 Pipeline OpenAI/OpenRouter operativa per Subito:
 - Input: titolo, descrizione e prezzo.
 - Output vincolato: `taxonomy_id` numerico della Bibbia oppure `other`, confidence 0-100, tipo oggetto e segnale prezzo.
-- Cascata modelli via OpenRouter: `openai/gpt-4o-mini` → `openai/gpt-4.1-mini` → `openai/gpt-5-mini`, configurabile via `OPENAI_CASCADE_MODELS`.
+- Cascata modelli via OpenRouter: `openai/gpt-5-nano` → `openai/gpt-4.1-nano` → `openai/gpt-5.4-nano`, configurabile via `OPENAI_CASCADE_MODELS`.
 - Soglia default 80: sotto soglia passa al modello successivo; sotto soglia anche al terzo finisce in `pending_review`.
 - Audit su `classification_runs`, `classification_attempts`, `human_reviews`.
 
@@ -228,7 +228,7 @@ File `config.toml` con override via variabili d'ambiente `TRADER_*`:
 | `TRADER_TELEGRAM_CHAT_ID` | (vuoto) | Chat ID destinatario Telegram |
 | `OPENAI_API_KEY` | — | Chiave API OpenRouter/OpenAI-compatible per `ai_cascade_classifier.py` |
 | `OPENAI_BASE_URL` | `https://openrouter.ai/api/v1` | Endpoint OpenAI-compatible |
-| `OPENAI_CASCADE_MODELS` | `openai/gpt-4o-mini,openai/gpt-4.1-mini,openai/gpt-5-mini` | Modelli OpenRouter in cascata |
+| `OPENAI_CASCADE_MODELS` | `openai/gpt-5-nano,openai/gpt-4.1-nano,openai/gpt-5.4-nano` | Modelli OpenRouter in cascata |
 | `TRADER_ENABLE_LEGACY_ANTHROPIC` | `false` | Riabilita il vecchio fallback Anthropic solo per recuperi manuali |
 
 ## Notifiche Telegram

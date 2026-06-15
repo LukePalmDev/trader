@@ -562,6 +562,11 @@ def main() -> None:
         action="store_true",
         help="Classifica annunci Subito con cascata OpenAI taxonomy-first.",
     )
+    parser.add_argument(
+        "--ai-ebay-cascade-classify",
+        action="store_true",
+        help="Classifica venduti eBay con cascata OpenAI taxonomy-first.",
+    )
     parser.add_argument("--ai-cascade-limit", type=int, default=200, help="Limite annunci per AI cascade")
     parser.add_argument("--ai-cascade-threshold", type=int, default=80, help="Soglia confidence AI cascade")
     parser.add_argument("--ai-cascade-all", action="store_true", help="Riclassifica tutti gli annunci")
@@ -569,7 +574,7 @@ def main() -> None:
     parser.add_argument(
         "--ai-cascade-models",
         default="",
-        help="Modelli OpenAI separati da virgola (default: openai/gpt-4o-mini,openai/gpt-4.1-mini,openai/gpt-5-mini).",
+        help="Modelli OpenAI separati da virgola (default: openai/gpt-5-nano,openai/gpt-4.1-nano,openai/gpt-5.4-nano).",
     )
     parser.add_argument("--ai-limit", type=int, default=None, help="Limite annunci per alias --ai-classify/cascade")
     parser.add_argument("--ai-batch-size", type=int, default=50, help="Legacy: ignorato dal cascade GPT")
@@ -578,7 +583,7 @@ def main() -> None:
         "--ai-source",
         choices=["subito", "ebay", "all"],
         default="subito",
-        help="Sorgente per --ai-classify compat: subito/all usano cascade GPT; ebay viene saltato.",
+        help="Sorgente per --ai-classify compat: subito, ebay o all usano cascade GPT.",
     )
     parser.add_argument(
         "--ai-all",
@@ -593,7 +598,7 @@ def main() -> None:
     parser.add_argument(
         "--ai-ebay-reclassify-all",
         action="store_true",
-        help="Legacy Anthropic/eBay: ignorato dal flusso GPT.",
+        help="Riclassifica tutti i venduti eBay con il cascade GPT.",
     )
     parser.add_argument(
         "--subito-rebuild-all",
@@ -864,38 +869,52 @@ def main() -> None:
         if args.ai_classify:
             import ai_cascade_classifier as _cascade
 
-            if args.ai_source == "ebay":
-                log.warning("--ai-source ebay non è supportato dal nuovo cascade GPT; nessuna chiamata Anthropic eseguita.")
-                ok = True
-                return
             models = tuple(
                 part.strip() for part in args.ai_cascade_models.split(",") if part.strip()
             ) or None
             with report.step("ai_cascade_classify"):
-                _cascade.run_ai_cascade_classifier(
-                    limit=args.ai_limit if args.ai_limit is not None else args.ai_cascade_limit,
-                    classify_all=args.ai_all,
-                    threshold=args.ai_cascade_threshold,
-                    dry_run=args.ai_cascade_dry_run,
-                    models=models,
-                )
+                if args.ai_source in {"subito", "all"}:
+                    _cascade.run_ai_cascade_classifier(
+                        limit=args.ai_limit if args.ai_limit is not None else args.ai_cascade_limit,
+                        classify_all=args.ai_all,
+                        threshold=args.ai_cascade_threshold,
+                        dry_run=args.ai_cascade_dry_run,
+                        models=models,
+                    )
+                if args.ai_source in {"ebay", "all"}:
+                    _cascade.run_ebay_cascade_classifier(
+                        limit=args.ai_limit if args.ai_limit is not None else args.ai_cascade_limit,
+                        classify_all=args.ai_all or args.ai_ebay_reclassify_all,
+                        threshold=args.ai_cascade_threshold,
+                        dry_run=args.ai_cascade_dry_run,
+                        models=models,
+                    )
             ok = True
             return
 
-        if args.ai_cascade_classify:
+        if args.ai_cascade_classify or args.ai_ebay_cascade_classify:
             import ai_cascade_classifier as _cascade
 
             models = tuple(
                 part.strip() for part in args.ai_cascade_models.split(",") if part.strip()
             ) or None
             with report.step("ai_cascade_classify"):
-                _cascade.run_ai_cascade_classifier(
-                    limit=args.ai_cascade_limit,
-                    classify_all=args.ai_cascade_all,
-                    threshold=args.ai_cascade_threshold,
-                    dry_run=args.ai_cascade_dry_run,
-                    models=models,
-                )
+                if args.ai_cascade_classify:
+                    _cascade.run_ai_cascade_classifier(
+                        limit=args.ai_cascade_limit,
+                        classify_all=args.ai_cascade_all,
+                        threshold=args.ai_cascade_threshold,
+                        dry_run=args.ai_cascade_dry_run,
+                        models=models,
+                    )
+                if args.ai_ebay_cascade_classify:
+                    _cascade.run_ebay_cascade_classifier(
+                        limit=args.ai_cascade_limit,
+                        classify_all=args.ai_cascade_all or args.ai_ebay_reclassify_all,
+                        threshold=args.ai_cascade_threshold,
+                        dry_run=args.ai_cascade_dry_run,
+                        models=models,
+                    )
             ok = True
             return
 

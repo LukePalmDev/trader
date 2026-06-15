@@ -130,7 +130,7 @@ _load_rows()                    # pending, pending_review, prompt obsoleto o --a
 hash input + prompt/taxonomy version
     ↓
 cascade modelli OpenRouter/OpenAI-compatible
-  openai/gpt-4o-mini → openai/gpt-4.1-mini → openai/gpt-5-mini
+  openai/gpt-5-nano → openai/gpt-4.1-nano → openai/gpt-5.4-nano
     ↓
 response_format json_schema vincolato alla Bibbia
   {taxonomy_id, confidence, object_type, price_signal, decision_reason}

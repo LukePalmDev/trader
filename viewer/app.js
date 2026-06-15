@@ -126,6 +126,10 @@ function _isAiPending(row) {
   return ['pending', 'pending_review'].includes(row?.ai_status || 'pending');
 }
 
+function _isSubitoActive(row) {
+  return !!row?.last_available && !row?.sold_at;
+}
+
 function _familyKey(name) {
   const n = String(name || '').toLowerCase();
   if (!n.trim()) return 'other';
@@ -186,14 +190,14 @@ function _bibleLabel(row) {
 }
 
 function _marketGroupKey(row, mode) {
-  if (mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s') {
+  if (mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s' || mode === 'ebay') {
     return _bibleId(row) || 'other';
   }
   return row.console_family || 'other';
 }
 
 function _marketGroupLabel(key, items, mode) {
-  if (mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s') {
+  if (mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s' || mode === 'ebay') {
     const sample = items.find(r => _bibleId(r) === key) || items[0] || {};
     if (key === 'other') return 'Altro / non classificato';
     return _bibleLabel(sample);
@@ -202,7 +206,7 @@ function _marketGroupLabel(key, items, mode) {
 }
 
 function _isSubitoMarket(mode) {
-  return mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s';
+  return mode === 'subito-b' || mode === 'subito-p' || mode === 'subito-s' || mode === 'ebay';
 }
 
 function _subitoPublicId(row) {
@@ -3468,8 +3472,8 @@ async function loadMarket(mode) {
         SUBITO_OPPS = _sanitizeRows(payload.items || []);
       }
       // Update stats for both sibling modes since we loaded all ads
-      const bRows = SUBITO_ADS.filter(a => _isAiApproved(a) && !!a.last_available);
-      const pRows = SUBITO_ADS.filter(a => _isAiPending(a));
+      const bRows = SUBITO_ADS.filter(a => _isAiApproved(a) && _isSubitoActive(a));
+      const pRows = SUBITO_ADS.filter(a => _isAiPending(a) && _isSubitoActive(a));
       _updateMktStats('subito-b', bRows);
       _updateMktStats('subito-p', pRows);
       _populateMktRegionFilter('subito-b', bRows);
@@ -3490,8 +3494,7 @@ async function loadMarket(mode) {
         [_fb],
       );
       if (rSold.ok) {
-        const items = _sanitizeRows(rSold.body);
-        EBAY_SOLD = items.filter(i => !PARTS_RE.test(i.name || ''));
+        EBAY_SOLD = _sanitizeRows(rSold.body);
       }
       _updateMktStats('ebay', EBAY_SOLD);
       _syncState();
@@ -3530,6 +3533,8 @@ function _renderMktRow(row, mode, famAvgs, oppByUrn) {
     if (mode === 'subito-s') {
       const rawD = row.sold_at_estimated || row.sold_at;
       tdData.textContent = rawD ? _fmtSubitoDate(rawD) : '—';
+    } else if (mode === 'ebay') {
+      tdData.textContent = row.sold_date || _fmtSubitoDate(row.first_seen);
     } else {
       tdData.textContent = _fmtSubitoDate(row.published_at);
     }
@@ -3642,9 +3647,9 @@ function renderMarket(mode) {
   // Base dataset per mode
   let rows;
   if (mode === 'subito-b') {
-    rows = SUBITO_ADS.filter(a => _isAiApproved(a) && !!a.last_available);
+    rows = SUBITO_ADS.filter(a => _isAiApproved(a) && _isSubitoActive(a));
   } else if (mode === 'subito-p') {
-    rows = SUBITO_ADS.filter(a => _isAiPending(a));
+    rows = SUBITO_ADS.filter(a => _isAiPending(a) && _isSubitoActive(a));
   } else if (mode === 'subito-s') {
     rows = SUBITO_SOLD.slice();
   } else {
@@ -3683,9 +3688,7 @@ function renderMarket(mode) {
   }
 
   const accent    = mode === 'ebay' ? '#e53935' : '#ff6600';
-  const famOrder  = mode === 'ebay'
-    ? [...CONSOLE_FAMILIES.map(f => f.key), 'other']
-    : Object.keys(byGroup).sort((a, b) => _marketGroupLabel(a, byGroup[a], mode).localeCompare(_marketGroupLabel(b, byGroup[b], mode), 'it'));
+  const famOrder  = Object.keys(byGroup).sort((a, b) => _marketGroupLabel(a, byGroup[a], mode).localeCompare(_marketGroupLabel(b, byGroup[b], mode), 'it'));
   const _famAvgs  = mode === 'subito-b' ? _computeFamilyAvgs(SUBITO_ADS) : {};
   const _oppByUrn = mode === 'subito-b' ? _buildOppMap(SUBITO_OPPS)      : {};
   const priceField = mode === 'ebay' ? 'sold_price' : 'last_price';
@@ -3788,8 +3791,8 @@ async function _updateMktAiStatus(adId, status) {
     const ad = SUBITO_ADS.find(a => a.id === adId);
     if (ad) ad.ai_status = status;
     // Aggiorna entrambe le viste
-    const bRows = SUBITO_ADS.filter(a => _isAiApproved(a) && !!a.last_available);
-    const pRows = SUBITO_ADS.filter(a => _isAiPending(a));
+    const bRows = SUBITO_ADS.filter(a => _isAiApproved(a) && _isSubitoActive(a));
+    const pRows = SUBITO_ADS.filter(a => _isAiPending(a) && _isSubitoActive(a));
     _updateMktStats('subito-b', bRows);
     _updateMktStats('subito-p', pRows);
     renderMarket('subito-p');

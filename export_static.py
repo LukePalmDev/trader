@@ -88,7 +88,7 @@ def export_all() -> None:
     _write("subito-sold.json", db_subito.get_sold_ads())
 
     log.info("Esportazione eBay sold (top 5000)...")
-    _write("ebay-sold.json", _get_ebay_sold_limited(5000))
+    _write("ebay-sold.json", _get_ebay_sold_limited(20000))
 
     # --- Valuation ---
     log.info("Esportazione valuation opportunities...")
@@ -173,6 +173,7 @@ def _get_active_ads() -> list[dict]:
 
 
 def _get_ebay_sold_limited(limit: int) -> list[dict]:
+    import db_ebay
     import sqlite3
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
@@ -183,7 +184,7 @@ def _get_ebay_sold_limited(limit: int) -> list[dict]:
             ORDER BY first_seen DESC NULLS LAST
             LIMIT ?
         """, (limit,)).fetchall()
-    return [dict(r) for r in rows]
+    return [db_ebay._with_bible_fields(dict(r)) for r in rows]
 
 
 def _get_combined_latest(data_dir: Path, sources_cfg: dict, enabled: list[str]) -> dict:

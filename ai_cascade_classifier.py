@@ -22,7 +22,7 @@ log = logging.getLogger("ai_cascade_classifier")
 
 PROMPT_VERSION = "ai-cascade:v2:bibbia+price:2026-06-05"
 TAXONOMY_VERSION = "xbox-bibbia:2026-06-05"
-DEFAULT_MODELS = ("openai/gpt-4o-mini", "openai/gpt-4.1-mini", "openai/gpt-5-mini")
+DEFAULT_MODELS = ("openai/gpt-5-nano", "openai/gpt-4.1-nano", "openai/gpt-5.4-nano")
 DEFAULT_THRESHOLD = 80
 DEFAULT_LIMIT = 200
 DEFAULT_OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
@@ -320,18 +320,21 @@ def _load_rows(
     limit: int | None,
     classify_all: bool,
 ) -> list[sqlite3.Row]:
-    where = ""
+    active_where = "last_available = 1 AND sold_at IS NULL"
     if not classify_all:
         where = """
-            WHERE (
+            WHERE last_available = 1
+              AND sold_at IS NULL
+              AND (
                 ai_status IN ('pending', 'pending_review')
                 OR ai_confidence IS NULL
                 OR ai_prompt_version IS NULL
                 OR ai_prompt_version <> ?
-            )
+              )
         """
         params: tuple[Any, ...] = (PROMPT_VERSION,)
     else:
+        where = f"WHERE {active_where}"
         params = ()
     sql = (
         "SELECT id, urn_id, name, body_text, last_price, ai_input_hash "
@@ -348,6 +351,20 @@ def _find_reusable_result(conn: sqlite3.Connection, input_hash: str) -> sqlite3.
         """
         SELECT taxonomy_id_final, confidence_final, status_final, selected_model
         FROM classification_runs
+        WHERE input_hash = ?
+          AND status_final IN ('approved_auto', 'rejected_auto', 'pending_review')
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (input_hash,),
+    ).fetchone()
+
+
+def _find_reusable_ebay_result(conn: sqlite3.Connection, input_hash: str) -> sqlite3.Row | None:
+    return conn.execute(
+        """
+        SELECT taxonomy_id_final, confidence_final, status_final, selected_model
+        FROM ebay_classification_runs
         WHERE input_hash = ?
           AND status_final IN ('approved_auto', 'rejected_auto', 'pending_review')
         ORDER BY id DESC
@@ -394,6 +411,67 @@ def _insert_run(
             """
             INSERT INTO classification_attempts (
                 run_id, ad_id, step_number, model, taxonomy_id, confidence,
+                object_type, price_signal, decision_reason, raw_response,
+                input_tokens, output_tokens, cost_estimate, latency_ms, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                run_id,
+                row["id"],
+                idx,
+                attempt["model"],
+                attempt["taxonomy_id"],
+                attempt["confidence"],
+                attempt["object_type"],
+                attempt["price_signal"],
+                attempt["decision_reason"],
+                attempt.get("raw_response"),
+                attempt.get("input_tokens"),
+                attempt.get("output_tokens"),
+                attempt.get("cost_estimate"),
+                attempt.get("latency_ms"),
+                _utc_now(),
+            ),
+        )
+    return run_id
+
+
+def _insert_ebay_run(
+    conn: sqlite3.Connection,
+    row: sqlite3.Row,
+    result: CascadeResult,
+    *,
+    dry_run: bool,
+) -> int | None:
+    if dry_run:
+        return None
+    cur = conn.execute(
+        """
+        INSERT INTO ebay_classification_runs (
+            sold_item_id, input_hash, title, price, taxonomy_version, prompt_version,
+            status_final, taxonomy_id_final, confidence_final, selected_model, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            row["id"],
+            result.input_hash,
+            row["name"],
+            row["last_price"],
+            TAXONOMY_VERSION,
+            PROMPT_VERSION,
+            result.status,
+            result.taxonomy_id,
+            result.confidence,
+            result.selected_model,
+            _utc_now(),
+        ),
+    )
+    run_id = int(cur.lastrowid)
+    for idx, attempt in enumerate(result.attempts, start=1):
+        conn.execute(
+            """
+            INSERT INTO ebay_classification_attempts (
+                run_id, sold_item_id, step_number, model, taxonomy_id, confidence,
                 object_type, price_signal, decision_reason, raw_response,
                 input_tokens, output_tokens, cost_estimate, latency_ms, created_at
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -475,6 +553,51 @@ def _apply_result_to_ad(
             f"ai-cascade:{result.selected_model}",
             classify_confidence,
             PROMPT_VERSION,
+            row["id"],
+        ),
+    )
+
+
+def _apply_result_to_ebay_item(
+    conn: sqlite3.Connection,
+    row: sqlite3.Row,
+    result: CascadeResult,
+    *,
+    dry_run: bool,
+) -> None:
+    if dry_run:
+        log.info(
+            "[DRY-RUN][eBay] item=%s taxonomy=%s confidence=%s status=%s model=%s",
+            row["id"],
+            result.taxonomy_id,
+            result.confidence,
+            result.status,
+            result.selected_model,
+        )
+        return
+
+    mapped = fields_from_canonical_id(result.taxonomy_id)
+    classify_confidence = round(result.confidence / 100.0, 3)
+    conn.execute(
+        """
+        UPDATE sold_items
+        SET console_family = ?,
+            sub_model = ?,
+            model_segment = ?,
+            edition_class = ?,
+            canonical_model = ?,
+            classify_method = ?,
+            classify_confidence = ?
+        WHERE id = ?
+        """,
+        (
+            mapped.console_family,
+            mapped.sub_model,
+            mapped.model_segment,
+            mapped.edition_class,
+            mapped.canonical_model,
+            f"ai-cascade:{result.selected_model}:{result.status}",
+            classify_confidence,
             row["id"],
         ),
     )
@@ -564,6 +687,115 @@ def _result_from_reuse(row: sqlite3.Row, reusable: sqlite3.Row, input_hash: str)
     )
 
 
+def _load_ebay_rows(
+    conn: sqlite3.Connection,
+    *,
+    limit: int | None,
+    classify_all: bool,
+) -> list[sqlite3.Row]:
+    where = ""
+    params: tuple[Any, ...] = ()
+    if not classify_all:
+        where = """
+            WHERE classify_method IS NULL
+               OR classify_method NOT LIKE 'ai-cascade:%'
+        """
+    sql = (
+        "SELECT id, item_id AS urn_id, name, '' AS body_text, sold_price AS last_price "
+        f"FROM sold_items {where} ORDER BY id"
+    )
+    if limit is not None and limit > 0:
+        sql += " LIMIT ?"
+        params = params + (int(limit),)
+    return conn.execute(sql, params).fetchall()
+
+
+def run_ebay_cascade_classifier(
+    *,
+    limit: int | None = None,
+    classify_all: bool = False,
+    threshold: int = DEFAULT_THRESHOLD,
+    dry_run: bool = False,
+    reuse: bool = True,
+    models: tuple[str, ...] | None = None,
+) -> dict[str, int]:
+    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not api_key and not dry_run:
+        raise RuntimeError("OPENAI_API_KEY non impostata.")
+
+    import db_ebay as _db_ebay
+
+    _db_ebay.init_db(DB_PATH)
+    conn = _connect(DB_PATH)
+    rows = _load_ebay_rows(conn, limit=limit, classify_all=classify_all)
+    log.info("AI cascade eBay: %d lotti candidati.", len(rows))
+
+    updated = 0
+    errors = 0
+    reused_count = 0
+    pending_review = 0
+    selected_models = models or _models_from_env()
+    threshold = max(0, min(int(threshold), 100))
+
+    for row in rows:
+        try:
+            input_hash = _input_hash(row)
+            reusable = _find_reusable_ebay_result(conn, input_hash) if reuse and not dry_run else None
+            if reusable is not None:
+                result = _result_from_reuse(row, reusable, input_hash)
+                reused_count += 1
+            else:
+                result = classify_row(
+                    row,
+                    api_key=api_key,
+                    models=selected_models,
+                    threshold=threshold,
+                )
+
+            _insert_ebay_run(conn, row, result, dry_run=dry_run)
+            _apply_result_to_ebay_item(conn, row, result, dry_run=dry_run)
+            updated += 1
+            if result.status == "pending_review":
+                pending_review += 1
+
+            if not dry_run and updated % 25 == 0:
+                conn.commit()
+        except Exception as exc:  # noqa: BLE001
+            log.error("Errore classificazione cascade eBay item %s: %s", row["id"], exc)
+            errors += 1
+
+    if not dry_run:
+        conn.commit()
+    conn.close()
+    log.info(
+        "AI cascade eBay completata: total=%d updated=%d reused=%d pending_review=%d errors=%d",
+        len(rows),
+        updated,
+        reused_count,
+        pending_review,
+        errors,
+    )
+    result = {
+        "total": len(rows),
+        "updated": updated,
+        "errors": errors,
+        "reused": reused_count,
+        "pending_review": pending_review,
+    }
+    try:
+        import job_runs as _job_runs
+        if errors and not updated:
+            _st, _msg = "error", f"eBay: {errors} errori, 0 aggiornati"
+        elif errors:
+            _st, _msg = "warn", f"eBay: {errors} errori su {len(rows)}"
+        else:
+            _st, _msg = "ok", None
+        _job_runs.record("ai-cascade", _st, counts={"ebay": result}, error=_msg)
+    except Exception:  # noqa: BLE001
+        pass
+    return result
+
+
 def run_ai_cascade_classifier(
     *,
     limit: int | None = DEFAULT_LIMIT,
@@ -649,7 +881,8 @@ def run_ai_cascade_classifier(
 
 
 def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Classifica annunci Subito con cascata OpenAI.")
+    parser = argparse.ArgumentParser(description="Classifica annunci Subito/eBay con cascata OpenAI.")
+    parser.add_argument("--source", choices=("subito", "ebay"), default="subito")
     parser.add_argument("--limit", type=int, default=DEFAULT_LIMIT)
     parser.add_argument("--all", action="store_true", dest="classify_all")
     parser.add_argument("--threshold", type=int, default=DEFAULT_THRESHOLD)
@@ -660,7 +893,7 @@ def _build_parser() -> argparse.ArgumentParser:
         default="",
         help=(
             "Lista modelli separata da virgola. Default: OPENAI_CASCADE_MODELS "
-            "o openai/gpt-4o-mini,openai/gpt-4.1-mini,openai/gpt-5-mini."
+            "o openai/gpt-5-nano,openai/gpt-4.1-nano,openai/gpt-5.4-nano."
         ),
     )
     return parser
@@ -669,14 +902,24 @@ def _build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     args = _build_parser().parse_args()
     models = tuple(part.strip() for part in args.models.split(",") if part.strip()) or None
-    result = run_ai_cascade_classifier(
-        limit=args.limit,
-        classify_all=args.classify_all,
-        threshold=args.threshold,
-        dry_run=args.dry_run,
-        reuse=not args.no_reuse,
-        models=models,
-    )
+    if args.source == "ebay":
+        result = run_ebay_cascade_classifier(
+            limit=args.limit,
+            classify_all=args.classify_all,
+            threshold=args.threshold,
+            dry_run=args.dry_run,
+            reuse=not args.no_reuse,
+            models=models,
+        )
+    else:
+        result = run_ai_cascade_classifier(
+            limit=args.limit,
+            classify_all=args.classify_all,
+            threshold=args.threshold,
+            dry_run=args.dry_run,
+            reuse=not args.no_reuse,
+            models=models,
+        )
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 

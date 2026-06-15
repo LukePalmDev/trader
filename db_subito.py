@@ -763,7 +763,7 @@ def get_all_ads(db_path: Path = DB_PATH) -> list[dict]:
                 ai_status, ai_confidence,
                 ai_taxonomy_id, ai_object_type, ai_price_signal,
                 verify_status,
-                sold_at_estimated, sold_window_hours
+                sold_at, sold_at_estimated, sold_window_hours
             FROM ads
             ORDER BY console_family, last_price ASC NULLS LAST
         """).fetchall()
@@ -784,6 +784,7 @@ def get_pending_reviews(limit: int = 250, db_path: Path = DB_PATH) -> list[dict]
                 a.id, a.urn_id, a.name, a.body_text, a.last_price, a.url, a.image_url,
                 a.city, a.region, a.ai_status, a.ai_confidence, a.ai_taxonomy_id,
                 a.ai_object_type, a.ai_price_signal, a.canonical_model,
+                a.last_available, a.sold_at,
                 r.id AS run_id, r.selected_model, r.created_at AS classified_at
             FROM ads a
             LEFT JOIN classification_runs r
@@ -794,6 +795,8 @@ def get_pending_reviews(limit: int = 250, db_path: Path = DB_PATH) -> list[dict]
                 LIMIT 1
               )
             WHERE a.ai_status = 'pending_review'
+              AND a.last_available = 1
+              AND a.sold_at IS NULL
             ORDER BY a.ai_confidence DESC, a.id DESC
             LIMIT ?
             """,
