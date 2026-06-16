@@ -28,6 +28,7 @@ LEGACY_DEFAULT_MODELS = ("openai/gpt-4o-mini", "openai/gpt-4.1-mini", "openai/gp
 DEFAULT_THRESHOLD = 80
 DEFAULT_LIMIT = 200
 DEFAULT_OPENAI_BASE_URL = "https://openrouter.ai/api/v1"
+FATAL_PROVIDER_STATUS_CODES = {401, 402, 403}
 
 OBJECT_TYPES = (
     "console",
@@ -74,6 +75,10 @@ class CascadeResult:
     selected_model: str
     attempts: list[dict[str, Any]]
     input_hash: str
+
+
+class AIProviderFatalError(RuntimeError):
+    """Provider error that cannot be fixed by retrying more rows."""
 
 
 def _utc_now() -> str:
@@ -237,6 +242,11 @@ def _post_openai(model: str, row: sqlite3.Row | dict[str, Any], api_key: str) ->
         timeout=60,
     )
     latency_ms = int((time.monotonic() - started) * 1000)
+    if response.status_code in FATAL_PROVIDER_STATUS_CODES:
+        body = _shorten(response.text, 400)
+        raise AIProviderFatalError(
+            f"provider AI non disponibile ({response.status_code}) per {model}: {body}"
+        )
     response.raise_for_status()
     data = response.json()
     content = data["choices"][0]["message"]["content"]
@@ -728,7 +738,7 @@ def run_ebay_cascade_classifier(
     reuse: bool = True,
     concurrency: int = 4,
     models: tuple[str, ...] | None = None,
-) -> dict[str, int]:
+) -> dict[str, Any]:
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key and not dry_run:
         raise RuntimeError("OPENAI_API_KEY non impostata.")
@@ -744,6 +754,7 @@ def run_ebay_cascade_classifier(
     errors = 0
     reused_count = 0
     pending_review = 0
+    fatal_error: str | None = None
     selected_models = models or _models_from_env()
     threshold = max(0, min(int(threshold), 100))
     concurrency = max(1, int(concurrency))
@@ -780,7 +791,9 @@ def run_ebay_cascade_classifier(
     row_iter = iter(rows)
     with ThreadPoolExecutor(max_workers=concurrency) as executor:
         def _submit_next() -> bool:
-            nonlocal reused_count, errors
+            nonlocal reused_count, errors, fatal_error
+            if fatal_error:
+                return False
             for row in row_iter:
                 try:
                     input_hash = _input_hash(row)
@@ -792,6 +805,11 @@ def run_ebay_cascade_classifier(
                         continue
                     pending[executor.submit(_classify_async, row)] = row
                     return True
+                except AIProviderFatalError as exc:
+                    fatal_error = str(exc)
+                    log.error("Interrompo classificazione cascade eBay: %s", exc)
+                    errors += 1
+                    return False
                 except Exception as exc:  # noqa: BLE001
                     log.error("Errore preparazione classificazione cascade eBay item %s: %s", row["id"], exc)
                     errors += 1
@@ -806,6 +824,14 @@ def run_ebay_cascade_classifier(
             row = pending.pop(future)
             try:
                 _record_result(row, future.result())
+            except AIProviderFatalError as exc:
+                fatal_error = str(exc)
+                log.error("Interrompo classificazione cascade eBay: %s", exc)
+                errors += 1
+                for pending_future in pending:
+                    pending_future.cancel()
+                pending.clear()
+                break
             except Exception as exc:  # noqa: BLE001
                 log.error("Errore classificazione cascade eBay item %s: %s", row["id"], exc)
                 errors += 1
@@ -830,9 +856,13 @@ def run_ebay_cascade_classifier(
         "reused": reused_count,
         "pending_review": pending_review,
     }
+    if fatal_error:
+        result["fatal_error"] = fatal_error
     try:
         import job_runs as _job_runs
-        if errors and not updated:
+        if fatal_error:
+            _st, _msg = "error", f"eBay: classificazione interrotta: {fatal_error}"
+        elif errors and not updated:
             _st, _msg = "error", f"eBay: {errors} errori, 0 aggiornati"
         elif errors:
             _st, _msg = "warn", f"eBay: {errors} errori su {len(rows)}"
@@ -852,7 +882,7 @@ def run_ai_cascade_classifier(
     dry_run: bool = False,
     reuse: bool = True,
     models: tuple[str, ...] | None = None,
-) -> dict[str, int]:
+) -> dict[str, Any]:
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key and not dry_run:
         raise RuntimeError("OPENAI_API_KEY non impostata.")
@@ -866,6 +896,7 @@ def run_ai_cascade_classifier(
     errors = 0
     reused_count = 0
     pending_review = 0
+    fatal_error: str | None = None
     selected_models = models or _models_from_env()
     threshold = max(0, min(int(threshold), 100))
 
@@ -892,6 +923,11 @@ def run_ai_cascade_classifier(
 
             if not dry_run and updated % 25 == 0:
                 conn.commit()
+        except AIProviderFatalError as exc:
+            fatal_error = str(exc)
+            log.error("Interrompo classificazione cascade: %s", exc)
+            errors += 1
+            break
         except Exception as exc:  # noqa: BLE001
             log.error("Errore classificazione cascade ad %s: %s", row["id"], exc)
             errors += 1
@@ -914,9 +950,13 @@ def run_ai_cascade_classifier(
         "reused": reused_count,
         "pending_review": pending_review,
     }
+    if fatal_error:
+        result["fatal_error"] = fatal_error
     try:
         import job_runs as _job_runs
-        if errors and not updated:
+        if fatal_error:
+            _st, _msg = "error", f"classificazione interrotta: {fatal_error}"
+        elif errors and not updated:
             _st, _msg = "error", f"{errors} errori, 0 aggiornati (controlla credito/API)"
         elif errors:
             _st, _msg = "warn", f"{errors} errori su {len(rows)}"

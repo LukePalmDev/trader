@@ -245,6 +245,75 @@ def test_ebay_cascade_updates_sold_item_and_saves_audit(tmp_path: Path, monkeypa
     assert attempts["n"] == 1
 
 
+def test_openai_payment_required_is_fatal(monkeypatch) -> None:
+    class FakeResponse:
+        status_code = 402
+        text = "Payment Required"
+
+        def raise_for_status(self) -> None:
+            raise AssertionError("fatal provider responses should not call raise_for_status")
+
+    monkeypatch.setattr(cascade.requests, "post", lambda *args, **kwargs: FakeResponse())
+
+    try:
+        cascade._post_openai("m1", _row(), "test")
+    except cascade.AIProviderFatalError as exc:
+        assert "402" in str(exc)
+        assert "Payment Required" in str(exc)
+    else:
+        raise AssertionError("expected AIProviderFatalError")
+
+
+def test_ebay_cascade_stops_on_provider_fatal_error(tmp_path: Path, monkeypatch) -> None:
+    db_path = tmp_path / "tracker.db"
+    monkeypatch.setattr(cascade, "DB_PATH", db_path)
+    monkeypatch.setenv("OPENAI_API_KEY", "test")
+    db_ebay.init_db(db_path)
+
+    con = sqlite3.connect(db_path)
+    for idx in range(5):
+        con.execute(
+            """
+            INSERT INTO sold_items (
+                item_id, name, console_family, sub_model, model_segment, edition_class,
+                canonical_model, classify_confidence, classify_method, sold_price,
+                sold_date, url, query_label, first_seen, last_seen
+            ) VALUES (?, ?, 'series', 'S', 'base', 'standard',
+                      'series-s-512gb', 0.8, 'rules:v1', 180, '',
+                      ?, 'Xbox Series S', 'now', 'now')
+            """,
+            (f"EBAY-{idx}", f"Xbox Series S Console {idx}", f"https://example.test/{idx}"),
+        )
+    con.commit()
+    con.close()
+
+    calls = 0
+
+    def fake_post(model, row, api_key):
+        nonlocal calls
+        calls += 1
+        raise cascade.AIProviderFatalError("provider AI non disponibile (402): Payment Required")
+
+    monkeypatch.setattr(cascade, "_post_openai", fake_post)
+
+    result = cascade.run_ebay_cascade_classifier(
+        limit=None,
+        classify_all=True,
+        models=("m1",),
+        concurrency=2,
+    )
+
+    assert result["updated"] == 0
+    assert result["errors"] == 1
+    assert "fatal_error" in result
+    assert calls <= 2
+
+    con = sqlite3.connect(db_path)
+    runs = con.execute("SELECT COUNT(*) FROM ebay_classification_runs").fetchone()[0]
+    con.close()
+    assert runs == 0
+
+
 def test_human_review_updates_ad_and_saves_audit(tmp_path: Path) -> None:
     db_path = tmp_path / "tracker.db"
     db_subito.init_db(db_path)
