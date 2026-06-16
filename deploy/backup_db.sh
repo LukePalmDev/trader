@@ -4,6 +4,7 @@ set -euo pipefail
 BACKUP_DIR="${BACKUP_DIR:-/var/backups/trader}"
 RETENTION_DAYS="${RETENTION_DAYS:-14}"
 LOG_DIR="${LOG_DIR:-/var/log/trader}"
+APP="$(cd "$(dirname "$0")/.." && pwd)"
 
 cd /
 
@@ -22,7 +23,6 @@ LOG_FILE="$LOG_DIR/backup.log"
 mkdir -p "$LOG_DIR" 2>/dev/null || true
 log_line() { echo "$(date -u +%FT%TZ) $*" >>"$LOG_FILE" 2>/dev/null || true; }
 
-APP="$(cd "$(dirname "$0")/.." && pwd)"
 PY="${TRADER_PYTHON:-/opt/trader/venv/bin/python}"
 [ -x "$PY" ] || PY="python3"
 rec() { (cd "$APP" && "$PY" job_runs.py record backup "$1" ${2:+--error "$2"}) 2>/dev/null || true; }
