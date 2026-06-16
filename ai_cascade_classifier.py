@@ -104,7 +104,7 @@ def _models_from_env() -> tuple[str, ...]:
         return DEFAULT_MODELS
     models = tuple(part.strip() for part in raw.split(",") if part.strip())
     if models == LEGACY_DEFAULT_MODELS:
-        log.warning(
+        log.info(
             "OPENAI_CASCADE_MODELS usa il vecchio default %s; applico il nuovo default %s.",
             ",".join(LEGACY_DEFAULT_MODELS),
             ",".join(DEFAULT_MODELS),
