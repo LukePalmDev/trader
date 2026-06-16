@@ -76,8 +76,8 @@ run_case() {
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
 {
   flock -n 9 || {
-    echo "[trader] another job is already running"
-    exit 75
+    echo "[trader] another job is already running; skip $job"
+    exit 0
   }
   echo "[trader] job $job started at $timestamp"
   run_case
