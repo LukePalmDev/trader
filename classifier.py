@@ -20,6 +20,7 @@ import os
 import sqlite3
 from pathlib import Path
 
+import settings  # noqa: F401  # carica .env prima del fallback Anthropic
 from model_rules import VALID_EDITIONS, VALID_SEGMENTS, classify_title
 from paths import DB_PATH
 

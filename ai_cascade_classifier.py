@@ -14,6 +14,7 @@ from typing import Any
 
 import requests
 
+import settings  # noqa: F401  # carica .env prima di leggere OPENAI_*
 from db_subito import DB_PATH, _connect, init_db as init_subito_db
 from model_rules import canonical_taxonomy_ids, fields_from_canonical_id, taxonomy_entry
 

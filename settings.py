@@ -84,6 +84,32 @@ def _env_str(name: str, default: str) -> str:
     return default if value is None else value.strip()
 
 
+def load_local_env(path: Path | None = None) -> None:
+    """Carica un file .env locale senza sovrascrivere variabili già presenti.
+
+    Non è una dipendenza esterna: righe vuote e commenti vengono ignorati.
+    Le virgolette che racchiudono il valore vengono rimosse.
+    """
+    env_path = path or (Path(__file__).parent / ".env")
+    if not env_path.is_file():
+        return
+    for raw_line in env_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("export "):
+            line = line[7:].strip()
+        if "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+            value = value[1:-1]
+        if key and key not in os.environ:
+            os.environ[key] = value
+
+
 def load_config(config_path: Path) -> dict:
     """Carica e valida config.toml applicando override ENV."""
     with config_path.open("rb") as fh:
@@ -212,3 +238,6 @@ def load_config(config_path: Path) -> dict:
 def load_default_config(root: Path | None = None) -> dict:
     base = root or Path(__file__).parent
     return load_config(base / "config.toml")
+
+
+load_local_env()

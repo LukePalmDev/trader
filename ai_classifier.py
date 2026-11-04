@@ -11,6 +11,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 import logging_setup
+import settings  # noqa: F401  # carica .env prima di leggere ANTHROPIC_API_KEY
 logging_setup.setup()
 log = logging.getLogger("ai_classifier")
 
