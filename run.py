@@ -1022,7 +1022,7 @@ def main() -> None:
             if success:
                 log.info("✅ Messaggio Telegram inviato con successo!")
             else:
-                log.error("❌ Invio Telegram fallito. Controlla bot_token e chat_id in config.toml")
+                log.error("❌ Invio Telegram fallito. Controlla TRADER_TELEGRAM_TOKEN e TRADER_TELEGRAM_CHAT_ID")
             ok = success
             return
 

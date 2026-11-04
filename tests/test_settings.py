@@ -1,8 +1,9 @@
+import os
 from pathlib import Path
 
 import pytest
 
-from settings import ConfigError, load_config
+from settings import ConfigError, load_config, load_local_env
 
 
 _VALID = """
@@ -42,6 +43,26 @@ def test_load_config_with_env_override(tmp_path: Path, monkeypatch: pytest.Monke
 
     assert cfg["viewer"]["host"] == "0.0.0.0"
     assert cfg["common"]["playwright_channel"] == "chromium"
+
+
+def test_load_local_env_fills_missing_and_keeps_existing(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("TRADER_TEST_KEEP", "from-env")
+    monkeypatch.delenv("TRADER_TEST_FROM_FILE", raising=False)
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "\n".join([
+            "# commento",
+            "TRADER_TEST_KEEP=from-file",
+            'export TRADER_TEST_FROM_FILE="yes"',
+            "",
+        ]),
+        encoding="utf-8",
+    )
+
+    load_local_env(env_file)
+
+    assert os.environ["TRADER_TEST_KEEP"] == "from-env"
+    assert os.environ["TRADER_TEST_FROM_FILE"] == "yes"
 
 
 def test_load_config_raises_on_missing_sections(tmp_path: Path) -> None:

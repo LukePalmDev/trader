@@ -215,6 +215,11 @@ def _make_handler(
                 result.append(entry)
             return result
 
+        def do_HEAD(self):
+            # do_HEAD della stdlib ignora questo routing e, su "/", elenca la
+            # root del repository. Le richieste HEAD usano lo stesso instradamento.
+            self.do_GET()
+
         # --- GET routing ---
 
         def do_GET(self):
@@ -381,6 +386,13 @@ def _make_handler(
                 self.send_response(302)
                 self.send_header("Location", "/viewer/index.html")
                 self.end_headers()
+            elif path in ("/log", "/log.html", "/style.css"):
+                # Nginx in produzione ha root=viewer/. In locale gli stessi URL
+                # assoluti (pagina /log e il suo CSS) devono risolversi qui.
+                target = "/viewer/log.html" if path in ("/log", "/log.html") else "/viewer/style.css"
+                qs = urlparse(self.path).query
+                self.path = target + (f"?{qs}" if qs else "")
+                super().do_GET()
             elif path.startswith("/viewer/"):
                 # Serve solo la cartella viewer — nient'altro è accessibile
                 super().do_GET()
@@ -515,7 +527,10 @@ def start_server(
 
     if not api_token:
         api_token = secrets.token_hex(16)
-        log.warning("NESSUN API TOKEN CONFIGURATO! Token auto-generato per la sessione: %s", api_token)
+        log.warning(
+            "Nessun TRADER_API_TOKEN configurato: generato un token di sessione. "
+            "Il valore non viene scritto nei log."
+        )
 
     os.chdir(_ROOT)
 
@@ -542,7 +557,7 @@ def start_server(
 
     url = f"http://{host}:{actual_port}/viewer/index.html"
     log.info("Viewer avviato su: %s", url)
-    log.info("API Token: %s  (il viewer lo legge automaticamente dall'header di bootstrap)", api_token)
+    log.info("Il viewer riceve le credenziali da /api/token; il valore non è nei log.")
     log.info("Premi Ctrl+C per fermare.")
 
     if open_browser:

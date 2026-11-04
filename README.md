@@ -1,522 +1,139 @@
 # Xbox Tracker
 
-Tracker multi-sorgente per prezzi console Xbox.
-Scrapa 8 fonti online, classifica automaticamente gli annunci con AI, calcola il fair value di mercato e notifica le occasioni d'acquisto via macOS e Telegram.
+Tracker dei prezzi delle console Xbox sul mercato dell'usato italiano.
+Legge i listini di negozi e marketplace, classifica gli annunci, stima un prezzo equo e segnala le occasioni.
 
-## Architettura
+Il programma gira in locale oppure sul server (droplet, `trader.byluke.org`).
+Questo repository è solo il codice: non è pubblicato su GitHub Pages.
+Il viewer usato è `viewer/`. La cartella `frontend/` è uno scaffold Preact incompleto e non va avviato al posto del viewer.
 
-```
-Scraper (8 fonti)  ->  Snapshot JSON  ->  tracker.db (SQLite)  ->  API HTTP  ->  Viewer Web
-       |                                        |
-  Playwright/requests                    Change detection
-  Algolia API                            AI classification
-                                         Fair value engine
-                                         Alert (macOS + Telegram)
-```
+## Cosa fa
 
-### Componenti principali
+1. Gli scraper in `scrapers/` salvano uno snapshot JSON per fonte.
+2. `db.py`, `db_subito.py` e `db_ebay.py` aggiornano `tracker.db` (SQLite) e lo storico delle variazioni.
+3. `model_rules.py` e `ai_cascade_classifier.py` assegnano famiglia, modello e ID della Bibbia (`Bibbia.md`).
+4. `valuation.py` stima il fair value (CEX 45%, eBay venduti 35%, Subito 20%, con taglio degli outlier).
+5. `alerts.py` può notificare su macOS e Telegram.
+6. `server.py` espone l'API e il viewer su `127.0.0.1:8080`. In produzione Nginx fa da reverse proxy.
 
-| File | Ruolo |
-|------|-------|
-| `run.py` | CLI orchestrator — scraping, cleanup, cron, classificazione, viewer |
-| `server.py` | Server HTTP con API REST JSON (30+ endpoint GET, 2 POST) |
-| `db.py` | Modulo prodotti shop — schema `products` + `state_changes` |
-| `db_subito.py` | Modulo annunci Subito.it — schema `ads` + `ad_changes` |
-| `db_ebay.py` | Modulo eBay venduti — schema `sold_items` + `sold_changes` |
-| `migrations.py` | Framework migrazioni schema versionato con namespace |
-| `classifier.py` | Pipeline classificazione: regole + CEX matching + fallback AI |
-| `ai_classifier.py` | Legacy Anthropic deprecato; il flusso operativo usa `ai_cascade_classifier.py` |
-| `ai_cascade_classifier.py` | Nuova classificazione OpenAI a cascata con tassonomia vincolata e review umana |
-| `valuation.py` | Fair value engine: mediana ponderata CEX/Subito/eBay con backtesting |
-| `alerts.py` | Sistema alert prezzi con notifiche macOS + Telegram |
-| `verify_sold.py` | Verifica asincrona stato venduto annunci Subito |
-| `model_rules.py` | Classificazione deterministica regex (famiglia, sotto-modello, segmento, edizione) |
-| `settings.py` | Configurazione da `config.toml` + override ENV |
-| `id_utils.py` | Generazione ID stabili per prodotti |
-| `run_report.py` | Tracciamento esecuzione con timing e report JSON |
-
-### Scrapers
-
-| Fonte | Metodo | File |
-|-------|--------|------|
-| CEX (it.webuy.com) | Algolia API | `scrapers/cex.py` |
-| Gamelife.it | Playwright (context fresco per Cloudflare) | `scrapers/gamelife.py` |
-| GamePeople.it | Playwright | `scrapers/gamepeople.py` |
-| Gameshock.it | requests + BeautifulSoup | `scrapers/gameshock.py` |
-| Rebuy.it | requests + BeautifulSoup | `scrapers/rebuy.py` |
-| Subito.it | Playwright (bypass Akamai) | `scrapers/subito.py` |
-| eBay.it | Playwright (solo SOLD items) | `scrapers/ebay.py` |
-| JollyRogerBay | Disabilitato (solo giochi) | `scrapers/jollyrogerbay.py` |
-
-### Viewer Web
-
-UI single-page statica in `viewer/` con dark mode e dashboard operative:
-
-| Tab | Descrizione |
-|-----|-------------|
-| Home | Dashboard statistiche e riepilogo prezzi |
-| Riepilogo | Panoramica globale con statistiche aggregate per store |
-| Catalogo | Tabella prodotti shop con filtri, ordinamento e toggle base model |
-| Subito.it B/P/S | Annunci marketplace per vista operativa, prezzo e stato |
-| Subito Dash | Dashboard venduti Subito con grafici giornalieri e dettaglio per console |
-| eBay | Venduti eBay con statistiche prezzo per famiglia |
-| Statistiche | Z-score, spread, trend analysis, clustering, fair value |
-| Trend | Grafici SVG storici dei prezzi per i modelli base con filtri periodo/famiglia |
-| Ricerca | Ricerca avanzata per attributi (famiglia, modello, edizione, colore, storage) |
-
-Funzionalita viewer:
-- **Dark mode** — toggle chiaro/scuro con persistenza `localStorage`
-- **Event delegation** — listener delegati per performance con migliaia di annunci
-- **Caricamento resiliente** — `Promise.allSettled` con fallback per ogni API
-- **Token bootstrap** — acquisizione automatica del token ad ogni avvio (no stale tokens)
-
-Moduli JavaScript:
-- `modules/api.js` — client REST con bearer token auth (bootstrap automatico)
-- `modules/sanitize.js` — XSS prevention (sanitizeText, sanitizeUrl, sanitizeRecord)
-- `modules/state.js` — gestione stato globale
-
-## Database
-
-Tutti i dati risiedono in un singolo file `tracker.db` (SQLite) con 8 tabelle:
-
-| Tabella | Dominio | Record tipici |
-|---------|---------|---------------|
-| `categories` | Categorie console | 4 |
-| `storage_sizes` | Dimensioni storage | 11 |
-| `products` | Prodotti shop (6 fonti) | ~400 |
-| `state_changes` | Storico prezzi/disponibilita shop | ~600+ |
-| `ads` | Annunci Subito.it | ~18.000 |
-| `ad_changes` | Storico modifiche annunci | ~18.500 |
-| `sold_items` | eBay venduti | ~2.800 |
-| `sold_changes` | Variazioni prezzo venduti | ~200 |
-
-Le migrazioni sono gestite con namespace (`products`, `ads`, `ebay`) nella tabella `schema_migrations`.
-
-## Catalogazione Xbox
-
-Dal 5 giugno 2026 il progetto usa `Bibbia.md` come fonte canonica dei contenitori Xbox:
-
-| Campo | Valori principali | Significato |
-|-------|-------------------|-------------|
-| `console_family` | `original`, `360`, `one`, `series`, `other` | Famiglia principale. |
-| `sub_model` | Derivato da `Modello` nella Bibbia | Modello dentro la famiglia. |
-| `canonical_model` | es. `12622`, `14111`, `24221` | ID canonico della riga Bibbia. |
-
-Il catalogo operativo è in `Bibbia.md` e `console_catalog.md`; il riferimento strutturato
-è in `taxonomy.json` e `catalogs/xbox_bibbia_2026-06-05.json`. Lo schema precedente è
-archiviato in `STORICI3GIUGNO/`.
-
-## Pipeline di classificazione
-
-```
-Titolo annuncio
-    |
-    v
-[1] Regole deterministiche (model_rules.py)
-    -> famiglia, sub_model, segmento, edizione, canonical_model
-    |
-    v
-[2] CEX Matching (Jaccard similarity)
-    -> boost confidence se match >= 0.45
-    |
-    v
-[3] AI Cascade GPT (OpenRouter/OpenAI-compatible)
-    -> taxonomy_id canonico oppure other
-    -> review umana se confidence bassa o prezzo incoerente
-```
-
-### AI Classifier legacy
-
-Il vecchio filtro Anthropic e il fallback Claude sono deprecati. Gli entrypoint
-operativi `--ai-classify` e `trader-ai-classify` ora instradano sul cascade GPT.
-Il fallback Anthropic in `classifier.py` resta disponibile solo impostando
-`TRADER_ENABLE_LEGACY_ANTHROPIC=true`.
-
-### AI Cascade Classifier (Bibbia-first)
-
-Pipeline OpenAI/OpenRouter operativa per Subito:
-- Input: titolo, descrizione e prezzo.
-- Output vincolato: `taxonomy_id` numerico della Bibbia oppure `other`, confidence 0-100, tipo oggetto e segnale prezzo.
-- Cascata modelli via OpenRouter: `openai/gpt-5-nano` → `openai/gpt-4.1-nano` → `openai/gpt-5.4-nano`, configurabile via `OPENAI_CASCADE_MODELS`.
-- Soglia default 80: sotto soglia passa al modello successivo; sotto soglia anche al terzo finisce in `pending_review`.
-- Audit su `classification_runs`, `classification_attempts`, `human_reviews`.
-
-## Fair Value Engine
-
-Calcola il "prezzo equo" per ogni modello Xbox:
-
-```
-fair_value = weighted_average(
-    CEX_net_price * 0.45,    # prezzi CEX al netto IVA 22%
-    eBay_sold_median * 0.35,  # mediana venduti eBay
-    Subito_median * 0.20      # mediana annunci Subito
-)
-```
-
-Con trimmed mean (rimuove outlier 15%), backtesting vs eBay venduti (MAPE, MAE), e tuning automatico dei pesi.
-
-## Comandi principali
-
-```bash
-# Scrape tutte le fonti abilitate
-python3 run.py
-
-# Scrape fonti specifiche
-python3 run.py --source subito,ebay
-
-# Scrape + viewer web
-python3 run.py --all
-
-# Pipeline completo: Subito + eBay + verify sold + AI cascade GPT + viewer
-python3 run.py --full
-
-# Solo viewer web (senza scraping)
-python3 run.py --view
-
-# Classificazione attributi locale
-python3 run.py --classify
-python3 run.py --classify --classify-limit 100 --classify-dry-run
-
-# Classificazione OpenAI a cascata su annunci Subito
-python3 run.py --ai-classify --ai-limit 200        # alias compatibile
-python3 run.py --ai-cascade-classify --ai-cascade-limit 200
-python3 run.py --ai-cascade-classify --ai-cascade-all --ai-cascade-threshold 80
-
-# Report fair value
-python3 run.py --valuation-report
-
-# Tuning pesi fair value
-python3 run.py --tune-valuation
-
-# Test notifica Telegram
-python3 run.py --test-telegram
-
-# Maintenance: retention snapshot + archiviazione + VACUUM
-python3 run.py --cleanup
-
-# Routine server (systemd timers su VPS)
-systemctl list-timers 'trader-*'
-journalctl -u trader-scrape-subito.service -n 80 --no-pager
-
-# Scrape Subito mirato (una o più regioni)
-python3 run.py --source subito --subito-region lombardia
-python3 run.py --source subito --subito-region "lombardia,veneto" --subito-max-pages 120
-
-# Deduplica snapshot Subito senza rieseguire scraping
-python3 run.py --subito-dedup --subito-dedup-latest 5
-python3 run.py --subito-dedup --subito-dedup-files "data/subito_a.json,data/subito_b.json" --subito-dedup-update-db
-
-# Verify sold mirata su annunci Xbox-only
-python3 run.py --verify-sold 500 --verify-xbox-only --verify-chunk-size 200
-```
-
-## Configurazione
-
-File `config.toml` con override via variabili d'ambiente `TRADER_*`:
-
-| Variabile ENV | Default | Descrizione |
-|---------------|---------|-------------|
-| `TRADER_VIEWER_HOST` | `127.0.0.1` | Host del viewer |
-| `TRADER_VIEWER_PORT` | `8080` | Porta del viewer |
-| `TRADER_VIEWER_OPEN_BROWSER` | `true` | Apri browser automaticamente |
-| `TRADER_API_TOKEN` | (vuoto) | Token bearer per API (auto-generato se vuoto) |
-| `TRADER_PLAYWRIGHT_CHANNEL` | `chrome` | Browser: `chrome` (sistema) o `chromium` (bundled) |
-| `TRADER_RETENTION_KEEP` | `30` | Snapshot da mantenere per fonte |
-| `TRADER_ARCHIVE_AFTER_DAYS` | `45` | Comprimi snapshot dopo N giorni |
-| `TRADER_TELEGRAM_ENABLED` | `false` | Abilita notifiche Telegram |
-| `TRADER_TELEGRAM_TOKEN` | (vuoto) | Token bot Telegram (da @BotFather) |
-| `TRADER_TELEGRAM_CHAT_ID` | (vuoto) | Chat ID destinatario Telegram |
-| `OPENAI_API_KEY` | — | Chiave API OpenRouter/OpenAI-compatible per `ai_cascade_classifier.py` |
-| `OPENAI_BASE_URL` | `https://openrouter.ai/api/v1` | Endpoint OpenAI-compatible |
-| `OPENAI_CASCADE_MODELS` | `openai/gpt-5-nano,openai/gpt-4.1-nano,openai/gpt-5.4-nano` | Modelli OpenRouter in cascata |
-| `TRADER_ENABLE_LEGACY_ANTHROPIC` | `false` | Riabilita il vecchio fallback Anthropic solo per recuperi manuali |
-
-## Notifiche Telegram
-
-Le notifiche deal vengono inviate sia come alert macOS nativi che come messaggi Telegram (se configurato).
-
-### Setup
-
-1. Crea un bot con **@BotFather** su Telegram (`/newbot`)
-2. Copia il token del bot
-3. Avvia il bot e invia un messaggio, poi visita `https://api.telegram.org/botTUO_TOKEN/getUpdates` per ottenere il `chat_id`
-4. Configura in `config.toml`:
-
-```toml
-[telegram]
-enabled   = true
-bot_token = "123456789:ABCdefGHIjklMNOpqrSTUvwxYZ"
-chat_id   = "987654321"
-```
-
-5. Testa con `python3 run.py --test-telegram`
-
-In alternativa, usa variabili d'ambiente:
-```bash
-export TRADER_TELEGRAM_ENABLED=true
-export TRADER_TELEGRAM_TOKEN="123456789:ABCdef..."
-export TRADER_TELEGRAM_CHAT_ID="987654321"
-```
-
-## Sicurezza
-
-- Server bindato a `127.0.0.1` di default (solo localhost)
-- Tutti gli endpoint API (GET e POST) protetti con Bearer token
-- Token acquisito dal viewer via endpoint bootstrap `/api/token` (no query string)
-- Token rinnovato ad ogni avvio server (nessun token stale in sessionStorage)
-- Token in `sessionStorage` (si cancella alla chiusura del browser)
-- Input sanitizzato lato client (XSS prevention)
-- Input validato lato server (`_safe_int` con clamp)
-- Timing-safe comparison per token (`secrets.compare_digest`)
-
-## Alert
-
-Il sistema controlla dopo ogni scrape Subito se ci sono annunci sotto soglia:
-
-```
-soglia = MIN(prezzo_CEX_base_model) x (1 - 0.22 IVA)
-```
-
-Se un annuncio approvato dall'AI ha prezzo < soglia:
-- Invia notifica **macOS** nativa (osascript)
-- Invia messaggio **Telegram** (se configurato)
-
-I notificati sono tracciati in `alert_log.json` (con purge automatica a 90 giorni).
+Fonti abilitate in `config.toml`: CEX, Gamelife, GamePeople, Gameshock, Rebuy, Subito, eBay (solo venduti). JollyRogerBay è disabilitato perché vende giochi, non hardware.
 
 ## Requisiti
 
 - Python 3.10+
-- Dipendenze: `pip install -r requirements.lock`
-- Browser: `python -m playwright install chromium`
+- Dipendenze bloccate: `pip install -r requirements.lock`
+- Per gli scraper con browser: `python3 -m playwright install chromium`
+- Per i test: `pip install -r requirements-dev.txt` e poi `pytest`
 
-## Test e automazioni
+`pyproject.toml` elenca le stesse dipendenze runtime del lockfile.
 
-- Unit/smoke test: `pytest`
-- Lint: `ruff check .`
-- Routine operative: systemd timers sul server, documentati in `docs/server-routines.md`
-- GitHub Actions: workflow storici archiviati in `STORICI3GIUGNO/github-workflows/`
-- GitHub resta repository del codice; scraping, AI, verify e backup girano sul server.
-
-## Migrazione da vecchi DB
-
-Se provieni da una versione con 3 DB separati (`trader.db`, `subito.db`, `ebay.db`):
+## Avvio locale
 
 ```bash
-python3 migrate_to_tracker.py
+pip install -r requirements.lock
+python3 -m playwright install chromium
+cp .env.example .env          # opzionale: compila solo le chiavi che usi
+python3 run.py --view         # viewer su http://127.0.0.1:8080/viewer/index.html
 ```
 
-Lo script unisce i dati in `tracker.db` preservando tutti i record. I vecchi file restano come backup.
+Senza `.env` il viewer parte lo stesso: genera un token di sessione e non apre il browser se `TRADER_VIEWER_OPEN_BROWSER=false`.
+Il database `tracker.db` viene creato al primo avvio se manca. Non va committato.
 
-## Struttura directory
+Comandi utili, tutti senza obbligo di chiavi API tranne dove indicato:
 
-```
-trader/
-├── config.toml              # Configurazione multi-fonte + Telegram
-├── run.py                   # CLI orchestrator
-├── server.py                # Server HTTP + API REST
-├── db.py                    # Modulo DB prodotti shop
-├── db_subito.py             # Modulo DB annunci Subito
-├── db_ebay.py               # Modulo DB venduti eBay
-├── migrations.py            # Framework migrazioni schema
-├── classifier.py            # Pipeline classificazione (rules + AI)
-├── ai_classifier.py         # Legacy Anthropic deprecato
-├── ai_cascade_classifier.py # Classificazione GPT/OpenRouter Bibbia-first
-├── valuation.py             # Fair value engine + backtesting
-├── alerts.py                # Alert prezzi + notifiche macOS + Telegram
-├── verify_sold.py           # Verifica stato venduto Subito
-├── model_rules.py           # Regole classificazione regex
-├── Bibbia.md                # Fonte canonica umana dei contenitori Xbox
-├── console_catalog.md       # Vista catalogo allineata alla Bibbia
-├── catalogs/
-│   ├── xbox_bibbia_2026-06-05.json
-│   └── xbox_taxonomy_2026-06-03.json  # compat legacy
-├── settings.py              # Config validation + ENV override
-├── id_utils.py              # Generazione ID stabili
-├── run_report.py            # Tracciamento esecuzione
-├── migrate_to_tracker.py    # Script migrazione DB (una tantum)
-├── tracker.db               # Database SQLite unificato
-├── scrapers/
-│   ├── base.py              # Utilities comuni (clean_price, retry, save_snapshot)
-│   ├── cex.py               # CEX — Algolia API
-│   ├── ebay.py              # eBay — Playwright (SOLD only)
-│   ├── gamelife.py          # GameLife — Playwright + Cloudflare bypass
-│   ├── gamepeople.py        # GamePeople — Playwright
-│   ├── gameshock.py         # GameShock — requests
-│   ├── rebuy.py             # ReBuy — requests
-│   ├── subito.py            # Subito.it — Playwright + Akamai bypass
-│   └── jollyrogerbay.py     # Disabilitato (solo giochi)
-├── viewer/
-│   ├── index.html           # SPA shell (9 tab + dark mode toggle)
-│   ├── app.js               # Logica principale (rendering, filtri, sort, grafici SVG)
-│   ├── style.css            # Stili responsive + dark theme via CSS variables
-│   └── modules/
-│       ├── api.js           # REST client + bearer token bootstrap (auto-refresh)
-│       ├── sanitize.js      # XSS prevention
-│       └── state.js         # Stato globale
-├── data/                    # Snapshot JSON (non versionati)
-│   └── archive/             # Snapshot compressi (.json.gz)
-├── logs/                    # Report runtime
-├── tests/                   # Test suite
-├── docs/runbook.md          # Procedure operative
-├── docs/server-routines.md  # Timer systemd e mapping routine server
-└── STORICI3GIUGNO/          # Catalogo legacy e vecchi workflow GitHub
+```bash
+python3 run.py --help
+python3 run.py --valuation-report
+python3 run.py --classify --classify-dry-run --classify-limit 20
+python3 run.py --source cex                 # una fonte; serve rete
+python3 run.py --cleanup
+pytest
+ruff check .
 ```
 
-## Criticità note: verify\_sold
+La classificazione AI (`--ai-classify`, `--ai-cascade-classify`) richiede `OPENAI_API_KEY`.
+`--test-telegram` richiede il bot Telegram. Gli scraper Playwright richiedono il browser installato.
 
-Questa sezione documenta i problemi ricorrenti rilevati analizzando i run CI del 11 Aprile 2026 (v0→v3) e le sessioni di sviluppo precedenti.
+Sul server le routine periodiche sono timer systemd, non GitHub Actions.
+Vedi `docs/server-routines.md` e `docs/digitalocean-migration.md`.
+I workflow storici stanno in `STORICI3GIUGNO/github-workflows/`.
+L'unico workflow attivo, `.github/workflows/scrape-remote.yml`, scrapa Rebuy (e Subito se raggiungibile) dagli IP GitHub e spedisce lo snapshot al server via SSH.
 
----
+## Variabili d'ambiente
 
-### 1. Cloudflare cffi-block: degrado massiccio della coverage
+Copia `.env.example` in `.env`. Il processo legge `.env` all'avvio e non sovrascrive variabili già definite.
+Non mettere token in `config.toml`: quel file è versionato.
 
-**Descrizione**
-Il fast-path di verifica (`cffi` — HTTP diretto senza Playwright) viene bloccato da Cloudflare con risposte HTTP non classificabili. Quando Cloudflare entra in "burst block mode", interi chunk da 350 annunci vengono skippati in meno di 1 secondo (`reason: skipped:cffi-block=350`).
+| Variabile | Obbligatoria | Ruolo |
+|-----------|--------------|--------|
+| `OPENAI_API_KEY` | solo per l'AI | Chiave OpenRouter (o altro endpoint compatibile) |
+| `OPENAI_BASE_URL` | no | Default `https://openrouter.ai/api/v1` |
+| `OPENAI_CASCADE_MODELS` | no | Modelli in cascata, separati da virgola |
+| `TRADER_TELEGRAM_TOKEN` | solo per gli alert Telegram | Token del bot da @BotFather |
+| `TRADER_TELEGRAM_CHAT_ID` | solo per gli alert Telegram | Chat destinataria |
+| `TRADER_TELEGRAM_ENABLED` | no | `true` per inviare. Resta disattivo se manca token o chat |
+| `TRADER_API_TOKEN` | no in locale, sì in produzione | Bearer dell'API. Sul server: `openssl rand -hex 32` |
+| `TRADER_DB_PATH` | no | Default `tracker.db`. Sul server: `/var/lib/trader/tracker.db` |
+| `TRADER_OUTPUT_DIR` | no | Directory degli snapshot. Default `data` |
+| `TRADER_VIEWER_HOST` | no | Default `127.0.0.1` |
+| `TRADER_VIEWER_PORT` | no | Default `8080` |
+| `TRADER_VIEWER_OPEN_BROWSER` | no | Default preso da `config.toml` (`true`). In server va `false` |
+| `TRADER_PLAYWRIGHT_CHANNEL` | no | `chromium` (bundled) o `chrome` (installato sul sistema) |
+| `TRADER_PROXY` | no | Proxy HTTP opzionale, `http://utente:password@host:porta` |
+| `ANTHROPIC_API_KEY` | no | Solo se riattivi il fallback legacy con `TRADER_ENABLE_LEGACY_ANTHROPIC=true` |
 
-**Impatto osservato (4 run dello stesso giorno)**
+Sul droplet i valori stanno in `/etc/trader/trader.env` (parti da `deploy/trader.env.example`).
+Dopo aver cambiato quel file: `systemctl restart trader-viewer.service`.
 
-| Run | Ora | Pool | Verificati | Coverage | cffi-block chunks |
-|-----|-----|------|-----------|----------|-------------------|
-| v0 | 10:09 | 7.012 | 5.350 | **76%** | 0 |
-| v1 | 12:11 | 6.868 | 6.088 | **89%** | 2 |
-| v2 | 15:24 | 6.854 | 2.802 | **41%** | 13 |
-| v3 | 21:48 | 9.471 | 2.464 | **26%** | 20 consecutivi |
+## Comandi principali
 
-La coverage crolla da 89% a 26% nello stesso giorno in base all'orario. I run mattutini sono sistematicamente migliori.
-
-**Causa radice**
-Subito.it usa Cloudflare con rate limiting adattivo. Alte concorrenze (`--concurrency 18`) e chunk rapidi saturano la finestra di tolleranza. I run pomeridiani/serali partono già con un budget IP esaurito da sessioni precedenti.
-
-**Stato:** aperto — nessuna soluzione stabile implementata.
-
----
-
-### 2. Anti-burst pause fissa non scala contro blocchi sostenuti
-
-**Descrizione**
-Il meccanismo anti-burst (commit `8329759`) rileva N chunk consecutivi con cffi-block e applica una pausa di **30 secondi fissi** prima di riprovare. Quando Cloudflare rimane bloccato per molti chunk consecutivi, la pausa si ripete indefinitamente senza escalation.
-
-**Impatto osservato (v3)**
-- 20 burst rilevati consecutivi → 20 × 30s = **10 minuti sprecati in pause**
-- Cloudflare non si sblocca dopo 30s: la pausa non è abbastanza lunga
-- Il run termina in soli 13 minuti con 74% degli annunci skippati
-
-**Comportamento attuale**
+```bash
+python3 run.py                              # tutte le fonti abilitate
+python3 run.py --source subito,ebay
+python3 run.py --source subito --subito-region lombardia
+python3 run.py --all                        # scrape + viewer
+python3 run.py --full                       # Subito + eBay + verify sold + AI + viewer
+python3 run.py --ai-cascade-classify --ai-cascade-limit 200
+python3 run.py --verify-sold 500 --verify-xbox-only
+python3 run.py --tune-valuation
+python3 run.py --test-telegram
+python3 migrate_to_tracker.py               # solo se hai i vecchi DB separati
 ```
-WARNING: Cloudflare burst rilevato (N chunk consecutivi con cffi-block): pausa 30s
-# N cresce ma la pausa resta sempre 30s
+
+## Viewer
+
+Apri `http://127.0.0.1:8080/viewer/index.html` (il server reindirizza anche `/`).
+La pagina stato log è `http://127.0.0.1:8080/log`.
+Le chiamate API usano un bearer token letto da `/api/token` e tenuto in `sessionStorage`.
+
+In produzione Nginx pubblica il sito e inoltra `/api/` al processo locale.
+Il token di bootstrap è quindi raggiungibile da chi apre il sito: non è una password da distribuire, e le scritture (scrape, review) sono possibili a chiunque raggiunga l'API. Il sito va tenuto privato di rete se quei POST non devono essere pubblici.
+
+## Dati e classificazione
+
+Dal 5 giugno 2026 `Bibbia.md` è l'elenco canonico dei contenitori Xbox.
+`canonical_model` è l'ID numerico di quella riga. Dettaglio operativo in `flusso.md`, `SYSTEM_ARCHITECTURE.md` e `docs/runbook.md`.
+
+La cascata AI (OpenRouter) accetta solo un `taxonomy_id` della Bibbia oppure `other`.
+Sotto la soglia di confidence l'annuncio finisce in review umana.
+
+## Limitazioni note
+
+Subito e alcuni negozi bloccano gli IP dei datacenter (Cloudflare / Akamai).
+`verify_sold.py` usa un fast-path HTTP, backoff esponenziale sui blocchi (30s, 60s, 120s, tetto 300s), un secondo giro sugli annunci bloccati e, se gli passi `--min-coverage-ratio`, esce con codice 3 quando la coverage resta sotto soglia.
+Non elimina il blocco: le run da IP residenziale o negli orari meno saturi restano più stabili.
+Gamelife e Subito, sul droplet, non passano dallo scrape datacenter (vedi `deploy/server_job.sh`).
+
+## Layout
+
 ```
-
-**Comportamento desiderato**
-Backoff esponenziale: 30s → 60s → 120s → cap a 300s, oppure dopo soglia (es. 5 burst consecutivi) abbandonare il cffi per il resto del run e passare a Playwright puro.
-
-**Stato:** aperto — patch necessaria in `verify_sold.py`.
-
----
-
-### 3. Nessun fallback Playwright per annunci cffi-blocked
-
-**Descrizione**
-Quando un chunk viene skippato per cffi-block, gli annunci rimangono con status `pending` nel DB e vengono esclusi dai successivi run solo dopo che il loro status cambia. Non c'è un fallback automatico a Playwright per verificare quegli stessi annunci nello stesso run.
-
-**Impatto**
-- In v3: 6.998 annunci lasciati `pending` su 9.471 — rientreranno nel pool del prossimo run gonfiandolo ulteriormente
-- Effetto cumulativo: più run con coverage bassa → il pool pending cresce → i run successivi peggiorano
-
-**Mitigazione parziale**
-La flag `--selection-sample N` randomizza quali annunci vengono prioritizzati, evitando che gli stessi annunci vengano sempre skippati, ma non risolve il problema strutturale.
-
-**Stato:** aperto — nessun fallback implementato.
-
----
-
-### 4. Inflazione del pool pending dopo restore DB
-
-**Descrizione**
-Il restore del DB da backup (commit `0644f80`, 27 Mar) ha riportato in stato `pending` annunci che erano già stati verificati. Il pool da verificare in v3 è saltato a **9.471** (+35% rispetto ai run precedenti ~7.000).
-
-**Effetto combinato**
-Pool più grande × coverage bassa per cffi-block = impatto molto maggiore degli skip.
-
-**Stato:** conseguenza nota del restore — non evitabile retroattivamente. Per futuri restore: eseguire un run verify-sold dedicato subito dopo il restore, in orario mattutino.
-
----
-
-### 5. Sensibilità oraria non gestita
-
-**Descrizione**
-I run mattutini (10:00–13:00) ottengono sistematicamente coverage >75%. I run pomeridiani/serali (15:00+) subiscono blocchi cffi massivi. Il workflow CI è schedulato ogni 2 ore indipendentemente dall'orario.
-
-**Dati osservati**
-- v0 (10:09): 76.3%, v1 (12:11): 88.6%
-- v2 (15:24): 40.8%, v3 (21:48): 26.0%
-
-**Stato:** aperto — considerare di concentrare i run verify-sold nelle fasce 06:00–12:00.
-
----
-
-### 6. Timeout e 403 in pre-anti-burst (v0)
-
-**Descrizione**
-Prima dell'implementazione anti-burst, i blocchi Cloudflare si manifestavano come:
-- 841 HTTP 403 (12.0% del pool)
-- 698 timeout (wait completo prima del fallback)
-- 123 errori di rete
-
-Ogni timeout aspettava il timeout completo (`--nav-timeout-ms 7000`), sprecando ~81 minuti di runtime cumulativo solo in attese inutili.
-
-**Risoluzione parziale**
-Il cffi fast-path + anti-burst hanno eliminato quasi completamente i 403 e i timeout (v1: 0.5% e 179 timeout; v3: 0.18% e 0 timeout). Ma il problema si è spostato verso i cffi-block.
-
-**Stato:** parzialmente risolto — i timeout sono eliminati ma i cffi-block ora skippano silenziosamente senza Playwright fallback.
-
----
-
-### 7. Coverage warning senza fail del run
-
-**Descrizione**
-Il warning `Coverage bassa (26.0% < 70%)` viene loggato ma il run termina con exit code 0 e fa il commit del DB. Un run con 26% di coverage potrebbe mancare centinaia di annunci venduti nel frattempo.
-
-**Rischio**
-- Annunci venduti non marcati rimangono visibili nel viewer
-- Il fair value di Subito viene calcolato su un campione non rappresentativo
-
-**Stato:** aperto — valutare se forzare exit code ≠ 0 sotto una soglia critica (es. < 20%), o almeno sopprimere il commit automatico.
-
----
-
-### 8. Totale=31.501 vs ~33.600 — discrepanza post-restore
-
-**Descrizione**
-Dopo il restore del DB, il campo `totale` (tutti gli annunci in DB) è sceso da ~33.600 a 31.501. Questo indica che il backup usato (27 Mar) non conteneva ~2.100 annunci scrappati nelle settimane successive.
-
-**Stato:** dato acquisito — i 2.100 annunci mancanti verranno reintegrati man mano che Subito viene riscrappato nelle run successive.
-
----
-
-### Riepilogo priorità interventi
-
-| # | Problema | Impatto | Priorità |
-|---|----------|---------|----------|
-| 2 | Anti-burst pause fissa | Alto — spreca 10 min per run | P0 |
-| 3 | Nessun Playwright fallback per cffi-block | Alto — 74% skip in v3 | P0 |
-| 7 | Coverage warning senza fail | Medio — commit DB incompleto | P1 |
-| 5 | Sensibilità oraria non gestita | Medio — scheduling subottimale | P1 |
-| 1 | Cloudflare cffi-block strutturale | Alto — causa root | P2 (esterno) |
-| 4 | Pool inflazione post-restore | Basso — una tantum | P3 |
-
----
-
-## Troubleshooting
-
-| Problema | Soluzione |
-|----------|----------|
-| Playwright/Chrome non disponibile | `TRADER_PLAYWRIGHT_CHANNEL=chromium` |
-| API 401 Unauthorized | Hard refresh (`Cmd+Shift+R`), il token si rinnova automaticamente |
-| Config non valida | Avvio fallisce con `ConfigError` — controlla `config.toml` |
-| Porta occupata | Auto-increment automatico (porta+1), max 10 tentativi |
-| Vecchi DB da migrare | `python3 migrate_to_tracker.py` |
-| Dark mode non si attiva | Hard refresh per forzare il ricaricamento del CSS |
-| Telegram non invia | Verifica `bot_token` e `chat_id`, testa con `--test-telegram` |
-
-Per procedure operative e incident response: vedi `docs/runbook.md`.
+config.toml          configurazione fonti (senza segreti)
+.env.example         variabili richieste
+run.py               CLI
+server.py            API e viewer
+viewer/              interfaccia usata
+scrapers/            una fonte per modulo
+deploy/              systemd, nginx, backup, env del server
+docs/                runbook e routine
+tests/               pytest
+```
