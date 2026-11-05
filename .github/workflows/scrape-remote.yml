@@ -4,9 +4,10 @@ name: Scrape remoto (rebuy + subito)
 # qui gli IP GitHub funzionano per rebuy. Lo snapshot viene spedito al server
 # che lo ingerisce nel DB reale (lo scrape NON tocca il DB di GitHub).
 
+# DISMESSO (nov 2026): il server DigitalOcean non esiste più. rebuy e subito
+# ora girano sul Mac mini (launchd, deploy/install_launchd_mac.sh), che ha IP
+# residenziale e tiene il DB. Schedule rimosso; resta solo l'avvio manuale.
 on:
-  schedule:
-    - cron: '0 5,17 * * *'   # 05:00 e 17:00 UTC
   workflow_dispatch:
 
 concurrency:

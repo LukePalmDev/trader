@@ -52,18 +52,21 @@ user = "root"
 exec = "deploy/auto_deploy.sh"
 interval = "5min"
 
-# --- Job su IP residenziale/non bloccato (non systemd) ---
+# --- Job su IP residenziale (Mac mini, launchd) ---
+# Da nov 2026 TUTTI i job girano sul Mac mini (deploy/mac_job.sh, installati da
+# deploy/install_launchd_mac.sh). Le voci host="server" sopra restano come
+# riferimento per un eventuale ritorno su un server Linux (systemd).
 [jobs.scrape-rebuy]
-description = "Scrape rebuy (IP datacenter non bloccato)"
-host = "github"
-schedule = "cron 0 5,17 * * * (.github/workflows/scrape-remote.yml)"
+description = "Scrape rebuy (IP residenziale)"
+host = "mac"
+schedule = "launchd 07:00 (in scrape-fonti) + 18:00 (deploy/mac_job.sh scrape-rebuy)"
 
 [jobs.scrape-subito]
 description = "Scrape Subito annunci (IP residenziale)"
 host = "mac"
-schedule = "launchd ogni 6h (deploy/residential_scrape.sh subito,gamelife)"
+schedule = "launchd 04,10,16,22:00 (deploy/mac_job.sh scrape-subito)"
 
 [jobs.scrape-gamelife]
 description = "Scrape GameLife (IP residenziale)"
 host = "mac"
-schedule = "launchd ogni 6h (deploy/residential_scrape.sh subito,gamelife)"
+schedule = "launchd 04,10,16,22:00 con subito (deploy/mac_job.sh scrape-subito)"

@@ -56,3 +56,16 @@ Lo scraping NON gira più su GitHub Actions (workflow archiviati in `STORICI3GIU
 - Ripartizione scrape: rebuy → GitHub Actions; subito+gamelife → Mac residenziale (launchd, blocco IP datacenter); gamepeople+gameshock+cex+ebay → server.
 - Stati: 🟢 ok · 🟠 warn/non recente · 🔴 fallimento reale (crash/exit-code) · ⚪ sconosciuto.
 - File sul server: `/var/log/trader/*.log`; backend in `log_status.py`, endpoint in `server.py`.
+
+## 9) Mac mini (produzione da nov 2026)
+Il server DigitalOcean è dismesso: trader gira sul Mac mini in `~/trader`
+(venv `.venv`, DB `tracker.db`, segreti in `.env`, mai in git).
+- Installa/aggiorna i job: `deploy/install_launchd_mac.sh` (LaunchAgent `org.byluke.trader.*`
+  in `~/Library/LaunchAgents`). Rimuovi: `deploy/install_launchd_mac.sh --uninstall`.
+- Orari (ora locale): scrape-fonti 07:00 (gamepeople, gameshock, cex, gamelife, rebuy),
+  scrape-rebuy 18:00, scrape-subito 04/10/16/22:00 (subito + gamelife), scrape-ebay 00:30,
+  ai-cascade 05/11/17/23:10 (solo se `OPENAI_API_KEY` è nel `.env`), verify-sold 11/14:00,
+  backup 03:15 in `~/trader/backups` (14 giorni), watchdog ogni 3h, viewer sempre attivo su 127.0.0.1:8080.
+- Log: `~/trader/logs/<job>.log`. Stato: `launchctl list | grep org.byluke.trader`.
+- Lancio a mano: `deploy/mac_job.sh scrape-subito` (un job pesante alla volta, lock in `runtime/`).
+- Il Mac deve restare acceso con l'utente loggato (LaunchAgent utente).
