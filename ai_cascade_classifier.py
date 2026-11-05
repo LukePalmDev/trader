@@ -222,6 +222,24 @@ def _row_to_user_message(row: sqlite3.Row | dict[str, Any]) -> str:
 
 
 def _post_openai(model: str, row: sqlite3.Row | dict[str, Any], api_key: str) -> tuple[dict[str, Any], dict[str, Any]]:
+    payload: dict[str, Any] = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": _system_prompt()},
+            {"role": "user", "content": _row_to_user_message(row)},
+        ],
+        "response_format": {
+            "type": "json_schema",
+            "json_schema": _schema(),
+        },
+    }
+    # Thinking: OPENAI_REASONING_EFFORT se impostato; con Ollama locale (:11434)
+    # default "none", altrimenti gemma4/qwen3.x ragionano e sforano il timeout.
+    reasoning_effort = os.environ.get("OPENAI_REASONING_EFFORT", "").strip()
+    if not reasoning_effort and ":11434" in _chat_completions_url():
+        reasoning_effort = "none"
+    if reasoning_effort:
+        payload["reasoning_effort"] = reasoning_effort
     started = time.monotonic()
     response = requests.post(
         _chat_completions_url(),
@@ -229,17 +247,7 @@ def _post_openai(model: str, row: sqlite3.Row | dict[str, Any], api_key: str) ->
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
         },
-        json={
-            "model": model,
-            "messages": [
-                {"role": "system", "content": _system_prompt()},
-                {"role": "user", "content": _row_to_user_message(row)},
-            ],
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": _schema(),
-            },
-        },
+        json=payload,
         timeout=60,
     )
     latency_ms = int((time.monotonic() - started) * 1000)
